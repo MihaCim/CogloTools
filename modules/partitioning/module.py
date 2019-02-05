@@ -5,5 +5,5 @@ class Partitioning:
         pass
 
     @abstractmethod
-    def partition(self, data):
+    def partition(self, adj_spmat):
         pass
