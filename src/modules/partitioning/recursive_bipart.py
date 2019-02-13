@@ -15,25 +15,47 @@ class RecursiveBipart(Partitioning):
 
     def partition(self, adj_spmat, k, balance_eps):
         nvert = adj_spmat.get_shape()[0]
-        return self._partition(adj_spmat, range(nvert), k, balance_eps)
+        return self._partition(
+            adj_spmat,
+            k,
+            balance_eps,
+            range(nvert),
+            k
+        )
 
-    def _partition(self, adj_spmat, vert_ids, k, balance_eps):
-        if k == 1:
+    def _partition(self, adj_spmat, k_global, eps_global, vert_ids, k_level):
+        if k_level == 1:
             return [vert_ids]
 
-        bi_part = self._bipartition(adj_spmat, vert_ids, balance_eps)
+        n_global = adj_spmat.get_shape()[0]
+        n_level = len(vert_ids)
+        eps_level = 1.0 - 2.0*n_global*(1.0 - eps_global) / (k_global*n_level)
 
-        partN_large = 0 if len(bi_part[0]) >= len(bi_part[1]) else 1
-        partN_small = 1 - partN_large
+        vert_ids1, vert_ids2 = self._bipartition(adj_spmat, vert_ids, eps_level)
 
-        vert_ids_large = bi_part[partN_large]
-        vert_ids_small = bi_part[partN_small]
+        vert_ids_large = vert_ids1 if len(vert_ids1) >= len(vert_ids2) else vert_ids2
+        vert_ids_small = vert_ids2 if len(vert_ids1) >= len(vert_ids2) else vert_ids1
 
-        k_large = ceil(0.5*k)
-        k_small = floor(0.5*k)
+        n_large = len(vert_ids_large)
+        n_small = len(vert_ids_small)
 
-        part_large = self._partition(adj_spmat, vert_ids_large, k_large, balance_eps)
-        part_small = self._partition(adj_spmat, vert_ids_small, k_small, balance_eps)
+        k_large = min(ceil(k_level * float(n_large) / float(n_level)), k_level-1)
+        k_small = max(floor(k_level * float(n_small) / float(n_level)), 1)
+
+        part_large = self._partition(
+            adj_spmat,
+            k_global,
+            eps_global,
+            vert_ids_large,
+            k_large
+        )
+        part_small = self._partition(
+            adj_spmat,
+            k_global,
+            eps_global,
+            vert_ids_small,
+            k_small
+        )
 
         return part_large + part_small
 
@@ -78,7 +100,7 @@ class RecursiveBipart(Partitioning):
 
         assert minN != -1
         threshold = thresholds[minN]
-        partitions = [[], []]
+        partitions = ([], [])
         for valN, val in enumerate(eigvec2):
             vertex_id = vert_ids[valN]
             if val < threshold:
