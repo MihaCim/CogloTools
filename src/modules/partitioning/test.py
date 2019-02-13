@@ -1,6 +1,7 @@
 from scipy.sparse import csr_matrix
 
 from modules.partitioning.recursive_bipart import RecursiveBipart
+from modules.partitioning.utils import cut_size_undirected
 
 A = csr_matrix([
     [0, 2, 4, 0, 0, 0],
@@ -13,10 +14,35 @@ A = csr_matrix([
 
 part = RecursiveBipart()
 partitions = part.partition(A, 2, balance_eps=0.1)
-
-cut_size = RecursiveBipart.cut_size(A, partitions)
-assert cut_size == 1
+cut = cut_size_undirected(A, partitions)
 
 print("partitions: " + str(partitions))
+print("cut size: " + str(cut))
+
+assert cut == 1
+
+A = csr_matrix([
+    [0, 1, 2, 0, 0, 0, 0, 0, 0, 1, 0],
+    [1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+    [2, 1, 0, .5, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, .5, 0, 2, 3, 0, 0, 0, 0, 0],
+    [0, 0, 0, 2, 0, 4, 0, 0, 0, 0, 0],
+    [0, 0, 0, 3, 4, 0, 1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 1, 0, 2, 0, 3, 0],
+    [0, 0, 0, 0, 0, 0, 2, 0, 4, 0, 3],
+    [0, 0, 0, 0, 0, 0, 0, 4, 0, 2, 3],
+    [1, 0, 0, 0, 0, 0, 3, 0, 2, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 3, 3, 0, 0],
+])
+
+part = RecursiveBipart()
+partitions = part.partition(A, 3, balance_eps=0.1)
+
+cut = cut_size_undirected(A, partitions)
+
+print("partitions: " + str(partitions))
+print("cut size: " + str(cut))
+
+assert cut == 2.5
 
 # TODO: convert to unit test
