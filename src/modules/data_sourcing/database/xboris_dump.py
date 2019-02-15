@@ -15,7 +15,7 @@ class XBorISEvent(base):
     data = Column(JSON)
 
 
-class PostgresConnector():
+class PostgresConnector:
 
     def __init__(self, username="postgres", password="", host="127.0.0.1", port=5432, db_name="postgres"):
         user = username
@@ -45,7 +45,7 @@ class PostgresConnector():
     def retrieve_ids(self, age=0):
         '''
         Load recent event IDs from DB
-        :param age: maximum age of recrods to retrieve, unix epoch
+        :param age: maximum age of records to retrieve, unix epoch
         :return: List of event IDs
         '''
         query = select([XBorISEvent.event_id]).select_from(XBorISEvent).where(XBorISEvent.timestamp > age)
