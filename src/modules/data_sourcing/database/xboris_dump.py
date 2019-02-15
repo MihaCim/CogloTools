@@ -33,12 +33,21 @@ class PostgresConnector():
 
         base.metadata.create_all(self.db)
 
-    def store(self, dat):
-        for d in dat:
+    def store(self, records):
+        '''
+        Stores a list of event records
+        :param records: List of records
+        '''
+        for d in records:
             self.session.add(d)
         self.session.commit()
 
     def retrieve_ids(self, age=0):
+        '''
+        Load recent event IDs from DB
+        :param age: maximum age of recrods to retrieve, unix epoch
+        :return: List of event IDs
+        '''
         query = select([XBorISEvent.event_id]).select_from(XBorISEvent).where(XBorISEvent.timestamp > age)
         data = self.db.execute(query)
 

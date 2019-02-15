@@ -20,13 +20,18 @@ class PS_Grabber:
             200: "OK", 401: "AuthenticationError", 404: "NoData", 405: "InvalidArguments", 500: "ServerError"
         }
         self.existing_event_ids = []
-        self.load_cache()
+        self._load_id_cache()
 
 
 
     def schedule(self, period=10): #TODO change period
-        self._scrape()
-        #schedule.every(period).seconds.do(self._scrape)
+        '''
+        Initializes periodical web source polling
+        :param period: How often to poll data (minutes), default is 10
+        '''
+        #self._scrape()
+
+        schedule.every(period).minutes.do(self._scrape)
 
     def _scrape(self):
         try:
@@ -54,7 +59,10 @@ class PS_Grabber:
         except Exception as e:
             self._logger.error(e)
 
-    def load_cache(self):
+    def _load_id_cache(self):
+        '''
+        Loads recent (24 hours) event IDs from database for duplicate detection
+        '''
         age = time.time() - 60*60*24 #last 24 hours
 
         self.existing_event_ids = self.db_connector.retrieve_ids(age=age)
