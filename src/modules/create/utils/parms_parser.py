@@ -14,10 +14,14 @@ class ParmsParser:
         # program parameters
         parser = argparse.ArgumentParser(description='All in one script for camp data scraping, parsing and processing')
         #required=True,
+        parser.add_argument('-cf', '--config-file',  help='Script configuration filepath')
+
 
         parser.add_argument('-Eo2p', '--export_osm2postgres', action='store_true',
-                            help='OSM data to nextPin')
+                            help='OSM data')
 
+        parser.add_argument('-ipo', '--import_postalOfices', action='store_true',
+                            help='import postall offices')
         if args is None:
             self.args = parser.parse_args()
         else:
@@ -26,7 +30,6 @@ class ParmsParser:
     def read_config(self, conf_file):
         parser = ConfigParser()
         parser.read(conf_file)
-        import json
 
 
 

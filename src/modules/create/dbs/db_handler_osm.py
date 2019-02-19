@@ -12,8 +12,19 @@ class db_handler_osm:
 
 
 
-
-    """
+    def create_database(self):
+        cur = self.connection_osm.cursor()
+        select = '''
+            DROP TABLE IF EXISTS public.post_offices;
+            CREATE TABLE public.post_offices
+           (pe character varying(2),
+            postna_stevilka bigint,
+            gemoetry public.geometry,
+            vrsta_posta character varying(30),
+            vrsta_poste2 character varying(30) )'''
+        cur.execute(select,)
+        self.connection_osm.commit()
+        """
     def create_table(self):
         cur = self.connection_osm.cursor()
         select = " create table updated_table( " \
