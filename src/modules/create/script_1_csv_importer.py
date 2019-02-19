@@ -16,10 +16,13 @@ class csv_importer:
             csv_reader = csv.reader(csv_file, delimiter=',')
             line_count = 0
             for row in csv_reader:
-                if line_count == 0:
-                    print(f'Column names are {", ".join(row)}')
-                    line_count += 1
-                else:
-                    print(f'\t{row[0]} works in the {row[1]} department, and was born in {row[2]}.')
-                    line_count += 1
+
+                print(row[1]+", "+row[2]+", "+row[5]+", "+row[12]+", "+row[22]+", "+row[23])
+                try:
+                    lat = float(row[22].replace(",","."))
+                    lon = float(row[23].replace(",","."))
+                    self.db_handler_osm.insert(row[0], row[1], lat, lon, row[5], row[6])
+                except ValueError:
+                    print("Not a float")
+
             print(f'Processed {line_count} lines.')
