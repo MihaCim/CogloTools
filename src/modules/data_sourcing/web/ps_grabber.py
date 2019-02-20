@@ -72,10 +72,10 @@ if __name__ == '__main__':
 
     logging.basicConfig(level=logging.DEBUG)
 
-    db = PostgresConnector(host="localhost")
-    xb = PS_Grabber(db)
+    db_conn = PostgresConnector(host="localhost")
+    poller = PS_Grabber(db_conn)
 
-    xb.schedule()
+    poller.schedule(period=30)
 
     while True:
         time.sleep(30)
