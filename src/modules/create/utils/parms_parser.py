@@ -22,6 +22,9 @@ class ParmsParser:
 
         parser.add_argument('-ipo', '--import_postalOfices', action='store_true',
                             help='import postall offices')
+
+        parser.add_argument('-ssp', '--search_shortest_path', action='store_true',
+                            help='import postall offices')
         if args is None:
             self.args = parser.parse_args()
         else:

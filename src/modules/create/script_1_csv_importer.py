@@ -19,8 +19,8 @@ class csv_importer:
 
                 print(row[1]+", "+row[2]+", "+row[5]+", "+row[12]+", "+row[22]+", "+row[23])
                 try:
-                    lat = float(row[22].replace(",","."))
-                    lon = float(row[23].replace(",","."))
+                    lon = float(row[22].replace(",","."))
+                    lat = float(row[23].replace(",","."))
                     self.db_handler_osm.insert(row[0], row[1], lat, lon, row[5], row[6])
                 except ValueError:
                     print("Not a float")
