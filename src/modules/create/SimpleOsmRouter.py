@@ -33,7 +33,7 @@ class DictHandler(sax.handler.ContentHandler):
         # searching for nodes and store all relevant information
         if name == "node":
             self.aktiv = "node"
-            self.db.addNode(attrs["id"], node(attrs["id"], attrs["lat"], attrs["lon"]))
+            self.db.addNode(attrs["id"], node(attrs["id"], float(attrs["lat"]), float(attrs["lon"])))
         # searching for ways
         if name == "way":
             print("<----------------- A new Way Starts here ---------------------------------->")
