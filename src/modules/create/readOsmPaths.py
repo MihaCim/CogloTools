@@ -14,6 +14,8 @@ ways = []
 class OsmHandler(xml.sax.ContentHandler):
     def __init__(self):
         self.tmpWays = []
+        self.roads = {"motorway", "trunk", "primary", "secondary", "teritary", "unclassified", "residential",
+                      "motorway_link", "trunk_link", "primary_link", "secondary_link", "teritary_link"}
     def startElement(self, name, attrs):
         if name == "node":
             node = Node()
@@ -26,6 +28,9 @@ class OsmHandler(xml.sax.ContentHandler):
                 print(key + ", " + attrs[key])
         if name == "nd":
             self.tmpWays.append(attrs["ref"])
+        if name == "tag":
+            if attrs["k"] == "tag" and attrs["v"] in self.roads:
+                self.tmpWays = []
 
 
     def endElement(self, name):
@@ -274,7 +279,7 @@ if (__name__ == "__main__"):
         tmpD = edgesDict[way.ids[0]]
         tmpD[way.ids[1]] = {"weight": way.distance}
         edgesDict[way.ids[0]] = tmpD
-    search_near_posts(nodesDict, edgesDict, "4862147915")
+    search_near_posts(nodesDict, edgesDict, "4919418982")
     print(nodesDict)
     print(edgesDict)
     #6326558776
