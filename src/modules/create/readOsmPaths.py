@@ -1,17 +1,19 @@
 #!/usr/bin/python3
-
+import sys
 import xml.sax
 import networkx as nx
 import matplotlib.pyplot as plt
 import csv
-from math import radians, cos, sin, asin, sqrt
+from math import radians, cos, sin, asin, sqrt, atan2
+import math
 
 nodes = {}
 ways = []
 
 
 class OsmHandler(xml.sax.ContentHandler):
-
+    def __init__(self):
+        self.tmpWays = []
     def startElement(self, name, attrs):
         if name == "node":
             node = Node()
@@ -19,15 +21,24 @@ class OsmHandler(xml.sax.ContentHandler):
                 node.addNode(attrs["id"], float(attrs["lat"]), float(attrs["lon"]))
                 nodes[attrs["id"]] = node
         if name == "way":
-            self.way = Way()
+            self.tmpWays = []
             for key in dict(attrs):
                 print(key + ", " + attrs[key])
         if name == "nd":
-            self.way.addNode(attrs["ref"])
+            self.tmpWays.append(attrs["ref"])
+
 
     def endElement(self, name):
         if name == "way":
-            ways.append(self.way)
+            for i in range(1, len(self.tmpWays)):
+                way = Way()
+                way.addNode(self.tmpWays[i - 1])
+                way.addNode(self.tmpWays[i])
+                node1 = nodes[self.tmpWays[i - 1]]
+                node2 = nodes[self.tmpWays[i]]
+                distance = calcDistance(node1.lat, node1.lon, node2.lat, node2.lon)
+                way.addDistance(distance)
+                ways.append(way)
 
 
     #def characters(self, data):
@@ -64,6 +75,10 @@ class Way:
 
     def getAllNodes(self):
         return self.ids
+
+    def addDistance(self, distance):
+        self.distance = distance
+
 
 class Post:
     def __init__(self, address, latitude, longitude):
@@ -111,17 +126,17 @@ def calcDistance(lat1, lon1, lat2, lon2):
     on the earth (specified in decimal degrees)
     """
     # convert decimal degrees to radians
+    R = 6373.0
     lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
 
-    # haversine formula
     dlon = lon2 - lon1
     dlat = lat2 - lat1
-    a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
-    c = 2 * asin(sqrt(a))
 
-    # 6367 km is the radius of the Earth
-    km = 6367 * c
-    return km
+    a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+    distance = R * c
+    return distance
 
 
 def readPostalOffices():
@@ -138,10 +153,10 @@ def readPostalOffices():
     return posts
 
 def alignNodesAndPosts(posts, nodes):
-    import sys
-    minDist = sys.maxsize
-    nodeKey = ""
+
     for post in posts:
+        minDist = sys.maxsize
+        nodeKey = ""
         for key, node in nodes.items():
             tmpDist = calcDistance(post.latitude, post.longitude, node.lat, node.lon)
             if minDist > tmpDist:
@@ -149,9 +164,86 @@ def alignNodesAndPosts(posts, nodes):
                 nodeKey = key
 
         tmpNode = nodes[nodeKey]
-        tmpNode.addPost(post.address)
-        nodes[nodeKey] = tmpNode
+        if calcDistance(post.latitude, post.longitude, tmpNode.lat, tmpNode.lon) < 0.5:
+            print(nodeKey)
+            print(post.address)
+            tmpNode.addPost(post.address)
+            nodes[nodeKey] = tmpNode
     return nodes
+
+def search_near_posts(nodes, edges, start_nodes):
+    fronta = [(start_nodes, 0, [])]
+    visited_nodes = set()
+    results = []
+
+    while len(fronta) != 0:
+        current_element = 0
+        current_sdistance = math.inf
+        current_visited_points = []
+        previous_element = 0
+        for (index, distance, visited_node) in fronta:
+            Neigbours = edges[index]  # get neighbors od te tocke
+            for neigbour in Neigbours:
+                if ((distance + Neigbours[neigbour]["weight"]) < current_sdistance) and (neigbour not in visited_nodes):
+                    current_sdistance = distance + Neigbours[neigbour]["weight"]
+                    current_element = neigbour
+                    current_visited_points = list(visited_node)
+                    previous_element = index
+        print(current_element)
+        print(current_sdistance)
+        print(current_visited_points)
+        print(previous_element)
+        if nodes[current_element].get("post"):
+            current_visited_points.append(current_element)
+            print(current_visited_points)
+            if len(current_visited_points) == 1:
+                results.append(current_element)
+        fronta.append((current_element, current_sdistance, current_visited_points))
+        print(fronta)
+        st = 0
+        visited_nodes.add(current_element)
+        visited_nodes.add(start_nodes)
+        # deleting procedure id should be much more simple
+
+        d = []
+        i = 0
+        for (index, distance, vn) in fronta:
+            st = 0
+            for n in edges[index]:
+                for visited_node in visited_nodes:
+                    if n == visited_node:
+                        st = st + 1
+                        ##break;
+            if st == len(edges[index]):
+                d.append(i)
+            i = i + 1
+
+        for index in sorted(d, reverse=True):
+            del fronta[index]
+            print("remove: "+str(index))
+
+
+        print("visited:"+str(visited_nodes))
+        print("results:"+str(results))
+        #import time
+        #time.sleep(2)
+    print("aa")
+    print(results)
+
+
+
+def writeDict(dict):
+    import json
+    json = json.dumps(dict)
+    f = open("dict.json", "w")
+    f.write(json)
+    f.close()
+def readDict(dict):
+    import json
+    f = open("dict.txt", "w")
+    f.write(str(dict))
+    f.close()
+
 
 if (__name__ == "__main__"):
     # create an XMLReader
@@ -168,8 +260,28 @@ if (__name__ == "__main__"):
     print(len(nodes))
     print(len(ways))
     posts = readPostalOffices()
-    nodes = alignNodesAndPosts(posts, nodes)
-    print(nodes)
+    nodesC = alignNodesAndPosts(posts, nodes)
+
+    nodesDict = {}
+    for key, node in nodes.items():
+        nodesDict[node.id] = {"post":node.post}
+
+    edgesDict = {}
+    for key, node in nodes.items():
+        edgesDict[node.id] = {}
+    for way in ways:
+
+        tmpD = edgesDict[way.ids[0]]
+        tmpD[way.ids[1]] = {"weight": way.distance}
+        edgesDict[way.ids[0]] = tmpD
+    search_near_posts(nodesDict, edgesDict, "4862147915")
+    print(nodesDict)
+    print(edgesDict)
+    #6326558776
+    #Vir Gubčeva ulica 12
+
+
+
     #drawGraph()
 
 
