@@ -14,36 +14,42 @@ ways = []
 class OsmHandler(xml.sax.ContentHandler):
     def __init__(self):
         self.tmpWays = []
-        self.roads = {"motorway", "trunk", "primary", "secondary", "teritary", "unclassified", "residential",
-                      "motorway_link", "trunk_link", "primary_link", "secondary_link", "teritary_link"}
+        self.tags = {}
+        self.roads = {"motorway", "trunk", "primary", "secondary", "tertiary", "unclassified", "residential", "service",
+                 "living_street", "motorway_link", "trunk_link", "primary_link", "secondary_link", "tertiary_link", "motorway_junction"}
     def startElement(self, name, attrs):
         if name == "node":
             node = Node()
             if "id" in attrs and "lat" in attrs and "lon" in attrs:
-                node.addNode(attrs["id"], float(attrs["lat"]), float(attrs["lon"]))
-                nodes[attrs["id"]] = node
+                node.addNode(int(attrs["id"]), float(attrs["lat"]), float(attrs["lon"]))
+                nodes[int(attrs["id"])] = node
         if name == "way":
             self.tmpWays = []
-            for key in dict(attrs):
-                print(key + ", " + attrs[key])
+            self.tags = {}
+            #for key in dict(attrs):
+            #    print(key + ", " + attrs[key])
         if name == "nd":
             self.tmpWays.append(attrs["ref"])
         if name == "tag":
-            if attrs["k"] == "tag" and attrs["v"] in self.roads:
-                self.tmpWays = []
+            self.tags[attrs["k"]] = attrs["v"]
 
 
     def endElement(self, name):
         if name == "way":
-            for i in range(1, len(self.tmpWays)):
-                way = Way()
-                way.addNode(self.tmpWays[i - 1])
-                way.addNode(self.tmpWays[i])
-                node1 = nodes[self.tmpWays[i - 1]]
-                node2 = nodes[self.tmpWays[i]]
-                distance = calcDistance(node1.lat, node1.lon, node2.lat, node2.lon)
-                way.addDistance(distance)
-                ways.append(way)
+            if "highway" in self.tags and self.tags["highway"] in self.roads:
+                for i in range(1, len(self.tmpWays)):
+                    distance = 0
+                    way = Way()
+                    node1 = nodes[int(self.tmpWays[i - 1])]
+                    node2 = nodes[int(self.tmpWays[i])]
+                    way.addPath(int(self.tmpWays[i - 1]), int(self.tmpWays[i]))
+                    distance = calcDistance(node1.lat, node1.lon, node2.lat, node2.lon)
+                    way.addDistance(distance)
+                    ways.append(way)
+                self.tags = {}
+                self.tmpWays = {}
+          #  else:
+          #      print(self.tags)
 
 
     #def characters(self, data):
@@ -70,10 +76,10 @@ class Node:
 class Way:
 
     def __init__(self):
-        self.ids = []
+        self.ids = ()
 
-    def addNode(self, id):
-        self.ids.append(id)
+    def addPath(self, id1, id2):
+        self.ids = (id1, id2)
 
     def getNodes(self):
         return (self.ids[0], self.ids[len(self.ids)-1])
@@ -91,29 +97,30 @@ class Post:
         self.latitude = latitude
         self.longitude = longitude
 
-def drawGraph():
+def drawGraph(waysL):
     G = nx.Graph()
-    color_map = []
+    #color_map = []
 
-    for edge in ways:
+    pos = {}
+    for edge in waysL:
         l= edge.getAllNodes()
-        if(len(l) > 1):
-            G.add_node(l[0])
-            for i in range(1, len(l)-1):
-                G.add_edge(l[i-1], l[i], weight=1)
-                G.add_node(l[i])
+        G.add_edge(l[0], l[1], weight=edge.distance)
+        pos[l[0]] = (nodes[l[0]],nodes[l[1]])
 
     # use one of the edge properties to control line thickness
     edgewidth = [d['weight'] for (u, v, d) in G.edges(data=True)]
 
+    d = nx.degree(G)
+    pos = nx.spring_layout(G, iterations=50)
     # rendering
-    plt.figure(1)
+    plt.figure(figsize=(8,8))
     plt.axis('off')
-    pos = nx.spring_layout(G)
-    nx.draw_networkx_nodes(G, pos,
-                           node_color=color_map,
-                           alpha=0.8)
-    nx.draw_networkx_edges(G, pos, width=edgewidth, )
+
+    #nx.draw_networkx_nodes(G, pos, node_size=1, nodelist=d._nodes.keys())
+    nx.draw(G, nodelist=d._nodes.keys(), node_size = 1, pos = pos)
+    #nx.draw_networkx_labels(G, pos)
+    #nx.draw_networkx_edges(G, pos, width=edgewidth, )
+    plt.savefig("Graph.png", format="PNG")
     plt.show()
 
 def isNumber(str):
@@ -157,24 +164,25 @@ def readPostalOffices():
 
     return posts
 
-def alignNodesAndPosts(posts, nodes):
+def alignNodesAndPosts(posts, nodesL):
 
     for post in posts:
         minDist = sys.maxsize
         nodeKey = ""
-        for key, node in nodes.items():
+        for key, node in nodesL.items():
             tmpDist = calcDistance(post.latitude, post.longitude, node.lat, node.lon)
             if minDist > tmpDist:
                 minDist = tmpDist
                 nodeKey = key
 
-        tmpNode = nodes[nodeKey]
-        if calcDistance(post.latitude, post.longitude, tmpNode.lat, tmpNode.lon) < 0.5:
+        tmpNode = nodesL[nodeKey]
+        if calcDistance(post.latitude, post.longitude, tmpNode.lat, tmpNode.lon) < 1:
             print(nodeKey)
             print(post.address)
+            print(calcDistance(post.latitude, post.longitude, tmpNode.lat, tmpNode.lon))
             tmpNode.addPost(post.address)
-            nodes[nodeKey] = tmpNode
-    return nodes
+            nodesL[nodeKey] = tmpNode
+    return nodesL
 
 def search_near_posts(nodes, edges, start_nodes):
     fronta = [(start_nodes, 0, [])]
@@ -230,7 +238,7 @@ def search_near_posts(nodes, edges, start_nodes):
 
         print("visited:"+str(visited_nodes))
         print("results:"+str(results))
-        #import time
+        import time
         #time.sleep(2)
     print("aa")
     print(results)
@@ -260,34 +268,41 @@ if (__name__ == "__main__"):
     Handler = OsmHandler()
     parser.setContentHandler(Handler)
 
-    parser.parse("stahovica.osm")
+    parser.parse("data/kamnik_export.osm")
 
     print(len(nodes))
     print(len(ways))
     posts = readPostalOffices()
-    nodesC = alignNodesAndPosts(posts, nodes)
+    nodesFiltered = {}
+    for way in ways:
+        for id in way.ids:
+            nodesFiltered[id] = nodes[id]
+
+
+    nodesC = alignNodesAndPosts(posts, nodesFiltered)
 
     nodesDict = {}
-    for key, node in nodes.items():
+    edgesDict = {}
+
+    for key, node in nodesC.items():
         nodesDict[node.id] = {"post":node.post}
 
-    edgesDict = {}
-    for key, node in nodes.items():
+    for key, node in nodesC.items():
         edgesDict[node.id] = {}
-    for way in ways:
 
+    for way in ways:
         tmpD = edgesDict[way.ids[0]]
         tmpD[way.ids[1]] = {"weight": way.distance}
         edgesDict[way.ids[0]] = tmpD
-    search_near_posts(nodesDict, edgesDict, "4919418982")
-    print(nodesDict)
-    print(edgesDict)
+    print(len(nodes))
+    print(len(nodesFiltered))
+    print(len(edgesDict))
+    search_near_posts(nodesDict, edgesDict, 307816993)
     #6326558776
     #Vir Gubčeva ulica 12
 
 
-
-    #drawGraph()
+    drawGraph(ways)
 
 
     

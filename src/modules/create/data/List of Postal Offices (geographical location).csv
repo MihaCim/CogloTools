@@ -551,3 +551,6 @@ MB-9,9710,Grad,9263,Kuzma,pogodbena,pogodbena,1/ 7/ 2015,2/ 1/ 2016,,,,pogodbena
 MB-9,9710,Grad,9264,Grad,pogodbena,pogodbena,,1/ 9/ 2016,,,,pogodbena,Grad,Grad,186,B,179318,583609,184461,"46° 47' 55.8874""","16° 5' 25.8072""",46.7988576111111,16.090502,,,,,pogodbena
 MB-9,9710,Grad,9265,Bodonci,pogodbena,pogodbena,2/ 9/ 2013,3/ 5/ 2014,,,,pogodbena,Bodonci,Bodonci,7,,186014,583675,177995,"46° 44' 26.4785""","16° 5' 24.6846""",46.7406884722222,16.0901901666667,,,,5/3/2014,pogodbena
 MB-9,9710,Grad,9710,Grad,dostavna točka,#N/A,,,,,,,,,,,,,,,,,,,,,,
+Test,9710,Grad,9265,Test,pogodbena,pogodbena,2/ 9/ 2013,3/ 5/ 2014,,,,pogodbena,Test,Kamb bistrica 1,7,,186014,583675,177995,"46° 44' 26.4785""","16° 5' 24.6846""",46.273332,14.609340,,,,5/3/2014,pogodbena
+Test,9710,Grad,9265,Test,pogodbena,pogodbena,2/ 9/ 2013,3/ 5/ 2014,,,,pogodbena,Test,Kamb bistrica 2,7,,186014,583675,177995,"46° 44' 26.4785""","16° 5' 24.6846""",46.312617,14.607175,,,,5/3/2014,pogodbena
+Test,9710,Grad,9265,Test,pogodbena,pogodbena,2/ 9/ 2013,3/ 5/ 2014,,,,pogodbena,Test,Kamb bistrica 3,7,,186014,583675,177995,"46° 44' 26.4785""","16° 5' 24.6846""",46.317840,14.600733,,,,5/3/2014,pogodbena
