@@ -268,7 +268,7 @@ if (__name__ == "__main__"):
     Handler = OsmHandler()
     parser.setContentHandler(Handler)
 
-    parser.parse("data/kamnik_export.osm")
+    parser.parse("data/test_export.osm")
 
     print(len(nodes))
     print(len(ways))
@@ -294,10 +294,11 @@ if (__name__ == "__main__"):
         tmpD = edgesDict[way.ids[0]]
         tmpD[way.ids[1]] = {"weight": way.distance}
         edgesDict[way.ids[0]] = tmpD
+
     print(len(nodes))
     print(len(nodesFiltered))
     print(len(edgesDict))
-    search_near_posts(nodesDict, edgesDict, 307816993)
+    search_near_posts(nodesDict, edgesDict, 2244725770)
     #6326558776
     #Vir Gubčeva ulica 12
 
