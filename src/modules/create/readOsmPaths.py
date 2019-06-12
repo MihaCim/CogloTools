@@ -70,22 +70,21 @@ class PostHandler:
 
 
 
-def drawGraph(algPostalWays, H, nodes):
+def drawGraph(algPostalWays, H, nodes, postalNodes):
     G = nx.Graph()
-    n = set()
-
     li = []
+
+    for posts in postalNodes:
+        li.append(posts)
+        G.add_node(posts, pos=(nodes[posts].lat, nodes[posts].lon))
+
     for edge in algPostalWays:
         l= edge.getAllNodes()
-        if l[0] not in n:
-            G.add_node(l[0], pos=(nodes[l[0]].lat, nodes[l[0]].lon))
-        if l[1] not in n:
-            G.add_node(l[1], pos=(nodes[l[1]].lat, nodes[l[1]].lon))
+        ##if l[0] not in n:
+         #   G.add_node(l[0], pos=(nodes[l[0]].lat, nodes[l[0]].lon))
+        #if l[1] not in n:
+        #    G.add_node(l[1], pos=(nodes[l[1]].lat, nodes[l[1]].lon))
         G.add_edge(l[0], l[1], weight=edge.distance)
-        n.add(l[0])
-        n.add(l[1])
-        li.append(l[0])
-        li.append(l[1])
 
         import matplotlib.pyplot as plt
 
@@ -93,8 +92,8 @@ def drawGraph(algPostalWays, H, nodes):
         #plt.figure(1)
         pos = nx.get_node_attributes(H, 'pos')
         nx.draw(H, pos=pos, node_size=1)
-        nx.draw_networkx_nodes(G, pos, nodelist=l, node_color='g')
-        nx.draw_networkx_edges(G, pos, nodelist=l, node_color='g')
+        nx.draw_networkx_nodes(G, pos, nodelist=li, node_color='g')
+        nx.draw_networkx_edges(G, pos, nodelist=li, node_color='g')
 
         #plt.figure(2)
         #nx.draw(G)
@@ -227,16 +226,17 @@ if (__name__ == "__main__"):
 
 
     algPostalWays = []
-    for posts in postsNodes:
-        results = search_near_posts(nodesDict, edgesDict, posts)
-        for result in results:
+    #for posts in postsNodes:
+    posts = postsNodes[0]
+    results = search_near_posts(nodesDict, edgesDict, posts)
+    for result in results:
             tmp = parseOsm.Way()
             tmp.addPath(result, posts)
             tmp.addDistance(utils.calcDistance(roadNodes[result].lat, roadNodes[result].lon, roadNodes[posts].lat, roadNodes[posts].lon))
             algPostalWays.append(tmp)
 
 
-    drawGraph(algPostalWays, G, roadNodesAnotated)
+    drawGraph(algPostalWays, G, roadNodesAnotated, postsNodes)
 
 
     

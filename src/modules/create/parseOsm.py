@@ -61,7 +61,7 @@ class OsmHandler(xml.sax.ContentHandler):
         parser.setContentHandler(handler)
 
 
-        parser.parse("data/stahovica.osm")
+        parser.parse("data/kamnik_export.osm")
 
         self.ways = handler.ways
         self.nodes = handler.nodes
