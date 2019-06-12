@@ -150,7 +150,8 @@ def search_near_posts(nodes, edges, start_nodes):
         print(current_sdistance)
         print(current_visited_points)
         print(previous_element)
-        if nodes[current_element].get("post"):
+
+        if current_element in nodes and nodes[current_element].get("post"):
             current_visited_points.append(current_element)
             print(current_visited_points)
             if len(current_visited_points) == 1:
@@ -197,7 +198,12 @@ if (__name__ == "__main__"):
     roadNodes = osmHandler.nodes
     roadWays = osmHandler.ways
     postHandler = PostHandler()
-    (roadNodesAnotated, postsNodes) = postHandler.alignNodesAndPosts(roadNodes)
+
+    nodesFiltered = {}
+    for way in roadWays:
+        for id in way.ids:
+            nodesFiltered[id] = roadNodes[id]
+    (roadNodesAnotated, postsNodes) = postHandler.alignNodesAndPosts(nodesFiltered)
 
 
     nodesDict = {}
