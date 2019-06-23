@@ -3,3 +3,6 @@
 
 # Vim files
 .vimrc
+
+# Jetbrains files
+.idea
