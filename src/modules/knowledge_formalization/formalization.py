@@ -1,7 +1,7 @@
 import scipy
 import numpy as np
+from scipy.sparse import linalg
 from scipy.sparse import csr_matrix
-
 
 # this class is used for extracting additional concepts from array of given concepts which shows extracted additional knowledge
 
@@ -53,8 +53,8 @@ def create_initial_concept_transition_matrix(initial_concepts, all_concept_indic
                 transition_values.append(1.0)
             else:
                 transition_values.append(0)
-            transition_row.append(i)
-            transition_col.append(j)
+            transition_row.append(j)
+            transition_col.append(i)
 
     # create sparse matrix
     sparse = csr_matrix((transition_values, (transition_row, transition_col)))
@@ -94,30 +94,34 @@ if __name__ == '__main__':
 
     # TODO create parser for initial concepts
     # TODO fake concepts
-    initial_concepts = [3, 5, 7]
+    initial_concepts = [3]
 
     # create transition matrix
     matrix_P = create_transition_matrix(concept_mappings)
-    print "===================================="
-    print matrix_P
+    # print "===================================="
+    # print matrix_P
 
     # create matrix that contains transition probabilities from each concept back to initial concept
     all_concept_indices = len(concept_mappings)
     matrix_J = create_initial_concept_transition_matrix(initial_concepts, all_concept_indices)
-    print "===================================="
-    print matrix_J
+    # print "===================================="
+    # print matrix_J.todense()
 
-    p0 = 1  # reset probability
-    k = 2  # number of initial concepts
+    alfa = 0.2  # reset probability
+    k = 1  # number of initial concepts
 
-    alfa = p0 / k  # reset probability / number of initial concepts
+    P1 = csr_matrix(((1 - alfa) * matrix_P) + ((alfa / float(k)) * matrix_J))
+    # print "===================================="
+    print P1.todense()
 
-    #
-    P1 = csr_matrix(((1 - alfa) * matrix_P) + ((alfa * matrix_J)))
+    # simulation
+    # extract eigen values and eigen vectors
+    [eigenvalues, vectors] = linalg.eigs(P1.transpose(), k, None, None, 'LM')
+    print [eigenvalues, vectors]
 
-    # P1 = csr_matrix.multiply(matrix_P, (1 - alfa)) + (csr_matrix.multiply(matrix_J, alfa))
-    print "===================================="
-    print P1
+    # only keep real value
+    real = vectors.real
 
-    # threshold = 0.2
-    # print alfa
+    t = 0.2  # minimum part of time that walker is in the node, for the node to be considered neighbour
+
+    # check if any EigenVector real value is the same or larger than t - this node is neighbour
