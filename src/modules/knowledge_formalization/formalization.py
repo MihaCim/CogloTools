@@ -1,9 +1,24 @@
 import scipy
+import operator
 import numpy as np
 from scipy.sparse import linalg
 from scipy.sparse import csr_matrix
 
-# this class is used for extracting additional concepts from array of given concepts which shows extracted additional knowledge
+# class SimilarConcept holds initial concept ID, this concept id and its value in regard to initial concept id
+class SimilarConcept:
+    def __init__(self, initial_concept_id, similar_concept_id, value):
+        self.initial_concept_id = initial_concept_id
+        self.similar_concept_id = similar_concept_id
+        self.value = value
+
+    def _get_initial_concept_id(self):
+        return self.initial_concept_id
+
+    def _get_similar_concept_id(self):
+        return self.similar_concept_id
+
+    def _get_value(self):
+        return self.value
 
 # This method calculates neighbourhood from existing P matrices
 # first parameter is P matrix, for example dump of wikipedia
@@ -61,10 +76,17 @@ def create_initial_concept_transition_matrix(initial_concepts, all_concept_indic
 
     return sparse
 
+
+# normalizes data (0 - 1)
+def normalize_data(array):
+    return (array - array.min()) / (array.max() - array.min())
+
+
 if __name__ == '__main__':
     # TODO create parser for concepts
     # TODO fake all concepts
     all_concepts = {}
+    all_concepts[0] = "test"
     all_concepts[1] = "car"
     all_concepts[2] = "house"
     all_concepts[3] = "monitor"
@@ -74,6 +96,7 @@ if __name__ == '__main__':
     all_concepts[7] = "computer"
     all_concepts[8] = "test"
     all_concepts[9] = "headphones"
+    all_concepts[10] = "headphones"
     all_concepts[11] = "keyboard"
 
     # TODO create parser for mappings
@@ -87,10 +110,10 @@ if __name__ == '__main__':
     concept_mappings[5] = {3, 8, 11}
     concept_mappings[6] = {11}
     concept_mappings[7] = {11}
-    concept_mappings[8] = {5, 9, 11}
-    concept_mappings[9] = {8}
+    concept_mappings[8] = {5, 9, 0}
+    concept_mappings[9] = {10}
     concept_mappings[10] = {8}
-    concept_mappings[11] = {4, 5, 6, 7}
+    concept_mappings[11] = {7}
 
     # TODO create parser for initial concepts
     # TODO fake concepts
@@ -107,12 +130,12 @@ if __name__ == '__main__':
     # print "===================================="
     # print matrix_J.todense()
 
-    alfa = 0.2  # reset probability
-    k = 1  # number of initial concepts
+    alfa = 0  # reset probability
+    k = len(initial_concepts)  # number of initial concepts
 
     P1 = csr_matrix(((1 - alfa) * matrix_P) + ((alfa / float(k)) * matrix_J))
     # print "===================================="
-    print P1.todense()
+    # print P1.todense()
 
     # simulation
     # extract eigen values and eigen vectors
@@ -120,8 +143,36 @@ if __name__ == '__main__':
     print [eigenvalues, vectors]
 
     # only keep real value
-    real = vectors.real
+    resultArray = vectors.real
 
-    t = 0.2  # minimum part of time that walker is in the node, for the node to be considered neighbour
+    # TODO norm by column or by all the results?
 
-    # check if any EigenVector real value is the same or larger than t - this node is neighbour
+    # go through all columns - they represent result for each initial concept and normalize the data
+    normalizedArray = np.zeros((len(vectors), len(eigenvalues)))
+    idx = 0
+    for column in resultArray.T:
+        normalizedArray[:, idx] = normalize_data(column)
+        idx = idx + 1
+
+    # go through results and align them
+    t = 0  # minimum part of time that walker is in the node, for the node to be considered neighbour
+    similar_concepts = []
+    for initial_concept_idx in range(len(normalizedArray.T)):
+        initial_concept_id = initial_concepts[initial_concept_idx]
+        print "initial concept id", initial_concept_id
+
+        for id in range(len(normalizedArray.T[initial_concept_idx])):
+            value = normalizedArray.T[initial_concept_idx][id]
+            print "found concept id", id, "value", value
+
+            # if ID is not the same as initial concept, extract the value and compare iot with value t
+            if (id == initial_concept_id):
+                print "concept", id, "is the same as initial concept ID"
+            elif value >= t:
+                concept = SimilarConcept(initial_concept_id, id, value)
+                similar_concepts.append(concept)
+
+    # sort descending - most similar concept is the highest
+    similar_concepts.sort(key=operator.attrgetter('value'), reverse=True)
+
+    # TODO do something with extracted neighbour concepts
