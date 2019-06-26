@@ -4,6 +4,7 @@ import json
 import os
 from scipy.sparse import linalg
 from scipy.sparse import csr_matrix
+from scipy.sparse import coo_matrix
 from scipy import sparse
 
 
@@ -17,7 +18,7 @@ def calc_neighbourhood(matrix_P):
 
 
 # create transition matrix from all concepts
-def create_transition_matrix(concept_mappings, concept_old_id_to_new_id_mapping):
+def create_transition_matrix(concept_mappings):
     matrix_dimension = len(concept_mappings)
     print "creating transition matrix P of dimension", matrix_dimension, "x", matrix_dimension
     transition_row = []
@@ -25,47 +26,54 @@ def create_transition_matrix(concept_mappings, concept_old_id_to_new_id_mapping)
     transition_values = []
 
     # go through concept mappings
+    id = 0
     for concept_idx in concept_mappings.keys():
-        mapping = concept_mappings[concept_idx]
-
         # go through each transition
-        for transition in mapping:
-            # fix transition with mapping from OLD -> NEW concept ID
-            if transition in concept_old_id_to_new_id_mapping:
-                transition = concept_old_id_to_new_id_mapping[transition]
-
+        for transition in concept_mappings[concept_idx]:
             # add transition a -> b
             transition_values.append(1.0)
             transition_row.append(concept_idx)
             transition_col.append(transition)
 
             # add transition b -> a
-            if transition not in transition_row and concept_idx not in transition_col:
-                transition_values.append(1.0)
-                transition_row.append(transition)
-                transition_col.append(concept_idx)
+            transition_values.append(1.0)
+            transition_row.append(transition)
+            transition_col.append(concept_idx)
 
-    transition_row = np.array(transition_row).astype(np.long)
-    transition_col = np.array(transition_col).astype(np.long)
+            id = id + 1
+            if id % 1000000 == 0:
+                print id
+
+    transition_row = np.array(transition_row).astype(np.int_)
+    transition_col = np.array(transition_col).astype(np.int_)
 
     # create sparse matrix Q that contains ones for each transition from A->B and B->A
-    matrix_Q = csr_matrix((transition_values, (transition_row, transition_col)), (matrix_dimension, matrix_dimension))
+    print "creating matrix Q"
+    matrix_Q = coo_matrix((transition_values, (transition_row, transition_col)), (matrix_dimension, matrix_dimension)).todok().tocsc()
+    print "matrix Q created"
 
     # column vector of ones
+    print "creating vector I"
     vector_I = np.ones((matrix_dimension, 1), dtype=float)
-    qi = matrix_Q * vector_I  # 1D vector that contains the number of transitions in each row
+    print "vector I created"
+
+    # 1D vector that contains the number of transitions in each row
+    qi = matrix_Q * vector_I
 
     # create reciprocal matrix and transpose it
     reciprocal_transposed = np.transpose(np.reciprocal(qi))[0, :]
 
-    # create diagnonal matrix
+    # create diagonal matrix
     reciprocal_range = range(matrix_dimension)
+    print "creating diagonal sparse matrix"
     sparse_diagonal_matrix = csr_matrix((reciprocal_transposed, (reciprocal_range, reciprocal_range)),
                                         (matrix_dimension, matrix_dimension))
+    print "diagonal sparse matrix created"
 
     # get P matrix as a product of Q nad diagonal(inverse(Q * I))
+    print "creating P matrix"
     matrix_P = csr_matrix((sparse_diagonal_matrix * matrix_Q), (matrix_dimension, matrix_dimension))
-    print "matrix P created in format", matrix_P.shape
+    print "matrix P created"
 
     return matrix_P
 
@@ -85,8 +93,8 @@ def create_initial_concept_transition_matrix(initial_concepts, all_concepts):
             transition_row.append(rowN)
             transition_col.append(colN)
 
-    transition_row = np.array(transition_row).astype(np.long)
-    transition_col = np.array(transition_col).astype(np.long)
+    transition_row = np.array(transition_row).astype(np.int_)
+    transition_col = np.array(transition_col).astype(np.int_)
 
     # create sparse matrix
     sparse = csr_matrix((transition_values, (transition_row, transition_col)), (matrix_dimension, matrix_dimension))
@@ -225,7 +233,7 @@ def create_concept_ids(DEFAULT_CONCEPT_FILE, OLD_NEW_ID_CONCEPT_MAPPING_DUMP_PAT
 
 
 # method creates concept mapping if it doesn't exist yet. If it does, it just reads if from a dump file
-def create_concept_mappings_dict(DEFAULT_CONCEPT_FILE, DEFAULT_CONCEPT_MAPPING_JSON_DUMP_PATH):
+def create_concept_mappings_dict(DEFAULT_CONCEPT_MAPPING_FILE, DEFAULT_CONCEPT_MAPPING_JSON_DUMP_PATH, concept_old_id_to_new_id_mapping):
     # go through each line and build concept mapping
     concept_mappings = {}
     if os.path.isfile(DEFAULT_CONCEPT_MAPPING_JSON_DUMP_PATH):
@@ -263,12 +271,13 @@ def create_concept_mappings_dict(DEFAULT_CONCEPT_FILE, DEFAULT_CONCEPT_MAPPING_J
                         continue
 
                     key = split[0]
+                    id = concept_old_id_to_new_id_mapping[split[1]]
                     if key in concept_mappings:
                         array = concept_mappings.get(key)
                         # append new value to array
-                        array.append(split[1])
+                        array.append(id)
                     else:
-                        concept_mappings[key] = [split[1]]
+                        concept_mappings[key] = [id]
 
                 # print progress every 10M
                 if lineN % 1000000 == 0:
@@ -291,14 +300,14 @@ def create_concept_mappings_dict(DEFAULT_CONCEPT_FILE, DEFAULT_CONCEPT_MAPPING_J
 
 
 # create matrix only if its dump is not stored in the file system yet. If it is, we just read the dump
-def create_matrix_P(filePath, concept_mappings, concept_old_id_to_new_id_mapping):
+def create_matrix_P(filePath, concept_mappings):
     if os.path.isfile(filePath):
         print "matrix P file path exists"
         print "reading file", filePath
         matrix = sparse.load_npz(filePath)
         print "file", filePath, "read"
     else:
-        matrix = create_transition_matrix(concept_mappings, concept_old_id_to_new_id_mapping)
+        matrix = create_transition_matrix(concept_mappings)
         print "storing matrix P as sparse npz"
         sparse.save_npz(filePath, matrix)
         print "storing matrix P as sparse npz completed"
@@ -327,8 +336,9 @@ if __name__ == '__main__':
         ID_CONCEPT_MAPPING_JSON_DUMP_PATH)
 
     concept_mappings = create_concept_mappings_dict(
-        DEFAULT_CONCEPT_FILE,
-        DEFAULT_CONCEPT_MAPPING_JSON_DUMP_PATH)
+        DEFAULT_CONCEPT_MAPPING_FILE,
+        DEFAULT_CONCEPT_MAPPING_JSON_DUMP_PATH,
+        concept_old_id_to_new_id_mapping)
 
     # concept_old_id_to_new_id_mapping = {}
     # concept_old_id_to_new_id_mapping[33] = 7
@@ -353,7 +363,7 @@ if __name__ == '__main__':
     # concept_mappings[15] = [1]
 
     # create transition matrix
-    matrix_P = create_matrix_P(MATRIX_P_FILE_PATH, concept_mappings, concept_old_id_to_new_id_mapping)
+    matrix_P = create_matrix_P(MATRIX_P_FILE_PATH, concept_mappings)
     print matrix_P.shape
 
     # TODO create parser for initial concepts
