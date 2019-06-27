@@ -5,12 +5,12 @@ import os
 from scipy.sparse import linalg
 from scipy.sparse import csr_matrix
 from scipy import sparse
-import cPickle as pickle
+import pickle as pickle
 
 
 # create transition matrix from all concepts
 def create_transition_matrix(concept_mappings_both_transitions, matrix_dimension):
-    print "creating transition matrix P of dimension", matrix_dimension, "x", matrix_dimension
+    print("creating transition matrix P of dimension", matrix_dimension, "x", matrix_dimension)
     transition_row = []
     transition_col = []
 
@@ -25,27 +25,27 @@ def create_transition_matrix(concept_mappings_both_transitions, matrix_dimension
         id = id + len(transitions)
         counter = counter + 1
         if counter % 10000 == 0:
-            print "at counter", counter, "current ID is", id
+            print("at counter", counter, "current ID is", id)
 
-    print "creating transition values vector"
+    print("creating transition values vector")
     transition_values = np.ones(len(transition_col), dtype=float)
-    print "transition values vector created"
+    print("transition values vector created")
 
-    print "transition values length", len(transition_values)
-    print "transition row length", len(transition_row)
-    print "transition col length", len(transition_col)
-    print "matrix dimension", matrix_dimension, "x", matrix_dimension
+    print("transition values length", len(transition_values))
+    print("transition row length", len(transition_row))
+    print("transition col length", len(transition_col))
+    print("matrix dimension", matrix_dimension, "x", matrix_dimension)
 
     # create sparse matrix Q that contains ones for each transition from A->B and B->A
-    print "creating matrix Q"
+    print("creating matrix Q")
     matrix_Q = csr_matrix((transition_values, (transition_row, transition_col)), (matrix_dimension, matrix_dimension))
-    print matrix_Q.shape
-    print "matrix Q created"
+    print(matrix_Q.shape)
+    print("matrix Q created")
 
     # column vector of ones
-    print "creating vector I"
+    print("creating vector I")
     vector_I = np.ones((matrix_dimension, 1), dtype=float)
-    print "vector I created"
+    print("vector I created")
 
     # 1D vector that contains the number of transitions in each row
     qi = matrix_Q * vector_I
@@ -55,22 +55,22 @@ def create_transition_matrix(concept_mappings_both_transitions, matrix_dimension
 
     # create diagonal matrix
     reciprocal_range = range(matrix_dimension)
-    print "creating diagonal sparse matrix"
+    print("creating diagonal sparse matrix")
     sparse_diagonal_matrix = csr_matrix((reciprocal_transposed, (reciprocal_range, reciprocal_range)),
                                         (matrix_dimension, matrix_dimension))
-    print "diagonal sparse matrix created"
+    print("diagonal sparse matrix created")
 
     # get P matrix as a product of Q nad diagonal(inverse(Q * I))
-    print "creating P matrix"
+    print("creating P matrix")
     matrix_P = csr_matrix((sparse_diagonal_matrix * matrix_Q), (matrix_dimension, matrix_dimension))
-    print "matrix P created"
+    print("matrix P created")
 
     return matrix_P
 
 
 # creates matrices
 def create_initial_concept_transition_matrix(initial_concepts, all_concepts, matrix_dimension):
-    print "creating initial concept transition matrix J"
+    print("creating initial concept transition matrix J")
     transition_row = []
     transition_col = []
 
@@ -79,18 +79,18 @@ def create_initial_concept_transition_matrix(initial_concepts, all_concepts, mat
         transition_col.extend([colN] * len(all_concepts))
         transition_row.extend(all_concepts)
 
-    print "creating transition values vector"
+    print("creating transition values vector")
     transition_values = np.ones(len(transition_col), dtype=float)
-    print "transition values vector created"
+    print("transition values vector created")
 
-    print len(transition_row)
-    print len(transition_col)
-    print len(transition_values)
+    print(len(transition_row))
+    print(len(transition_col))
+    print(len(transition_values))
 
     # create sparse matrix
     sparse = csr_matrix((transition_values, (transition_row, transition_col)), (matrix_dimension, matrix_dimension))
-    print sparse.shape
-    print "matrix J created"
+    print(sparse.shape)
+    print("matrix J created")
 
     return sparse
 
@@ -120,17 +120,17 @@ def calc_neighbourhood(matrix_dimension,
 
     k = len(initial_concepts)  # number of initial concepts
 
-    print "creating P1 matrix from matrix P and matrix J"
+    print("creating P1 matrix from matrix P and matrix J")
     matrix_P1 = csr_matrix(((1 - alfa) * matrix_P) + ((alfa / float(k)) * matrix_J))
-    print "matrix P1 created"
+    print("matrix P1 created")
 
     # simulation
     # extract EigenValues and EigenVectors
-    print "extracting eigenvalues and eigenvectors"
+    print("extracting eigenvalues and eigenvectors")
     [eigenvalues, vectors] = linalg.eigs(matrix_P1.transpose(), k, None, None, 'LM')
 
     # extract only the column where EigenValue is 1.0
-    print "extracting column of eigenvectors where eigenvalue is 1"
+    print("extracting column of eigenvectors where eigenvalue is 1")
     resultArrayIdx = -1
     for eigenValueIdx in range(len(eigenvalues)):
         value = eigenvalues[eigenValueIdx].real
@@ -139,20 +139,20 @@ def calc_neighbourhood(matrix_dimension,
             resultArrayIdx = eigenValueIdx
             break
     if resultArrayIdx == -1:
-        print "No EigenValue 1.0 in received eigenvalues. Exiting program..."
+        print("No EigenValue 1.0 in received eigenvalues. Exiting program...")
         exit(3)
-    print "extracted eigenvectors successfully"
+    print("extracted eigenvectors successfully")
 
     # only keep real value
-    print "converting vectors to keep only real values"
+    print("converting vectors to keep only real values")
     resultArray = vectors.real
 
     # normalize data from column with index resultArrayIdx because that column represents our results
-    print "normalizing data"
+    print("normalizing data")
     normalizedArray = normalize_data(resultArray.T[resultArrayIdx])
-    print "data normalized"
+    print("data normalized")
 
-    print "creating array of similar concepts"
+    print("creating array of similar concepts")
     similar_concepts = {}
     for concept_id in range(len(normalizedArray.T)):
         value = normalizedArray.T[concept_id]
@@ -162,9 +162,9 @@ def calc_neighbourhood(matrix_dimension,
             similar_concepts[concept_id] = value
 
     # sort descending - most similar concept is the highest
-    print "sorting array of similar concepts descdending by probability"
+    print("sorting array of similar concepts descdending by probability")
     sorted_similar_concepts = sorted(similar_concepts.items(), key=operator.itemgetter(1), reverse=True)
-    print sorted_similar_concepts
+    print(sorted_similar_concepts)
 
     # TODO extract a word from wikipedia dictionary that was build in the beginning of the program
 
@@ -182,30 +182,30 @@ def create_concept_ids(DEFAULT_CONCEPT_FILE,
 
     if os.path.isfile(OLD_NEW_ID_MAPPING_DUMP_PATH) and os.path.isfile(ID_CONCEPT_MAPPING_PICKLE_DUMP_PATH) and os.path.isfile(NEW_OLD_ID_MAPPING_DUMP_PATH):
 
-        print "concept file PICKLE dumps exist"
-        print "opening file", OLD_NEW_ID_MAPPING_DUMP_PATH
+        print("concept file PICKLE dumps exist")
+        print("opening file", OLD_NEW_ID_MAPPING_DUMP_PATH)
         old_new_id_mapping = pickle.load(open(OLD_NEW_ID_MAPPING_DUMP_PATH, "rb"))
-        print "file", OLD_NEW_ID_MAPPING_DUMP_PATH, "read"
+        print("file", OLD_NEW_ID_MAPPING_DUMP_PATH, "read")
 
-        print "opening file", NEW_OLD_ID_MAPPING_DUMP_PATH
+        print("opening file", NEW_OLD_ID_MAPPING_DUMP_PATH)
         new_old_id_mapping = pickle.load(open(NEW_OLD_ID_MAPPING_DUMP_PATH, "rb"))
-        print "file", NEW_OLD_ID_MAPPING_DUMP_PATH, "read"
+        print("file", NEW_OLD_ID_MAPPING_DUMP_PATH, "read")
 
-        print "opening file", ID_CONCEPT_MAPPING_PICKLE_DUMP_PATH
+        print("opening file", ID_CONCEPT_MAPPING_PICKLE_DUMP_PATH)
         new_id_to_concept_mapping = pickle.load(open(ID_CONCEPT_MAPPING_PICKLE_DUMP_PATH, "rb"))
-        print "file", ID_CONCEPT_MAPPING_PICKLE_DUMP_PATH, "read"
+        print("file", ID_CONCEPT_MAPPING_PICKLE_DUMP_PATH, "read")
 
     elif os.path.isfile(DEFAULT_CONCEPT_FILE):
-        print "using default concept file path", DEFAULT_CONCEPT_FILE
-        print "opening concepts file"
+        print("using default concept file path", DEFAULT_CONCEPT_FILE)
+        print("opening concepts file")
         key = 0
         with open(DEFAULT_CONCEPT_FILE) as concepts_file:
-            for lineN, line in enumerate(concepts_file.xreadlines()):
+            for lineN, line in enumerate(concepts_file):
                 line = line.strip()
                 split = line.split("\t")
 
                 if len(split) < 3:
-                    print "Skipping line because it doesn't have at least 3 columns..."
+                    print("Skipping line because it doesn't have at least 3 columns...")
                 else:
                     if not split[0].isdigit():
                         continue
@@ -219,18 +219,18 @@ def create_concept_ids(DEFAULT_CONCEPT_FILE,
                     key = key + 1
         # close file
         concepts_file.close()
-        print "created own dictionary of old to new and new to old indices and ID to word mappings"
+        print("created own dictionary of old to new and new to old indices and ID to word mappings")
 
-        print "storing own old-new IDs dictionary to PICKLE dump"
+        print("storing own old-new IDs dictionary to PICKLE dump")
         pickle.dump(old_new_id_mapping, open(OLD_NEW_ID_MAPPING_DUMP_PATH, "wb"))
 
-        print "storing own new-old IDs dictionary to PICKLE dump"
+        print("storing own new-old IDs dictionary to PICKLE dump")
         pickle.dump(new_old_id_mapping, open(NEW_OLD_ID_MAPPING_DUMP_PATH, "wb"))
 
         pickle.dump(new_id_to_concept_mapping, open(ID_CONCEPT_MAPPING_PICKLE_DUMP_PATH, "wb"))
-        print "storing own dictionary to PICKLE dump completed"
+        print("storing own dictionary to PICKLE dump completed")
     else:
-        print "no concept id file or PICKLE dump, cannot proceed"
+        print("no concept id file or PICKLE dump, cannot proceed")
         exit(1)
 
     return old_new_id_mapping, new_old_id_mapping, new_id_to_concept_mapping
@@ -247,33 +247,34 @@ def create_concept_mappings_dict(DEFAULT_CONCEPT_MAPPING_FILE,
 
     if os.path.isfile(DEFAULT_CONCEPT_MAPPING_PICKLE_DUMP_PATH) and os.path.isfile(
             DEFAULT_CONCEPT_MAPPING_PICKLE_BOTH_TRANSITIONS_DUMP_PATH):
-        print "concept mapping PICKLE dumps exist"
-        print "reading file", DEFAULT_CONCEPT_MAPPING_PICKLE_DUMP_PATH
+        print("concept mapping PICKLE dumps exist")
+        print("reading file", DEFAULT_CONCEPT_MAPPING_PICKLE_DUMP_PATH)
         concept_mappings = pickle.load(open(ID_CONCEPT_MAPPING_PICKLE_DUMP_PATH, "rb"))
-        print "file", DEFAULT_CONCEPT_MAPPING_PICKLE_DUMP_PATH, "read"
+        print("file", DEFAULT_CONCEPT_MAPPING_PICKLE_DUMP_PATH, "read")
 
-        print "reading file", DEFAULT_CONCEPT_MAPPING_PICKLE_BOTH_TRANSITIONS_DUMP_PATH
+        print("reading file", DEFAULT_CONCEPT_MAPPING_PICKLE_BOTH_TRANSITIONS_DUMP_PATH)
         concept_mappings_both_transitions = pickle.load(open(DEFAULT_CONCEPT_MAPPING_PICKLE_BOTH_TRANSITIONS_DUMP_PATH, "rb"))
-        print "file", DEFAULT_CONCEPT_MAPPING_PICKLE_BOTH_TRANSITIONS_DUMP_PATH, "read"
+        print("file", DEFAULT_CONCEPT_MAPPING_PICKLE_BOTH_TRANSITIONS_DUMP_PATH, "read")
 
     elif os.path.isfile(DEFAULT_CONCEPT_MAPPING_FILE):
-        print "concept file dump doesnt exist. building new one from file", DEFAULT_CONCEPT_MAPPING_FILE
+        print("concept file dump doesnt exist. building new one from file", DEFAULT_CONCEPT_MAPPING_FILE)
 
-        print "opening file for creating concept transition dictionary"
+        print("opening file for creating concept transition dictionary")
         #  go through each line and build a dictionary of indices
         with open(DEFAULT_CONCEPT_MAPPING_FILE) as concept_mappings_file:
-            for lineN, line in enumerate(concept_mappings_file.xreadlines()):
+            for lineN, line in enumerate(concept_mappings_file):
                 line = line.strip()
                 split = line.split("\t")
 
                 if len(split) < 2:
-                    print "Skipping line because it doesn't have at least 2 columns (concept ID and connection)"
+                    print("Skipping line because it doesn't have at least 2 columns (concept ID and connection)")
                 else:
                     # skip a line if it doesnt contain a number
                     if not split[0].isdigit() or not split[1].isdigit():
                         continue
 
                     # extract key and ID
+                    print(split[0])
                     key = old_new_id_mapping[split[0]]
                     id = old_new_id_mapping[split[1]]
 
@@ -295,21 +296,21 @@ def create_concept_mappings_dict(DEFAULT_CONCEPT_MAPPING_FILE,
 
                 # print progress every 10M
                 if lineN % 1000000 == 0:
-                    print lineN/1000000
+                    print(lineN/1000000)
 
         # close file
         concept_mappings_file.close()
-        print "created concept transition dictionary"
+        print("created concept transition dictionary")
 
-        print "storing own concept mapping dictionary to PICKLE dump"
+        print("storing own concept mapping dictionary to PICKLE dump")
         pickle.dump(concept_mappings, open(DEFAULT_CONCEPT_MAPPING_PICKLE_DUMP_PATH, "wb"))
-        print "storing own concept mapping dictionary to PICKLE dump completed"
+        print("storing own concept mapping dictionary to PICKLE dump completed")
 
-        print "storing own concept mapping dictionary for both transitions to PICKLE dump"
+        print("storing own concept mapping dictionary for both transitions to PICKLE dump")
         pickle.dump(concept_mappings_both_transitions, open(DEFAULT_CONCEPT_MAPPING_PICKLE_BOTH_TRANSITIONS_DUMP_PATH, "wb"))
-        print "storing own concept mapping dictionary for both transitions to PICKLE dump completed"
+        print("storing own concept mapping dictionary for both transitions to PICKLE dump completed")
     else:
-        print "no concept mapping file or PICKLE dump, cannot proceed"
+        print("no concept mapping file or PICKLE dump, cannot proceed")
         exit(2)
 
     return concept_mappings, concept_mappings_both_transitions
@@ -318,15 +319,15 @@ def create_concept_mappings_dict(DEFAULT_CONCEPT_MAPPING_FILE,
 # create matrix only if its dump is not stored in the file system yet. If it is, we just read the dump
 def create_matrix_P(filePath, concept_mappings_both_transitions, matrix_dimension):
     if os.path.isfile(filePath):
-        print "matrix P file path exists"
-        print "reading file", filePath
+        print("matrix P file path exists")
+        print("reading file", filePath)
         matrix = sparse.load_npz(filePath)
-        print "file", filePath, "read"
+        print("file", filePath, "read")
     else:
         matrix = create_transition_matrix(concept_mappings_both_transitions, matrix_dimension)
-        print "storing matrix P as sparse npz"
+        print("storing matrix P as sparse npz")
         sparse.save_npz(filePath, matrix)
-        print "storing matrix P as sparse npz completed"
+        print("storing matrix P as sparse npz completed")
 
     return matrix
 
@@ -345,7 +346,7 @@ if __name__ == '__main__':
     ALFA = 0.2
 
     if ALFA < 0 or ALFA > 1:
-        print "alfa parameter should be between 0 and 1"
+        print("alfa parameter should be between 0 and 1")
         exit(1)
 
     # ========================================================================================================
@@ -432,7 +433,7 @@ if __name__ == '__main__':
 
     # create transition matrix
     matrix_P = create_matrix_P(MATRIX_P_FILE_PATH, concept_mappings_both_transitions, matrix_dimension)
-    print matrix_P.shape
+    print("matrix P shape",matrix_P.shape)
 
     # TODO create parser for initial concepts
     # TODO fake concepts
