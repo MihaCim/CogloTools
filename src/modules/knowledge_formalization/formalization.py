@@ -180,7 +180,8 @@ def create_concept_ids(DEFAULT_CONCEPT_FILE,
     new_old_index_array = []
     old_new_index_dict = {}
 
-    if os.path.isfile(ID_CONCEPT_MAPPING_PICKLE_DUMP_PATH) and os.path.isfile(NEW_OLD_ID_MAPPING_DUMP_PATH) and os.path.isfile(OLD_NEW_ID_MAPPING_DUMP_PATH):
+    if os.path.isfile(ID_CONCEPT_MAPPING_PICKLE_DUMP_PATH) and os.path.isfile(
+            NEW_OLD_ID_MAPPING_DUMP_PATH) and os.path.isfile(OLD_NEW_ID_MAPPING_DUMP_PATH):
 
         # try opening concepts file dump and if it doesn't exist, try opening the file and construct dump from it
         print("concept file PICKLE dumps exist")
@@ -215,7 +216,7 @@ def create_concept_ids(DEFAULT_CONCEPT_FILE,
                     # append each element after previous one. indices are new IDs, values are old IDs
                     value = int(split[0])
                     new_old_index_array.append(value)
-                    old_new_index_dict[value] = key
+                    old_new_index_dict[value] = key  # old ID -> new ID
 
                     # maps for example 1 to Anarchism
                     new_id_to_concept_mapping[key] = split[2]
@@ -248,11 +249,11 @@ def create_concept_mappings_dict(default_concept_mapping_file,
                                  default_concept_mapping_pickle_dump_path,
                                  default_concept_mapping_pickle_both_transitions_dump_path,
                                  old_new_index_dict):
-
     id_concept_map = defaultdict(list)  # contains transitions A -> B
-    both_transitions_map = defaultdict(list) # contains transitions A -> B and B -> A
+    both_transitions_map = defaultdict(list)  # contains transitions A -> B and B -> A
 
-    if os.path.isfile(default_concept_mapping_pickle_dump_path) and os.path.isfile(default_concept_mapping_pickle_both_transitions_dump_path):
+    if os.path.isfile(default_concept_mapping_pickle_dump_path) and os.path.isfile(
+            default_concept_mapping_pickle_both_transitions_dump_path):
 
         print("concept mapping PICKLE dumps exist")
         print("reading file", default_concept_mapping_pickle_dump_path)
@@ -293,7 +294,7 @@ def create_concept_mappings_dict(default_concept_mapping_file,
                         if lineN % 1000000 == 0:
                             print(lineN / 1000000)
 
-                    except IndexError:
+                    except KeyError:
                         print("key", split[0], "value", split[1], "max index in array", len(old_new_index_dict) - 1)
                         print("Error extracting from_page_id or to_page_id from id_array")
 
