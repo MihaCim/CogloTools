@@ -70,7 +70,7 @@ def create_transition_matrix(transitions_map, matrix_dimension):
     return matrix_P
 
 
-# creates matrices
+# creates transition matrix from initial concepts
 def create_initial_concept_transition_matrix(initial_concepts, all_concepts, matrix_dimension):
     print("creating initial concept transition matrix J")
     transition_row = []
