@@ -11,7 +11,7 @@ from collections import defaultdict
 
 
 # create transition matrix from all concepts
-def create_transition_matrix(concept_mappings_both_transitions, matrix_dimension):
+def create_transition_matrix(transitions_map, matrix_dimension):
     print("creating transition matrix P of dimension", matrix_dimension, "x", matrix_dimension)
     transition_row = []
     transition_col = []
@@ -19,8 +19,8 @@ def create_transition_matrix(concept_mappings_both_transitions, matrix_dimension
     # go through concept mappings
     id = 0
     counter = 0
-    for concept_idx in concept_mappings_both_transitions:
-        transitions = concept_mappings_both_transitions[concept_idx]
+    for concept_idx in transitions_map:
+        transitions = transitions_map[concept_idx]
         transition_row.extend([concept_idx] * len(transitions))
         transition_col.extend(transitions)
 
@@ -244,31 +244,31 @@ def create_concept_ids(DEFAULT_CONCEPT_FILE,
 
 
 # method creates concept mapping if it doesn't exist yet. If it does, it just reads if from a dump file
-def create_concept_mappings_dict(DEFAULT_CONCEPT_MAPPING_FILE,
-                                 DEFAULT_CONCEPT_MAPPING_PICKLE_DUMP_PATH,
-                                 DEFAULT_CONCEPT_MAPPING_PICKLE_BOTH_TRANSITIONS_DUMP_PATH,
+def create_concept_mappings_dict(default_concept_mapping_file,
+                                 default_concept_mapping_pickle_dump_path,
+                                 default_concept_mapping_pickle_both_transitions_dump_path,
                                  old_new_index_dict):
 
-    concept_mappings = defaultdict(list)  # contains transitions A -> B
-    concept_mappings_both_transitions = defaultdict(list) # contains transitions A -> B and B -> A
+    id_concept_map = defaultdict(list)  # contains transitions A -> B
+    both_transitions_map = defaultdict(list) # contains transitions A -> B and B -> A
 
-    if os.path.isfile(DEFAULT_CONCEPT_MAPPING_PICKLE_DUMP_PATH) and os.path.isfile(DEFAULT_CONCEPT_MAPPING_PICKLE_BOTH_TRANSITIONS_DUMP_PATH):
+    if os.path.isfile(default_concept_mapping_pickle_dump_path) and os.path.isfile(default_concept_mapping_pickle_both_transitions_dump_path):
 
         print("concept mapping PICKLE dumps exist")
-        print("reading file", DEFAULT_CONCEPT_MAPPING_PICKLE_DUMP_PATH)
-        concept_mappings = pickle.load(open(ID_CONCEPT_MAPPING_PICKLE_DUMP_PATH, "rb"))
-        print("file", DEFAULT_CONCEPT_MAPPING_PICKLE_DUMP_PATH, "read")
+        print("reading file", default_concept_mapping_pickle_dump_path)
+        id_concept_map = pickle.load(open(ID_CONCEPT_MAPPING_PICKLE_DUMP_PATH, "rb"))
+        print("file", default_concept_mapping_pickle_dump_path, "read")
 
-        print("reading file", DEFAULT_CONCEPT_MAPPING_PICKLE_BOTH_TRANSITIONS_DUMP_PATH)
-        concept_mappings_both_transitions = pickle.load(open(DEFAULT_CONCEPT_MAPPING_PICKLE_BOTH_TRANSITIONS_DUMP_PATH, "rb"))
-        print("file", DEFAULT_CONCEPT_MAPPING_PICKLE_BOTH_TRANSITIONS_DUMP_PATH, "read")
+        print("reading file", default_concept_mapping_pickle_both_transitions_dump_path)
+        both_transitions_map = pickle.load(open(default_concept_mapping_pickle_both_transitions_dump_path, "rb"))
+        print("file", default_concept_mapping_pickle_both_transitions_dump_path, "read")
 
-    elif os.path.isfile(DEFAULT_CONCEPT_MAPPING_FILE):
-        print("concept file dump doesnt exist. building new one from file", DEFAULT_CONCEPT_MAPPING_FILE)
+    elif os.path.isfile(default_concept_mapping_file):
+        print("concept file dump doesnt exist. building new one from file", default_concept_mapping_file)
 
         print("opening file for creating concept transition dictionary")
         #  go through each line and build a dictionary of indices
-        with open(DEFAULT_CONCEPT_MAPPING_FILE) as concept_mappings_file:
+        with open(default_concept_mapping_file) as concept_mappings_file:
             for lineN, line in enumerate(concept_mappings_file):
                 line = line.strip()
                 split = line.split("\t")
@@ -285,9 +285,9 @@ def create_concept_mappings_dict(DEFAULT_CONCEPT_MAPPING_FILE,
                         key = old_new_index_dict[int(split[0])]
                         value = old_new_index_dict[int(split[1])]
 
-                        concept_mappings[key].append(value)
-                        concept_mappings_both_transitions[key].append(value)
-                        concept_mappings_both_transitions[value].append(key)
+                        id_concept_map[key].append(value)
+                        both_transitions_map[key].append(value)
+                        both_transitions_map[value].append(key)
 
                         # print progress every 10M
                         if lineN % 1000000 == 0:
@@ -302,28 +302,28 @@ def create_concept_mappings_dict(DEFAULT_CONCEPT_MAPPING_FILE,
         print("created concept transition dictionary")
 
         print("storing own concept mapping dictionary to PICKLE dump")
-        pickle.dump(concept_mappings, open(DEFAULT_CONCEPT_MAPPING_PICKLE_DUMP_PATH, "wb"))
+        pickle.dump(id_concept_map, open(default_concept_mapping_pickle_dump_path, "wb"))
         print("storing own concept mapping dictionary to PICKLE dump completed")
 
         print("storing own concept mapping dictionary for both transitions to PICKLE dump")
-        pickle.dump(concept_mappings_both_transitions, open(DEFAULT_CONCEPT_MAPPING_PICKLE_BOTH_TRANSITIONS_DUMP_PATH, "wb"))
+        pickle.dump(both_transitions_map, open(default_concept_mapping_pickle_both_transitions_dump_path, "wb"))
         print("storing own concept mapping dictionary for both transitions to PICKLE dump completed")
     else:
         print("no concept mapping file or PICKLE dump, cannot proceed")
         exit(2)
 
-    return concept_mappings, concept_mappings_both_transitions
+    return id_concept_map, both_transitions_map
 
 
 # create matrix only if its dump is not stored in the file system yet. If it is, we just read the dump
-def create_matrix_P(filePath, concept_mappings_both_transitions, matrix_dimension):
+def create_matrix_P(filePath, both_transitions_map, matrix_dim):
     if os.path.isfile(filePath):
         print("matrix P file path exists")
         print("reading file", filePath)
         matrix = sparse.load_npz(filePath)
         print("file", filePath, "read")
     else:
-        matrix = create_transition_matrix(concept_mappings_both_transitions, matrix_dimension)
+        matrix = create_transition_matrix(both_transitions_map, matrix_dim)
         print("storing matrix P as sparse npz")
         sparse.save_npz(filePath, matrix)
         print("storing matrix P as sparse npz completed")
