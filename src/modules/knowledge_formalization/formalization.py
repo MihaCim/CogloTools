@@ -7,6 +7,8 @@ from scipy.sparse import csr_matrix
 from scipy import sparse
 import pickle as pickle
 
+from collections import defaultdict
+
 
 # create transition matrix from all concepts
 def create_transition_matrix(concept_mappings_both_transitions, matrix_dimension):
@@ -107,8 +109,7 @@ def is_close(a, b, rel_tol=1e-07, abs_tol=0.0):
 
 # method calculates neighbourhood based on concept mappings and initial concepts
 def calc_neighbourhood(matrix_dimension,
-                       old_new_id_mapping,
-                       new_old_id_mapping,
+                       indices_array,
                        id_to_concept_mapping,
                        concept_mappings,
                        initial_concepts,
@@ -172,23 +173,18 @@ def calc_neighbourhood(matrix_dimension,
 # method extracts concepts IDs and creates new dictionary from them, if dump doesn't exist yet. if dump exists,
 # it just reads it from a dump file
 def create_concept_ids(DEFAULT_CONCEPT_FILE,
-                       OLD_NEW_ID_MAPPING_DUMP_PATH,
                        NEW_OLD_ID_MAPPING_DUMP_PATH,
                        ID_CONCEPT_MAPPING_PICKLE_DUMP_PATH):
-    # try opening concepts file dump and if it doesn't exist, try opening the file and construct dump from it
-    old_new_id_mapping = {}
-    new_old_id_mapping = {}
     new_id_to_concept_mapping = {}
+    id_array = []
 
-    if os.path.isfile(OLD_NEW_ID_MAPPING_DUMP_PATH) and os.path.isfile(ID_CONCEPT_MAPPING_PICKLE_DUMP_PATH) and os.path.isfile(NEW_OLD_ID_MAPPING_DUMP_PATH):
+    if os.path.isfile(ID_CONCEPT_MAPPING_PICKLE_DUMP_PATH) and os.path.isfile(NEW_OLD_ID_MAPPING_DUMP_PATH):
 
+        # try opening concepts file dump and if it doesn't exist, try opening the file and construct dump from it
         print("concept file PICKLE dumps exist")
-        print("opening file", OLD_NEW_ID_MAPPING_DUMP_PATH)
-        old_new_id_mapping = pickle.load(open(OLD_NEW_ID_MAPPING_DUMP_PATH, "rb"))
-        print("file", OLD_NEW_ID_MAPPING_DUMP_PATH, "read")
 
         print("opening file", NEW_OLD_ID_MAPPING_DUMP_PATH)
-        new_old_id_mapping = pickle.load(open(NEW_OLD_ID_MAPPING_DUMP_PATH, "rb"))
+        id_array = pickle.load(open(NEW_OLD_ID_MAPPING_DUMP_PATH, "rb"))
         print("file", NEW_OLD_ID_MAPPING_DUMP_PATH, "read")
 
         print("opening file", ID_CONCEPT_MAPPING_PICKLE_DUMP_PATH)
@@ -210,22 +206,22 @@ def create_concept_ids(DEFAULT_CONCEPT_FILE,
                     if not split[0].isdigit():
                         continue
 
-                    # maps for example 1 to 3300
-                    new_old_id_mapping[key] = split[0]
-                    # maps for example 3300 to 1
-                    old_new_id_mapping[split[0]] = key
+                    # append each element after previous one. indices are new IDs, values are old IDs
+                    id_array.append(int(split[0]))
+
                     # maps for example 1 to Anarchism
                     new_id_to_concept_mapping[key] = split[2]
                     key = key + 1
+
+                    # print progress every 10M
+                    if lineN % 1000000 == 0:
+                        print(lineN / 1000000)
         # close file
         concepts_file.close()
         print("created own dictionary of old to new and new to old indices and ID to word mappings")
 
-        print("storing own old-new IDs dictionary to PICKLE dump")
-        pickle.dump(old_new_id_mapping, open(OLD_NEW_ID_MAPPING_DUMP_PATH, "wb"))
-
-        print("storing own new-old IDs dictionary to PICKLE dump")
-        pickle.dump(new_old_id_mapping, open(NEW_OLD_ID_MAPPING_DUMP_PATH, "wb"))
+        print("storing own new-old IDs array to PICKLE dump")
+        pickle.dump(id_array, open(NEW_OLD_ID_MAPPING_DUMP_PATH, "wb"))
 
         pickle.dump(new_id_to_concept_mapping, open(ID_CONCEPT_MAPPING_PICKLE_DUMP_PATH, "wb"))
         print("storing own dictionary to PICKLE dump completed")
@@ -233,20 +229,20 @@ def create_concept_ids(DEFAULT_CONCEPT_FILE,
         print("no concept id file or PICKLE dump, cannot proceed")
         exit(1)
 
-    return old_new_id_mapping, new_old_id_mapping, new_id_to_concept_mapping
+    return id_array, new_id_to_concept_mapping
 
 
 # method creates concept mapping if it doesn't exist yet. If it does, it just reads if from a dump file
 def create_concept_mappings_dict(DEFAULT_CONCEPT_MAPPING_FILE,
                                  DEFAULT_CONCEPT_MAPPING_PICKLE_DUMP_PATH,
                                  DEFAULT_CONCEPT_MAPPING_PICKLE_BOTH_TRANSITIONS_DUMP_PATH,
-                                 old_new_id_mapping):
-    # go through each line and build concept mapping
-    concept_mappings = {}  # transition A -> B
-    concept_mappings_both_transitions = {}  # transition A -> B and B -> A
+                                 indices_array):
 
-    if os.path.isfile(DEFAULT_CONCEPT_MAPPING_PICKLE_DUMP_PATH) and os.path.isfile(
-            DEFAULT_CONCEPT_MAPPING_PICKLE_BOTH_TRANSITIONS_DUMP_PATH):
+    concept_mappings = defaultdict(list)  # contains transitions A -> B
+    concept_mappings_both_transitions = defaultdict(list) # contains transitions A -> B and B -> A
+
+    if os.path.isfile(DEFAULT_CONCEPT_MAPPING_PICKLE_DUMP_PATH) and os.path.isfile(DEFAULT_CONCEPT_MAPPING_PICKLE_BOTH_TRANSITIONS_DUMP_PATH):
+
         print("concept mapping PICKLE dumps exist")
         print("reading file", DEFAULT_CONCEPT_MAPPING_PICKLE_DUMP_PATH)
         concept_mappings = pickle.load(open(ID_CONCEPT_MAPPING_PICKLE_DUMP_PATH, "rb"))
@@ -273,30 +269,51 @@ def create_concept_mappings_dict(DEFAULT_CONCEPT_MAPPING_FILE,
                     if not split[0].isdigit() or not split[1].isdigit():
                         continue
 
-                    # extract key and ID
-                    print(split[0])
-                    key = old_new_id_mapping[split[0]]
-                    id = old_new_id_mapping[split[1]]
+                    try:
+                        # declare two variables for start node ID and end node ID
+                        key = indices_array[int(split[0])]
+                        value = indices_array[int(split[1])]
 
-                    # add transition A -> B
-                    if key in concept_mappings:
-                        # append new value to both arrays if not there yet
-                        concept_mappings[key].append(id)
-                        concept_mappings_both_transitions[key].append(id)
-                    else:
-                        concept_mappings[key] = [id]
-                        concept_mappings_both_transitions[key] = [id]
+                        # TODO OPTION 1 - 10 - 20 = 28.61s
+                        # try:
+                        #     concept_mappings[key].append(value)
+                        #     concept_mappings_both_transitions[key].append(value)
+                        # except KeyError:
+                        #     concept_mappings[key] = [value]
+                        #     concept_mappings_both_transitions[key] = [value]
+                        #
+                        # try:
+                        #     concept_mappings_both_transitions[value].append(key)
+                        # except KeyError:
+                        #     concept_mappings_both_transitions[value] = [key]
 
-                    # add transition from B -> A
-                    if id in concept_mappings_both_transitions:
-                        # append new value to array if not there yet
-                        concept_mappings_both_transitions[id].append(key)
-                    else:
-                        concept_mappings_both_transitions[id] = [key]
+                        # TODO OPTION 2 - 10 - 20 = 30.46s
+                        # add transition A -> B
+                        # if key in concept_mappings:
+                        #     concept_mappings[key].append(value)
+                        #     concept_mappings_both_transitions[key].append(value)
+                        # else:
+                        #     concept_mappings[key] = [value]
+                        #     concept_mappings_both_transitions[key] = [value]
+                        #
+                        # # add transition from B -> A
+                        # if value in concept_mappings_both_transitions:
+                        #     concept_mappings_both_transitions[value].append(key)
+                        # else:
+                        #     concept_mappings_both_transitions[value] = [key]
 
-                # print progress every 10M
-                if lineN % 1000000 == 0:
-                    print(lineN/1000000)
+                        # TODO OPTION 3 is with defaultdict(list) where you can append without checking
+                        # TODO OPTION 3 - 10 - 20 = 26.73s
+                        concept_mappings[key].append(value)
+                        concept_mappings_both_transitions[key].append(value)
+                        concept_mappings_both_transitions[value].append(key)
+
+                        # print progress every 10M
+                        if lineN % 1000000 == 0:
+                            print(lineN / 1000000)
+
+                    except ValueError:
+                        print("Error extracting from_page_id or to_page_id from id_array")
 
         # close file
         concept_mappings_file.close()
@@ -335,7 +352,6 @@ def create_matrix_P(filePath, concept_mappings_both_transitions, matrix_dimensio
 if __name__ == '__main__':
     DEFAULT_CONCEPT_FILE = './linkGraph-en-verts.txt'
     DEFAULT_CONCEPT_MAPPING_FILE = './linkGraph-en-edges.txt'
-    OLD_NEW_ID_MAPPING_DUMP_PATH = './temp/linkGraph-en-verts-old-new-id-concept-mapping-dump.pkl'
     NEW_OLD_ID_MAPPING_DUMP_PATH = './temp/linkGraph-en-verts-new-old-id-concept-mapping-dump.pkl'
     ID_CONCEPT_MAPPING_PICKLE_DUMP_PATH = './temp/linkGraph-en-verts-id-concept-mapping-dump.pkl'
     DEFAULT_CONCEPT_MAPPING_PICKLE_DUMP_PATH = './temp/linkGraph-en-edges-dump.pkl'
@@ -355,9 +371,9 @@ if __name__ == '__main__':
     # initial concepts values should not be higher than maximum concept ID
     # ========================================================================================================
 
-    old_new_id_mapping, new_old_id_mapping,  id_to_concept_mapping = create_concept_ids(
+    # indices_array is a 1D array where position presents index (new ID) and value presents old ID value
+    indices_array,  id_to_concept_mapping = create_concept_ids(
         DEFAULT_CONCEPT_FILE,
-        OLD_NEW_ID_MAPPING_DUMP_PATH,
         NEW_OLD_ID_MAPPING_DUMP_PATH,
         ID_CONCEPT_MAPPING_PICKLE_DUMP_PATH)
 
@@ -373,12 +389,13 @@ if __name__ == '__main__':
     # max_val2 = max(id_to_concept_mapping, key=int)
     # print "Max ID to concept mapping ID", max_val2, ",length", len(id_to_concept_mapping)
 
-    # if matrix_P already exists in a file, we don't need to extract concept_mappings and concept mappings for both transitions
+    # if matrix_P already exists in a file, we don't need to extract concept_mappings and concept mappings
+    # for both transitions
     concept_mappings, concept_mappings_both_transitions = create_concept_mappings_dict(
         DEFAULT_CONCEPT_MAPPING_FILE,
         DEFAULT_CONCEPT_MAPPING_PICKLE_DUMP_PATH,
         DEFAULT_CONCEPT_MAPPING_PICKLE_BOTH_TRANSITIONS_DUMP_PATH,
-        old_new_id_mapping)
+        indices_array)
 
     # old_new_id_mapping = {}
     # old_new_id_mapping[0] = 0
@@ -429,19 +446,18 @@ if __name__ == '__main__':
 
     # matrix dimension should be the same for all the matrices (at least one dimension)
     # length is 13504875 for EN-Wikipedia
-    matrix_dimension = len(old_new_id_mapping)
+    matrix_dimension = len(indices_array)
 
     # create transition matrix
     matrix_P = create_matrix_P(MATRIX_P_FILE_PATH, concept_mappings_both_transitions, matrix_dimension)
-    print("matrix P shape",matrix_P.shape)
+    print("matrix P shape", matrix_P.shape)
 
     # TODO create parser for initial concepts
     # TODO fake concepts
     initial_concepts = [3, 4, 2]
 
     calc_neighbourhood(matrix_dimension,
-                       old_new_id_mapping,
-                       new_old_id_mapping,
+                       indices_array,
                        id_to_concept_mapping,
                        concept_mappings,
                        initial_concepts,
