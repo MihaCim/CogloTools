@@ -52,6 +52,11 @@ def create_transition_matrix(transitions_map, matrix_dimension):
     # 1D vector that contains the number of transitions in each row
     qi = matrix_Q * vector_I
 
+    for rowN in range(len(qi)):
+        value = qi[rowN]
+        if value == 0:
+            print("Value in row", rowN, "is 0!")
+
     # create reciprocal matrix and transpose it
     reciprocal_transposed = np.transpose(np.reciprocal(qi))[0, :]
 
@@ -302,6 +307,18 @@ def create_concept_mappings_dict(default_concept_mapping_file,
         concept_mappings_file.close()
         print("created concept transition dictionary")
 
+        print("removing concepts that don't have any transitions")
+        # remove concepts from dictionaries that don't have any transitions
+        remove_keys = []
+        for concept in both_transitions_map:
+            transitions = both_transitions_map[concept]
+            if len(transitions) == 0:
+                remove_keys.append(concept)
+        for key in remove_keys:
+            del id_concept_map[key]
+            del both_transitions_map[key]
+        print("concepts without transitions successfully removed")
+
         print("storing own concept mapping dictionary to PICKLE dump")
         pickle.dump(id_concept_map, open(default_concept_mapping_pickle_dump_path, "wb"))
         print("storing own concept mapping dictionary to PICKLE dump completed")
@@ -370,23 +387,9 @@ if __name__ == '__main__':
         DEFAULT_CONCEPT_MAPPING_PICKLE_BOTH_TRANSITIONS_DUMP_PATH,
         old_new_index_dict)
 
-    # old_new_id_mapping = {}
-    # old_new_id_mapping[0] = 0
-    # old_new_id_mapping[1] = 1
-    # old_new_id_mapping[2] = 2
-    # old_new_id_mapping[3] = 3
-    # old_new_id_mapping[4] = 4
-    # old_new_id_mapping[5] = 5
-    # old_new_id_mapping[6] = 6
+    # old_new_id_mapping = {0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6}
     #
-    # new_old_id_mapping = {}
-    # new_old_id_mapping[0] = 0
-    # new_old_id_mapping[1] = 1
-    # new_old_id_mapping[2] = 2
-    # new_old_id_mapping[3] = 3
-    # new_old_id_mapping[4] = 4
-    # new_old_id_mapping[5] = 5
-    # new_old_id_mapping[6] = 6
+    # new_old_index_array = [0, 1, 2, 3, 4, 5, 6]
     #
     # concept_old_id_to_new_id_mapping = {}
     # concept_old_id_to_new_id_mapping[33] = 3
@@ -412,7 +415,7 @@ if __name__ == '__main__':
 
     # matrix dimension should be the same for all the matrices (at least one dimension)
     # length is 13504875 for EN-Wikipedia
-    matrix_dimension = len(new_old_index_array)
+    matrix_dimension = len(concept_mappings_both_transitions)
 
     # create transition matrix
     matrix_P = create_matrix_P(MATRIX_P_FILE_PATH, concept_mappings_both_transitions, matrix_dimension)
