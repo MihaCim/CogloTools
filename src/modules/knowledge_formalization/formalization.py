@@ -269,7 +269,7 @@ def create_concept_mappings_dict(default_concept_mapping_file,
 
         print("concept mapping PICKLE dumps exist")
         print("reading file", default_concept_mapping_pickle_dump_path)
-        new_id_transitions_map = pickle.load(open(ID_CONCEPT_MAPPING_PICKLE_DUMP_PATH, "rb"))
+        new_id_transitions_map = pickle.load(open(default_concept_mapping_pickle_dump_path, "rb"))
         print("file", default_concept_mapping_pickle_dump_path, "read")
 
         print("reading file", default_concept_mapping_pickle_both_transitions_dump_path)
