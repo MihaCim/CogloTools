@@ -5,7 +5,7 @@ import os
 from scipy.sparse import linalg
 from scipy.sparse import csr_matrix
 from scipy import sparse
-import pickle as pickle
+import json as json
 
 from collections import defaultdict
 
@@ -178,7 +178,7 @@ def calc_neighbourhood(matrix_dimension,
 # it just reads it from a dump file
 def create_concept_ids(default_concept_file,
                        new_old_id_mapping_dump_path,
-                       id_concept_mapping_pickle_dump_path,
+                       id_concept_mapping_json_dump_path,
                        old_new_id_dict):
 
     # old_new_id_temp_dict contains the mapping old -> new ID for old concepts that contain transitions
@@ -187,18 +187,22 @@ def create_concept_ids(default_concept_file,
 
     new_id_to_concept_string_mapping = {}
 
-    if os.path.isfile(id_concept_mapping_pickle_dump_path) and os.path.isfile(new_old_id_mapping_dump_path):
+    if os.path.isfile(id_concept_mapping_json_dump_path) and os.path.isfile(new_old_id_mapping_dump_path):
 
         # try opening concepts file dump and if it doesn't exist, try opening the file and construct dump from it
-        print("concept file PICKLE dumps exist")
+        print("concept file json dumps exist")
 
         print("opening file", new_old_id_mapping_dump_path)
-        new_old_id_dict = pickle.load(open(new_old_id_mapping_dump_path, "rb"))
+        with open(new_old_id_mapping_dump_path, 'r') as fp1:
+            new_old_id_dict = json.load(fp1)
+        fp1.close()
         print("file", new_old_id_mapping_dump_path, "read")
 
-        print("opening file", id_concept_mapping_pickle_dump_path)
-        new_id_to_concept_string_mapping = pickle.load(open(id_concept_mapping_pickle_dump_path, "rb"))
-        print("file", id_concept_mapping_pickle_dump_path, "read")
+        print("opening file", id_concept_mapping_json_dump_path)
+        with open(id_concept_mapping_json_dump_path, 'r') as fp2:
+            new_id_to_concept_string_mapping = json.load(fp2)
+        fp2.close()
+        print("file", id_concept_mapping_json_dump_path, "read")
 
     elif os.path.isfile(default_concept_file):
         print("using default concept file path", default_concept_file)
@@ -206,7 +210,7 @@ def create_concept_ids(default_concept_file,
 
         # get maximum value of new ID so far
         counter = int(max(new_old_id_dict, key=int)) + 1
-        with open(default_concept_file) as concepts_file:
+        with open(default_concept_file, 'r') as concepts_file:
             for lineN, line in enumerate(concepts_file):
                 line = line.strip()
                 split = line.split("\t")
@@ -241,13 +245,17 @@ def create_concept_ids(default_concept_file,
         concepts_file.close()
         print("created our own dictionary of old to new and new to old indices and ID to word mappings")
 
-        print("storing our own new-old IDs array to PICKLE dump")
-        pickle.dump(new_old_id_dict, open(new_old_id_mapping_dump_path, "wb"))
+        print("storing our own new-old IDs array to json dump")
+        with open(new_old_id_mapping_dump_path, 'w') as fp1:
+            json.dump(new_old_id_dict, fp1)
+        fp1.close()
 
-        print("storing our own dictionary to PICKLE dump")
-        pickle.dump(new_id_to_concept_string_mapping, open(id_concept_mapping_pickle_dump_path, "wb"))
+        print("storing our own dictionary to json dump")
+        with open(id_concept_mapping_json_dump_path, 'w') as fp2:
+            json.dump(new_id_to_concept_string_mapping, fp2)
+        fp2.close()
     else:
-        print("no concept id file or PICKLE dump, cannot proceed")
+        print("no concept id file or json dump, cannot proceed")
         exit(1)
 
     return new_old_id_dict, new_id_to_concept_string_mapping
@@ -255,8 +263,8 @@ def create_concept_ids(default_concept_file,
 
 # method creates concept mapping if it doesn't exist yet. If it does, it just reads if from a dump file
 def create_concept_mappings_dict(default_concept_mapping_file,
-                                 default_concept_mapping_pickle_dump_path,
-                                 default_concept_mapping_pickle_both_transitions_dump_path):
+                                 default_concept_mapping_json_dump_path,
+                                 default_concept_mapping_json_both_transitions_dump_path):
     transition_map = defaultdict(list)  # contains transitions A -> B with old IDs
     both_transitions_map = defaultdict(list)  # contains transitions A -> B and B -> A with old IDs
 
@@ -264,17 +272,21 @@ def create_concept_mappings_dict(default_concept_mapping_file,
     new_id_both_transitions_map = defaultdict(list)
     new_id_transitions_map = defaultdict(list)
 
-    if os.path.isfile(default_concept_mapping_pickle_dump_path) and os.path.isfile(
-            default_concept_mapping_pickle_both_transitions_dump_path):
+    if os.path.isfile(default_concept_mapping_json_dump_path) and os.path.isfile(
+            default_concept_mapping_json_both_transitions_dump_path):
 
-        print("concept mapping PICKLE dumps exist")
-        print("reading file", default_concept_mapping_pickle_dump_path)
-        new_id_transitions_map = pickle.load(open(default_concept_mapping_pickle_dump_path, "rb"))
-        print("file", default_concept_mapping_pickle_dump_path, "read")
+        print("concept mapping json dumps exist")
+        print("reading file", default_concept_mapping_json_dump_path)
+        with open(default_concept_mapping_json_dump_path, 'r') as fp1:
+            new_id_transitions_map = json.load(fp1)
+        fp1.close()
+        print("file", default_concept_mapping_json_dump_path, "read")
 
-        print("reading file", default_concept_mapping_pickle_both_transitions_dump_path)
-        new_id_both_transitions_map = pickle.load(open(default_concept_mapping_pickle_both_transitions_dump_path, "rb"))
-        print("file", default_concept_mapping_pickle_both_transitions_dump_path, "read")
+        print("reading file", default_concept_mapping_json_both_transitions_dump_path)
+        with open(default_concept_mapping_json_both_transitions_dump_path, 'r') as fp2:
+            new_id_both_transitions_map = json.load(fp2)
+        fp2.close()
+        print("file", default_concept_mapping_json_both_transitions_dump_path, "read")
 
         print("creating hashmap of old -> new ID")
         # create mapping od old ID to new ID
@@ -289,7 +301,7 @@ def create_concept_mappings_dict(default_concept_mapping_file,
         print("concept file dump doesnt exist. building new one from file", default_concept_mapping_file)
 
         #  go through each line and build dictionaries for concept transitions
-        with open(default_concept_mapping_file) as concept_mappings_file:
+        with open(default_concept_mapping_file, 'r') as concept_mappings_file:
             for lineN, line in enumerate(concept_mappings_file):
                 line = line.strip()
                 split = line.split("\t")
@@ -372,15 +384,19 @@ def create_concept_mappings_dict(default_concept_mapping_file,
                 new_id_both_transitions_map[new_id].append(new_transition_id)
         print("hashmap of new ID -> transactions with new ID created")
 
-        print("storing new ID -> transitions hashmap to PICKLE dump")
-        pickle.dump(new_id_transitions_map, open(default_concept_mapping_pickle_dump_path, "wb"))
-        print("storing new ID -> transitions hashmap to PICKLE dump completed")
+        print("storing new ID -> transitions hashmap to json dump")
+        with open(default_concept_mapping_json_dump_path, 'w') as fp1:
+            json.dump(new_id_transitions_map, fp1)
+        fp1.close()
+        print("storing new ID -> transitions hashmap to json dump completed")
 
-        print("storing new ID -> transitions hashmap for both transitions to PICKLE dump")
-        pickle.dump(new_id_both_transitions_map, open(default_concept_mapping_pickle_both_transitions_dump_path, "wb"))
-        print("storing new ID -> transitions hashmap for both transitions to PICKLE dump completed")
+        print("storing new ID -> transitions hashmap for both transitions to json dump")
+        with open(default_concept_mapping_json_both_transitions_dump_path, 'w') as fp2:
+            json.dump(new_id_both_transitions_map, fp2)
+        fp2.close()
+        print("storing new ID -> transitions hashmap for both transitions to json dump completed")
     else:
-        print("no concept mapping file or PICKLE dump, cannot proceed")
+        print("no concept mapping file or json dump, cannot proceed")
         exit(2)
 
     return new_id_transitions_map, new_id_both_transitions_map, old_new_id_dict
@@ -405,10 +421,10 @@ def create_matrix_P(filePath, both_transitions_map, matrix_dim):
 if __name__ == '__main__':
     DEFAULT_CONCEPT_FILE = './linkGraph-en-verts.txt'
     DEFAULT_CONCEPT_MAPPING_FILE = './linkGraph-en-edges.txt'
-    NEW_OLD_ID_MAPPING_DUMP_PATH = './temp/linkGraph-en-verts-new-old-id-concept-mapping-dump.pkl'
-    ID_CONCEPT_MAPPING_PICKLE_DUMP_PATH = './temp/linkGraph-en-verts-id-concept-mapping-dump.pkl'
-    DEFAULT_CONCEPT_MAPPING_PICKLE_DUMP_PATH = './temp/linkGraph-en-edges-dump.pkl'
-    DEFAULT_CONCEPT_MAPPING_PICKLE_BOTH_TRANSITIONS_DUMP_PATH = './temp/linkGraph-en-edges-both-transitions-dump.pkl'
+    NEW_OLD_ID_MAPPING_DUMP_PATH = './temp/linkGraph-en-verts-new-old-id-concept-mapping-dump.json'
+    ID_CONCEPT_MAPPING_JSON_DUMP_PATH = './temp/linkGraph-en-verts-id-concept-mapping-dump.json'
+    DEFAULT_CONCEPT_MAPPING_JSON_DUMP_PATH = './temp/linkGraph-en-edges-dump.json'
+    DEFAULT_CONCEPT_MAPPING_JSON_BOTH_TRANSITIONS_DUMP_PATH = './temp/linkGraph-en-edges-both-transitions-dump.json'
     MATRIX_P_FILE_PATH = './temp/linkGraph-matrix-P-dump.npz'
 
     NUMBER_OF_NEW_CONCEPTS = 20
@@ -421,14 +437,14 @@ if __name__ == '__main__':
     # read all concept transitions from a file (or a dump) and create a dictionary with modified IDs
     concept_mappings, concept_mappings_both_transitions, old_new_id_temp_dict = create_concept_mappings_dict(
         DEFAULT_CONCEPT_MAPPING_FILE,
-        DEFAULT_CONCEPT_MAPPING_PICKLE_DUMP_PATH,
-        DEFAULT_CONCEPT_MAPPING_PICKLE_BOTH_TRANSITIONS_DUMP_PATH)
+        DEFAULT_CONCEPT_MAPPING_JSON_DUMP_PATH,
+        DEFAULT_CONCEPT_MAPPING_JSON_BOTH_TRANSITIONS_DUMP_PATH)
 
     # # indices_array is a 1D array where position presents index (new ID) and value presents old ID value
     new_old_idx_map, id_str_concept_map = create_concept_ids(
         DEFAULT_CONCEPT_FILE,
         NEW_OLD_ID_MAPPING_DUMP_PATH,
-        ID_CONCEPT_MAPPING_PICKLE_DUMP_PATH,
+        ID_CONCEPT_MAPPING_JSON_DUMP_PATH,
         old_new_id_temp_dict)
 
     # matrix dimension is the length of all transitions
