@@ -176,10 +176,9 @@ def calc_neighbourhood(matrix_dimension,
 
 # method extracts concepts IDs and creates new dictionary from them, if dump doesn't exist yet. if dump exists,
 # it just reads it from a dump file
-def create_concept_ids(DEFAULT_CONCEPT_FILE,
-                       NEW_OLD_ID_MAPPING_DUMP_PATH,
-                       OLD_NEW_ID_MAPPING_DUMP_PATH,
-                       ID_CONCEPT_MAPPING_PICKLE_DUMP_PATH,
+def create_concept_ids(default_concept_file,
+                       new_old_id_mapping_dump_path,
+                       id_concept_mapping_pickle_dump_path,
                        old_new_id_dict):
 
     # old_new_id_temp_dict contains the mapping old -> new ID for old concepts that contain transitions
@@ -188,27 +187,26 @@ def create_concept_ids(DEFAULT_CONCEPT_FILE,
 
     new_id_to_concept_string_mapping = {}
 
-    if os.path.isfile(ID_CONCEPT_MAPPING_PICKLE_DUMP_PATH) and os.path.isfile(
-            NEW_OLD_ID_MAPPING_DUMP_PATH) and os.path.isfile(OLD_NEW_ID_MAPPING_DUMP_PATH):
+    if os.path.isfile(id_concept_mapping_pickle_dump_path) and os.path.isfile(new_old_id_mapping_dump_path):
 
         # try opening concepts file dump and if it doesn't exist, try opening the file and construct dump from it
         print("concept file PICKLE dumps exist")
 
-        print("opening file", NEW_OLD_ID_MAPPING_DUMP_PATH)
-        new_old_id_dict = pickle.load(open(NEW_OLD_ID_MAPPING_DUMP_PATH, "rb"))
-        print("file", NEW_OLD_ID_MAPPING_DUMP_PATH, "read")
+        print("opening file", new_old_id_mapping_dump_path)
+        new_old_id_dict = pickle.load(open(new_old_id_mapping_dump_path, "rb"))
+        print("file", new_old_id_mapping_dump_path, "read")
 
-        print("opening file", ID_CONCEPT_MAPPING_PICKLE_DUMP_PATH)
-        new_id_to_concept_string_mapping = pickle.load(open(ID_CONCEPT_MAPPING_PICKLE_DUMP_PATH, "rb"))
-        print("file", ID_CONCEPT_MAPPING_PICKLE_DUMP_PATH, "read")
+        print("opening file", id_concept_mapping_pickle_dump_path)
+        new_id_to_concept_string_mapping = pickle.load(open(id_concept_mapping_pickle_dump_path, "rb"))
+        print("file", id_concept_mapping_pickle_dump_path, "read")
 
-    elif os.path.isfile(DEFAULT_CONCEPT_FILE):
-        print("using default concept file path", DEFAULT_CONCEPT_FILE)
+    elif os.path.isfile(default_concept_file):
+        print("using default concept file path", default_concept_file)
         print("opening concepts file")
 
         # get maximum value of new ID so far
         counter = int(max(new_old_id_dict, key=int)) + 1
-        with open(DEFAULT_CONCEPT_FILE) as concepts_file:
+        with open(default_concept_file) as concepts_file:
             for lineN, line in enumerate(concepts_file):
                 line = line.strip()
                 split = line.split("\t")
@@ -244,10 +242,10 @@ def create_concept_ids(DEFAULT_CONCEPT_FILE,
         print("created our own dictionary of old to new and new to old indices and ID to word mappings")
 
         print("storing our own new-old IDs array to PICKLE dump")
-        pickle.dump(new_old_id_dict, open(NEW_OLD_ID_MAPPING_DUMP_PATH, "wb"))
+        pickle.dump(new_old_id_dict, open(new_old_id_mapping_dump_path, "wb"))
 
         print("storing our own dictionary to PICKLE dump")
-        pickle.dump(new_id_to_concept_string_mapping, open(ID_CONCEPT_MAPPING_PICKLE_DUMP_PATH, "wb"))
+        pickle.dump(new_id_to_concept_string_mapping, open(id_concept_mapping_pickle_dump_path, "wb"))
     else:
         print("no concept id file or PICKLE dump, cannot proceed")
         exit(1)
@@ -408,7 +406,6 @@ if __name__ == '__main__':
     DEFAULT_CONCEPT_FILE = './linkGraph-en-verts.txt'
     DEFAULT_CONCEPT_MAPPING_FILE = './linkGraph-en-edges.txt'
     NEW_OLD_ID_MAPPING_DUMP_PATH = './temp/linkGraph-en-verts-new-old-id-concept-mapping-dump.pkl'
-    OLD_NEW_ID_MAPPING_DUMP_PATH = './temp/linkGraph-en-verts-old-new-id-mapping-dump.pkl'
     ID_CONCEPT_MAPPING_PICKLE_DUMP_PATH = './temp/linkGraph-en-verts-id-concept-mapping-dump.pkl'
     DEFAULT_CONCEPT_MAPPING_PICKLE_DUMP_PATH = './temp/linkGraph-en-edges-dump.pkl'
     DEFAULT_CONCEPT_MAPPING_PICKLE_BOTH_TRANSITIONS_DUMP_PATH = './temp/linkGraph-en-edges-both-transitions-dump.pkl'
@@ -431,7 +428,6 @@ if __name__ == '__main__':
     new_old_idx_map, id_str_concept_map = create_concept_ids(
         DEFAULT_CONCEPT_FILE,
         NEW_OLD_ID_MAPPING_DUMP_PATH,
-        OLD_NEW_ID_MAPPING_DUMP_PATH,
         ID_CONCEPT_MAPPING_PICKLE_DUMP_PATH,
         old_new_id_temp_dict)
 
