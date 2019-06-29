@@ -280,9 +280,10 @@ def create_concept_mappings_dict(default_concept_mapping_file,
         # create mapping od old ID to new ID
         old_new_id_dict = {}
         new_id = 0
-        for old_id in both_transitions_map:
+        for old_id in new_id_both_transitions_map:
             old_new_id_dict[old_id] = new_id
             new_id = new_id + 1
+            print(new_id)
         print("hashmap of old -> new ID created")
 
     elif os.path.isfile(default_concept_mapping_file):
