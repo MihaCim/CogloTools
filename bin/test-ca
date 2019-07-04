@@ -5,4 +5,4 @@ set -e
 
 # run the test
 cd ../src
-python -m modules.partitioning.test
+python -m pytest modules/middleware/test/

@@ -1,0 +1,6 @@
+requests
+schedule
+sqlalchemy
+numpy
+scipy
+psycopg2-binary
