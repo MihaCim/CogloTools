@@ -213,6 +213,7 @@ def calc_neighbourhood(matrix_dimension,
 
     exit(0)
 
+
 # method extracts concepts IDs and creates new dictionary from them, if dump doesn't exist yet. if dump exists,
 # it just reads it from a dump file
 def create_concept_ids(default_concept_file,
@@ -542,21 +543,6 @@ def create_concept_mappings_dict(default_concept_mapping_file,
         exit(2)
 
     return new_id_transitions_map
-
-
-def create_matrix_P(filePath, both_transitions_map, matrix_dim):
-    if os.path.isfile(filePath):
-        print("matrix P file path exists")
-        print("reading file", filePath)
-        matrix = sparse.load_npz(filePath)
-        print("file", filePath, "read")
-    else:
-        matrix = create_transition_matrix(both_transitions_map, matrix_dim)
-        print("storing matrix P as sparse npz")
-        sparse.save_npz(filePath, matrix)
-        print("storing matrix P as sparse npz completed")
-
-    return matrix
 
 
 if __name__ == '__main__':
