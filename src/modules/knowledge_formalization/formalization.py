@@ -610,11 +610,6 @@ if __name__ == '__main__':
         ID_CONCEPT_MAPPING_JSON_DUMP_PATH,
         old_new_id_temp_dict)
 
-    print(len(new_old_idx_map))
-    print(new_old_idx_map.get(0))
-
-    # TODO check with csc matrix if its faster
-
     del old_new_id_temp_dict
 
     # create concept mappings
