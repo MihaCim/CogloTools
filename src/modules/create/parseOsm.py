@@ -52,6 +52,7 @@ class OsmHandler(xml.sax.ContentHandler):
 
     def __init__(self):
         # create an XMLReader
+
         parser = xml.sax.make_parser()
         # turn off namepsaces
         parser.setFeature(xml.sax.handler.feature_namespaces, 0)
@@ -60,8 +61,7 @@ class OsmHandler(xml.sax.ContentHandler):
         handler = OsmParsers()
         parser.setContentHandler(handler)
 
-
-        parser.parse("data/kamnik_export.osm")
+        parser.parse("data/test_export.osm")
 
         self.ways = handler.ways
         self.nodes = handler.nodes
