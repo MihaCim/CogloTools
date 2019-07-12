@@ -313,28 +313,29 @@ def create_concept_ids(default_concept_file,
 
 
 # method creates concept mapping if it doesn't exist yet. If it does, it just reads if from a dump file
-def create_concept_mappings_both_transitions_dict(default_concept_mapping_file,
-                                 default_concept_mapping_json_both_transitions_dump_path):
-    both_transitions_map = defaultdict(list)  # contains transitions A -> B and B -> A with old IDs
+def create_concept_mappings_dict(default_concept_mapping_file,
+                                 default_concept_mapping_json_both_dump_path,
+                                 should_use_both_transitions):
+    concept_transition_map = defaultdict(list)  # contains transitions A -> B (and B -> A with old IDs if should_use_both_transitions flag is set)
 
     # similar to above (but with new IDs)
-    new_id_both_transitions_map = defaultdict(list)
+    new_id_concept_transition_map = defaultdict(list)
 
-    if os.path.isfile(default_concept_mapping_json_both_transitions_dump_path):
+    if os.path.isfile(default_concept_mapping_json_both_dump_path):
 
         print("concept mapping json dumps exist")
-        print("reading file", default_concept_mapping_json_both_transitions_dump_path)
-        with open(default_concept_mapping_json_both_transitions_dump_path, 'r') as fp2:
-            new_id_both_transitions_load = json.load(fp2)
+        print("reading file", default_concept_mapping_json_both_dump_path)
+        with open(default_concept_mapping_json_both_dump_path, 'r') as fp2:
+            new_id_mapping_load = json.load(fp2)
         fp2.close()
-        new_id_both_transitions_map = {int(old_key): val for old_key, val in new_id_both_transitions_load.items()}  # convert string keys to integers
-        print("file", default_concept_mapping_json_both_transitions_dump_path, "read")
+        new_id_concept_transition_map = {int(old_key): val for old_key, val in new_id_mapping_load.items()}  # convert string keys to integers
+        print("file", default_concept_mapping_json_both_dump_path, "read")
 
         print("creating hashmap of old -> new ID")
         # create mapping od old ID to new ID
         old_new_id_dict = {}
         new_id = 0
-        for old_id in new_id_both_transitions_map:
+        for old_id in new_id_concept_transition_map:
             old_new_id_dict[old_id] = new_id
             new_id = new_id + 1
         print("hashmap of old -> new ID created")
@@ -360,8 +361,9 @@ def create_concept_mappings_both_transitions_dict(default_concept_mapping_file,
                     value = int(split[1])
 
                     # if key already exists in a dict, it appends value to it instead of overriding it
-                    both_transitions_map[old_id].append(value)
-                    both_transitions_map[value].append(old_id)
+                    concept_transition_map[old_id].append(value)
+                    if should_use_both_transitions:
+                        concept_transition_map[value].append(old_id)
 
                     # print progress every 1M
                     if lineN % 10000000 == 0:
@@ -374,13 +376,13 @@ def create_concept_mappings_both_transitions_dict(default_concept_mapping_file,
         # remove concepts from dictionaries that don't have any transitions
         print("removing concepts that don't have any transitions")
         remove_keys = []
-        for concept in both_transitions_map:
-            transitions = both_transitions_map[concept]
+        for concept in concept_transition_map:
+            transitions = concept_transition_map[concept]
             if len(transitions) == 0:
                 remove_keys.append(concept)
         for key in remove_keys:
             # remove elements from both dictionaries
-            del both_transitions_map[key]
+            del concept_transition_map[key]
 
         print("concepts without transitions and their IDs successfully removed")
 
@@ -388,7 +390,7 @@ def create_concept_mappings_both_transitions_dict(default_concept_mapping_file,
         # create mapping od old ID to new ID
         old_new_id_dict = {}
         new_id = 0
-        for old_id in both_transitions_map:
+        for old_id in concept_transition_map:
             old_new_id_dict[old_id] = new_id
             new_id = new_id + 1
         print("hashmap of old -> new ID created")
@@ -396,12 +398,12 @@ def create_concept_mappings_both_transitions_dict(default_concept_mapping_file,
         print("creating hashmap of new ID -> transactions with new ID")
 
         # new mapping for both transitions
-        new_id_both_transitions_map = defaultdict(list)
+        new_id_concept_transition_map = defaultdict(list)
         id = 0
         counter = 0
-        for old_id in both_transitions_map:
+        for old_id in concept_transition_map:
             # array of transitions but with old ids
-            transitions = both_transitions_map[old_id]
+            transitions = concept_transition_map[old_id]
 
             # get new ID for this concept
             new_id = old_new_id_dict[old_id]
@@ -410,7 +412,7 @@ def create_concept_mappings_both_transitions_dict(default_concept_mapping_file,
             for transition in transitions:
                 # extract new transition ID and append it to the dictionary
                 new_transition_id = old_new_id_dict[transition]
-                new_id_both_transitions_map[new_id].append(new_transition_id)
+                new_id_concept_transition_map[new_id].append(new_transition_id)
 
                 id = id + len(transitions)
                 counter = counter + 1
@@ -421,128 +423,18 @@ def create_concept_mappings_both_transitions_dict(default_concept_mapping_file,
         print("hashmap of new ID -> transactions with new ID created")
 
         # remove transition map from memory
-        del both_transitions_map
+        del concept_transition_map
 
         print("storing new ID -> transitions hashmap for both transitions to json dump")
-        with open(default_concept_mapping_json_both_transitions_dump_path, 'w') as fp2:
-            json.dump(new_id_both_transitions_map, fp2)
+        with open(default_concept_mapping_json_both_dump_path, 'w') as fp2:
+            json.dump(new_id_concept_transition_map, fp2)
         fp2.close()
         print("storing new ID -> transitions hashmap for both transitions to json dump completed")
     else:
         print("no concept mapping file or json dump, cannot proceed")
         exit(2)
 
-    return new_id_both_transitions_map, old_new_id_dict
-
-
-# method creates concept mapping if it doesn't exist yet. If it does, it just reads if from a dump file
-def create_concept_mappings_dict(default_concept_mapping_file,
-                                                   default_concept_mapping_json_dump_path):
-    transition_map = defaultdict(list)  # contains transitions A -> B with old IDs
-
-    # similar to above (but with new IDs)
-    new_id_transitions_map = defaultdict(list)
-
-    if os.path.isfile(default_concept_mapping_json_dump_path):
-
-        print("concept mapping json dumps exist")
-        print("reading file", default_concept_mapping_json_dump_path)
-        with open(default_concept_mapping_json_dump_path, 'r') as fp1:
-            new_id_transitions_load = json.load(fp1)
-        fp1.close()
-        new_id_transitions_map = {int(old_key): val for old_key, val in new_id_transitions_load.items()}  # convert string keys to integers
-        print("file", default_concept_mapping_json_dump_path, "read")
-
-    elif os.path.isfile(default_concept_mapping_file):
-        print("concept file dump doesnt exist. building new one from file", default_concept_mapping_file)
-
-        #  go through each line and build dictionaries for concept transitions
-        with open(default_concept_mapping_file, 'r') as concept_mappings_file:
-            for lineN, line in enumerate(concept_mappings_file):
-                line = line.strip()
-                split = line.split("\t")
-
-                if len(split) < 2:
-                    print("Skipping line because it doesn't have at least 2 columns (concept ID and connection)")
-                else:
-                    # skip a line if it doesnt contain a number
-                    if not split[0].isdigit() or not split[1].isdigit():
-                        continue
-
-                    # declare two variables for start node ID and end node ID
-                    old_id = int(split[0])
-                    value = int(split[1])
-
-                    # if key already exists in a dict, it appends value to it instead of overriding it
-                    transition_map[old_id].append(value)
-
-                    # print progress every 1M
-                    if lineN % 10000000 == 0:
-                        print(lineN / 1000000)
-
-        # close file
-        concept_mappings_file.close()
-        print("created concept transition dictionary")
-
-        # remove concepts from dictionaries that don't have any transitions
-        print("removing concepts that don't have any transitions")
-        remove_keys = []
-        for concept in transition_map:
-            transitions = transition_map[concept]
-            if len(transitions) == 0:
-                remove_keys.append(concept)
-        for key in remove_keys:
-            # remove elements from both dictionaries
-            del transition_map[key]
-
-        print("concepts without transitions and their IDs successfully removed")
-
-        print("creating hashmap of old -> new ID")
-        # create mapping of old ID to new ID
-        old_new_id_dict = {}
-        new_id = 0
-        for old_id in transition_map:
-            old_new_id_dict[old_id] = new_id
-            new_id = new_id + 1
-        print("hashmap of old -> new ID created")
-
-        print("creating hashmap of new ID -> transactions with new ID")
-        id = 0
-        counter = 0
-        # new mapping for transitions
-        for old_id in transition_map:
-            # array of transitions but with old ids
-            transitions = transition_map[old_id]
-
-            # get new ID for this concept
-            new_id = old_new_id_dict[old_id]
-
-            # go through array of transitions
-            for transition in transitions:
-                # extract new transition ID and append it to the dictionary
-                new_transition_id = old_new_id_dict[transition]
-                new_id_transitions_map[new_id].append(new_transition_id)
-
-                id = id + len(transitions)
-                counter = counter + 1
-                if counter % 10000000 == 0:
-                    print("at counter", counter, "current ID is", id)
-
-        print("hashmap of new ID -> transactions with new ID created")
-
-        # remove transition map from memory
-        del transition_map
-
-        print("storing new ID -> transitions hashmap to json dump")
-        with open(default_concept_mapping_json_dump_path, 'w') as fp1:
-            json.dump(new_id_transitions_map, fp1)
-        fp1.close()
-        print("storing new ID -> transitions hashmap to json dump completed")
-    else:
-        print("no concept mapping file or json dump, cannot proceed")
-        exit(2)
-
-    return new_id_transitions_map
+    return new_id_concept_transition_map, old_new_id_dict
 
 
 if __name__ == '__main__':
@@ -554,6 +446,12 @@ if __name__ == '__main__':
     DEFAULT_CONCEPT_MAPPING_JSON_BOTH_TRANSITIONS_DUMP_PATH = './temp/linkGraph-en-edges-both-transitions-dump.json'
     MATRIX_P_FILE_PATH = './temp/linkGraph-matrix-P-dump.npz'
 
+    # initial concepts will be given as array of strings API parameter
+    # TODO map strings to concept IDs
+    initial_concepts = [9000, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 1000, 54324, 11241, 11100, 10101,
+                        9219, 9231]
+
+    # alfa and number of new concepts will be given as API parameter
     NUMBER_OF_NEW_CONCEPTS = 20
     ALFA = 0.2
 
@@ -574,9 +472,9 @@ if __name__ == '__main__':
         print("file", MATRIX_P_FILE_PATH, "read")
     else:
         # read all concept transitions from a file (or a dump) and create a dictionary with modified IDs
-        concept_mappings_both_transitions, old_new_id_temp_dict = create_concept_mappings_both_transitions_dict(
+        concept_mappings_both_transitions, old_new_id_temp_dict = create_concept_mappings_dict(
             DEFAULT_CONCEPT_MAPPING_FILE,
-            DEFAULT_CONCEPT_MAPPING_JSON_BOTH_TRANSITIONS_DUMP_PATH)
+            DEFAULT_CONCEPT_MAPPING_JSON_BOTH_TRANSITIONS_DUMP_PATH, True)
 
         # matrix dimension is the length of all transitions
         matrix_dimension = len(concept_mappings_both_transitions)
@@ -601,13 +499,11 @@ if __name__ == '__main__':
     # create concept mappings
     concept_mappings = create_concept_mappings_dict(
         DEFAULT_CONCEPT_MAPPING_FILE,
-        DEFAULT_CONCEPT_MAPPING_JSON_DUMP_PATH)
+        DEFAULT_CONCEPT_MAPPING_JSON_DUMP_PATH,
+        False)
 
     # calculate matrix dimension based on concept mappings length
     matrix_dimension = len(concept_mappings)
-
-    # TODO create parser for initial concepts
-    initial_concepts = [9000, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 1000, 54324, 11241, 11100, 10101, 9219, 9231]
 
     calc_neighbourhood(matrix_dimension,
                        concept_mappings,
