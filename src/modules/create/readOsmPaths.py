@@ -112,7 +112,7 @@ def drawStaticGraph(nodes, ways, results):
                 color_map.append('red')
             else:
                 color_map.append('blue')
-            labels[i] = nodes[posts].post_id
+            labels[i] = nodes[posts].post_id + "("+str(posts)+")"
         else:
             labels[i] = posts
             color_map.append('green')
@@ -134,7 +134,7 @@ def drawStaticGraph(nodes, ways, results):
     import matplotlib.pyplot as plt
 
             # plt.figure(1)
-    pos = nx.spring_layout(G)
+    pos = nx.spring_layout(G, k=0.25, iterations=40)
     nx.draw_networkx_nodes(G, pos, node_color= color_map, nodelist=li)
     nx.draw_networkx_edges(G, pos, nodelist=li, node_color='g')
 
@@ -159,12 +159,12 @@ class FrontData:
         self.prev_posts = prev_posts
         self.eps_history = eps_history
 
-    def has_traversed(self, node_id):
+    def has_traversed(self, n_id):
         """
         Checks if node_id is in the history of this node.
         """
         for hist_node_id, hist_node_dist_origin in self.eps_history:
-            if hist_node_id == node_id:
+            if hist_node_id == n_id:
                 return True
         return False
 
@@ -252,23 +252,38 @@ def search_near_posts(node_id_node_map, node_id_edge_map, start_node_id, eps_km)
         # compute the history of the new node
         active_node_history = prev_node_data.eps_history + [(prev_node_id, prev_node_data.origin_dist)]
 
-        '''
-        while True:
+        active_node_dist_origin = min_distance
+        while len(active_node_history) > 0:
             oldest_node_id, oldest_node_dist_origin = active_node_history[0]
-            newest_node_id, newest_node_dist_origin = active_node_history[-1]
-            dist_diff = newest_node_dist_origin - oldest_node_dist_origin
-
+            #newest_node_id, newest_node_dist_origin = active_node_history[-1]
+            dist_diff = active_node_dist_origin - oldest_node_dist_origin
             if dist_diff <= eps_km:
                 break
             active_node_history.pop(0)
-
-        '''
 
         front[active_node_id] = FrontData(
             min_distance,
             current_visited_points,
             active_node_history
         )
+
+        '''
+
+        for f in front:
+            print(f)
+            current_origin_distance = front[f].origin_dist
+            current_eps_history = front[f].eps_history
+            while True:
+                if current_eps_history is None or len(current_eps_history) == 0:
+                    break
+                oldest_node_id, oldest_node_dist_origin = current_eps_history[0]
+                dist_diff = current_origin_distance - oldest_node_dist_origin
+
+                if dist_diff <= eps_km:
+                    break
+                current_eps_history.pop(0)
+            front[f].eps_history = current_eps_history
+            '''
 
 
         #front.append((active_node_id, min_distance, current_visited_points))
@@ -279,11 +294,13 @@ def search_near_posts(node_id_node_map, node_id_edge_map, start_node_id, eps_km)
         print("Visited: "+str(visited_node_ids))
         print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
-        '''
+
         # check if we need to snap the current post back to the intersection
         if is_post:
             snap_node_id = active_node_id
             snap_node_history = [node_id for node_id in reversed(active_node_history)]  # TODO: optimize
+            #TODO check if all the naighbors of previous point were visited
+            #if not snap the node back
 
             found_intersec = True
             while found_intersec:
@@ -312,13 +329,15 @@ def search_near_posts(node_id_node_map, node_id_edge_map, start_node_id, eps_km)
                         if front_node_data.has_traversed(hist_node_id):
                             intersects_node_ids.append(front_node_id)
 
-                    found_intersec = len(intersects_node_ids) > 0
+                    found_intersec = len(intersects_node_ids) > 1
                     if found_intersec:
                         # swap the historical node with the current node
 
                         # swap the post_id of the historical node with the post_id
                         # of the current node
                         hist_node.post_id = snap_node.post_id
+                        hist_node.is_post = True
+                        snap_node.is_post = False
                         snap_node.post_id = None
 
                         # add hist_node_id into prev_posts for all the found nodes
@@ -336,7 +355,7 @@ def search_near_posts(node_id_node_map, node_id_edge_map, start_node_id, eps_km)
                         snap_node_history = snap_node_history[hist_nodeN + 1:]
 
         print(front)
-        '''
+
 
         # if all the neighbours of the previous point have been visited, remove it
         # from the front
@@ -415,7 +434,7 @@ def synticGraph():
         0: {1: {'weight': 2}, 2: {'weight': 2}, 3: {'weight': 2}, 4: {'weight': 2}},
         1: {5: {'weight': 0.5}, 6: {'weight': 2}, 0: {'weight': 2}},
         2: {0: {'weight': 2}, 9: {'weight': 2}, 10: {'weight': 6}},
-        3: {0: {'weight': 2}, 19: {'weight': 0.5}, 20: {'weight': 0.5}},
+        3: {0: {'weight': 2}, 19: {'weight': 2}, 20: {'weight': 0.5}},
         4: {0: {'weight': 2}, 30: {'weight': 0.5}},
         5: {1: {'weight': 0.5}},
         6: {1: {'weight': 2}, 7: {'weight': 2}, 8: {'weight': 1.5}},
@@ -431,7 +450,7 @@ def synticGraph():
         16: {41: {'weight': 0.5}, 17: {'weight': 0.5}},
         17: {16: {'weight': 0.5}, 18: {'weight': 0.5}, 44: {'weight': 0.5}},
         18: {17: {'weight': 0.5}},
-        19: {3: {'weight': 0.5}, 45: {'weight': 0.5}},
+        19: {3: {'weight': 2}, 45: {'weight': 0.5}},
         20: {3: {'weight': 0.5}, 21: {'weight': 0.3}, 27: {'weight': 0.3}},
         21: {20: {'weight': 0.5}, 25: {'weight': 0.3}, 22: {'weight': 0.3}},
         22: {21: {'weight': 0.5}, 24: {'weight': 0.3}, 23: {'weight': 0.3}},
@@ -446,14 +465,14 @@ def synticGraph():
         31: {30: {'weight': 0.5}},
         32: {30: {'weight': 0.3}, 33: {'weight': 0.3}, 34: {'weight': 0.3}},
         33: {32: {'weight': 0.4}},
-        34: {35: {'weight': 0.5}, 32: {'weight': 0.5}},
+        34: {35: {'weight': 0.5}, 32: {'weight': 0.3}},
         35: {34: {'weight': 0.5}, 36: {'weight': 0.3}},
         36: {35: {'weight': 0.5}},
 
         37: {30: {'weight': 0.5}, 38: {'weight': 0.3}},
         38: {37: {'weight': 0.5}, 39: {'weight': 0.3}},
-        39: {38: {'weight': 0.5}, 40: {'weight': 0.3}},
-        40: {39: {'weight': 0.5}},
+        39: {38: {'weight': 0.5}, 40: {'weight': 3}},
+        40: {39: {'weight': 5}},
         41: {9: {'weight': 0.5}, 16: {'weight': 0.5}, 42: {'weight': 0.5}},
         42: {8: {'weight': 0.5}, 41: {'weight': 0.5}, 43: {'weight': 0.5}},
         43: {42: {'weight': 0.5}},
@@ -498,8 +517,8 @@ if __name__ == "__main__":
         tmpD[way.ids[1]] = {"weight": way.distance}
         edgesDict[way.ids[0]] = tmpD
 
-    print(len(roadNodes))
-    print(len(edgesDict))
+    #print(len(roadNodes))
+    #print(len(edgesDict))
 
     nodesDict,edgesDict = synticGraph()
 
@@ -508,6 +527,8 @@ if __name__ == "__main__":
     #for posts in postsNodes:
         # posts = 401868937
     posts = 0
+    # drawStaticGraph(nodesDict, edgesDict, [])
+    #posts = 2244725770
     results = search_near_posts(nodesDict, edgesDict, posts, 1)
     drawStaticGraph(nodesDict, edgesDict, results)
     #drawStaticGraph(nodesDict, edgesDict)
@@ -520,6 +541,6 @@ if __name__ == "__main__":
                                                roadNodes[posts].lon))
             algPostalWays.append(tmp)
 
-    
-    drawGraph(algPostalWays, G, roadNodesAnotated, postsNodes)
     '''
+    drawGraph(algPostalWays, G, roadNodesAnotated, postsNodes)
+
