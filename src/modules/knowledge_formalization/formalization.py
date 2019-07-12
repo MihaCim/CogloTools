@@ -362,6 +362,8 @@ def create_concept_mappings_dict(default_concept_mapping_file,
 
                     # if key already exists in a dict, it appends value to it instead of overriding it
                     concept_transition_map[old_id].append(value)
+                    
+                    # if this flag is set, old_id points to value and value also points to old_id
                     if should_use_both_transitions:
                         concept_transition_map[value].append(old_id)
 
