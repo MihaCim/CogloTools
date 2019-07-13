@@ -195,18 +195,9 @@ def search_near_posts(node_id_node_map, node_id_edge_map, start_node_id, eps_km)
 
             node_dist = node_data.origin_dist
             neigbours = node_id_edge_map[node_id]  # get neighbors od te tocke
-            print("Neighbours of "+str(node_id))
-            for neigbour in neigbours:
-                print("===============================================================================")
-                print("Nei of "+str(neigbour))
-                edge_dist = neigbours[neigbour]["weight"]
 
-                print(neigbours)
-                print(node_dist + edge_dist )
-                print(min_distance)
-                print(neigbour)
-                print(visited_node_ids)
-                print("===============================================================================")
+            for neigbour in neigbours:
+                edge_dist = neigbours[neigbour]["weight"]
                 if ((node_dist + edge_dist) < min_distance) and (neigbour not in visited_node_ids):
                     min_distance = node_dist + edge_dist
                     active_node_id = neigbour
@@ -232,9 +223,6 @@ def search_near_posts(node_id_node_map, node_id_edge_map, start_node_id, eps_km)
         is_post = node_id_node_map[active_node_id].post_id is not None
         if is_post:
             current_visited_points += [active_node_id]
-            print("Active node id: "+str(active_node_id))
-            print(current_visited_points)
-            print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
             if len(current_visited_points) == 1:
                 results += [node_id_node_map[active_node_id].post_id]
 
@@ -290,10 +278,6 @@ def search_near_posts(node_id_node_map, node_id_edge_map, start_node_id, eps_km)
         # add the active node to the list of visited nodes
 
         visited_node_ids.add(active_node_id)
-        print("Front: "+str(front.keys()))
-        print("Visited: "+str(visited_node_ids))
-        print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-
 
         # check if we need to snap the current post back to the intersection
         if is_post:
@@ -302,58 +286,93 @@ def search_near_posts(node_id_node_map, node_id_edge_map, start_node_id, eps_km)
             #TODO check if all the naighbors of previous point were visited
             #if not snap the node back
 
-            found_intersec = True
-            while found_intersec:
-                # if there is no more history to traverse the procedure is finished (we have already
-                # searched for eps kilometers back)
-                if len(snap_node_history) == 0:
-                    break
-
-                found_intersec = False
-
-                snap_node = node_id_node_map[snap_node_id]
-                for hist_nodeN, hist_node_data in enumerate(snap_node_history):
-                    hist_node_id, hist_node_dist_origin = hist_node_data
-                    hist_node = node_id_node_map[hist_node_id]
-                    is_hist_node_post = hist_node.post_id is not None
-                    if is_hist_node_post:
-                        # we have found a post office when searching through the history
-                        # that means that this procedure was already run on that post office
-                        # and we were unable to snap it to an intersection. Hence, there is
-                        # no need to run the procedure again.
+            print(snap_node_id)
+            print(snap_node_history)
+            all_visited = True
+            snap_back_to = -1
+            for node_id, eps_distance in snap_node_history:
+                print(node_id_node_map[node_id])
+                for id in node_id_edge_map[node_id]:
+                    if id not in visited_node_ids:
+                        all_visited = False
+                        snap_back_to = node_id
                         break
 
-                    intersects_node_ids = []
-                    for front_node_id in front:
-                        front_node_data = front[front_node_id]
-                        if front_node_data.has_traversed(hist_node_id):
-                            intersects_node_ids.append(front_node_id)
+            if all_visited == False and node_id_node_map[snap_back_to].post_id is None:
+                node_id_node_map[snap_back_to].post_id = node_id_node_map[snap_node_id].post_id
+                node_id_node_map[snap_back_to].is_post = True
+                node_id_node_map[snap_node_id].is_post = False
+                node_id_node_map[snap_node_id].post_id = None
+                ##snap_node_id je node na katerem smo in katerega zelimo prestavit
+                ## snop_back_to je lokacija nove lokacije
 
-                    found_intersec = len(intersects_node_ids) > 1
-                    if found_intersec:
-                        # swap the historical node with the current node
 
-                        # swap the post_id of the historical node with the post_id
-                        # of the current node
-                        hist_node.post_id = snap_node.post_id
-                        hist_node.is_post = True
-                        snap_node.is_post = False
-                        snap_node.post_id = None
+                for f in front:
+                    for id, dist in front[f].eps_history:
+                        if snap_back_to == id and f != snap_node_id:
+                            print("nasel")
+                            print(front[f].eps_history)
+                            front[snap_back_to].prev_posts.append(snap_back_to)
+                if snap_back_to in front:
+                    front[snap_back_to].prev_posts.append(snap_back_to)
 
-                        # add hist_node_id into prev_posts for all the found nodes
-                        # hist_node_id can be added as the last post office visited
-                        # if this was not the case that other post would have already
-                        # been visited and would have been snapped back to the same
-                        # intersection we are snapping the current post to. Hence, we would
-                        # have terminated in the is_hist_node_post check
-                        for intersec_node_id in intersects_node_ids:
-                            intersec_node_data = front[intersec_node_id]
-                            intersec_node_data.prev_posts += [hist_node_id]
+                print("aa")
 
-                        # update the snap node and history
-                        snap_node_id = hist_node_id
-                        snap_node_history = snap_node_history[hist_nodeN + 1:]
+            else:
 
+                found_intersec = True
+                while found_intersec:
+                    # if there is no more history to traverse the procedure is finished (we have already
+                    # searched for eps kilometers back)
+                    if len(snap_node_history) == 0:
+                        break
+
+                    found_intersec = False
+
+                    snap_node = node_id_node_map[snap_node_id]
+                    for hist_nodeN, hist_node_data in enumerate(snap_node_history):
+                        hist_node_id, hist_node_dist_origin = hist_node_data
+                        hist_node = node_id_node_map[hist_node_id]
+                        is_hist_node_post = hist_node.post_id is not None
+                        if is_hist_node_post:
+                            # we have found a post office when searching through the history
+                            # that means that this procedure was already run on that post office
+                            # and we were unable to snap it to an intersection. Hence, there is
+                            # no need to run the procedure again.
+                            break
+
+                        intersects_node_ids = []
+                        for front_node_id in front:
+                            front_node_data = front[front_node_id]
+                            if front_node_data.has_traversed(hist_node_id):
+                                intersects_node_ids.append(front_node_id)
+
+                        found_intersec = len(intersects_node_ids) > 1
+                        if found_intersec:
+                            # swap the historical node with the current node
+
+                            # swap the post_id of the historical node with the post_id
+                            # of the current node
+                            hist_node.post_id = snap_node.post_id
+                            hist_node.is_post = True
+                            snap_node.is_post = False
+                            snap_node.post_id = None
+
+                            # add hist_node_id into prev_posts for all the found nodes
+                            # hist_node_id can be added as the last post office visited
+                            # if this was not the case that other post would have already
+                            # been visited and would have been snapped back to the same
+                            # intersection we are snapping the current post to. Hence, we would
+                            # have terminated in the is_hist_node_post check
+                            for intersec_node_id in intersects_node_ids:
+                                intersec_node_data = front[intersec_node_id]
+                                intersec_node_data.prev_posts += [hist_node_id]
+
+                            # update the snap node and history
+                            snap_node_id = hist_node_id
+                            snap_node_history = snap_node_history[hist_nodeN + 1:]
+
+                
         print(front)
 
 
@@ -434,7 +453,7 @@ def synticGraph():
         0: {1: {'weight': 2}, 2: {'weight': 2}, 3: {'weight': 2}, 4: {'weight': 2}},
         1: {5: {'weight': 0.5}, 6: {'weight': 2}, 0: {'weight': 2}},
         2: {0: {'weight': 2}, 9: {'weight': 2}, 10: {'weight': 6}},
-        3: {0: {'weight': 2}, 19: {'weight': 2}, 20: {'weight': 0.5}},
+        3: {0: {'weight': 2}, 19: {'weight': 2}, 20: {'weight': 2}},
         4: {0: {'weight': 2}, 30: {'weight': 0.5}},
         5: {1: {'weight': 0.5}},
         6: {1: {'weight': 2}, 7: {'weight': 2}, 8: {'weight': 1.5}},
@@ -451,7 +470,7 @@ def synticGraph():
         17: {16: {'weight': 0.5}, 18: {'weight': 0.5}, 44: {'weight': 0.5}},
         18: {17: {'weight': 0.5}},
         19: {3: {'weight': 2}, 45: {'weight': 0.5}},
-        20: {3: {'weight': 0.5}, 21: {'weight': 0.3}, 27: {'weight': 0.3}},
+        20: {3: {'weight': 2}, 21: {'weight': 0.3}, 27: {'weight': 0.3}},
         21: {20: {'weight': 0.5}, 25: {'weight': 0.3}, 22: {'weight': 0.3}},
         22: {21: {'weight': 0.5}, 24: {'weight': 0.3}, 23: {'weight': 0.3}},
         23: {22: {'weight': 0.5}},
