@@ -4,3 +4,5 @@
 # Vim files
 .vimrc
 .idea/*
+*.osm
+*.pbf
