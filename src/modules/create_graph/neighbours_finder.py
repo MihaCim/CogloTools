@@ -1,15 +1,19 @@
 import math
+import copy
 from src.modules.create_graph.pojo.front_data import FrontData
 
 class NeighboursFinder():
 
-    def search_near_posts(self, node_id_node_map, node_id_edge_map, start_node_id, eps_km):
+    def search_near_posts(self, node_id_node_map_tmp, node_id_edge_map, start_node_id, eps_km):
         # front = [(start_node_id, 0, [])]
+        node_id_node_map = copy.deepcopy(node_id_node_map_tmp)
+        node_id_edge_map = copy.deepcopy(node_id_edge_map)
         front = {
             start_node_id: FrontData(0, [], [])
         }
         visited_node_ids = set()
         results = []
+
 
         visited_node_ids.add(0)
 
@@ -119,12 +123,12 @@ class NeighboursFinder():
                 # TODO check if all the naighbors of previous point were visited
                 # if not snap the node back
 
-                print(snap_node_id)
-                print(snap_node_history)
+                #print(snap_node_id)
+                #print(snap_node_history)
                 all_visited = True
                 snap_back_to = -1
                 for node_id, eps_distance in snap_node_history:
-                    print(node_id_node_map[node_id])
+                    #print(node_id_node_map[node_id])
                     for id in node_id_edge_map[node_id]:
                         if id not in visited_node_ids:
                             all_visited = False
@@ -142,13 +146,12 @@ class NeighboursFinder():
                     for f in front:
                         for id, dist in front[f].eps_history:
                             if snap_back_to == id and f != snap_node_id:
-                                print("nasel")
-                                print(front[f].eps_history)
+                                #print("nasel")
+                                #print(front[f].eps_history)
                                 front[snap_back_to].prev_posts.append(snap_back_to)
                     if snap_back_to in front:
                         front[snap_back_to].prev_posts.append(snap_back_to)
 
-                    print("aa")
 
                 else:
 
@@ -204,7 +207,7 @@ class NeighboursFinder():
                                 snap_node_id = hist_node_id
                                 snap_node_history = snap_node_history[hist_nodeN + 1:]
 
-            print(front)
+            #print(front)
 
             # if all the neighbours of the previous point have been visited, remove it
             # from the front
@@ -221,9 +224,9 @@ class NeighboursFinder():
             for node_id in tmpD:
                 del front[node_id]
 
-            print("visited:" + str(visited_node_ids))
-            print("results:" + str(results))
+           # print("visited:" + str(visited_node_ids))
+           # print("results:" + str(results))
 
-        print("done")
-        print(results)
+        #print("done")
+        #print(results)
         return results

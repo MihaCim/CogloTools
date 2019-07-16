@@ -1,41 +1,34 @@
 #!/usr/bin/python3
 
-
-from src.modules.create_graph.utils import utils
 from src.modules.create_graph.data_parser.data_handler import DataHandler
 import networkx as nx
-from src.modules.create_graph.pojo.front_data import FrontData
-from src.modules.create_graph.pojo.search_node import SearchNode
 import src.modules.create_graph.neighbours_finder as neighbourAlg
+import matplotlib.pyplot as plt
 
 
-def drawGraph(algPostalWays, H, nodes, postalNodes):
+def drawGraph(H, postalNodes, postalWays):
     G = nx.Graph()
     li = []
+    labels = {}
 
     for posts in postalNodes:
         li.append(posts)
-        G.add_node(posts, pos=(nodes[posts].lat, nodes[posts].lon))
+        G.add_node(posts, pos=(postalNodes[posts].lat, postalNodes[posts].lon))
+        labels[posts] = postalNodes[posts].post_id + "(" + str(posts) + ")"
 
-    for edge in algPostalWays:
-        l = edge.get_all_nodes()
-        ##if l[0] not in n:
-        #   G.add_node(l[0], pos=(nodes[l[0]].lat, nodes[l[0]].lon))
-        # if l[1] not in n:
-        #    G.add_node(l[1], pos=(nodes[l[1]].lat, nodes[l[1]].lon))
-        G.add_edge(l[0], l[1], weight=edge.distance)
+    for edge in postalWays:
+        for edgeN in postalWays[edge]:
+            G.add_edge(edge, edgeN, weight=postalWays[edge][edgeN]['weight'])
 
-        import matplotlib.pyplot as plt
 
         # plt.figure(1)
-        pos = nx.get_node_attributes(H, 'pos')
-        nx.draw(H, pos=pos, node_size=1)
-        nx.draw_networkx_nodes(G, pos, nodelist=li, node_color='g')
-        nx.draw_networkx_edges(G, pos, nodelist=li, node_color='g')
+    pos = nx.get_node_attributes(H, 'pos')
+    nx.draw(H, pos=pos, node_size=1)
+    nx.draw_networkx_nodes(G, pos, nodelist=li, node_color='g')
+    nx.draw_networkx_edges(G, pos, nodelist=li, node_color='g')
+    nx.draw_networkx_labels(G, pos, labels, font_size=16)
 
-        # plt.figure(2)
-        # nx.draw(G)
-        plt.show()
+    plt.show()
 
 
 def drawStaticGraph(nodes, ways, results):
@@ -85,30 +78,40 @@ def drawStaticGraph(nodes, ways, results):
 
 if __name__ == "__main__":
 
-    osmHandler = DataHandler("data/test_export.osm",
+    osmHandler = DataHandler("data/kamnik_export.osm",
                              'data/List of Postal Offices (geographical location).csv')
     G = osmHandler.graph_viz()
 
     roadNodes = osmHandler.modified_nodes
     roadWays = osmHandler.modified_ways
+    map_posts_to_nodes = {}
+    for k,v in roadNodes.items():
+        if v.is_post:
+            map_posts_to_nodes[v.post_id] = k
 
 
 
+    postNode = {}
+    postEdge = {}
 
-    # nodesDict,edgesDict = synticGraph()
     # drawStaticGraph(nodesDict, edgesDict, results)
     finder = neighbourAlg.NeighboursFinder()
-    finder.search_near_posts(roadNodes, roadWays, 4576807226, 1)
-    '''
-    for posts in postsNodes:
-        results = finder.search_near_posts(nodesDict, edgesDict, posts, 1)
-        for result in results:
-            tmp = parse_osm.Way()
-            tmp.add_path(result, posts)
-            tmp.add_distance(utils.calcDistance(roadNodes[result].lat, roadNodes[result].lon, roadNodes[posts].lat,
-                                                roadNodes[posts].lon))
-            # algPostalWays.append(tmp)
-            
-    '''
+    for postId, nodeId in map_posts_to_nodes.items():
+        res = finder.search_near_posts(roadNodes, roadWays, nodeId, 1)
+        print('PostID '+str(postId) +' Node: '+str(nodeId) + ' r: '+str(res))
+        postNode[nodeId] = roadNodes[nodeId]
+        for result in res:
+            postNode[roadNodes[map_posts_to_nodes[result]].node_id] = roadNodes[map_posts_to_nodes[result]]
 
-    # drawGraph(algPostalWays, G, roadNodesAnotated, postsNodes)
+            if roadNodes[map_posts_to_nodes[result]].node_id in postEdge:
+                tmp = postEdge[nodeId]
+                tmp[roadNodes[map_posts_to_nodes[result]].node_id] = {'weight': 1}
+                postEdge[nodeId] = tmp
+                print(result)
+            else:
+                print('aa')
+                postEdge[nodeId] = {roadNodes[map_posts_to_nodes[result]].node_id:{'weight': 1}}
+            
+
+
+    drawGraph(G, postNode, postEdge)

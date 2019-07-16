@@ -65,6 +65,7 @@ class DataHandler():
         self.nodes = handler.nodes
 
         nodes_filtered = {}
+
         #in this step we remove nodes which are not connected to road
         #with this step we want to avoid that algoritm will hang on.
         for way in self.ways:
@@ -77,14 +78,16 @@ class DataHandler():
         #alignement
         (roadNodesAnotated, postsNodes) =  self.align_nodes_and_posts(nodes_filtered)
 
-        i = 1
         #generate ides for post offices (generic)
+        i = 1
         for key, node in roadNodesAnotated.items():
             if node.post:
-                nodesDict[node.id] = SearchNode(node.id, i, node.post)
+                nodesDict[node.id] = SearchNode(node.id, node.lat, node.lon, node.address, 'A' + str(i), node.post)
                 i = i + 1
             else:
-                nodesDict[node.id] = SearchNode(node.id)
+                nodesDict[node.id] = SearchNode(node.id, node.lat, node.lon, node.address)
+
+
 
 
         for key, node in roadNodesAnotated.items():
