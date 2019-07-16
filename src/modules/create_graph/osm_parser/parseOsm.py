@@ -84,38 +84,4 @@ class OsmHandler(xml.sax.ContentHandler):
         return G
 
 
-class Node:
 
-    def __init__(self):
-        self.post = False
-        self.address = ""
-
-    def addNode(self, id, lat, lon):
-        self.id = id
-        self.lat = lat
-        self.lon = lon
-
-    def addPost(self, address):
-        self.post = True
-        self.address = address;
-
-    def getId(self):
-        return self.id
-
-
-class Way:
-
-    def __init__(self):
-        self.ids = ()
-
-    def addPath(self, id1, id2):
-        self.ids = (id1, id2)
-
-    def getNodes(self):
-        return (self.ids[0], self.ids[len(self.ids) - 1])
-
-    def getAllNodes(self):
-        return self.ids
-
-    def addDistance(self, distance):
-        self.distance = distance

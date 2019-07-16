@@ -3,7 +3,7 @@ import sys
 import csv
 
 from src.modules.create_graph.utils import utils
-from src.modules.create_graph import parseOsm
+from src.modules.create_graph.osm_parser import parseOsm
 import networkx as nx
 
 
