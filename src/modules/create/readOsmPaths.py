@@ -515,6 +515,8 @@ if __name__ == "__main__":
     for way in roadWays:
         for id in way.ids:
             nodesFiltered[id] = roadNodes[id]
+
+
     (roadNodesAnotated, postsNodes) = postHandler.alignNodesAndPosts(nodesFiltered)
 
     nodesDict = {}
@@ -536,30 +538,20 @@ if __name__ == "__main__":
         tmpD[way.ids[1]] = {"weight": way.distance}
         edgesDict[way.ids[0]] = tmpD
 
-    #print(len(roadNodes))
-    #print(len(edgesDict))
 
-    nodesDict,edgesDict = synticGraph()
+    #nodesDict,edgesDict = synticGraph()
+    #drawStaticGraph(nodesDict, edgesDict, results)
 
-   # for n in nodesNode:
-    algPostalWays = []
-    #for posts in postsNodes:
-        # posts = 401868937
-    posts = 0
-    # drawStaticGraph(nodesDict, edgesDict, [])
-    #posts = 2244725770
-    results = search_near_posts(nodesDict, edgesDict, posts, 1)
-    drawStaticGraph(nodesDict, edgesDict, results)
-    #drawStaticGraph(nodesDict, edgesDict)
 
-    '''
-    for result in results:
+    for posts in postsNodes:
+        results = search_near_posts(nodesDict, edgesDict, posts, 1)
+        for result in results:
             tmp = parseOsm.Way()
             tmp.addPath(result, posts)
             tmp.addDistance(utils.calcDistance(roadNodes[result].lat, roadNodes[result].lon, roadNodes[posts].lat,
-                                               roadNodes[posts].lon))
-            algPostalWays.append(tmp)
+                                                       roadNodes[posts].lon))
+                    #algPostalWays.append(tmp)
+    
+    #drawGraph(algPostalWays, G, roadNodesAnotated, postsNodes)
 
-    '''
-    drawGraph(algPostalWays, G, roadNodesAnotated, postsNodes)
 
