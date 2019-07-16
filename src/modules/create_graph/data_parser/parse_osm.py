@@ -1,6 +1,5 @@
 import xml.sax
 from src.modules.create_graph.utils import utils
-import networkx as nx
 from src.modules.create_graph.data_parser.pojo.way import Way
 from src.modules.create_graph.data_parser.pojo.node import Node
 

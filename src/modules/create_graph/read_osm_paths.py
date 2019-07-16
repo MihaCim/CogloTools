@@ -2,7 +2,7 @@
 
 
 from src.modules.create_graph.utils import utils
-from src.modules.create_graph.data_parser import parse_osm
+from src.modules.create_graph.data_parser.data_handler import DataHandler
 import networkx as nx
 from src.modules.create_graph.pojo.front_data import FrontData
 from src.modules.create_graph.pojo.search_node import SearchNode
@@ -85,43 +85,21 @@ def drawStaticGraph(nodes, ways, results):
 
 if __name__ == "__main__":
 
-    osmHandler = parse_osm.DataHandler()
+    osmHandler = DataHandler("data/test_export.osm",
+                             'data/List of Postal Offices (geographical location).csv')
     G = osmHandler.graph_viz()
 
-    roadNodes = osmHandler.nodes
-    roadWays = osmHandler.ways
-    postHandler = PostHandler()
+    roadNodes = osmHandler.modified_nodes
+    roadWays = osmHandler.modified_ways
 
-    nodesFiltered = {}
-    for way in roadWays:
-        for id in way.ids:
-            nodesFiltered[id] = roadNodes[id]
 
-    (roadNodesAnotated, postsNodes) = postHandler.align_nodes_and_posts(nodesFiltered)
 
-    nodesDict = {}
-    edgesDict = {}
-
-    i = 1
-    for key, node in roadNodesAnotated.items():
-        if node.post:
-            nodesDict[node.id] = SearchNode(node.id, i, node.post)
-            i = i + 1
-        else:
-            nodesDict[node.id] = SearchNode(node.id)
-
-    for key, node in roadNodesAnotated.items():
-        edgesDict[node.id] = {}
-
-    for way in roadWays:
-        tmpD = edgesDict[way.ids[0]]
-        tmpD[way.ids[1]] = {"weight": way.distance}
-        edgesDict[way.ids[0]] = tmpD
 
     # nodesDict,edgesDict = synticGraph()
     # drawStaticGraph(nodesDict, edgesDict, results)
     finder = neighbourAlg.NeighboursFinder()
-
+    finder.search_near_posts(roadNodes, roadWays, 4576807226, 1)
+    '''
     for posts in postsNodes:
         results = finder.search_near_posts(nodesDict, edgesDict, posts, 1)
         for result in results:
@@ -130,5 +108,7 @@ if __name__ == "__main__":
             tmp.add_distance(utils.calcDistance(roadNodes[result].lat, roadNodes[result].lon, roadNodes[posts].lat,
                                                 roadNodes[posts].lon))
             # algPostalWays.append(tmp)
+            
+    '''
 
     # drawGraph(algPostalWays, G, roadNodesAnotated, postsNodes)
