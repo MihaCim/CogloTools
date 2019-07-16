@@ -1,42 +1,42 @@
 import unittest
-import src.modules.create_graph.pojo.searchNode as searchNode
-import src.modules.create_graph.neighbours_finder as neighbourAlg
+import src.modules.create_graph.pojo.search_node as search_node
+import src.modules.create_graph.neighbours_finder as neighbour_alg
 
 class TestCreateGraph(unittest.TestCase):
 
-    def synteticGraph1Construction(self):
+    def syntetic_graph1_construction(self):
         nodes = {}
-        nodes[0] = searchNode.SearchNode(0, 'A0', True)
-        nodes[1] = searchNode.SearchNode(1, None, False)
-        nodes[2] = searchNode.SearchNode(2, None, False)
-        nodes[3] = searchNode.SearchNode(3, None, False)
-        nodes[4] = searchNode.SearchNode(4, None, False)
-        nodes[5] = searchNode.SearchNode(5, None, False)
-        nodes[6] = searchNode.SearchNode(6, 'A1', True)
-        nodes[7] = searchNode.SearchNode(7, 'A2', True)
-        nodes[8] = searchNode.SearchNode(8, None, False)
-        nodes[9] = searchNode.SearchNode(9, None, False)
-        nodes[10] = searchNode.SearchNode(10, None, False)
-        nodes[11] = searchNode.SearchNode(11, None, False)
-        nodes[12] = searchNode.SearchNode(12, 'A3', True)
-        nodes[13] = searchNode.SearchNode(13, None, False)
-        nodes[14] = searchNode.SearchNode(14, 'A4', True)
-        nodes[15] = searchNode.SearchNode(15, None, False)
-        nodes[16] = searchNode.SearchNode(16, None, False)
-        nodes[17] = searchNode.SearchNode(17, None, False)
-        nodes[18] = searchNode.SearchNode(18, None, False)
-        nodes[19] = searchNode.SearchNode(19, None, False)
-        nodes[20] = searchNode.SearchNode(20, None, False)
-        nodes[21] = searchNode.SearchNode(21, None, False)
-        nodes[22] = searchNode.SearchNode(22, None, False)
-        nodes[23] = searchNode.SearchNode(23, 'A5', True)
-        nodes[24] = searchNode.SearchNode(24, None, False)
-        nodes[25] = searchNode.SearchNode(25, None, False)
-        nodes[26] = searchNode.SearchNode(26, None, False)
-        nodes[27] = searchNode.SearchNode(27, None, False)
-        nodes[28] = searchNode.SearchNode(28, None, False)
-        nodes[29] = searchNode.SearchNode(29, None, False)
-        nodes[30] = searchNode.SearchNode(30, None, False)
+        nodes[0] = search_node.SearchNode(0, 'A0', True)
+        nodes[1] = search_node.SearchNode(1, None, False)
+        nodes[2] = search_node.SearchNode(2, None, False)
+        nodes[3] = search_node.SearchNode(3, None, False)
+        nodes[4] = search_node.SearchNode(4, None, False)
+        nodes[5] = search_node.SearchNode(5, None, False)
+        nodes[6] = search_node.SearchNode(6, 'A1', True)
+        nodes[7] = search_node.SearchNode(7, 'A2', True)
+        nodes[8] = search_node.SearchNode(8, None, False)
+        nodes[9] = search_node.SearchNode(9, None, False)
+        nodes[10] = search_node.SearchNode(10, None, False)
+        nodes[11] = search_node.SearchNode(11, None, False)
+        nodes[12] = search_node.SearchNode(12, 'A3', True)
+        nodes[13] = search_node.SearchNode(13, None, False)
+        nodes[14] = search_node.SearchNode(14, 'A4', True)
+        nodes[15] = search_node.SearchNode(15, None, False)
+        nodes[16] = search_node.SearchNode(16, None, False)
+        nodes[17] = search_node.SearchNode(17, None, False)
+        nodes[18] = search_node.SearchNode(18, None, False)
+        nodes[19] = search_node.SearchNode(19, None, False)
+        nodes[20] = search_node.SearchNode(20, None, False)
+        nodes[21] = search_node.SearchNode(21, None, False)
+        nodes[22] = search_node.SearchNode(22, None, False)
+        nodes[23] = search_node.SearchNode(23, 'A5', True)
+        nodes[24] = search_node.SearchNode(24, None, False)
+        nodes[25] = search_node.SearchNode(25, None, False)
+        nodes[26] = search_node.SearchNode(26, None, False)
+        nodes[27] = search_node.SearchNode(27, None, False)
+        nodes[28] = search_node.SearchNode(28, None, False)
+        nodes[29] = search_node.SearchNode(29, None, False)
+        nodes[30] = search_node.SearchNode(30, None, False)
 
         edges = {0: {1: {"weight": 0.5}, 2: {"weight": 0.2}, 20: {"weight": 0.3}, 21: {"weight": 0.6}},
                  1: {7: {"weight": 0.5}, 0: {"weight": 0.5}},
@@ -73,57 +73,57 @@ class TestCreateGraph(unittest.TestCase):
 
         return nodes, edges
 
-    def synticGraph2Constraction(self):
-        nodesDict = {}
-        nodesDict[0] = searchNode.SearchNode(0, "A0", True)
-        nodesDict[1] = searchNode.SearchNode(1, None, False)
-        nodesDict[2] = searchNode.SearchNode(2, None, False)
-        nodesDict[3] = searchNode.SearchNode(3, None, False)
-        nodesDict[4] = searchNode.SearchNode(4, None, False)
-        nodesDict[5] = searchNode.SearchNode(5, None, False)
-        nodesDict[6] = searchNode.SearchNode(6, None, False)
-        nodesDict[7] = searchNode.SearchNode(7, "A1", True)
-        nodesDict[8] = searchNode.SearchNode(8, None, False)
-        nodesDict[9] = searchNode.SearchNode(9, None, False)
-        nodesDict[10] = searchNode.SearchNode(10, None, False)
-        nodesDict[11] = searchNode.SearchNode(11, "A2", True)
-        nodesDict[12] = searchNode.SearchNode(12, "A3", True)
-        nodesDict[13] = searchNode.SearchNode(13, "A4", True)
-        nodesDict[14] = searchNode.SearchNode(14, None, False)
-        nodesDict[15] = searchNode.SearchNode(15, None, False)
-        nodesDict[16] = searchNode.SearchNode(16, None, False)
-        nodesDict[17] = searchNode.SearchNode(17, None, False)
-        nodesDict[18] = searchNode.SearchNode(18, None, False)
-        nodesDict[19] = searchNode.SearchNode(19, "A5", True)
-        nodesDict[20] = searchNode.SearchNode(20, None, False)
-        nodesDict[21] = searchNode.SearchNode(21, None, False)
-        nodesDict[22] = searchNode.SearchNode(22, None, False)
-        nodesDict[24] = searchNode.SearchNode(24, None, False)
-        nodesDict[23] = searchNode.SearchNode(23, None, False)
-        nodesDict[25] = searchNode.SearchNode(25, "A6", True)
-        nodesDict[26] = searchNode.SearchNode(26, None, False)
-        nodesDict[27] = searchNode.SearchNode(27, "A7", True)
-        nodesDict[28] = searchNode.SearchNode(28, None, False)
-        nodesDict[29] = searchNode.SearchNode(29, None, False)
-        nodesDict[30] = searchNode.SearchNode(30, None, False)
-        nodesDict[31] = searchNode.SearchNode(31, None, False)
-        nodesDict[32] = searchNode.SearchNode(32, None, False)
-        nodesDict[33] = searchNode.SearchNode(33, None, False)
-        nodesDict[34] = searchNode.SearchNode(34, "A8", True)
-        nodesDict[35] = searchNode.SearchNode(35, None, False)
-        nodesDict[36] = searchNode.SearchNode(36, None, False)
-        nodesDict[37] = searchNode.SearchNode(37, None, False)
-        nodesDict[38] = searchNode.SearchNode(38, None, False)
-        nodesDict[39] = searchNode.SearchNode(39, None, False)
-        nodesDict[40] = searchNode.SearchNode(40, "A9", True)
-        nodesDict[41] = searchNode.SearchNode(41, "A10", True)
-        nodesDict[42] = searchNode.SearchNode(42, None, False)
-        nodesDict[43] = searchNode.SearchNode(43, None, False)
-        nodesDict[44] = searchNode.SearchNode(44, None, False)
-        nodesDict[45] = searchNode.SearchNode(45, None, False)
-        nodesDict[46] = searchNode.SearchNode(46, None, False)
+    def syntic_graph2_constraction(self):
+        nodes_dict = {}
+        nodes_dict[0] = search_node.SearchNode(0, "A0", True)
+        nodes_dict[1] = search_node.SearchNode(1, None, False)
+        nodes_dict[2] = search_node.SearchNode(2, None, False)
+        nodes_dict[3] = search_node.SearchNode(3, None, False)
+        nodes_dict[4] = search_node.SearchNode(4, None, False)
+        nodes_dict[5] = search_node.SearchNode(5, None, False)
+        nodes_dict[6] = search_node.SearchNode(6, None, False)
+        nodes_dict[7] = search_node.SearchNode(7, "A1", True)
+        nodes_dict[8] = search_node.SearchNode(8, None, False)
+        nodes_dict[9] = search_node.SearchNode(9, None, False)
+        nodes_dict[10] = search_node.SearchNode(10, None, False)
+        nodes_dict[11] = search_node.SearchNode(11, "A2", True)
+        nodes_dict[12] = search_node.SearchNode(12, "A3", True)
+        nodes_dict[13] = search_node.SearchNode(13, "A4", True)
+        nodes_dict[14] = search_node.SearchNode(14, None, False)
+        nodes_dict[15] = search_node.SearchNode(15, None, False)
+        nodes_dict[16] = search_node.SearchNode(16, None, False)
+        nodes_dict[17] = search_node.SearchNode(17, None, False)
+        nodes_dict[18] = search_node.SearchNode(18, None, False)
+        nodes_dict[19] = search_node.SearchNode(19, "A5", True)
+        nodes_dict[20] = search_node.SearchNode(20, None, False)
+        nodes_dict[21] = search_node.SearchNode(21, None, False)
+        nodes_dict[22] = search_node.SearchNode(22, None, False)
+        nodes_dict[24] = search_node.SearchNode(24, None, False)
+        nodes_dict[23] = search_node.SearchNode(23, None, False)
+        nodes_dict[25] = search_node.SearchNode(25, "A6", True)
+        nodes_dict[26] = search_node.SearchNode(26, None, False)
+        nodes_dict[27] = search_node.SearchNode(27, "A7", True)
+        nodes_dict[28] = search_node.SearchNode(28, None, False)
+        nodes_dict[29] = search_node.SearchNode(29, None, False)
+        nodes_dict[30] = search_node.SearchNode(30, None, False)
+        nodes_dict[31] = search_node.SearchNode(31, None, False)
+        nodes_dict[32] = search_node.SearchNode(32, None, False)
+        nodes_dict[33] = search_node.SearchNode(33, None, False)
+        nodes_dict[34] = search_node.SearchNode(34, "A8", True)
+        nodes_dict[35] = search_node.SearchNode(35, None, False)
+        nodes_dict[36] = search_node.SearchNode(36, None, False)
+        nodes_dict[37] = search_node.SearchNode(37, None, False)
+        nodes_dict[38] = search_node.SearchNode(38, None, False)
+        nodes_dict[39] = search_node.SearchNode(39, None, False)
+        nodes_dict[40] = search_node.SearchNode(40, "A9", True)
+        nodes_dict[41] = search_node.SearchNode(41, "A10", True)
+        nodes_dict[42] = search_node.SearchNode(42, None, False)
+        nodes_dict[43] = search_node.SearchNode(43, None, False)
+        nodes_dict[44] = search_node.SearchNode(44, None, False)
+        nodes_dict[45] = search_node.SearchNode(45, None, False)
+        nodes_dict[46] = search_node.SearchNode(46, None, False)
 
-        edgesDict = {
+        edges_dict = {
             0: {1: {'weight': 2}, 2: {'weight': 2}, 3: {'weight': 2}, 4: {'weight': 2}},
             1: {5: {'weight': 0.5}, 6: {'weight': 2}, 0: {'weight': 2}},
             2: {0: {'weight': 2}, 9: {'weight': 2}, 10: {'weight': 6}},
@@ -174,24 +174,23 @@ class TestCreateGraph(unittest.TestCase):
             46: {45: {'weight': 0.5}}
         }
 
-        return nodesDict, edgesDict
+        return nodes_dict, edges_dict
 
     def test_simple_graph(self):
-        nodesDict, edgesDict = self.synteticGraph1Construction()
+        nodes_dict, edges_dict = self.syntetic_graph1_construction()
 
-        finder = neighbourAlg.NeighboursFinder()
+        finder = neighbour_alg.NeighboursFinder()
+        result =finder.search_near_posts(nodes_dict, edges_dict, 0, 1)
 
-        result =finder.search_near_posts(nodesDict, edgesDict, 0, 1)
         print(result)
         self.assertLessEqual(result, ['A2', 'A5', 'A1'])
 
 
     def test_complex_graph(self):
-        nodesDict, edgesDict = self.synticGraph2Constraction()
+        nodes_dict, edges_dict = self.syntic_graph2_constraction()
 
-        finder = neighbourAlg.NeighboursFinder()
-
-        result =finder.search_near_posts(nodesDict, edgesDict, 0, 1)
+        finder = neighbour_alg.NeighboursFinder()
+        result =finder.search_near_posts(nodes_dict, edges_dict, 0, 1)
 
         self.assertLessEqual(result, ['A8', 'A5', 'A7', 'A10', 'A1'])
 

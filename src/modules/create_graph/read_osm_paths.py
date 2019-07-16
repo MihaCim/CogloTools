@@ -1,73 +1,12 @@
 #!/usr/bin/python3
-import sys
-import csv
+
 
 from src.modules.create_graph.utils import utils
-from src.modules.create_graph.osm_parser import parseOsm
+from src.modules.create_graph.data_parser import parse_osm
 import networkx as nx
-
-
-class Post:
-    def __init__(self, address, latitude, longitude):
-        self.address = address
-        self.latitude = latitude
-        self.longitude = longitude
-
-
-class PostHandler:
-
-    def __init__(self):
-        self.posts = []
-
-    def isNumber(self, str):
-        try:
-            return float(str)
-        except ValueError:
-            return None
-
-    def readPostalOffices(self):
-        ''' Postal offices are read from csv file and than added to array
-        '''
-        self.posts = []
-        with open('config/List of Postal Offices (geographical location).csv') as csv_file:
-            csv_reader = csv.reader(csv_file, delimiter=',')
-
-            for row in csv_reader:
-                address = [row[13], row[14], row[15]]
-                if (self.isNumber(row[22]) != None and self.isNumber(row[23]) != None):
-                    post = Post(' '.join(address), self.isNumber(row[22]), self.isNumber(row[23]))
-                    self.posts.append(post)
-
-        return self.posts
-
-    def alignNodesAndPosts(self, nodesL):
-        '''
-        Align post offices with nodes
-
-        :param posts:
-        :param nodesL:
-        :return:
-        '''
-        posts = self.readPostalOffices()
-        postsNodes = []
-        for post in posts:
-            minDist = sys.maxsize
-            nodeKey = ""
-            for key, node in nodesL.items():
-                tmpDist = utils.calcDistance(post.latitude, post.longitude, node.lat, node.lon)
-                if minDist > tmpDist:
-                    minDist = tmpDist
-                    nodeKey = key
-
-            tmpNode = nodesL[nodeKey]
-            if utils.calcDistance(post.latitude, post.longitude, tmpNode.lat, tmpNode.lon) < 1:
-                print(nodeKey)
-                print(post.address)
-                print(utils.calcDistance(post.latitude, post.longitude, tmpNode.lat, tmpNode.lon))
-                postsNodes.append(nodeKey)
-                tmpNode.addPost(post.address)
-                nodesL[nodeKey] = tmpNode
-        return (nodesL, postsNodes)
+from src.modules.create_graph.pojo.front_data import FrontData
+from src.modules.create_graph.pojo.search_node import SearchNode
+import src.modules.create_graph.neighbours_finder as neighbourAlg
 
 
 def drawGraph(algPostalWays, H, nodes, postalNodes):
@@ -79,7 +18,7 @@ def drawGraph(algPostalWays, H, nodes, postalNodes):
         G.add_node(posts, pos=(nodes[posts].lat, nodes[posts].lon))
 
     for edge in algPostalWays:
-        l = edge.getAllNodes()
+        l = edge.get_all_nodes()
         ##if l[0] not in n:
         #   G.add_node(l[0], pos=(nodes[l[0]].lat, nodes[l[0]].lon))
         # if l[1] not in n:
@@ -146,8 +85,8 @@ def drawStaticGraph(nodes, ways, results):
 
 if __name__ == "__main__":
 
-    osmHandler = parseOsm.OsmHandler()
-    G = osmHandler.graphViz()
+    osmHandler = parse_osm.DataHandler()
+    G = osmHandler.graph_viz()
 
     roadNodes = osmHandler.nodes
     roadWays = osmHandler.ways
@@ -158,7 +97,7 @@ if __name__ == "__main__":
         for id in way.ids:
             nodesFiltered[id] = roadNodes[id]
 
-    (roadNodesAnotated, postsNodes) = postHandler.alignNodesAndPosts(nodesFiltered)
+    (roadNodesAnotated, postsNodes) = postHandler.align_nodes_and_posts(nodesFiltered)
 
     nodesDict = {}
     edgesDict = {}
@@ -181,14 +120,15 @@ if __name__ == "__main__":
 
     # nodesDict,edgesDict = synticGraph()
     # drawStaticGraph(nodesDict, edgesDict, results)
+    finder = neighbourAlg.NeighboursFinder()
 
     for posts in postsNodes:
-        results = search_near_posts(nodesDict, edgesDict, posts, 1)
+        results = finder.search_near_posts(nodesDict, edgesDict, posts, 1)
         for result in results:
-            tmp = parseOsm.Way()
-            tmp.addPath(result, posts)
-            tmp.addDistance(utils.calcDistance(roadNodes[result].lat, roadNodes[result].lon, roadNodes[posts].lat,
-                                               roadNodes[posts].lon))
+            tmp = parse_osm.Way()
+            tmp.add_path(result, posts)
+            tmp.add_distance(utils.calcDistance(roadNodes[result].lat, roadNodes[result].lon, roadNodes[posts].lat,
+                                                roadNodes[posts].lon))
             # algPostalWays.append(tmp)
 
     # drawGraph(algPostalWays, G, roadNodesAnotated, postsNodes)

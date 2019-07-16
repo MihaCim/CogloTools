@@ -1,5 +1,5 @@
 import math
-from src.modules.create_graph.pojo.frontData import FrontData
+from src.modules.create_graph.pojo.front_data import FrontData
 
 class NeighboursFinder():
 

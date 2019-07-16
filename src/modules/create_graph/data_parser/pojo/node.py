@@ -5,14 +5,14 @@ class Node:
         self.post = False
         self.address = ""
 
-    def addNode(self, id, lat, lon):
+    def add_node(self, id, lat, lon):
         self.id = id
         self.lat = lat
         self.lon = lon
 
-    def addPost(self, address):
+    def add_post(self, address):
         self.post = True
         self.address = address;
 
-    def getId(self):
+    def get_id(self):
         return self.id

@@ -1,7 +1,8 @@
 import xml.sax
 from src.modules.create_graph.utils import utils
 import networkx as nx
-
+from src.modules.create_graph.data_parser.pojo.way import Way
+from src.modules.create_graph.data_parser.pojo.node import Node
 
 class OsmParsers(xml.sax.ContentHandler):
     '''
@@ -22,7 +23,7 @@ class OsmParsers(xml.sax.ContentHandler):
         if name == "node":
             node = Node()
             if "id" in attrs and "lat" in attrs and "lon" in attrs:
-                node.addNode(int(attrs["id"]), float(attrs["lat"]), float(attrs["lon"]))
+                node.add_node(int(attrs["id"]), float(attrs["lat"]), float(attrs["lon"]))
                 self.nodes[int(attrs["id"])] = node
         if name == "way":
             self.tmpWays = []
@@ -42,46 +43,10 @@ class OsmParsers(xml.sax.ContentHandler):
                     way = Way()
                     node1 = self.nodes[int(self.tmpWays[i - 1])]
                     node2 = self.nodes[int(self.tmpWays[i])]
-                    way.addPath(int(self.tmpWays[i - 1]), int(self.tmpWays[i]))
+                    way.add_path(int(self.tmpWays[i - 1]), int(self.tmpWays[i]))
                     distance = utils.calcDistance(node1.lat, node1.lon, node2.lat, node2.lon)
-                    way.addDistance(distance)
+                    way.add_distance(distance)
                     self.ways.append(way)
                 self.tags = {}
                 self.tmpWays = {}
-
-
-class OsmHandler(xml.sax.ContentHandler):
-
-    def __init__(self):
-        # create_graph an XMLReader
-
-        parser = xml.sax.make_parser()
-        # turn off namepsaces
-        parser.setFeature(xml.sax.handler.feature_namespaces, 0)
-
-        # override the default ContextHandler
-        handler = OsmParsers()
-        parser.setContentHandler(handler)
-
-        parser.parse("data/test_export.osm")
-
-        self.ways = handler.ways
-        self.nodes = handler.nodes
-
-    def graphViz(self):
-        G = nx.Graph()
-        n = set()
-
-        for edge in self.ways:
-            l = edge.getAllNodes()
-            if l[0] not in n:
-                G.add_node(l[0], pos=(self.nodes[l[0]].lat, self.nodes[l[0]].lon))
-            if l[1] not in n:
-                G.add_node(l[1], pos=(self.nodes[l[1]].lat, self.nodes[l[1]].lon))
-            G.add_edge(l[0], l[1], weight=edge.distance)
-            n.add(l[0])
-            n.add(l[1])
-        return G
-
-
 
