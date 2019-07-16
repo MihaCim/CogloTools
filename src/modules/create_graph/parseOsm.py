@@ -1,12 +1,14 @@
 import xml.sax
-from src.modules.create.utils import utils
+from src.modules.create_graph.utils import utils
 import networkx as nx
+
 
 class OsmParsers(xml.sax.ContentHandler):
     '''
         OsmParsers parse OSM data to nodes and ways. Nodes are represents as dictionary in order to fast accesss to it.
         Ways are list.
     '''
+
     def __init__(self):
         self.nodes = {}  # nodes are save
         self.ways = []
@@ -32,7 +34,6 @@ class OsmParsers(xml.sax.ContentHandler):
         if name == "tag":
             self.tags[attrs["k"]] = attrs["v"]
 
-
     def endElement(self, name):
         if name == "way":
             if "highway" in self.tags and self.tags["highway"] in self.roads:
@@ -47,11 +48,12 @@ class OsmParsers(xml.sax.ContentHandler):
                     self.ways.append(way)
                 self.tags = {}
                 self.tmpWays = {}
+
+
 class OsmHandler(xml.sax.ContentHandler):
 
-
     def __init__(self):
-        # create an XMLReader
+        # create_graph an XMLReader
 
         parser = xml.sax.make_parser()
         # turn off namepsaces

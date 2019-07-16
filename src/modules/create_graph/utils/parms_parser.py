@@ -13,9 +13,8 @@ class ParmsParser:
 
         # program parameters
         parser = argparse.ArgumentParser(description='All in one script for camp data scraping, parsing and processing')
-        #required=True,
-        parser.add_argument('-cf', '--config-file',  help='Script configuration filepath')
-
+        # required=True,
+        parser.add_argument('-cf', '--config-file', help='Script configuration filepath')
 
         parser.add_argument('-Eo2p', '--export_osm2postgres', action='store_true',
                             help='OSM data')
@@ -34,11 +33,9 @@ class ParmsParser:
         parser = ConfigParser()
         parser.read(conf_file)
 
-
-
         self.osm['cache_size'] = parser.get('osm', 'cache_size')
-        self.osm['download']=ast.literal_eval(parser.get('osm','download'))
-        #self.osm['prefix'] = parser.get('osm', 'prefix')
+        self.osm['download'] = ast.literal_eval(parser.get('osm', 'download'))
+        # self.osm['prefix'] = parser.get('osm', 'prefix')
 
         self.osm['style_file'] = parser.get('osm', 'style_file')
         self.osm['number_processes'] = parser.get('osm', 'number_processes')
@@ -47,9 +44,8 @@ class ParmsParser:
         self.osm['osm_file'] = parser.get('osm', 'osm_file')
         self.osm['file_postal_office'] = parser.get('osm', 'file_postal')
 
-
         SECTIONS = ['osm']
-        OPTIONS = ['host', 'dbname', 'user', 'password','port']
+        OPTIONS = ['host', 'dbname', 'user', 'password', 'port']
         dict = {}
         str = ""
         for section in SECTIONS:
@@ -58,9 +54,8 @@ class ParmsParser:
                 if has_option:
                     str = str + " " + candidate + "=" + parser.get(section, candidate)
                     if section is 'osm':
-                        self.osm[candidate]=parser.get(section, candidate)
+                        self.osm[candidate] = parser.get(section, candidate)
             dict[section] = str
             str = ''
 
         self.osm['conn_string'] = dict['osm']
-

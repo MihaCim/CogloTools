@@ -39,8 +39,6 @@ edges = {0: {1: {"weight": 0.5}, 2: {"weight": 0.2}, 20: {"weight": 0.3}, 21: {"
          30: {25: {"weight": 0.5}}}
 
 
-
-
 def search_near_posts(nodes, edges, start_nodes):
     fronta = [(start_nodes, 0, [])]
     visited_nodes = set()
@@ -90,15 +88,15 @@ def search_near_posts(nodes, edges, start_nodes):
 
         for index in sorted(d, reverse=True):
             del fronta[index]
-            print("remove: "+str(index))
+            print("remove: " + str(index))
 
-
-        print("visited:"+str(visited_nodes))
-        print("results:"+str(results))
+        print("visited:" + str(visited_nodes))
+        print("results:" + str(results))
         import time
         time.sleep(2)
     print("aa")
     print(results)
+
 
 lenEdges = len(edges)
 

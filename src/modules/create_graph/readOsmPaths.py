@@ -2,8 +2,8 @@
 import sys
 import csv
 import math
-from src.modules.create.utils import utils
-from src.modules.create import parseOsm
+from src.modules.create_graph.utils import utils
+from src.modules.create_graph import parseOsm
 import networkx as nx
 
 
@@ -29,7 +29,7 @@ class PostHandler:
         ''' Postal offices are read from csv file and than added to array
         '''
         self.posts = []
-        with open('data/List of Postal Offices (geographical location).csv') as csv_file:
+        with open('config/List of Postal Offices (geographical location).csv') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
 
             for row in csv_reader:
@@ -98,11 +98,12 @@ def drawGraph(algPostalWays, H, nodes, postalNodes):
         # nx.draw(G)
         plt.show()
 
+
 def drawStaticGraph(nodes, ways, results):
     G = nx.Graph()
     li = []
 
-#    edge
+    #    edge
     labels = {}
     i = 0
     color_map = []
@@ -112,7 +113,7 @@ def drawStaticGraph(nodes, ways, results):
                 color_map.append('red')
             else:
                 color_map.append('blue')
-            labels[i] = nodes[posts].post_id + "("+str(posts)+")"
+            labels[i] = nodes[posts].post_id + "(" + str(posts) + ")"
         else:
             labels[i] = posts
             color_map.append('green')
@@ -120,8 +121,7 @@ def drawStaticGraph(nodes, ways, results):
         li.append(posts)
         G.add_node(posts)
 
-        i = i +1
-
+        i = i + 1
 
     for key, value in ways.items():
         for kc, vc in value.items():
@@ -130,14 +130,12 @@ def drawStaticGraph(nodes, ways, results):
 
             G.add_edge(key, kc, weight=vc['weight'])
 
-
     import matplotlib.pyplot as plt
 
-            # plt.figure(1)
+    # plt.figure(1)
     pos = nx.spring_layout(G, k=0.25, iterations=40)
-    nx.draw_networkx_nodes(G, pos, node_color= color_map, nodelist=li)
+    nx.draw_networkx_nodes(G, pos, node_color=color_map, nodelist=li)
     nx.draw_networkx_edges(G, pos, nodelist=li, node_color='g')
-
 
     nx.draw_networkx_labels(G, pos, labels, font_size=16)
 
@@ -187,8 +185,8 @@ def search_near_posts(node_id_node_map, node_id_edge_map, start_node_id, eps_km)
         min_distance = math.inf
 
         for node_id, node_data in front.items():
-            #print(node_id)
-            #print(node_data)
+            # print(node_id)
+            # print(node_data)
 
             if node_id not in node_id_edge_map:
                 continue
@@ -204,10 +202,10 @@ def search_near_posts(node_id_node_map, node_id_edge_map, start_node_id, eps_km)
                     current_visited_points = [val for val in node_data.prev_posts]
                     prev_node_id = node_id
 
-        #print(active_node_id)
-        #print(min_distance)
-        #print(current_visited_points)
-        #print(prev_node_id)
+        # print(active_node_id)
+        # print(min_distance)
+        # print(current_visited_points)
+        # print(prev_node_id)
 
         if active_node_id is None:
             # we were unable to find any new neighbours to extend the front
@@ -243,7 +241,7 @@ def search_near_posts(node_id_node_map, node_id_edge_map, start_node_id, eps_km)
         active_node_dist_origin = min_distance
         while len(active_node_history) > 0:
             oldest_node_id, oldest_node_dist_origin = active_node_history[0]
-            #newest_node_id, newest_node_dist_origin = active_node_history[-1]
+            # newest_node_id, newest_node_dist_origin = active_node_history[-1]
             dist_diff = active_node_dist_origin - oldest_node_dist_origin
             if dist_diff <= eps_km:
                 break
@@ -273,8 +271,7 @@ def search_near_posts(node_id_node_map, node_id_edge_map, start_node_id, eps_km)
             front[f].eps_history = current_eps_history
             '''
 
-
-        #front.append((active_node_id, min_distance, current_visited_points))
+        # front.append((active_node_id, min_distance, current_visited_points))
         # add the active node to the list of visited nodes
 
         visited_node_ids.add(active_node_id)
@@ -283,8 +280,8 @@ def search_near_posts(node_id_node_map, node_id_edge_map, start_node_id, eps_km)
         if is_post:
             snap_node_id = active_node_id
             snap_node_history = [node_id for node_id in reversed(active_node_history)]  # TODO: optimize
-            #TODO check if all the naighbors of previous point were visited
-            #if not snap the node back
+            # TODO check if all the naighbors of previous point were visited
+            # if not snap the node back
 
             print(snap_node_id)
             print(snap_node_history)
@@ -305,7 +302,6 @@ def search_near_posts(node_id_node_map, node_id_edge_map, start_node_id, eps_km)
                 node_id_node_map[snap_node_id].post_id = None
                 ##snap_node_id je node na katerem smo in katerega zelimo prestavit
                 ## snop_back_to je lokacija nove lokacije
-
 
                 for f in front:
                     for id, dist in front[f].eps_history:
@@ -372,9 +368,7 @@ def search_near_posts(node_id_node_map, node_id_edge_map, start_node_id, eps_km)
                             snap_node_id = hist_node_id
                             snap_node_history = snap_node_history[hist_nodeN + 1:]
 
-                
         print(front)
-
 
         # if all the neighbours of the previous point have been visited, remove it
         # from the front
@@ -498,9 +492,10 @@ def synticGraph():
         44: {17: {'weight': 0.5}},
         45: {11: {'weight': 0.5}, 19: {'weight': 0.5}, 46: {'weight': 0.15}},
         46: {45: {'weight': 0.5}}
-        }
+    }
 
     return nodesDict, edgesDict
+
 
 if __name__ == "__main__":
 
@@ -515,7 +510,6 @@ if __name__ == "__main__":
     for way in roadWays:
         for id in way.ids:
             nodesFiltered[id] = roadNodes[id]
-
 
     (roadNodesAnotated, postsNodes) = postHandler.alignNodesAndPosts(nodesFiltered)
 
@@ -538,10 +532,8 @@ if __name__ == "__main__":
         tmpD[way.ids[1]] = {"weight": way.distance}
         edgesDict[way.ids[0]] = tmpD
 
-
-    #nodesDict,edgesDict = synticGraph()
-    #drawStaticGraph(nodesDict, edgesDict, results)
-
+    # nodesDict,edgesDict = synticGraph()
+    # drawStaticGraph(nodesDict, edgesDict, results)
 
     for posts in postsNodes:
         results = search_near_posts(nodesDict, edgesDict, posts, 1)
@@ -549,9 +541,7 @@ if __name__ == "__main__":
             tmp = parseOsm.Way()
             tmp.addPath(result, posts)
             tmp.addDistance(utils.calcDistance(roadNodes[result].lat, roadNodes[result].lon, roadNodes[posts].lat,
-                                                       roadNodes[posts].lon))
-                    #algPostalWays.append(tmp)
-    
-    #drawGraph(algPostalWays, G, roadNodesAnotated, postsNodes)
+                                               roadNodes[posts].lon))
+            # algPostalWays.append(tmp)
 
-
+    # drawGraph(algPostalWays, G, roadNodesAnotated, postsNodes)

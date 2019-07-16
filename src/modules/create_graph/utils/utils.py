@@ -2,7 +2,6 @@ from math import radians, cos, sin, asin, sqrt, atan2
 
 
 def calcDistance(lat1, lon1, lat2, lon2):
-
     # Code coppied form: http://stackoverflow.com/questions/4913349/haversine-formula-in-python-bearing-and-distance-between-two-gps-points
     """
     Calculate the great circle distance between two points
@@ -20,4 +19,3 @@ def calcDistance(lat1, lon1, lat2, lon2):
 
     distance = R * c
     return distance
-
