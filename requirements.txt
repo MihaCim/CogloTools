@@ -4,3 +4,6 @@ sqlalchemy
 numpy
 scipy
 psycopg2-binary
+flask
+flask-jsonpify
+flask-restful

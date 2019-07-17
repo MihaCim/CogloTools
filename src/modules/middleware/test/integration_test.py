@@ -9,10 +9,10 @@ class MockRemoteSIOT(ca.SIoT):
 
 class IntegrationTest:
     def __init__(self):
-        awService = ca.NopAwarenessServices()
+        aw_service = ca.NopAwarenessServices()
 
 
-        self._advisor = ca.CaEventProcessor(awService, siot=MockRemoteSIOT(), storage=None, vehicle_routing=None)
+        self._advisor = ca.CaEventProcessor(aw_service, siot=MockRemoteSIOT(), storage=None, vehicle_routing=None)
 
 
 

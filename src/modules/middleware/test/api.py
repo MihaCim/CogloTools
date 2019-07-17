@@ -16,11 +16,20 @@ class Event(Resource):
         event = json['event']
         vehicles = json['vehicles']
 
+        if "broken" not in event['type']:
+            return jsonify({
+                "success": False,
+                "message": "Event type " + event['type'] + " currently not supported"
+            })
+
         for vehicle in vehicles:
             evt = ca.VehicleBreakdownEvent(vehicle['UUID'], vehicle['metadata'], vehicle['dropOffLocation'])
             processor.process_event(evt)
         print(json)
-        return jsonify({"success": True})
+        return jsonify({
+            "success": True,
+            "message": "Processing " + len(vehicles) + " events"
+        })
 
 
 class CognitiveAdvisorAPI:
