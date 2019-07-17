@@ -237,14 +237,12 @@ def create_concept_ids(default_concept_file,
         print("opening file", new_old_id_mapping_dump_path)
         with open(new_old_id_mapping_dump_path, 'r') as fp1:
             new_old_dict_load = json.load(fp1)
-        fp1.close()
         new_old_id_dict = {int(old_key): val for old_key, val in new_old_dict_load.items()}  # convert string keys to integers
         print("file", new_old_id_mapping_dump_path, "read")
 
         print("opening file", id_concept_mapping_json_dump_path)
         with open(id_concept_mapping_json_dump_path, 'r') as fp2:
             new_id_to_concept_string_load = json.load(fp2)
-        fp2.close()
         new_id_to_concept_string_mapping = {int(old_key): val for old_key, val in new_id_to_concept_string_load.items()}  # convert string keys to integers
         print("file", id_concept_mapping_json_dump_path, "read")
 
@@ -288,9 +286,6 @@ def create_concept_ids(default_concept_file,
                     # print progress every 10M
                     if lineN % 1000000 == 0:
                         print(lineN / 1000000)
-
-        # close file
-        concepts_file.close()
         print("created our own dictionary of old to new and new to old indices and ID to word mappings")
 
         # remove old -> new dictionary from memory
@@ -299,12 +294,10 @@ def create_concept_ids(default_concept_file,
         print("storing our own new-old IDs array to json dump")
         with open(new_old_id_mapping_dump_path, 'w') as fp1:
             json.dump(new_old_id_dict, fp1)
-        fp1.close()
 
         print("storing our own dictionary to json dump")
         with open(id_concept_mapping_json_dump_path, 'w') as fp2:
             json.dump(new_id_to_concept_string_mapping, fp2)
-        fp2.close()
     else:
         print("no concept id file or json dump, cannot proceed")
         exit(1)
@@ -327,7 +320,6 @@ def create_concept_mappings_dict(default_concept_mapping_file,
         print("reading file", default_concept_mapping_json_both_dump_path)
         with open(default_concept_mapping_json_both_dump_path, 'r') as fp2:
             new_id_mapping_load = json.load(fp2)
-        fp2.close()
         new_id_concept_transition_map = {int(old_key): val for old_key, val in new_id_mapping_load.items()}  # convert string keys to integers
         print("file", default_concept_mapping_json_both_dump_path, "read")
 
@@ -370,9 +362,6 @@ def create_concept_mappings_dict(default_concept_mapping_file,
                     # print progress every 1M
                     if lineN % 10000000 == 0:
                         print(lineN / 1000000)
-
-        # close file
-        concept_mappings_file.close()
         print("created concept transition dictionary")
 
         # remove concepts from dictionaries that don't have any transitions
@@ -430,7 +419,6 @@ def create_concept_mappings_dict(default_concept_mapping_file,
         print("storing new ID -> transitions hashmap for both transitions to json dump")
         with open(default_concept_mapping_json_both_dump_path, 'w') as fp2:
             json.dump(new_id_concept_transition_map, fp2)
-        fp2.close()
         print("storing new ID -> transitions hashmap for both transitions to json dump completed")
     else:
         print("no concept mapping file or json dump, cannot proceed")
