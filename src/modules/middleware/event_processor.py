@@ -154,10 +154,11 @@ class VehicleBreakdownEvent:
 
     type = 'vehicle-breakdown'
 
-    def __init__(self, vehicle_id, last_location_id):
+    def __init__(self, vehicle_id, metadata, route):
         self.metadata = {
             'vehicle_id': vehicle_id,
-            'last_visited_location_id': last_location_id
+            'route': route,
+            'metadata': metadata
         }
 
 #=======================================
