@@ -3,7 +3,7 @@ import modules.middleware.test.api as api
 
 class MockRemoteSIOT(ca.SIoT):
 
-    async def get_vehicles_near(self, vehicle, location, vehicle_route):
+    async def get_vehicles_near(self, vehicle, vehicle_route):
         pass
 
 

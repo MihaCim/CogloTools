@@ -56,7 +56,7 @@ class MockSiot(ca.SIoT):
         self._vehicle_capacities = vehicle_capacities
         self._vehicle_loads = vehicle_loads
 
-    async def get_vehicles_near(self, vehicle_id, vehicle_location_id, vehicle_future_loc_ids):
+    async def get_vehicles_near(self, vehicle_id, vehicle_future_loc_ids):
         return self._vehicle_ids, self._vehicle_capacities, self._vehicle_loads
 
 
