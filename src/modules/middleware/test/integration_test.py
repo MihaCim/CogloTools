@@ -1,5 +1,5 @@
 import modules.middleware.event_processor as ca
-import modules.middleware.test.api as api
+
 
 class MockRemoteSIOT(ca.SIoT):
 
@@ -7,17 +7,13 @@ class MockRemoteSIOT(ca.SIoT):
         pass
 
 
-class IntegrationTest:
-    def __init__(self):
-        aw_service = ca.NopAwarenessServices()
+class MockVRP(ca.VRPlanner):
+    async def calc_plan(self):
+        pass
 
+class MockStorage(ca.CaStorage):
+    async def get_plan_by_vehicle(self, vehicle_id):
+        pass
 
-        self._advisor = ca.CaEventProcessor(aw_service, siot=MockRemoteSIOT(), storage=None, vehicle_routing=None)
-
-
-
-if __name__ == '__main__':
-    server = api.CognitiveAdvisorAPI()
-
-    server.serve()
-
+    async def store_plan(self, plan):
+        pass

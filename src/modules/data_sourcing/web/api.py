@@ -3,10 +3,10 @@ from flask_restful import Resource, Api, reqparse
 import asyncio
 
 from flask_jsonpify import jsonify
-
+import modules.middleware.test.integration_test as it
 import modules.middleware.event_processor as ca
 
-processor = ca.CaEventProcessor(ca.NopAwarenessServices(), None, None, None)
+processor = ca.CaEventProcessor(ca.NopAwarenessServices(), it.MockRemoteSIOT(), it.MockStorage(), it.MockVRP())
 
 class Event(Resource):
 

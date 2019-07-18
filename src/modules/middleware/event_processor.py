@@ -14,7 +14,7 @@ class AwarenessServices(ABC):
 class SIoT(ABC):
 
     @abstractmethod
-    async def get_vehicles_near(self, vehicle, vehicle_route):
+    async def get_vehicles_near(self, vehicle, location, vehicle_route):
         pass
 
 class CaStorage(ABC):
@@ -158,7 +158,8 @@ class VehicleBreakdownEvent:
         self.metadata = {
             'vehicle_id': vehicle_id,
             'route': route,
-            'metadata': metadata
+            'metadata': metadata,
+            'last_visited_location_id': 0
         }
 
 #=======================================
@@ -218,6 +219,7 @@ class CaEventProcessor:
         print('processing a vehicle breakdown event')
 
         vehicle_id = event_data['vehicle_id']
+        last_dropoff_id = event_data['last_visited_location_id']
 
         print('fetching current distribution plan')
         previous_plan = await self._storage.get_plan_by_vehicle(vehicle_id)
@@ -226,7 +228,7 @@ class CaEventProcessor:
         print('fetching nearby vehicles')
         new_vehicles, new_capacities, new_loads = await self._siot.get_vehicles_near(
             vehicle_id,
-
+            last_dropoff_id,
             vehicle_route
         )
 
