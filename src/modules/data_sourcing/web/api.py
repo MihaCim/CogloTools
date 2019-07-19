@@ -18,6 +18,7 @@ class Event(Resource):
         event = json['event']
         vehicle = json['vehicle']
         loop = asyncio.new_event_loop()
+        print(json)
         if "broken" not in event['type']:
             return jsonify({
                 "success": False,
@@ -27,7 +28,6 @@ class Event(Resource):
         evt = ca.VehicleBreakdownEvent(vehicle['vehicleId'], None, None)
         task = asyncio.ensure_future(processor.process_event(evt), loop=loop)
 
-        #print(json)
         print('processed')
         loop.run_until_complete(task)
         return jsonify({
@@ -38,7 +38,7 @@ class Event(Resource):
 
 class CognitiveAdvisorAPI:
     def __init__(self, port=5000):
-
+        # http://151.97.13.227:8080/SIOT-war/SIoT/Server/proposedPlan
         self._port = port
         self._app = Flask(__name__)
         self._api = Api(self._app)

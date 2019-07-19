@@ -1,15 +1,18 @@
+import requests
 from abc import ABC, abstractmethod
 import numpy as np
 
-#=======================================
+
+# =======================================
 # INTERFACES
-#=======================================
+# =======================================
 
 class AwarenessServices(ABC):
 
     @abstractmethod
     async def classify_event(self, event):
         pass
+
 
 class SIoT(ABC):
 
@@ -24,6 +27,7 @@ class SIoT(ABC):
     async def propose_plan(self, data):
         pass
 
+
 class CaStorage(ABC):
 
     @abstractmethod
@@ -34,31 +38,37 @@ class CaStorage(ABC):
     async def get_plan_by_vehicle(self, vehicle_id):
         pass
 
+
 class VRPlanner(ABC):
 
     @abstractmethod
     async def calc_plan(self):
         pass
-#=======================================
+
+
+# =======================================
 # INITIAL IMPLEMENTATIONS
-#=======================================
+# =======================================
 
 class NopAwarenessServices(AwarenessServices):
 
     async def classify_event(self, event):
         return event
 
-#=======================================
+
+# =======================================
 # OBJECTS
-#=======================================
+# =======================================
 
 
 curr_plan_id = -1
+
 
 def gen_plan_id():
     global curr_plan_id
     curr_plan_id += 1
     return curr_plan_id
+
 
 class DistributionPlan:
 
@@ -153,12 +163,12 @@ class DistributionPlan:
 
         return location_ids
 
-#=======================================
+
+# =======================================
 # EVENTS
-#=======================================
+# =======================================
 
 class VehicleBreakdownEvent:
-
     type = 'vehicle-breakdown'
 
     def __init__(self, vehicle_id, metadata, route):
@@ -169,12 +179,12 @@ class VehicleBreakdownEvent:
             'last_visited_location_id': 0
         }
 
-#=======================================
+
+# =======================================
 # EVENT PROCESSOR
-#=======================================
+# =======================================
 
 class CaEventProcessor:
-
     '''
 
     The Congitive Advisor Event Processor component is the main orchestrator in the
@@ -198,7 +208,6 @@ class CaEventProcessor:
         self._event_handlers = {
             'plan-adjusted': []
         }
-
 
     async def process_event(self, event):
         event_data = await self._awareness_services.classify_event(event)
@@ -229,13 +238,31 @@ class CaEventProcessor:
         last_dropoff_id = event_data['last_visited_location_id']
 
         print('fetching current distribution plan')
-        #await self._storage.store_plan({'UUID': vehicle_id, 'dropOffLocations': event_data['route'] })
 
-        #previous_plan = await self._storage.get_plan_by_vehicle(vehicle_id)
+        url = "http://151.97.13.227:8080/SIOT-war/SIoT/Server/newEvent"
+
+        print("Posting" + vehicle_id)
+
+        payload = {
+            'event': {
+                'name': 'fault',
+                'type': 'delay/broken fire'
+            },
+            'vehicle': {
+                'vehicleId': vehicle_id
+            }
+        }
+
+        data = requests.post(url, payload)
+
+        # TODO parse data
+        print(data)
+        print(data.json())
+
+        # previous_plan = await self._storage.get_plan_by_vehicle(vehicle_id)
         # vehicle_route = previous_plan.get_route_location_ids(vehicle_id)
         vehicle_route = None
         print('fetching nearby vehicles')
-
 
         new_vehicles, new_capacities, new_loads = await self._siot.get_vehicles_near(
             vehicle_id,
@@ -243,10 +270,72 @@ class CaEventProcessor:
             vehicle_route
         )
 
-        #TODO refactor vehicles
+        # TODO refactor vehicles
 
         new_plan = None
-        await self._siot.propose_plan(new_plan)
+        url = "http://151.97.13.227:8080/SIOT-war/SIoT/Server/newEvent"
+
+        print("Posting" + "new plan")
+
+        payload = {
+            "vehicles": [
+                {
+                    "UUID": "carflowF1",
+                    "route": [
+                        {
+                            "locationId": 3,
+                            "dropoffWeightKg": 130,
+                            "dropoffVolumeM3": 5
+                        },
+                        {
+                            "locationId": 5,
+                            "dropoffWeightKg": 40,
+                            "dropoffVolumeM3": 5
+                        },
+                        {
+                            "locationId": 9,
+                            "dropoffWeightKg": 30,
+                            "dropoffVolumeM3": 1
+                        },
+                        {
+                            "locationId": 12,
+                            "dropoffWeightKg": 130,
+                            "dropoffVolumeM3": 5
+                        }
+                    ]
+                },
+                {
+                    "UUID": "carflowF3",
+                    "route": [
+                        {
+                            "locationId": 13,
+                            "dropoffWeightKg": 130,
+                            "dropoffVolumeM3": 5
+                        },
+                        {
+                            "locationId": 6,
+                            "dropoffWeightKg": 40,
+                            "dropoffVolumeM3": 5
+                        },
+                        {
+                            "locationId": 13,
+                            "dropoffWeightKg": 30,
+                            "dropoffVolumeM3": 1
+                        },
+                        {
+                            "locationId": 10,
+                            "dropoffWeightKg": 130,
+                            "dropoffVolumeM3": 5
+                        }
+                    ]
+                }
+            ]
+        }
+
+        data = requests.post(url, payload)
+
+        print(data)
+        print(data.json())
         return
 
         print('constructing VRP constraints')
@@ -272,9 +361,9 @@ class CaEventProcessor:
         print('notifying plan change')
         await self._fire_event('plan-adjusted', new_plan)
 
-    #==================================
+    # ==================================
     # OUTPUT EVENTS
-    #==================================
+    # ==================================
 
     async def _fire_event(self, event_id, event):
         if event_id not in self._event_handlers:

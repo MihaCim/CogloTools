@@ -5,16 +5,19 @@ import requests
 class MockRemoteSIOT(ca.SIoT):
 
     # Make req to SIOT simulator
-    async def send_event(self, event):
-        url = None
+    async def send_event(self, vehicle_id):
+        url = "http://151.97.13.227:8080/SIOT-war/SIoT/Server/newEvent"
 
+        print("Posting" + vehicle_id)
         if url is not None:
             payload = {
                 'event': {
                     'name': 'fault',
                     'type': 'delay/broken fire'
                 },
-                'vehicle': event.metadata.vehicle_id
+                'vehicle': {
+                    'vehicleId': vehicle_id
+                }
             }
 
             data = requests.post(url, payload)
