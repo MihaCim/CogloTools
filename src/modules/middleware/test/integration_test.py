@@ -25,8 +25,69 @@ class MockRemoteSIOT(ca.SIoT):
         else:
             return await self.get_vehicles_near(None, None)
 
+    async def propose_plan(self, data):
+        url = None
+
+        if url is not None:
+            payload = {
+                "vehicles": [
+                    {
+                        "UUID": "92C199BD42E6None",
+                        "route": [
+                            {
+                                "locationId": 3,
+                                "dropoffWeightKg": 130,
+                                "dropoffVolumeM3": 5
+                            },
+                            {
+                                "locationId": 5,
+                                "dropoffWeightKg": 40,
+                                "dropoffVolumeM3": 5
+                            },
+                            {
+                                "locationId": 9,
+                                "dropoffWeightKg": 30,
+                                "dropoffVolumeM3": 1
+                            },
+                            {
+                                "locationId": 12,
+                                "dropoffWeightKg": 130,
+                                "dropoffVolumeM3": 5
+                            }
+                        ]
+                    },
+                    {
+                        "UUID": "92C199BD42E6None",
+                        "route": [
+                            {
+                                "locationId": 13,
+                                "dropoffWeightKg": 130,
+                                "dropoffVolumeM3": 5
+                            },
+                            {
+                                "locationId": 6,
+                                "dropoffWeightKg": 40,
+                                "dropoffVolumeM3": 5
+                            },
+                            {
+                                "locationId": 13,
+                                "dropoffWeightKg": 30,
+                                "dropoffVolumeM3": 1
+                            },
+                            {
+                                "locationId": 10,
+                                "dropoffWeightKg": 130,
+                                "dropoffVolumeM3": 5
+                            }
+                        ]
+                    }
+                ]
+            }
+
+            data = requests.post(url, payload)
+
     # Just mock some nearby vehicles
-    async def get_vehicles_near(self, vehicle, vehicle_route):
+    async def get_vehicles_near(self, vehicle, dropoff_id, vehicle_route):
         vehicles = [
             {
                 "vehicleId": 1,
@@ -63,7 +124,9 @@ class MockRemoteSIOT(ca.SIoT):
             }
         ]
 
-        return vehicles
+        return [v['vehicleId'] for v in vehicles], \
+               [v['metadata']['capacityKg'] for v in vehicles], \
+               [v['metadata']['currentLoadKg'] for v in vehicles]
 
 
 class MockVRP(ca.VRPlanner):
@@ -72,8 +135,11 @@ class MockVRP(ca.VRPlanner):
 
 
 class MockStorage(ca.CaStorage):
+    def __init__(self):
+        self._plans = {}
+
     async def get_plan_by_vehicle(self, vehicle_id):
-        pass
+        return self._plans[vehicle_id]
 
     async def store_plan(self, plan):
-        pass
+        self._plans[plan['UUID']] = plan['dropOffLocations']

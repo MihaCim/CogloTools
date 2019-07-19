@@ -10,6 +10,9 @@ processor = ca.CaEventProcessor(ca.NopAwarenessServices(), it.MockRemoteSIOT(), 
 
 class Event(Resource):
 
+    def get(self):
+        pass
+
     def post(self):
         json = request.get_json(force=True)
         event = json['event']
@@ -49,7 +52,7 @@ class CognitiveAdvisorAPI:
         self._api.add_resource(class_ref, endpoint_name)
 
     def serve(self):
-        self._app.run(port=self._port)
+        self._app.run(host='0.0.0.0',port=self._port)
 
     # ================================
     #  API ENDPOINTS

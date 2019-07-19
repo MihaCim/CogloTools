@@ -18,7 +18,10 @@ class SIoT(ABC):
         pass
 
     @abstractmethod
-    def send_event(self, event):
+    async def send_event(self, event):
+        pass
+
+    async def propose_plan(self, data):
         pass
 
 class CaStorage(ABC):
@@ -226,21 +229,25 @@ class CaEventProcessor:
         last_dropoff_id = event_data['last_visited_location_id']
 
         print('fetching current distribution plan')
-        previous_plan = await self._storage.get_plan_by_vehicle(vehicle_id)
-        vehicle_route = previous_plan.get_route_location_ids(vehicle_id)
+        await self._storage.store_plan({'UUID': vehicle_id, 'dropOffLocations': event_data['route'] })
 
+        previous_plan = await self._storage.get_plan_by_vehicle(vehicle_id)
+        # vehicle_route = previous_plan.get_route_location_ids(vehicle_id)
+        vehicle_route = None
         print('fetching nearby vehicles')
 
 
-        # new_vehicles, new_capacities, new_loads = await self._siot.get_vehicles_near(
-        #     vehicle_id,
-        #     last_dropoff_id,
-        #     vehicle_route
-        # )
-
-        vehicles = await self._siot.send_event(event_data);
+        new_vehicles, new_capacities, new_loads = await self._siot.get_vehicles_near(
+            vehicle_id,
+            last_dropoff_id,
+            vehicle_route
+        )
 
         #TODO refactor vehicles
+
+        new_plan = None
+        await self._siot.propose_plan(new_plan)
+        return
 
         print('constructing VRP constraints')
         # get the capacity of each vehicle
