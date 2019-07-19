@@ -14,7 +14,7 @@ def drawGraph(H, postalNodes, postalWays):
     for posts in postalNodes:
         li.append(posts)
         G.add_node(posts, pos=(postalNodes[posts].lat, postalNodes[posts].lon))
-        labels[posts] = postalNodes[posts].post_id + "(" + str(posts) + ")"
+        labels[posts] = postalNodes[posts].post_id
 
     for edge in postalWays:
         for edgeN in postalWays[edge]:
@@ -22,10 +22,13 @@ def drawGraph(H, postalNodes, postalWays):
 
 
         # plt.figure(1)
-    pos = nx.get_node_attributes(H, 'pos')
-    nx.draw(H, pos=pos, node_size=1)
+
+    #pos = nx.spring_layout(G, k=0.25, iterations=40)
+    pos = nx.get_node_attributes(H, 'pos', )
+    nx.draw(H, pos=pos, node_size=0.1, node_color='g', edge_color='g',)
     nx.draw_networkx_nodes(G, pos, nodelist=li, node_color='g')
-    nx.draw_networkx_edges(G, pos, nodelist=li, node_color='g')
+    col = nx.draw_networkx_edges(G, pos, nodelist=li, node_color='g',edge_color='r')
+    col.set_zorder(20)
     nx.draw_networkx_labels(G, pos, labels, font_size=16)
 
     plt.show()
@@ -65,7 +68,7 @@ def drawStaticGraph(nodes, ways, results):
     import matplotlib.pyplot as plt
 
     # plt.figure(1)
-    pos = nx.spring_layout(G, k=0.25, iterations=40)
+    pos = nx.spring_layout(G, k=0.1, iterations=80)
     nx.draw_networkx_nodes(G, pos, node_color=color_map, nodelist=li)
     nx.draw_networkx_edges(G, pos, nodelist=li, node_color='g')
 
@@ -88,6 +91,7 @@ if __name__ == "__main__":
     for k,v in roadNodes.items():
         if v.is_post:
             map_posts_to_nodes[v.post_id] = k
+            print("Post_id: "+str(v.post_id)+ " node_id"+ str(k))
 
 
 
@@ -95,23 +99,28 @@ if __name__ == "__main__":
     postEdge = {}
 
     # drawStaticGraph(nodesDict, edgesDict, results)
+    tmpRes =[]
     finder = neighbourAlg.NeighboursFinder()
+
     for postId, nodeId in map_posts_to_nodes.items():
+    #postId = 'A2'
+    #nodeId = 292263326
         res = finder.search_near_posts(roadNodes, roadWays, nodeId, 1)
         print('PostID '+str(postId) +' Node: '+str(nodeId) + ' r: '+str(res))
+        tmpRes.append((postId, nodeId, res))
         postNode[nodeId] = roadNodes[nodeId]
         for result in res:
-            postNode[roadNodes[map_posts_to_nodes[result]].node_id] = roadNodes[map_posts_to_nodes[result]]
+                    postNode[roadNodes[map_posts_to_nodes[result]].node_id] = roadNodes[map_posts_to_nodes[result]]
 
-            if roadNodes[map_posts_to_nodes[result]].node_id in postEdge:
-                tmp = postEdge[nodeId]
-                tmp[roadNodes[map_posts_to_nodes[result]].node_id] = {'weight': 1}
-                postEdge[nodeId] = tmp
-                print(result)
-            else:
-                print('aa')
-                postEdge[nodeId] = {roadNodes[map_posts_to_nodes[result]].node_id:{'weight': 1}}
-            
+                    if nodeId in postEdge:
+                        tmp = postEdge[nodeId]
+                        tmp[roadNodes[map_posts_to_nodes[result]].node_id] = {'weight': 1}
+                        postEdge[nodeId] = tmp
+                        print(result)
+                    else:
+                        postEdge[nodeId] = {roadNodes[map_posts_to_nodes[result]].node_id:{'weight': 1}}
 
-
-    drawGraph(G, postNode, postEdge)
+    for postId, nodeId, res in tmpRes:
+        print('PostID ' + str(postId) + ' Node: ' + str(nodeId) + ' r: ' + str(res))
+    if len(postEdge) != 0:
+        drawGraph(G, postNode, postEdge)

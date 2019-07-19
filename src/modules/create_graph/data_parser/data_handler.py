@@ -94,9 +94,16 @@ class DataHandler():
             edgesDict[node.id] = {}
 
         for way in self.ways:
+            #Firstly add edge from A to B
             tmpD = edgesDict[way.ids[0]]
             tmpD[way.ids[1]] = {"weight": way.distance}
             edgesDict[way.ids[0]] = tmpD
+
+            #Than add edge from B to A
+            tmpD = edgesDict[way.ids[1]]
+            tmpD[way.ids[0]] = {"weight": way.distance}
+            edgesDict[way.ids[1]] = tmpD
+            
 
         self.modified_ways = edgesDict
         self.modified_nodes = nodesDict

@@ -9,13 +9,13 @@ class NeighboursFinder():
         node_id_node_map = copy.deepcopy(node_id_node_map_tmp)
         node_id_edge_map = copy.deepcopy(node_id_edge_map)
         front = {
-            start_node_id: FrontData(0, [], [])
+            start_node_id: FrontData(start_node_id, [], [])
         }
         visited_node_ids = set()
         results = []
 
 
-        visited_node_ids.add(0)
+        visited_node_ids.add(start_node_id)
 
         while len(front) != 0:
 
