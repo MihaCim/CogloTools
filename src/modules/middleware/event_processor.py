@@ -229,9 +229,9 @@ class CaEventProcessor:
         last_dropoff_id = event_data['last_visited_location_id']
 
         print('fetching current distribution plan')
-        await self._storage.store_plan({'UUID': vehicle_id, 'dropOffLocations': event_data['route'] })
+        #await self._storage.store_plan({'UUID': vehicle_id, 'dropOffLocations': event_data['route'] })
 
-        previous_plan = await self._storage.get_plan_by_vehicle(vehicle_id)
+        #previous_plan = await self._storage.get_plan_by_vehicle(vehicle_id)
         # vehicle_route = previous_plan.get_route_location_ids(vehicle_id)
         vehicle_route = None
         print('fetching nearby vehicles')

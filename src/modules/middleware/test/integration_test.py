@@ -15,7 +15,6 @@ class MockRemoteSIOT(ca.SIoT):
                     'type': 'delay/broken fire'
                 },
                 'vehicle': event.metadata.vehicle_id
-
             }
 
             data = requests.post(url, payload)

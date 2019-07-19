@@ -11,12 +11,12 @@ processor = ca.CaEventProcessor(ca.NopAwarenessServices(), it.MockRemoteSIOT(), 
 class Event(Resource):
 
     def get(self):
-        pass
+        return jsonify({"success": True, "message": "Please use POST request"})
 
     def post(self):
         json = request.get_json(force=True)
         event = json['event']
-        vehicles = json['vehicles']
+        vehicle = json['vehicle']
         loop = asyncio.new_event_loop()
         if "broken" not in event['type']:
             return jsonify({
@@ -24,8 +24,7 @@ class Event(Resource):
                 "message": "Event type " + event['type'] + " currently not supported"
             })
 
-        vehicle = vehicles[0]
-        evt = ca.VehicleBreakdownEvent(vehicle['UUID'], vehicle['metadata'], vehicle['dropOffLocations'])
+        evt = ca.VehicleBreakdownEvent(vehicle['vehicleId'], None, None)
         task = asyncio.ensure_future(processor.process_event(evt), loop=loop)
 
         #print(json)
@@ -33,7 +32,7 @@ class Event(Resource):
         loop.run_until_complete(task)
         return jsonify({
             "success": True,
-            "message": "Processing {0} events".format(len(vehicles))
+            "message": "Processing event for vehicle {}".format(vehicle['vehicleId'])
         })
 
 
