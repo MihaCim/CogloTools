@@ -81,6 +81,8 @@ def drawStaticGraph(nodes, ways, results):
 
 if __name__ == "__main__":
 
+    #osmHandler = DataHandler("data/duplica_dob_test_export.osm",
+    #                         'data/List of Postal Offices (geographical location).csv')
     osmHandler = DataHandler("data/kamnik_export.osm",
                              'data/List of Postal Offices (geographical location).csv')
     G = osmHandler.graph_viz()
@@ -100,15 +102,16 @@ if __name__ == "__main__":
 
     # drawStaticGraph(nodesDict, edgesDict, results)
     tmpRes =[]
-    finder = neighbourAlg.NeighboursFinder()
+    finder = neighbourAlg.NeighboursFinder(G)
 
     for postId, nodeId in map_posts_to_nodes.items():
-    #postId = 'A2'
-    #nodeId = 292263326
-        res = finder.search_near_posts(roadNodes, roadWays, nodeId, 1)
+    #postId = 'A6'
+    #nodeId = 56727693
+        res = finder.search_near_posts(roadNodes, roadWays, nodeId, 6)
         print('PostID '+str(postId) +' Node: '+str(nodeId) + ' r: '+str(res))
         tmpRes.append((postId, nodeId, res))
         postNode[nodeId] = roadNodes[nodeId]
+
         for result in res:
                     postNode[roadNodes[map_posts_to_nodes[result]].node_id] = roadNodes[map_posts_to_nodes[result]]
 
@@ -119,6 +122,11 @@ if __name__ == "__main__":
                         print(result)
                     else:
                         postEdge[nodeId] = {roadNodes[map_posts_to_nodes[result]].node_id:{'weight': 1}}
+
+    for k, v in roadNodes.items():
+        if v.post_id != None and not (v.post_id in res):
+            postNode[k] = v
+
 
     for postId, nodeId, res in tmpRes:
         print('PostID ' + str(postId) + ' Node: ' + str(nodeId) + ' r: ' + str(res))

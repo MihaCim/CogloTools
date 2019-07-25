@@ -17,6 +17,9 @@ class OsmParsers(xml.sax.ContentHandler):
         self.roads = {"motorway", "trunk", "primary", "secondary", "tertiary", "unclassified", "residential", "service",
                       "living_street", "motorway_link", "trunk_link", "primary_link", "secondary_link", "tertiary_link",
                       "motorway_junction"}
+        #self.roads = {"motorway", "trunk", "primary", "secondary", "tertiary", "residential", "service",
+        #              "living_street", "motorway_link", "trunk_link", "primary_link", "secondary_link", "tertiary_link",
+        #              "motorway_junction"}
 
     def startElement(self, name, attrs):
         if name == "node":

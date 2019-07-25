@@ -1,22 +1,67 @@
 import math
 import copy
 from src.modules.create_graph.pojo.front_data import FrontData
+import time
+import networkx as nx
+import matplotlib.pyplot as plt
+
 
 class NeighboursFinder():
+
+    def __init__(self, G):
+        self.G = G
+
+    def drawGraph(self, H_roads, front, postsRes, node_id_node_map_tmp):
+        plt.clf()
+        plt.cla()
+        plt.close()
+
+        G_front = nx.Graph()
+        K_posts = nx.Graph()
+        li = []
+        for k, v in front.items():
+            li.append(k)
+            G_front.add_node(k, pos=(node_id_node_map_tmp[k].lat, node_id_node_map_tmp[k].lon))
+
+        color_map = []
+        posts = []
+        if len(postsRes) != 0:
+            for k, v in node_id_node_map_tmp.items():
+                if v.post_id != None and not (v.post_id in postsRes):
+                    posts.append(k)
+                    K_posts.add_node(k, pos=(node_id_node_map_tmp[k].lat, node_id_node_map_tmp[k].lon))
+                    color_map.append('blue')
+                elif v.post_id != None and v.post_id in postsRes:
+                    posts.append(k)
+                    K_posts.add_node(k, pos=(node_id_node_map_tmp[k].lat, node_id_node_map_tmp[k].lon))
+                    color_map.append('red')
+
+        # pos = nx.spring_layout(G, k=0.25, iterations=40)
+        pos = nx.get_node_attributes(H_roads, 'pos', )
+
+        nx.draw(H_roads, pos=pos, node_size=0.1, node_color='g', edge_color='g', )
+        nx.draw_networkx_nodes(G_front, pos, node_size=100, nodelist=li, node_color='rosybrown')
+        nx.draw_networkx_nodes(K_posts, pos, nodelist=posts, node_color=color_map)
+
+        plt.show()
+        G_front.clear()
+        K_posts.clear()
+        # H_roads.clear()
 
     def search_near_posts(self, node_id_node_map_tmp, node_id_edge_map, start_node_id, eps_km):
         # front = [(start_node_id, 0, [])]
         node_id_node_map = copy.deepcopy(node_id_node_map_tmp)
         node_id_edge_map = copy.deepcopy(node_id_edge_map)
         front = {
-            start_node_id: FrontData(start_node_id, [], [])
+            start_node_id: FrontData(0, [], [])
         }
         visited_node_ids = set()
         results = []
 
-
         visited_node_ids.add(start_node_id)
 
+        i = 0
+        start_time = time.time()
         while len(front) != 0:
 
             active_node_id = None
@@ -93,24 +138,6 @@ class NeighboursFinder():
                 active_node_history
             )
 
-            '''
-
-            for f in front:
-                print(f)
-                current_origin_distance = front[f].origin_dist
-                current_eps_history = front[f].eps_history
-                while True:
-                    if current_eps_history is None or len(current_eps_history) == 0:
-                        break
-                    oldest_node_id, oldest_node_dist_origin = current_eps_history[0]
-                    dist_diff = current_origin_distance - oldest_node_dist_origin
-
-                    if dist_diff <= eps_km:
-                        break
-                    current_eps_history.pop(0)
-                front[f].eps_history = current_eps_history
-                '''
-
             # front.append((active_node_id, min_distance, current_visited_points))
             # add the active node to the list of visited nodes
 
@@ -123,17 +150,15 @@ class NeighboursFinder():
                 # TODO check if all the naighbors of previous point were visited
                 # if not snap the node back
 
-                #print(snap_node_id)
-                #print(snap_node_history)
-                all_visited = True
-                snap_back_to = -1
+                # print(snap_node_id)
+                # print(snap_node_history)
+                all_visited = False
+                snap_back_to = snap_node_history[-1][0]
                 for node_id, eps_distance in snap_node_history:
-                    #print(node_id_node_map[node_id])
-                    for id in node_id_edge_map[node_id]:
-                        if id not in visited_node_ids:
-                            all_visited = False
-                            snap_back_to = node_id
-                            break
+                    # print(node_id_node_map[node_id])
+                    if node_id_node_map[node_id].post_id != None:
+                        all_visited = True
+                        break
 
                 if all_visited == False and node_id_node_map[snap_back_to].post_id is None:
                     node_id_node_map[snap_back_to].post_id = node_id_node_map[snap_node_id].post_id
@@ -146,12 +171,12 @@ class NeighboursFinder():
                     for f in front:
                         for id, dist in front[f].eps_history:
                             if snap_back_to == id and f != snap_node_id:
-                                #print("nasel")
-                                #print(front[f].eps_history)
-                                front[snap_back_to].prev_posts.append(snap_back_to)
+                                # print("nasel")
+                                # print(front[f].eps_history)
+                                front[f].prev_posts.append(snap_back_to)
                     if snap_back_to in front:
                         front[snap_back_to].prev_posts.append(snap_back_to)
-
+                    print("snapp")
 
                 else:
 
@@ -207,7 +232,7 @@ class NeighboursFinder():
                                 snap_node_id = hist_node_id
                                 snap_node_history = snap_node_history[hist_nodeN + 1:]
 
-            #print(front)
+            # print(front)
 
             # if all the neighbours of the previous point have been visited, remove it
             # from the front
@@ -224,9 +249,14 @@ class NeighboursFinder():
             for node_id in tmpD:
                 del front[node_id]
 
-           # print("visited:" + str(visited_node_ids))
-           # print("results:" + str(results))
+            # if time.time() - start_time >= 0.005:
+            #    self.drawGraph(self.G, front, results, node_id_node_map)
+            #    start_time = time.time()
+            # print("visited:" + str(visited_node_ids))
+            print("results:" + str(results))
+            # print("done")
+            # print(results)
 
-        #print("done")
-        #print(results)
+        print("Runtime: {}".format(time.time() - start_time))
+
         return results
