@@ -122,9 +122,20 @@ class TestCreateGraph(unittest.TestCase):
         nodes_dict[44] = search_node.SearchNode(44, None, False)
         nodes_dict[45] = search_node.SearchNode(45, None, False)
         nodes_dict[46] = search_node.SearchNode(46, None, False)
+        nodes_dict[47] = search_node.SearchNode(47, None, False)
+        nodes_dict[48] = search_node.SearchNode(48, None, False)
+        nodes_dict[49] = search_node.SearchNode(49, None, False)
+        nodes_dict[50] = search_node.SearchNode(50, None, False)
+        nodes_dict[51] = search_node.SearchNode(51, "A11", True)
+        nodes_dict[52] = search_node.SearchNode(52, None, False)
+        nodes_dict[53] = search_node.SearchNode(53, None, False)
+        nodes_dict[54] = search_node.SearchNode(54, None, False)
+        nodes_dict[55] = search_node.SearchNode(55, None, False)
+        nodes_dict[56] = search_node.SearchNode(56, None, False)
+        nodes_dict[57] = search_node.SearchNode(57, "A12", True)
 
         edges_dict = {
-            0: {1: {'weight': 2}, 2: {'weight': 2}, 3: {'weight': 2}, 4: {'weight': 2}},
+            0: {1: {'weight': 2}, 2: {'weight': 2}, 3: {'weight': 2}, 4: {'weight': 2}, 47: {'weight': 3.5}},
             1: {5: {'weight': 0.5}, 6: {'weight': 2}, 0: {'weight': 2}},
             2: {0: {'weight': 2}, 9: {'weight': 2}, 10: {'weight': 6}},
             3: {0: {'weight': 2}, 19: {'weight': 2}, 20: {'weight': 2}},
@@ -171,7 +182,18 @@ class TestCreateGraph(unittest.TestCase):
             43: {42: {'weight': 0.5}},
             44: {17: {'weight': 0.5}},
             45: {11: {'weight': 0.5}, 19: {'weight': 0.5}, 46: {'weight': 0.15}},
-            46: {45: {'weight': 0.5}}
+            46: {45: {'weight': 0.5}},
+            47: {0: {'weight': 3.5}, 48: {'weight': 0.45}, 55: {'weight': 0.45}},
+            48: {47: {'weight': 0.45}, 49: {'weight': 0.45}},
+            49: {48: {'weight': 0.45}, 51: {'weight': 0.45}, 50: {'weight': 0.45}},
+            50: {49: {'weight': 0.45}},
+            51: {49: {'weight': 0.45}, 52: {'weight': 0.45}},
+            52: {51: {'weight': 0.45}, 53: {'weight': 0.45}, 56: {'weight': 0.45}},
+            53: {52: {'weight': 0.45}, 54: {'weight': 0.45}},
+            54: {53: {'weight': 0.45}, 55: {'weight': 0.45}},
+            55: {54: {'weight': 0.45}, 47: {'weight': 0.45}},
+            56: {52: {'weight': 0.45}},
+            57: {56: {'weight': 0.45}}
         }
 
         return nodes_dict, edges_dict
@@ -192,7 +214,7 @@ class TestCreateGraph(unittest.TestCase):
         finder = neighbour_alg.NeighboursFinder()
         result =finder.search_near_posts(nodes_dict, edges_dict, 0, 1)
 
-        self.assertLessEqual(result, ['A8', 'A5', 'A7', 'A10', 'A1'])
+        self.assertLessEqual(result, ['A8', 'A5', 'A7', 'A10', 'A11', 'A1'])
 
 
 

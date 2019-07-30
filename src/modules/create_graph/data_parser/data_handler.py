@@ -65,6 +65,7 @@ class DataHandler():
         self.nodes = handler.nodes
 
         nodes_filtered = {}
+
         #in this step we remove nodes which are not connected to road
         #with this step we want to avoid that algoritm will hang on.
         for way in self.ways:
@@ -77,23 +78,32 @@ class DataHandler():
         #alignement
         (roadNodesAnotated, postsNodes) =  self.align_nodes_and_posts(nodes_filtered)
 
-        i = 1
         #generate ides for post offices (generic)
+        i = 1
         for key, node in roadNodesAnotated.items():
             if node.post:
-                nodesDict[node.id] = SearchNode(node.id, i, node.post)
+                nodesDict[node.id] = SearchNode(node.id, 'A' + str(i), node.post, node.lat, node.lon, node.address,)
                 i = i + 1
             else:
-                nodesDict[node.id] = SearchNode(node.id)
+                nodesDict[node.id] = SearchNode(node.id, None, None, node.lat, node.lon, node.address)
+
+
 
 
         for key, node in roadNodesAnotated.items():
             edgesDict[node.id] = {}
 
         for way in self.ways:
+            #Firstly add edge from A to B
             tmpD = edgesDict[way.ids[0]]
             tmpD[way.ids[1]] = {"weight": way.distance}
             edgesDict[way.ids[0]] = tmpD
+
+            #Than add edge from B to A
+            tmpD = edgesDict[way.ids[1]]
+            tmpD[way.ids[0]] = {"weight": way.distance}
+            edgesDict[way.ids[1]] = tmpD
+            
 
         self.modified_ways = edgesDict
         self.modified_nodes = nodesDict
