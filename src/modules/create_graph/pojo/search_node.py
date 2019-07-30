@@ -9,8 +9,6 @@ class SearchNode:
         self.lon = lon
         self.address = address
 
-
-
     def set_lat_lon(self, lat, lon):
         self.lat = lat
         self.lon = lon

@@ -148,10 +148,7 @@ class NeighboursFinder():
                 snap_node_id = active_node_id
                 snap_node_history = [node_id for node_id in reversed(active_node_history)]  # TODO: optimize
                 # TODO check if all the naighbors of previous point were visited
-                # if not snap the node back
 
-                # print(snap_node_id)
-                # print(snap_node_history)
                 all_visited = False
                 snap_back_to = None
                 if len(snap_node_history) != 0:
@@ -176,6 +173,7 @@ class NeighboursFinder():
                                 # print("nasel")
                                 # print(front[f].eps_history)
                                 front[f].prev_posts.append(snap_back_to)
+
                     #if snap_back_to in front:
                     #    front[snap_back_to].prev_posts.append(snap_back_to)
                     print("snapp")

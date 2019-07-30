@@ -16,6 +16,7 @@ def drawGraph(H, postalNodes, postalWays):
         G.add_node(posts, pos=(postalNodes[posts]["lat"], postalNodes[posts]["lon"]))
         labels[posts] = postalNodes[posts]["post_id"]
 
+
     for edge in postalWays:
         for edgeN in postalWays[edge]:
             G.add_edge(edge, edgeN, weight=postalWays[edge][edgeN]['weight'])
@@ -207,9 +208,8 @@ def syntic_graph2_constraction():
 
 if __name__ == "__main__":
 
-    #osmHandler = DataHandler("data/duplica_dob_test_export.osm",
+    # osmHandler = DataHandler("data/duplica_dob_test_export.osm",
     #                         'data/List of Postal Offices (geographical location).csv')
-
 
     osmHandler = DataHandler("data/slovenia-latest.osm.xml",
                              'data/List of Postal Offices (geographical location).csv')
@@ -245,6 +245,7 @@ if __name__ == "__main__":
                         else:
                             postEdge[nodeId] = {roadNodes[map_posts_to_nodes[res_id]].node_id:{'weight': res_dist}}
 
+
     for k, v in roadNodes.items():
         if v.post_id != None:
             postNode[k] = v.__dict__
@@ -253,6 +254,9 @@ if __name__ == "__main__":
         print('PostID ' + str(postId) + ' Node: ' + str(nodeId) + ' r: ' + str(res))
     if len(postEdge) != 0:
         drawGraph(G, postNode, postEdge)
+
+    postNode = {}
+    postEdge = {}
 
 
     import json
@@ -269,3 +273,4 @@ if __name__ == "__main__":
     #for key, val in postNode.items():
     #    w.writerow([key, val])
     #drawStaticGraph(roadNodes, roadWays, res)
+
