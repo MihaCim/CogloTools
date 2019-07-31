@@ -1,6 +1,6 @@
 
 import csv
-from src.modules.create_graph.pojo.post import Post
+from modules.create_graph.pojo.post import Post
 
 class PostHandler:
 

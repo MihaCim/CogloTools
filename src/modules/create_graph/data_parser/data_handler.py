@@ -2,14 +2,12 @@ import sys
 
 import xml.sax
 import networkx as nx
-from src.modules.create_graph.utils import utils
-from src.modules.create_graph.data_parser.parse_osm import OsmParsers
-from src.modules.create_graph.data_parser.parse_posts import PostHandler
-from src.modules.create_graph.pojo.search_node import SearchNode
+from modules.create_graph.utils import utils
+from modules.create_graph.data_parser.parse_osm import OsmParsers
+from modules.create_graph.data_parser.parse_posts import PostHandler
+from modules.create_graph.pojo.search_node import SearchNode
 
 class DataHandler():
-
-
 
     def align_nodes_and_posts(self, nodesL):
         '''
