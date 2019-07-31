@@ -5,7 +5,69 @@ import requests
 from flask_jsonpify import jsonify
 
 SIOT_URL = 'http://151.97.13.227:8080/SIOT-war/SIoT/Server/'
-SIOT_URL = 'https://postman-echo.com/post'
+
+
+class RecRequest(Resource):
+    def post(self):
+        json = request.get_json(force=True)
+        print(json)
+
+        resp = {
+            "vehicles": [
+                {
+                    "UUID": "92C199BD42E6None",
+                    "route": [
+                        {
+                            "locationId": 3,
+                            "dropoffWeightKg": 130,
+                            "dropoffVolumeM3": 5
+                        },
+                        {
+                            "locationId": 5,
+                            "dropoffWeightKg": 40,
+                            "dropoffVolumeM3": 5
+                        },
+                        {
+                            "locationId": 9,
+                            "dropoffWeightKg": 30,
+                            "dropoffVolumeM3": 1
+                        },
+                        {
+                            "locationId": 12,
+                            "dropoffWeightKg": 130,
+                            "dropoffVolumeM3": 5
+                        }
+                    ]
+                },
+                {
+                    "UUID": "92C199BD42E6None",
+                    "route": [
+                        {
+                            "locationId": 13,
+                            "dropoffWeightKg": 130,
+                            "dropoffVolumeM3": 5
+                        },
+                        {
+                            "locationId": 6,
+                            "dropoffWeightKg": 40,
+                            "dropoffVolumeM3": 5
+                        },
+                        {
+                            "locationId": 13,
+                            "dropoffWeightKg": 30,
+                            "dropoffVolumeM3": 1
+                        },
+                        {
+                            "locationId": 10,
+                            "dropoffWeightKg": 130,
+                            "dropoffVolumeM3": 5
+                        }
+                    ]
+                }
+            ]
+        }
+
+        return jsonify(resp)
 
 
 class Event(Resource):
@@ -17,7 +79,6 @@ class Event(Resource):
         json = request.get_json(force=True)
         event = json['event']
         vehicle = json['vehicle']
-        loop = asyncio.new_event_loop()
         print(json)
         if "broken" not in event['type']:
             return jsonify({
@@ -25,8 +86,9 @@ class Event(Resource):
                 "message": "Event type " + event['type'] + " currently not supported"
             })
 
+        print("Posting to SIOT 1")
         data = requests.post(SIOT_URL + "newEvent", json=json)
-        print(data.json())
+        print(data.content)
 
         plan_payload = {
             "vehicles": [
@@ -83,8 +145,9 @@ class Event(Resource):
             ]
         }
 
+        print("Posting plan")
         plan_response = requests.post(SIOT_URL + "proposedPlan", json=plan_payload)
-        print(plan_response.json())
+        print(plan_response.content)
 
         return jsonify({
             "success": True,
@@ -102,6 +165,7 @@ class CognitiveAdvisorAPI:
 
     def _add_endpoints(self):
         self._register_endpoint('/api/adhoc/newEvent', Event)
+        self._register_endpoint('/api/adhoc/recommendationRequest', RecRequest)
 
     def _register_endpoint(self, endpoint_name, class_ref):
         self._api.add_resource(class_ref, endpoint_name)
