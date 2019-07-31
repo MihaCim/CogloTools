@@ -1,6 +1,6 @@
 import unittest
-import src.modules.create_graph.pojo.search_node as search_node
-import src.modules.create_graph.neighbours_finder as neighbour_alg
+import modules.create_graph.pojo.search_node as search_node
+import modules.create_graph.neighbours_finder as neighbour_alg
 
 class TestCreateGraph(unittest.TestCase):
 

@@ -1,7 +1,7 @@
 import xml.sax
-from src.modules.create_graph.utils import utils
-from src.modules.create_graph.data_parser.pojo.way import Way
-from src.modules.create_graph.data_parser.pojo.node import Node
+from modules.create_graph.utils import utils
+from modules.create_graph.data_parser.pojo.way import Way
+from modules.create_graph.data_parser.pojo.node import Node
 
 class OsmParsers(xml.sax.ContentHandler):
     '''

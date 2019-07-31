@@ -1,7 +1,9 @@
 #!/usr/bin/python3
 
-from src.modules.create_graph.data_parser.data_handler import DataHandler
-from src.modules.create_graph.neighbours_finder import NeighboursFinder
+import sys
+print(sys.path)
+from modules.create_graph.data_parser.data_handler import DataHandler
+from modules.create_graph.neighbours_finder import NeighboursFinder
 import networkx as nx
 import matplotlib.pyplot as plt
 
@@ -78,71 +80,65 @@ def drawStaticGraph(nodes, ways, results):
     plt.show()
 
 
-if __name__ == "__main__":
-
-    # osmHandler = DataHandler("data/duplica_dob_test_export.osm",
-    #                         'data/List of Postal Offices (geographical location).csv')
-
-    osmHandler = DataHandler("modules/create_graph/data/slovenia-latest.osm.xml",
+def run():
+    osmHandler = DataHandler("modules/create_graph/data/cerklje_test_export.osm",
                              'modules/create_graph/data/List of Postal Offices (geographical location).csv')
     G = osmHandler.graph_viz()
-
     roadNodes = osmHandler.modified_nodes
     roadWays = osmHandler.modified_ways
     map_posts_to_nodes = {}
-    for k,v in roadNodes.items():
+    for k, v in roadNodes.items():
         if v.is_post:
             map_posts_to_nodes[v.post_id] = k
-            print("Post_id: "+str(v.post_id)+ " node_id"+ str(k))
-
+            print("Post_id: " + str(v.post_id) + " node_id" + str(k))
     postNode = {}
     postEdge = {}
-    tmpRes =[]
-
-    finder = neighbourAlg.NeighboursFinder(G)
+    tmpRes = []
+    finder = NeighboursFinder(G)
     for postId, nodeId in map_posts_to_nodes.items():
-        #roadNodes, roadWays = syntic_graph2_constraction()
-        #postId = 'A5'
-        #nodeId = 601582324
+        # roadNodes, roadWays = syntic_graph2_constraction()
+        # postId = 'A5'
+        # nodeId = 601582324
         res = finder.search_near_posts(roadNodes, roadWays, nodeId, 1.5)
-        print('PostID '+str(postId) +' Node: '+str(nodeId) + ' r: '+str(res))
+        print('PostID ' + str(postId) + ' Node: ' + str(nodeId) + ' r: ' + str(res))
         tmpRes.append((postId, nodeId, res))
 
         for res_id, res_dist in res:
-                        if nodeId in postEdge:
-                            tmp = postEdge[nodeId]
-                            tmp[roadNodes[map_posts_to_nodes[res_id]].node_id] = {'weight': res_dist}
-                            postEdge[nodeId] = tmp
-                            print(res_id)
-                        else:
-                            postEdge[nodeId] = {roadNodes[map_posts_to_nodes[res_id]].node_id:{'weight': res_dist}}
-
-
+            if nodeId in postEdge:
+                tmp = postEdge[nodeId]
+                tmp[roadNodes[map_posts_to_nodes[res_id]].node_id] = {'weight': res_dist}
+                postEdge[nodeId] = tmp
+                print(res_id)
+            else:
+                postEdge[nodeId] = {roadNodes[map_posts_to_nodes[res_id]].node_id: {'weight': res_dist}}
     for k, v in roadNodes.items():
         if v.post_id != None:
             postNode[k] = v.__dict__
-
     for postId, nodeId, res in tmpRes:
         print('PostID ' + str(postId) + ' Node: ' + str(nodeId) + ' r: ' + str(res))
     if len(postEdge) != 0:
         drawGraph(G, postNode, postEdge)
-
     postNode = {}
     postEdge = {}
-
-
     import json
     json_str = json.dumps(postNode)
     f = open("post_nodes.json", "w")
     f.write(json_str)
     f.close()
-
     json_str = json.dumps(postEdge)
     f = open("post_edge.json", "w")
     f.write(json_str)
     f.close()
-    #w = csv.writer(open("edge.csv", "w"))
-    #for key, val in postNode.items():
+    # w = csv.writer(open("edge.csv", "w"))
+    # for key, val in postNode.items():
     #    w.writerow([key, val])
-    #drawStaticGraph(roadNodes, roadWays, res)
+    # drawStaticGraph(roadNodes, roadWays, res)
+
+
+if __name__ == "__main__":
+
+    # osmHandler = DataHandler("data/duplica_dob_test_export.osm",
+    #                         'data/List of Postal Offices (geographical location).csv')
+
+    run()
 
