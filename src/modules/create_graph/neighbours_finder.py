@@ -62,6 +62,10 @@ class NeighboursFinder():
 
         i = 0
         start_time = time.time()
+
+        # the counter is increased when have aleready one post office and than increase to the 3
+        # if there are already two or more we are not touch it
+        # also we have to decrese counter only if it has more or exactly 2 post offices in list
         while len(front) != 0:
 
             active_node_id = None
@@ -170,8 +174,6 @@ class NeighboursFinder():
                     for f in front:
                         for id, dist in front[f].eps_history:
                             if snap_back_to == id and f != snap_node_id:
-                                # print("nasel")
-                                # print(front[f].eps_history)
                                 front[f].prev_posts.append(snap_back_to)
 
                     #if snap_back_to in front:
@@ -179,8 +181,6 @@ class NeighboursFinder():
                     print("snapp")
 
                 else:
-                    print(front)
-
                     found_intersec = True
                     while found_intersec:
                         # if there is no more history to traverse the procedure is finished (we have already
@@ -249,13 +249,16 @@ class NeighboursFinder():
             for node_id in tmpD:
                 del front[node_id]
 
-            #if time.time() - start_time >= 0.09:
-            #    self.drawGraph(self.G, front, results, node_id_node_map)
-            #    start_time = time.time()
-             #print("visited:" + str(visited_node_ids))
-        # print("results:" + str(results))
-        # print("done")
-        # print(results)
+            if len(front) > 0:
+                front_has_two_posts = True
+                for f_id,f_data in front.items():
+                    if (len(f_data.prev_posts) < 2):
+                        front_has_two_posts = False
+                        break
+                if front_has_two_posts == True:
+                    print("procedure is braked")
+                    break
+
 
         print("Runtime: {}".format(time.time() - start_time))
 
