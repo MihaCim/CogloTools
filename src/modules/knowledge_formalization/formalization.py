@@ -1,17 +1,24 @@
 import operator
 import numpy as np
 
+import time
 import os
+import sys
+import signal
+import subprocess
+import psutil
 from scipy.sparse import linalg
 from scipy.sparse import csc_matrix
 from scipy import sparse
+
 import json as json
 
 from collections import defaultdict
+from db import Database
 
 
-# create transition matrix from all concepts
 def create_transition_matrix(transitions_map, matrix_dimension):
+    # create transition matrix from all concepts
     print("creating transition matrix P of dimension", matrix_dimension, "x", matrix_dimension)
     transition_row = []
     transition_col = []
@@ -152,7 +159,6 @@ def calc_neighbourhood(matrix_dimension,
     # extract EigenValues and EigenVectors
     print("extracting eigenvalues and eigenvectors")
     [eigenvalues, vectors] = linalg.eigs(transposed, k=1)
-    # [eigenvalues, vectors] = linalg.eigs(transposed, k=1, sigma=1, which='SM', return_eigenvectors=True, OPpart='r', tol=10e-4)
 
     print("eigenvalues", eigenvalues)
     print("eigenvectors", vectors)
@@ -211,7 +217,7 @@ def calc_neighbourhood(matrix_dimension,
 
         print("Concept ID", id, "probability", probability, "word", word, "old ID", old_id)
 
-    exit(0)
+    # TODO store result to the database
 
 
 # method extracts concepts IDs and creates new dictionary from them, if dump doesn't exist yet. if dump exists,
@@ -220,7 +226,6 @@ def create_concept_ids(default_concept_file,
                        new_old_id_mapping_dump_path,
                        id_concept_mapping_json_dump_path,
                        old_new_id_dict):
-
     new_old_id_dict = {}
     if len(old_new_id_dict) != 0:
         # old_new_id_temp_dict contains the mapping old -> new ID for old concepts that contain transitions
@@ -237,13 +242,15 @@ def create_concept_ids(default_concept_file,
         print("opening file", new_old_id_mapping_dump_path)
         with open(new_old_id_mapping_dump_path, 'r') as fp1:
             new_old_dict_load = json.load(fp1)
-        new_old_id_dict = {int(old_key): val for old_key, val in new_old_dict_load.items()}  # convert string keys to integers
+        new_old_id_dict = {int(old_key): val for old_key, val in
+                           new_old_dict_load.items()}  # convert string keys to integers
         print("file", new_old_id_mapping_dump_path, "read")
 
         print("opening file", id_concept_mapping_json_dump_path)
         with open(id_concept_mapping_json_dump_path, 'r') as fp2:
             new_id_to_concept_string_load = json.load(fp2)
-        new_id_to_concept_string_mapping = {int(old_key): val for old_key, val in new_id_to_concept_string_load.items()}  # convert string keys to integers
+        new_id_to_concept_string_mapping = {int(old_key): val for old_key, val in
+                                            new_id_to_concept_string_load.items()}  # convert string keys to integers
         print("file", id_concept_mapping_json_dump_path, "read")
 
     elif os.path.isfile(default_concept_file):
@@ -309,7 +316,8 @@ def create_concept_ids(default_concept_file,
 def create_concept_mappings_dict(default_concept_mapping_file,
                                  default_concept_mapping_json_both_dump_path,
                                  should_use_both_transitions):
-    concept_transition_map = defaultdict(list)  # contains transitions A -> B (and B -> A with old IDs if should_use_both_transitions flag is set)
+    concept_transition_map = defaultdict(
+        list)  # contains transitions A -> B (and B -> A with old IDs if should_use_both_transitions flag is set)
 
     # similar to above (but with new IDs)
     new_id_concept_transition_map = defaultdict(list)
@@ -320,7 +328,8 @@ def create_concept_mappings_dict(default_concept_mapping_file,
         print("reading file", default_concept_mapping_json_both_dump_path)
         with open(default_concept_mapping_json_both_dump_path, 'r') as fp2:
             new_id_mapping_load = json.load(fp2)
-        new_id_concept_transition_map = {int(old_key): val for old_key, val in new_id_mapping_load.items()}  # convert string keys to integers
+        new_id_concept_transition_map = {int(old_key): val for old_key, val in
+                                         new_id_mapping_load.items()}  # convert string keys to integers
         print("file", default_concept_mapping_json_both_dump_path, "read")
 
         print("creating hashmap of old -> new ID")
@@ -354,7 +363,7 @@ def create_concept_mappings_dict(default_concept_mapping_file,
 
                     # if key already exists in a dict, it appends value to it instead of overriding it
                     concept_transition_map[old_id].append(value)
-                    
+
                     # if this flag is set, old_id points to value and value also points to old_id
                     if should_use_both_transitions:
                         concept_transition_map[value].append(old_id)
@@ -410,7 +419,6 @@ def create_concept_mappings_dict(default_concept_mapping_file,
                 if counter % 10000000 == 0:
                     print("at counter", counter, "current ID is", id)
 
-
         print("hashmap of new ID -> transactions with new ID created")
 
         # remove transition map from memory
@@ -427,44 +435,30 @@ def create_concept_mappings_dict(default_concept_mapping_file,
     return new_id_concept_transition_map, old_new_id_dict
 
 
-if __name__ == '__main__':
-    DEFAULT_CONCEPT_FILE = './linkGraph-en-verts.txt'
-    DEFAULT_CONCEPT_MAPPING_FILE = './linkGraph-en-edges.txt'
-    NEW_OLD_ID_MAPPING_DUMP_PATH = './temp/linkGraph-en-verts-new-old-id-concept-mapping-dump.json'
-    ID_CONCEPT_MAPPING_JSON_DUMP_PATH = './temp/linkGraph-en-verts-id-concept-mapping-dump.json'
-    DEFAULT_CONCEPT_MAPPING_JSON_DUMP_PATH = './temp/linkGraph-en-edges-dump.json'
-    DEFAULT_CONCEPT_MAPPING_JSON_BOTH_TRANSITIONS_DUMP_PATH = './temp/linkGraph-en-edges-both-transitions-dump.json'
-    MATRIX_P_FILE_PATH = './temp/linkGraph-matrix-P-dump.npz'
-
-    # initial concepts will be given as array of strings API parameter
-    # TODO map strings to concept IDs
-    initial_concepts = [9000, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 1000, 54324, 11241, 11100, 10101,
-                        9219, 9231]
-
-    # alfa and number of new concepts will be given as API parameter
-    NUMBER_OF_NEW_CONCEPTS = 20
-    ALFA = 0.2
-
-    if ALFA < 0 or ALFA > 1:
-        print("alfa parameter should be between 0 and 1")
-        exit(1)
+def init_dictionaries():
+    default_concept_file = './linkGraph-en-verts.txt'
+    default_concept_mapping_file = './linkGraph-en-edges.txt'
+    new_old_id_mapping_dump_path = './temp/linkGraph-en-verts-new-old-id-concept-mapping-dump.json'
+    id_concept_mapping_json_dump_path = './temp/linkGraph-en-verts-id-concept-mapping-dump.json'
+    default_concept_mapping_json_dump_path = './temp/linkGraph-en-edges-dump.json'
+    default_concept_mapping_json_both_transitions_dump_path = './temp/linkGraph-en-edges-both-transitions-dump.json'
+    matrix_p_file_path = './temp/linkGraph-matrix-P-dump.npz'
 
     # initial values
-    matrix_dimension = 0
     old_new_id_temp_dict = {}
 
     # check if matrix P exists. If it does, we don't need to calculate concept mappings for both transitions,
     # if it doesn't, we need to calculate it
-    if os.path.isfile(MATRIX_P_FILE_PATH):
+    if os.path.isfile(matrix_p_file_path):
         print("matrix P file path exists")
-        print("reading file", MATRIX_P_FILE_PATH)
-        matrix_P = sparse.load_npz(MATRIX_P_FILE_PATH)
-        print("file", MATRIX_P_FILE_PATH, "read")
+        print("reading file", matrix_p_file_path)
+        matrix_P = sparse.load_npz(matrix_p_file_path)
+        print("file", matrix_p_file_path, "read")
     else:
         # read all concept transitions from a file (or a dump) and create a dictionary with modified IDs
         concept_mappings_both_transitions, old_new_id_temp_dict = create_concept_mappings_dict(
-            DEFAULT_CONCEPT_MAPPING_FILE,
-            DEFAULT_CONCEPT_MAPPING_JSON_BOTH_TRANSITIONS_DUMP_PATH, True)
+            default_concept_mapping_file,
+            default_concept_mapping_json_both_transitions_dump_path, True)
 
         # matrix dimension is the length of all transitions
         matrix_dimension = len(concept_mappings_both_transitions)
@@ -472,34 +466,136 @@ if __name__ == '__main__':
         # create matrix from both transitions maps
         matrix_P = create_transition_matrix(concept_mappings_both_transitions, matrix_dimension)
         print("storing matrix P as sparse npz")
-        sparse.save_npz(MATRIX_P_FILE_PATH, matrix_P)
+        sparse.save_npz(matrix_p_file_path, matrix_P)
         print("storing matrix P as sparse npz completed")
 
         del concept_mappings_both_transitions
 
     # indices_array is a 1D array where position presents index (new ID) and value presents old ID value
     new_old_idx_map, id_str_concept_map = create_concept_ids(
-        DEFAULT_CONCEPT_FILE,
-        NEW_OLD_ID_MAPPING_DUMP_PATH,
-        ID_CONCEPT_MAPPING_JSON_DUMP_PATH,
+        default_concept_file,
+        new_old_id_mapping_dump_path,
+        id_concept_mapping_json_dump_path,
         old_new_id_temp_dict)
 
     del old_new_id_temp_dict
 
     # create concept mappings
     concept_mappings = create_concept_mappings_dict(
-        DEFAULT_CONCEPT_MAPPING_FILE,
-        DEFAULT_CONCEPT_MAPPING_JSON_DUMP_PATH,
+        default_concept_mapping_file,
+        default_concept_mapping_json_dump_path,
         False)
+
+    return concept_mappings, matrix_P, id_str_concept_map, new_old_idx_map
+
+
+def handler(signum, frame):
+    # catch signal for abort/kill application and also kill API process
+    print('Signal handler called with signal', signum, ', killing api process and exiting application')
+    if apiProcess is not None:
+        kill(apiProcess.pid)
+    sys.exit()
+
+
+def kill(proc_pid):
+    # kills process using psutil package
+    process = psutil.Process(proc_pid)
+    for proc in process.children(recursive=True):
+        proc.kill()
+    process.kill()
+
+
+if __name__ == '__main__':
+    ##################################################################################
+    #                       DATABASE AND API INITIALIZATION
+    ##################################################################################
+    print("Start : %s" % time.ctime())
+
+    # get instance of database connection
+    db_name = "concepts_db"
+    database = Database(db_name)
+    database.create_database(db_name)
+    # database.drop_table("concepts")
+    # create table if it doesn't exist
+    database.create_table("CREATE TABLE IF NOT EXISTS concepts ("
+                          "id serial PRIMARY KEY NOT NULL, "
+                          "timestamp BIGINT NOT NULL, "
+                          "alpha REAL NOT NULL,"
+                          "concepts REAL NOT NULL,"
+                          "result VARCHAR)")
+
+    # TODO insert
+    database.execute("INSERT INTO concepts(id, timestamp, alpha, concepts) VALUES(DEFAULT, 431234124, 0.2, 10)")
+    database.execute("INSERT INTO concepts(id, timestamp, alpha, concepts) VALUES(DEFAULT, 523523, 0.2, 0.5)")
+    result = database.query("SELECT * FROM concepts")
+    print(result)
+
+    # TODO select
+    result = database.query("SELECT * FROM concepts WHERE id = %s", (9,))
+    print(result)
+
+    # TODO update
+    database.execute("UPDATE concepts set result = %s where id = %s", ("testtest", 6))
+    result = database.query("SELECT * FROM concepts WHERE id = %s", (6,))
+    print(result)
+
+    # TODO clean database
+    database.execute("DELETE FROM concepts WHERE timestamp < %s", (999999,))
+    result = database.query("SELECT * FROM concepts")
+    print(result)
+
+    # start API as subprocess
+    apiProcess = subprocess.Popen(["python", "api.py"])
+
+    # setup handler that will kill api if signal for abort/kill arrives (ctrl+c, ctrl+z)
+    signal.signal(signal.SIGABRT, handler)
+    signal.signal(signal.SIGINT, handler)
+    signal.signal(signal.SIGTSTP, handler)
+
+    ##################################################################################
+    #                              SCRIPT INITIALIZATION
+    ##################################################################################
+
+    # init dictionaries needed for API and concepts needed for API
+    concept_mappings, matrix_P, id_str_concept_map, new_old_idx_map = init_dictionaries()
 
     # calculate matrix dimension based on concept mappings length
     matrix_dimension = len(concept_mappings)
 
-    calc_neighbourhood(matrix_dimension,
-                       concept_mappings,
-                       initial_concepts,
-                       matrix_P,
-                       id_str_concept_map,
-                       new_old_idx_map,
-                       NUMBER_OF_NEW_CONCEPTS,
-                       ALFA)
+    # initial concepts will be given as array of strings API parameter
+    # TODO map strings to concept IDs
+    initial_concepts = [9000, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 1000, 54324, 11241, 11100, 10101]
+
+    print("Got initial concepts at : %s" % time.ctime())
+
+    ##################################################################################
+    #                            PROCESSING OF REQUESTS
+    ##################################################################################
+
+    while True:
+
+
+
+        # TODO
+        # keep checking whether anything is to be processed in the database and
+        # if parameter is a percent, calculate it to the number of new concepts
+        # alfa and number of new concepts will be given as API parameter
+        NUMBER_OF_NEW_CONCEPTS = 20
+        ALFA = 0.2
+        request_id = 1000
+
+        if ALFA < 0 or ALFA > 1:
+            print("alfa parameter should be between 0 and 1")
+            exit(1)
+
+        # calculate neighbourhood and store result into database
+        calc_neighbourhood(matrix_dimension,
+                           concept_mappings,
+                           initial_concepts,
+                           matrix_P,
+                           id_str_concept_map,
+                           new_old_idx_map,
+                           NUMBER_OF_NEW_CONCEPTS,
+                           ALFA)
+
+        time.sleep(10)
