@@ -524,23 +524,23 @@ if __name__ == '__main__':
                           "concepts REAL NOT NULL,"
                           "result VARCHAR)")
 
-    # TODO insert
-    database.execute("INSERT INTO concepts(id, timestamp, alpha, concepts) VALUES(DEFAULT, 431234124, 0.2, 10)")
-    database.execute("INSERT INTO concepts(id, timestamp, alpha, concepts) VALUES(DEFAULT, 523523, 0.2, 0.5)")
-    result = database.query("SELECT * FROM concepts")
-    print(result)
-
-    # TODO select
-    result = database.query("SELECT * FROM concepts WHERE id = %s", (9,))
-    print(result)
-
-    # TODO update
-    database.execute("UPDATE concepts set result = %s where id = %s", ("testtest", 6))
-    result = database.query("SELECT * FROM concepts WHERE id = %s", (6,))
-    print(result)
-
-    # TODO clean database
-    database.execute("DELETE FROM concepts WHERE timestamp < %s", (999999,))
+    # # TODO insert
+    # database.execute("INSERT INTO concepts(id, timestamp, alpha, concepts) VALUES(DEFAULT, 431234124, 0.2, 10)")
+    # database.execute("INSERT INTO concepts(id, timestamp, alpha, concepts) VALUES(DEFAULT, 523523, 0.2, 0.5)")
+    # result = database.query("SELECT * FROM concepts")
+    # print(result)
+    #
+    # # TODO select
+    # result = database.query("SELECT * FROM concepts WHERE id = %s", (9,))
+    # print(result)
+    #
+    # # TODO update
+    # database.execute("UPDATE concepts set result = %s where id = %s", ("testtest", 6))
+    # result = database.query("SELECT * FROM concepts WHERE id = %s", (6,))
+    # print(result)
+    #
+    # # TODO clean database
+    # database.execute("DELETE FROM concepts WHERE timestamp < %s", (999999,))
     result = database.query("SELECT * FROM concepts")
     print(result)
 
@@ -557,16 +557,16 @@ if __name__ == '__main__':
     ##################################################################################
 
     # init dictionaries needed for API and concepts needed for API
-    concept_mappings, matrix_P, id_str_concept_map, new_old_idx_map = init_dictionaries()
-
-    # calculate matrix dimension based on concept mappings length
-    matrix_dimension = len(concept_mappings)
-
-    # initial concepts will be given as array of strings API parameter
-    # TODO map strings to concept IDs
-    initial_concepts = [9000, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 1000, 54324, 11241, 11100, 10101]
-
-    print("Got initial concepts at : %s" % time.ctime())
+    # concept_mappings, matrix_P, id_str_concept_map, new_old_idx_map = init_dictionaries()
+    #
+    # # calculate matrix dimension based on concept mappings length
+    # matrix_dimension = len(concept_mappings)
+    #
+    # # initial concepts will be given as array of strings API parameter
+    # # TODO map strings to concept IDs
+    # initial_concepts = [9000, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 1000, 54324, 11241, 11100, 10101]
+    #
+    # print("Got initial concepts at : %s" % time.ctime())
 
     ##################################################################################
     #                            PROCESSING OF REQUESTS
@@ -580,22 +580,22 @@ if __name__ == '__main__':
         # keep checking whether anything is to be processed in the database and
         # if parameter is a percent, calculate it to the number of new concepts
         # alfa and number of new concepts will be given as API parameter
-        NUMBER_OF_NEW_CONCEPTS = 20
-        ALFA = 0.2
-        request_id = 1000
-
-        if ALFA < 0 or ALFA > 1:
-            print("alfa parameter should be between 0 and 1")
-            exit(1)
-
-        # calculate neighbourhood and store result into database
-        calc_neighbourhood(matrix_dimension,
-                           concept_mappings,
-                           initial_concepts,
-                           matrix_P,
-                           id_str_concept_map,
-                           new_old_idx_map,
-                           NUMBER_OF_NEW_CONCEPTS,
-                           ALFA)
+        # NUMBER_OF_NEW_CONCEPTS = 20
+        # ALFA = 0.2
+        # request_id = 1000
+        #
+        # if ALFA < 0 or ALFA > 1:
+        #     print("alfa parameter should be between 0 and 1")
+        #     exit(1)
+        #
+        # # calculate neighbourhood and store result into database
+        # calc_neighbourhood(matrix_dimension,
+        #                    concept_mappings,
+        #                    initial_concepts,
+        #                    matrix_P,
+        #                    id_str_concept_map,
+        #                    new_old_idx_map,
+        #                    NUMBER_OF_NEW_CONCEPTS,
+        #                    ALFA)
 
         time.sleep(10)

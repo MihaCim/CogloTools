@@ -134,6 +134,7 @@ class Database:
             print("Executing with line", content, "and parameters", parameters)
         else:
             print("Executing with line", content)
+        row_id = None
         try:
             self.connection = self.get_connection()
             self.cursor = self.get_cursor()
@@ -141,10 +142,11 @@ class Database:
                 self.cursor.execute(content, parameters)
             else:
                 self.cursor.execute(content)
+            row_id = self.cursor.fetchone()[0]
             self.connection.commit()
         except (Exception, psycopg2.DatabaseError) as error:
             print("Error executing line " + content, "Error:", error)
         finally:
             if self.connection is not None:
                 self.close()
-
+            return row_id
