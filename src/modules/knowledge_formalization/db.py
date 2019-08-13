@@ -121,11 +121,12 @@ class Database:
                 self.close()
             return result
 
-    def execute(self, content, parameters=None):
+    def execute(self, content, parameters=None, fetch=False):
         """
         Execute insert or update with parameters or without. Examples:
         1) "INSERT INTO concepts(id, timestamp, alpha, concepts) VALUES(DEFAULT, 431234124, 0.2, 10)"
         2) "UPDATE concepts set result = %s where id = %s", ("testtest", 6)
+        :param fetch:
         :param content:
         :param parameters:
         :return:
@@ -142,7 +143,9 @@ class Database:
                 self.cursor.execute(content, parameters)
             else:
                 self.cursor.execute(content)
-            row_id = self.cursor.fetchone()[0]
+            # fetch row_id
+            if fetch:
+                row_id = self.cursor.fetchone()[0]
             self.connection.commit()
         except (Exception, psycopg2.DatabaseError) as error:
             print("Error executing line " + content, "Error:", error)

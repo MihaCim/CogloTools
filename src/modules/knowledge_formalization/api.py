@@ -2,7 +2,6 @@ from flask import Flask
 from flask_restful import Api
 from flask import request
 
-import json
 import time
 
 from db import Database
@@ -18,7 +17,6 @@ def get_new_concepts():
     received_request = request.json
     if received_request == 'null' or received_request is None:
         return 'Error parsing request. It should be in JSON format'
-    print(received_request)
 
     if 'alpha' not in received_request:
         return 'JSON object in request must contain key "alpha".'
@@ -60,22 +58,35 @@ def get_new_concepts():
 
     # store request to the database and return ID of inserted row
     row_id = database.execute("INSERT INTO concepts (id, timestamp, alpha, concepts) "
-                              "VALUES (DEFAULT, %s, %s, %s) RETURNING id", (timestamp, alpha, value))
+                              "VALUES (DEFAULT, %s, %s, %s) RETURNING id", (timestamp, alpha, value), True)
     # error inserting into database
     if row_id is None:
         return "Error processing/storing request into the database."
 
     # create response as json object
-    response = {'result': 'success', 'id': row_id}
+    response = {'stored': 'success', 'id': row_id}
 
     return response
 
 
 @app.route('/getConceptResult', methods=['POST'])
 def get_concept_results():
-    # TODO extract task ID and check in the database if operation finished (database has result with this ID)
-    # TODO if operation is done, return result, otherwise return -1 or json with message "done": false
-    return "-1"
+    received_request = request.json
+    if received_request == 'null' or received_request is None:
+        return 'Error parsing request. It should be in JSON format'
+
+    if 'id' not in received_request:
+        return 'JSON object in request must contain key "id" which you received when you sent request to getNewConcept.'
+
+    id = received_request['id']
+    if not isinstance(id, int):
+        return 'id parameter should be an integer.'
+
+    result = database.query("SELECT result FROM concepts WHERE id = %s;", (id,))
+    if result is None or not result:
+        return {'result': 'null', 'id': id}
+    else:
+        return {'result': result[0], 'id': id}
 
 
 if __name__ == '__main__':

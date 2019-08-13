@@ -49,11 +49,6 @@ def create_transition_matrix(transitions_map, matrix_dimension):
     print(matrix_Q.shape)
     print("matrix Q created")
 
-    # remove arrays for creating matrix Q from memory
-    del transition_values
-    del transition_row
-    del transition_col
-
     # column vector of ones
     print("creating vector I")
     vector_I = np.ones((matrix_dimension, 1), dtype=float)
@@ -62,14 +57,8 @@ def create_transition_matrix(transitions_map, matrix_dimension):
     # 1D vector that contains the number of transitions in each row
     qi = matrix_Q * vector_I
 
-    # remove vector I from memory
-    del vector_I
-
     # create reciprocal matrix and transpose it
     reciprocal_transposed = np.transpose(np.reciprocal(qi))[0, :]
-
-    # remove vector qi
-    del qi
 
     # create diagonal matrix
     reciprocal_range = range(matrix_dimension)
@@ -77,10 +66,6 @@ def create_transition_matrix(transitions_map, matrix_dimension):
     sparse_diagonal_matrix = csc_matrix((reciprocal_transposed, (reciprocal_range, reciprocal_range)),
                                         (matrix_dimension, matrix_dimension))
     print("diagonal sparse matrix created")
-
-    # remove properties of reciprocal matrix
-    del reciprocal_range
-    del reciprocal_transposed
 
     # get P matrix as a product of Q nad diagonal(inverse(Q * I))
     print("creating P matrix")
@@ -94,8 +79,8 @@ def create_transition_matrix(transitions_map, matrix_dimension):
     return matrix_P
 
 
-# creates transition matrix from initial concepts
 def create_initial_concept_transition_matrix(initial_concepts, all_concepts, matrix_dimension):
+    # creates transition matrix from initial concepts
     print("creating initial concept transition matrix J")
     transition_row = []
     transition_col = []
@@ -121,8 +106,8 @@ def create_initial_concept_transition_matrix(initial_concepts, all_concepts, mat
     return sparse
 
 
-# normalizes data (0 - 1)
 def normalize_data(array):
+    # normalizes data (0 - 1)
     return (array - array.min()) / (array.max() - array.min())
 
 
@@ -131,20 +116,21 @@ def is_close(a, b, rel_tol=1e-03, abs_tol=0.0):
     return abs(a - b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
 
 
-# method calculates neighbourhood based on concept mappings and initial concepts
-def calc_neighbourhood(matrix_dimension,
+def calc_neighbourhood(matrix_dim,
                        concept_mappings,
-                       initial_concepts,
+                       entry_concepts,
                        matrix_P,
                        id_string_map,
                        new_old_index_mapping,
                        number_of_wanted_concepts,
                        alfa):
+    # method calculates neighbourhood based on concept mappings and initial concepts
+
     # create matrix that contains transition probabilities from each concept back to initial concept
-    matrix_J = create_initial_concept_transition_matrix(initial_concepts, concept_mappings, matrix_dimension)
+    matrix_J = create_initial_concept_transition_matrix(entry_concepts, concept_mappings, matrix_dim)
 
     print("creating P1 matrix from matrix P and matrix J")
-    matrix_P1 = csc_matrix(((1 - alfa) * matrix_P) + ((alfa / float(len(initial_concepts))) * matrix_J))
+    matrix_P1 = csc_matrix(((1 - alfa) * matrix_P) + ((alfa / float(len(entry_concepts))) * matrix_J))
     print("matrix P1 created")
 
     # remove matrix J and P from memory
@@ -198,7 +184,7 @@ def calc_neighbourhood(matrix_dimension,
         value = normalizedArray.T[concept_id]
 
         # if ID is not the same as initial concept, extract the value
-        if concept_id not in initial_concepts:
+        if concept_id not in entry_concepts:
             similar_concepts[concept_id] = value
 
     # sort descending - most similar concept is the highest
@@ -209,23 +195,28 @@ def calc_neighbourhood(matrix_dimension,
     extracted_concepts = sorted_similar_concepts[:number_of_wanted_concepts]
 
     # print result
+    list = []
     for final_concept in extracted_concepts:
         id = final_concept[0]
         probability = final_concept[1]
         old_id = new_old_index_mapping[id]
         word = id_string_map[id]
 
+        json_object = {'concept_id', id, 'probability', probability, 'string', word}
+        list.append(json_object)
+
         print("Concept ID", id, "probability", probability, "word", word, "old ID", old_id)
 
-    # TODO store result to the database
+    # return results as a list
+    return list
 
 
-# method extracts concepts IDs and creates new dictionary from them, if dump doesn't exist yet. if dump exists,
-# it just reads it from a dump file
 def create_concept_ids(default_concept_file,
                        new_old_id_mapping_dump_path,
                        id_concept_mapping_json_dump_path,
                        old_new_id_dict):
+    # method extracts concepts IDs and creates new dictionary from them, if dump doesn't exist yet. if dump exists,
+    # it just reads it from a dump file
     new_old_id_dict = {}
     if len(old_new_id_dict) != 0:
         # old_new_id_temp_dict contains the mapping old -> new ID for old concepts that contain transitions
@@ -312,18 +303,18 @@ def create_concept_ids(default_concept_file,
     return new_old_id_dict, new_id_to_concept_string_mapping
 
 
-# method creates concept mapping if it doesn't exist yet. If it does, it just reads if from a dump file
 def create_concept_mappings_dict(default_concept_mapping_file,
                                  default_concept_mapping_json_both_dump_path,
                                  should_use_both_transitions):
-    concept_transition_map = defaultdict(
-        list)  # contains transitions A -> B (and B -> A with old IDs if should_use_both_transitions flag is set)
+    # method creates concept mapping if it doesn't exist yet. If it does, it just reads if from a dump file
+
+    concept_transition_map = defaultdict(list)
+    # contains transitions A -> B (and B -> A with old IDs if should_use_both_transitions flag is set)
 
     # similar to above (but with new IDs)
     new_id_concept_transition_map = defaultdict(list)
 
     if os.path.isfile(default_concept_mapping_json_both_dump_path):
-
         print("concept mapping json dumps exist")
         print("reading file", default_concept_mapping_json_both_dump_path)
         with open(default_concept_mapping_json_both_dump_path, 'r') as fp2:
@@ -333,7 +324,7 @@ def create_concept_mappings_dict(default_concept_mapping_file,
         print("file", default_concept_mapping_json_both_dump_path, "read")
 
         print("creating hashmap of old -> new ID")
-        # create mapping od old ID to new ID
+        # create mapping of old ID to new ID
         old_new_id_dict = {}
         new_id = 0
         for old_id in new_id_concept_transition_map:
@@ -368,7 +359,7 @@ def create_concept_mappings_dict(default_concept_mapping_file,
                     if should_use_both_transitions:
                         concept_transition_map[value].append(old_id)
 
-                    # print progress every 1M
+                    # print progress every 10M
                     if lineN % 10000000 == 0:
                         print(lineN / 1000000)
         print("created concept transition dictionary")
@@ -511,91 +502,96 @@ if __name__ == '__main__':
     ##################################################################################
     print("Start : %s" % time.ctime())
 
-    # get instance of database connection
-    db_name = "concepts_db"
-    database = Database(db_name)
-    database.create_database(db_name)
-    # database.drop_table("concepts")
-    # create table if it doesn't exist
-    database.create_table("CREATE TABLE IF NOT EXISTS concepts ("
-                          "id serial PRIMARY KEY NOT NULL, "
-                          "timestamp BIGINT NOT NULL, "
-                          "alpha REAL NOT NULL,"
-                          "concepts REAL NOT NULL,"
-                          "result VARCHAR)")
-
-    # # TODO insert
-    # database.execute("INSERT INTO concepts(id, timestamp, alpha, concepts) VALUES(DEFAULT, 431234124, 0.2, 10)")
-    # database.execute("INSERT INTO concepts(id, timestamp, alpha, concepts) VALUES(DEFAULT, 523523, 0.2, 0.5)")
+    # # get instance of database connection
+    # db_name = "concepts_db"
+    # database = Database(db_name)
+    # database.create_database(db_name)
+    # # database.drop_table("concepts")
+    # # create table if it doesn't exist
+    # database.create_table("CREATE TABLE IF NOT EXISTS concepts ("
+    #                       "id serial PRIMARY KEY NOT NULL, "
+    #                       "timestamp BIGINT NOT NULL, "
+    #                       "alpha REAL NOT NULL,"
+    #                       "concepts INT NOT NULL,"
+    #                       "result VARCHAR)")
+    #
+    # # # TODO insert
+    # # database.execute("INSERT INTO concepts(id, timestamp, alpha, concepts, result) VALUES(DEFAULT, 431234124, 0.2, 10, 'asdasdasdasdasdasdasdasdasdasdasdasd')")
+    # # database.execute("INSERT INTO concepts(id, timestamp, alpha, concepts) VALUES(DEFAULT, 523523, 0.2, 0.5)")
+    # # result = database.query("SELECT * FROM concepts")
+    # # print(result)
+    # #
+    # # # TODO select
+    # # result = database.query("SELECT * FROM concepts WHERE id = %s", (9,))
+    # # print(result)
+    # #
+    # # # TODO update
+    # # database.execute("UPDATE concepts set result = %s where id = %s", ("testtest", 6))
+    # # now = int(round(time.time()))
+    # # result = database.query("SELECT * FROM concepts WHERE timestamp < %s;", (now,))
+    # # print(result)
+    # #
+    # # # TODO clean database
+    # # print("now: ", now)
+    # # database.execute("DELETE FROM concepts WHERE timestamp < %s;", (now,))
     # result = database.query("SELECT * FROM concepts")
     # print(result)
     #
-    # # TODO select
-    # result = database.query("SELECT * FROM concepts WHERE id = %s", (9,))
-    # print(result)
+    # # start API as subprocess
+    # apiProcess = subprocess.Popen(["python", "api.py"])
     #
-    # # TODO update
-    # database.execute("UPDATE concepts set result = %s where id = %s", ("testtest", 6))
-    # result = database.query("SELECT * FROM concepts WHERE id = %s", (6,))
-    # print(result)
-    #
-    # # TODO clean database
-    # database.execute("DELETE FROM concepts WHERE timestamp < %s", (999999,))
-    result = database.query("SELECT * FROM concepts")
-    print(result)
-
-    # start API as subprocess
-    apiProcess = subprocess.Popen(["python", "api.py"])
-
-    # setup handler that will kill api if signal for abort/kill arrives (ctrl+c, ctrl+z)
-    signal.signal(signal.SIGABRT, handler)
-    signal.signal(signal.SIGINT, handler)
-    signal.signal(signal.SIGTSTP, handler)
+    # # setup handler that will kill api if signal for abort/kill arrives (ctrl+c, ctrl+z)
+    # signal.signal(signal.SIGABRT, handler)
+    # signal.signal(signal.SIGINT, handler)
+    # signal.signal(signal.SIGTSTP, handler)
 
     ##################################################################################
     #                              SCRIPT INITIALIZATION
     ##################################################################################
 
     # init dictionaries needed for API and concepts needed for API
-    # concept_mappings, matrix_P, id_str_concept_map, new_old_idx_map = init_dictionaries()
-    #
-    # # calculate matrix dimension based on concept mappings length
-    # matrix_dimension = len(concept_mappings)
-    #
-    # # initial concepts will be given as array of strings API parameter
-    # # TODO map strings to concept IDs
-    # initial_concepts = [9000, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 1000, 54324, 11241, 11100, 10101]
-    #
-    # print("Got initial concepts at : %s" % time.ctime())
+    concept_mappings, matrix_P, id_str_concept_map, new_old_idx_map = init_dictionaries()
+
+    # calculate matrix dimension based on concept mappings length
+    matrix_dimension = len(concept_mappings)
+
+    # initial concepts will be given as array of strings API parameter
+    # TODO map strings to concept IDs
+    initial_concepts = [9000, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 1000, 54324, 11241, 11100, 10101]
+
+    print("Got initial concepts at : %s" % time.ctime())
 
     ##################################################################################
     #                            PROCESSING OF REQUESTS
     ##################################################################################
 
     while True:
+        # query database for next task
+        result = database.query("SELECT id, alpha, concepts FROM concepts WHERE result IS NULL")
+        print(result)
+        if not result:
+            # no task ahead, just wait for 10 seconds
+            time.sleep(10)
 
+        # extract alpha and number of new concepts and start processing
+        id = result[0][0]
+        alpha = result[0][1]
+        new_concepts_number = result[0][2]
 
+        print(id)
+        print(alpha)
+        print(new_concepts_number)
 
-        # TODO
-        # keep checking whether anything is to be processed in the database and
-        # if parameter is a percent, calculate it to the number of new concepts
-        # alfa and number of new concepts will be given as API parameter
-        # NUMBER_OF_NEW_CONCEPTS = 20
-        # ALFA = 0.2
-        # request_id = 1000
-        #
-        # if ALFA < 0 or ALFA > 1:
-        #     print("alfa parameter should be between 0 and 1")
-        #     exit(1)
-        #
-        # # calculate neighbourhood and store result into database
-        # calc_neighbourhood(matrix_dimension,
-        #                    concept_mappings,
-        #                    initial_concepts,
-        #                    matrix_P,
-        #                    id_str_concept_map,
-        #                    new_old_idx_map,
-        #                    NUMBER_OF_NEW_CONCEPTS,
-        #                    ALFA)
+        # # # calculate neighbourhood and store result into database
+        list = calc_neighbourhood(matrix_dimension,
+                                  concept_mappings,
+                                  initial_concepts,
+                                  matrix_P,
+                                  id_str_concept_map,
+                                  new_old_idx_map,
+                                  new_concepts_number,
+                                  alpha)
 
-        time.sleep(10)
+        """Update mobile set price = %s where id = %s"""
+        # insert result into database
+        database.execute("UPDATE concepts set result = %s WHERE id = %s;", (list, id))
