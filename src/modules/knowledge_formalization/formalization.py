@@ -364,8 +364,6 @@ def create_concept_mappings_dict(default_concept_mapping_file,
 
         print("creating hashmap of new ID -> transactions with new ID")
 
-        # new mapping for both transitions
-        new_id_concept_transition_map = defaultdict(list)
         id = 0
         counter = 0
         for old_id in concept_transition_map:
