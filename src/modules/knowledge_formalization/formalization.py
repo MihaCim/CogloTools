@@ -17,7 +17,7 @@ from collections import defaultdict
 from db import Database
 
 
-def create_transition_matrix(transitions_map, matrix_dimension):
+def create_matrix_P(transitions_map, matrix_dimension):
     # create transition matrix from all concepts
     print("creating transition matrix P of dimension", matrix_dimension, "x", matrix_dimension)
     transition_row = []
@@ -120,8 +120,6 @@ def calc_neighbourhood(matrix_dim,
                        concept_mappings,
                        entry_concepts,
                        matrix_P,
-                       id_string_map,
-                       new_old_index_mapping,
                        number_of_wanted_concepts,
                        alfa):
     # method calculates neighbourhood based on concept mappings and initial concepts
@@ -199,22 +197,21 @@ def calc_neighbourhood(matrix_dim,
     for final_concept in extracted_concepts:
         id = final_concept[0]
         probability = final_concept[1]
-        old_id = new_old_index_mapping[id]
-        word = id_string_map[id]
+        # word = id_string_map[id] TODO read this word from file
+        word = "test" # TODO remove
 
         json_object = {'concept_id', id, 'probability', probability, 'string', word}
         list.append(json_object)
 
-        print("Concept ID", id, "probability", probability, "word", word, "old ID", old_id)
+        print("Concept ID", id, "probability", probability, "word", word)
 
     # return results as a list
     return list
 
 
-def create_concept_ids(default_concept_file,
-                       new_old_id_mapping_dump_path,
-                       id_concept_mapping_json_dump_path,
-                       old_new_id_dict):
+def create_id_string_map(default_concept_file,
+                         id_concept_mapping_txt_dump_path,
+                         old_new_id_dict):
     # method extracts concepts IDs and creates new dictionary from them, if dump doesn't exist yet. if dump exists,
     # it just reads it from a dump file
     new_old_id_dict = {}
@@ -223,26 +220,9 @@ def create_concept_ids(default_concept_file,
         # so far we have old -> new and new -> old ID dictionary
         new_old_id_dict = {v: k for k, v in old_new_id_dict.items()}
 
-    new_id_to_concept_string_mapping = {}
-
-    if os.path.isfile(id_concept_mapping_json_dump_path) and os.path.isfile(new_old_id_mapping_dump_path):
-
-        # try opening concepts file dump and if it doesn't exist, try opening the file and construct dump from it
-        print("concept file json dumps exist")
-
-        print("opening file", new_old_id_mapping_dump_path)
-        with open(new_old_id_mapping_dump_path, 'r') as fp1:
-            new_old_dict_load = json.load(fp1)
-        new_old_id_dict = {int(old_key): val for old_key, val in
-                           new_old_dict_load.items()}  # convert string keys to integers
-        print("file", new_old_id_mapping_dump_path, "read")
-
-        print("opening file", id_concept_mapping_json_dump_path)
-        with open(id_concept_mapping_json_dump_path, 'r') as fp2:
-            new_id_to_concept_string_load = json.load(fp2)
-        new_id_to_concept_string_mapping = {int(old_key): val for old_key, val in
-                                            new_id_to_concept_string_load.items()}  # convert string keys to integers
-        print("file", id_concept_mapping_json_dump_path, "read")
+    if os.path.isfile(id_concept_mapping_txt_dump_path):
+        # file exists, no need to create new one
+        print("concept file txt dump exists")
 
     elif os.path.isfile(default_concept_file):
         print("using default concept file path", default_concept_file)
@@ -254,6 +234,8 @@ def create_concept_ids(default_concept_file,
         else:
             counter = int(max(new_old_id_dict, key=int)) + 1  # continue where we left off
 
+        ids = []
+        strings = []
         with open(default_concept_file, 'r') as concepts_file:
             for lineN, line in enumerate(concepts_file):
                 line = line.strip()
@@ -270,37 +252,31 @@ def create_concept_ids(default_concept_file,
 
                     # if its not in old -> new dictionary, its not in new -> old dictionary
                     new_id = counter
-                    if old_id not in old_new_id_dict.keys():
-                        # and new key to old -> new and new old ID to new -> old, increment counter
-                        old_new_id_dict[old_id] = counter
-                        new_old_id_dict[counter] = old_id
-                        counter = counter + 1
-                    else:
+                    if old_id in old_new_id_dict.keys():
                         new_id = old_new_id_dict[old_id]
+                    else:
+                        # add new key to old -> new and new old ID to new -> old, increment counter
+                        old_new_id_dict[old_id] = counter
+                        counter = counter + 1
 
-                    # get new ID
-                    new_id_to_concept_string_mapping[new_id] = split[2]
+                    # append new values to both arrays
+                    ids.append(new_id)
+                    strings.append(split[2])
 
                     # print progress every 10M
                     if lineN % 1000000 == 0:
                         print(lineN / 1000000)
-        print("created our own dictionary of old to new and new to old indices and ID to word mappings")
 
-        # remove old -> new dictionary from memory
-        del old_new_id_dict
+        # create arrays and store the data to text file
+        data = np.array([ids, strings])
+        data = data.T
 
-        print("storing our own new-old IDs array to json dump")
-        with open(new_old_id_mapping_dump_path, 'w') as fp1:
-            json.dump(new_old_id_dict, fp1)
-
-        print("storing our own dictionary to json dump")
-        with open(id_concept_mapping_json_dump_path, 'w') as fp2:
-            json.dump(new_id_to_concept_string_mapping, fp2)
+        print("Storing dictionary of new ID -> string concept...")
+        with open(id_concept_mapping_txt_dump_path, 'w') as fp:
+            np.savetxt(fp, data, delimiter='\t', fmt=['%s', '%s'])
     else:
         print("no concept id file or json dump, cannot proceed")
         exit(1)
-
-    return new_old_id_dict, new_id_to_concept_string_mapping
 
 
 def create_concept_mappings_dict(default_concept_mapping_file,
@@ -360,7 +336,7 @@ def create_concept_mappings_dict(default_concept_mapping_file,
                         concept_transition_map[value].append(old_id)
 
                     # print progress every 10M
-                    if lineN % 10000000 == 0:
+                    if lineN % 1000000 == 0:
                         print(lineN / 1000000)
         print("created concept transition dictionary")
 
@@ -429,14 +405,10 @@ def create_concept_mappings_dict(default_concept_mapping_file,
 def init_dictionaries():
     default_concept_file = './linkGraph-en-verts.txt'
     default_concept_mapping_file = './linkGraph-en-edges.txt'
-    new_old_id_mapping_dump_path = './temp/linkGraph-en-verts-new-old-id-concept-mapping-dump.json'
-    id_concept_mapping_json_dump_path = './temp/linkGraph-en-verts-id-concept-mapping-dump.json'
+    id_concept_mapping_json_dump_path = './temp/linkGraph-en-verts-id-concept-mapping-dump.txt'
     default_concept_mapping_json_dump_path = './temp/linkGraph-en-edges-dump.json'
     default_concept_mapping_json_both_transitions_dump_path = './temp/linkGraph-en-edges-both-transitions-dump.json'
     matrix_p_file_path = './temp/linkGraph-matrix-P-dump.npz'
-
-    # initial values
-    old_new_id_temp_dict = {}
 
     # check if matrix P exists. If it does, we don't need to calculate concept mappings for both transitions,
     # if it doesn't, we need to calculate it
@@ -451,25 +423,21 @@ def init_dictionaries():
             default_concept_mapping_file,
             default_concept_mapping_json_both_transitions_dump_path, True)
 
+        # indices_array is a 1D array where position presents index (new ID) and value presents old ID value
+        create_id_string_map(default_concept_file,
+                             id_concept_mapping_json_dump_path,
+                             old_new_id_temp_dict)
+
         # matrix dimension is the length of all transitions
         matrix_dimension = len(concept_mappings_both_transitions)
 
         # create matrix from both transitions maps
-        matrix_P = create_transition_matrix(concept_mappings_both_transitions, matrix_dimension)
+        matrix_P = create_matrix_P(concept_mappings_both_transitions, matrix_dimension)
         print("storing matrix P as sparse npz")
         sparse.save_npz(matrix_p_file_path, matrix_P)
         print("storing matrix P as sparse npz completed")
 
         del concept_mappings_both_transitions
-
-    # indices_array is a 1D array where position presents index (new ID) and value presents old ID value
-    new_old_idx_map, id_str_concept_map = create_concept_ids(
-        default_concept_file,
-        new_old_id_mapping_dump_path,
-        id_concept_mapping_json_dump_path,
-        old_new_id_temp_dict)
-
-    del old_new_id_temp_dict
 
     # create concept mappings
     concept_mappings = create_concept_mappings_dict(
@@ -477,7 +445,7 @@ def init_dictionaries():
         default_concept_mapping_json_dump_path,
         False)
 
-    return concept_mappings, matrix_P, id_str_concept_map, new_old_idx_map
+    return concept_mappings, matrix_P
 
 
 def handler(signum, frame):
@@ -550,7 +518,7 @@ if __name__ == '__main__':
     ##################################################################################
 
     # init dictionaries needed for API and concepts needed for API
-    concept_mappings, matrix_P, id_str_concept_map, new_old_idx_map = init_dictionaries()
+    concept_mappings, matrix_P = init_dictionaries()
 
     # calculate matrix dimension based on concept mappings length
     matrix_dimension = len(concept_mappings)
@@ -587,8 +555,6 @@ if __name__ == '__main__':
                                   concept_mappings,
                                   initial_concepts,
                                   matrix_P,
-                                  id_str_concept_map,
-                                  new_old_idx_map,
                                   new_concepts_number,
                                   alpha)
 
