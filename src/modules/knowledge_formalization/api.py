@@ -89,6 +89,32 @@ def get_concept_results():
         return {'result': result[0], 'id': id}
 
 
+@app.route('/generateInitialConcepts', methods=['POST'])
+def generate_new_initial_concepts():
+    received_request = request.json
+    if received_request == 'null' or received_request is None:
+        return 'Error parsing request. It should be in JSON format'
+
+    # request should contain 'concepts' key
+    if 'concepts' not in received_request:
+        return 'JSON object in request must contain key "concepts".'
+
+    # extract payload from concepts
+    payload = received_request['concepts']
+
+    # value of key 'concepts' must be an array
+    if not isinstance(payload, list) or not payload:
+        return 'Value of key concepts should be non empty array'
+
+    # go through the array and check if each key is a string
+    for word in payload:
+        # TODO check if variable is string and return message with result false if not
+        print(type(word))
+
+    return str(payload)
+
+
+
 if __name__ == '__main__':
     # get instance of database connection
     db_name = "concepts_db"

@@ -87,12 +87,13 @@ def create_matrix_p(transitions_map, matrix_dimension):
     return matrix_P
 
 
-def create_matrix_j(initial_concepts, all_concepts, matrix_dimension):
+def create_matrix_j(initial_concepts, all_concepts, matrix_dimension, recreate=False):
     # creates transition matrix from initial concepts
     matrix_j_file_path = './temp/linkGraph-matrix-J-dump.npz'
 
-    # check if matrix J exists already and just read it from file dump if it does
-    if os.path.isfile(matrix_j_file_path):
+    # check if matrix J exists already and we do not need to recreate it because initial concepts are still valid ->
+    # just read it from file dump
+    if os.path.isfile(matrix_j_file_path) and not recreate:
         print("==================================================================")
         print("                         READING MATRIX J")
         print("==================================================================")
@@ -127,7 +128,6 @@ def create_matrix_j(initial_concepts, all_concepts, matrix_dimension):
     del transition_col
     del transition_row
     del transition_values
-    del all_concepts
     del initial_concepts
 
     print("storing matrix J as sparse npz")
@@ -456,10 +456,9 @@ def create_concept_mappings_dict(default_concept_mapping_file,
         return new_id_concept_transition_map
 
 
-def init_dictionaries(test=False):
+def init_dictionaries(id_string_mapping_txt_path, test=False):
     default_concept_file = './linkGraph-en-verts.txt'
     default_concept_mapping_file = './linkGraph-en-edges.txt'
-    id_string_mapping_txt_path = './temp/linkGraph-en-verts-id-string-mapping.txt'
     default_concept_mapping_json_dump_path = './temp/linkGraph-en-edges-dump.json'
     default_concept_mapping_json_both_transitions_dump_path = './temp/linkGraph-en-edges-both-transitions-dump.json'
     matrix_p_file_path = './temp/linkGraph-matrix-P-dump.npz'
@@ -510,6 +509,41 @@ def init_dictionaries(test=False):
     return concept_mappings, matrix_P, id_string_mapping_txt_path
 
 
+def extract_concept_ids(id_string_file_path, words):
+    # extract concept IDs from strings in an array called 'words'
+
+    # open file and iterate through all the lines
+    concept_ids = []
+    with open(id_string_file_path, 'r') as concept_id_string_file:
+        for lineN, line in enumerate(concept_id_string_file):
+            line = line.strip()
+            split = line.split("\t")
+
+            if len(concept_ids) >= len(words):
+                print("Found IDs for all words (initial concepts)")
+                break
+
+            if len(split) < 2:
+                print("Skipping line because it doesn't have at least 2 columns (concept ID and string)")
+            else:
+                # skip a line if it doesnt contain a number
+                if not split[0].isdigit():
+                    continue
+
+                # second column
+                string = split[1]
+
+                # this word is in a list of words, that we received as new initial concepts ->
+                # save ID (column 0) to array of IDs
+                # TODO check if this works 100% (so that it only recognizes same string as equal)
+                if string.lower() in words:
+                    concept_ids.append(int(split[0]))
+
+    print(concept_ids)
+
+    return concept_ids
+
+
 def handler(signum, frame):
     # catch signal for abort/kill application and also kill API process
     print('Signal handler called with signal', signum, ', killing api process and exiting application')
@@ -536,13 +570,20 @@ if __name__ == '__main__':
     database = Database(db_name)
     database.create_database(db_name)
 
-    # create table if it doesn't exist
+    # create table if it doesn't exist - it will be used for storing/retrieving requests for concepts nearby
     database.create_table("CREATE TABLE IF NOT EXISTS concepts ("
                           "id serial PRIMARY KEY NOT NULL, "
                           "timestamp BIGINT NOT NULL, "
                           "alpha REAL NOT NULL,"
                           "concepts INT NOT NULL,"
                           "result jsonb)")
+
+    # create table that will be used for storing new concepts (used for recreating matrix J)
+    database.create_table("CREATE TABLE IF NOT EXISTS initial_concepts ("
+                          "id serial PRIMARY KEY NOT NULL, "
+                          "timestamp BIGINT NOT NULL, "
+                          "processed BOOLEAN NOT NULL DEFAULT FALSE, "
+                          "concepts jsonb)")
 
     # start API as subprocess
     apiProcess = subprocess.Popen(["python", "api.py"])
@@ -557,14 +598,15 @@ if __name__ == '__main__':
     ##################################################################################
 
     # init dictionaries needed for API and concepts needed for API
-    concept_mappings, matrix_P, id_string_txt_path = init_dictionaries(True)
+    id_string_file_path = './temp/linkGraph-en-verts-id-string-mapping.txt'
+    concept_mappings, matrix_P, id_string_txt_path = init_dictionaries(id_string_file_path, True)
 
     # calculate matrix dimension based on concept mappings length
     matrix_dimension = len(concept_mappings)
 
-    # initial concepts will be given as array of strings API parameter
-    # TODO map strings to concept IDs
-    initial_concepts = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    # initial concepts -> hardcoded IDs based on the strings given
+    # ""car", "motorhome", "bicycle", "truck", "caravan"
+    initial_concepts = [59328, 115417, 262446, 382724, 524266]
 
     # create matrix that contains transition probabilities from each concept back to initial concept
     matrix_J = create_matrix_j(initial_concepts, concept_mappings, matrix_dimension)
@@ -578,6 +620,61 @@ if __name__ == '__main__':
     print("==================================================================")
 
     while True:
+        ##################################################################################
+        #  CHECKING IF NEW CONCEPTS ARE AVAILABLE (for generating new initial concepts)
+        ##################################################################################
+
+        # query not processed requests for generating new initial concepts
+        available_concepts_result = database.query("SELECT id, concepts FROM initial_concepts WHERE NOT processed;")
+        print(available_concepts_result)
+
+        # new request for updating initial concepts
+        if available_concepts_result:
+
+            print("==================================================================")
+            print("     PROCESSING NEW REQUEST FOR GENERATING NEW INITIAL IDs")
+            print("==================================================================")
+
+            id = available_concepts_result[0][0]
+            json_obj = available_concepts_result[0][1]
+
+            # extract array of concepts, it should like something like ->
+            # ['car', 'motorhome', 'ship', 'moon', 'sun', 'idea']
+            concepts_arr = json_obj["concepts"]
+
+            # extract new concept IDs from given words
+            new_concept_ids = extract_concept_ids(id_string_file_path, concepts_arr)
+
+            # new concepts are valid (not an empty list) - make them initial concepts
+            if new_concept_ids:
+                print("New concept IDs", new_concept_ids)
+                initial_concepts = new_concept_ids
+
+                print("==================================================================")
+                print("           CREATING NEW MATRIX J FROM NEW CONCEPT IDs")
+                print("==================================================================")
+
+                # create matrix that contains transition probabilities from each concept back to initial concept
+                matrix_J = create_matrix_j(initial_concepts, concept_mappings, matrix_dimension, True)
+
+                print("==================================================================")
+                print("           NEW MATRIX J FROM NEW CONCEPT IDs JUST CREATED")
+                print("==================================================================")
+
+                # update database
+                database.execute("UPDATE initial_concepts SET processed = %s where id = %s;", (True, id))
+
+                # remove request older than one day
+                # remove requests that are at least 1 day old from the database
+                one_day_ago = round(time.time() - (24 * 60 * 60))
+                database.execute("DELETE FROM initial_concepts WHERE timestamp < %s;", (one_day_ago,))
+        else:
+            print("no new request for updating initial concepts at", round(time.time()))
+
+        ##################################################################################
+        #                      CHECKING IF NEW TASK IS AVAILABLE FOR PROCESSING
+        ##################################################################################
+
         # query database for next task
         result = database.query("SELECT id, alpha, concepts FROM concepts WHERE result IS NULL")
         if not result:
