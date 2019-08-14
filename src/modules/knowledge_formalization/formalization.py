@@ -581,7 +581,7 @@ if __name__ == '__main__':
         # query database for next task
         result = database.query("SELECT id, alpha, concepts FROM concepts WHERE result IS NULL")
         if not result:
-            print("No task at", time.time())
+            print("No task at", round(time.time()))
             # no task ahead, just wait for 10 seconds
             time.sleep(10)
             continue
