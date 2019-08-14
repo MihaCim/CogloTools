@@ -6,6 +6,7 @@ import os
 import sys
 import signal
 import subprocess
+import linecache
 import psutil
 from scipy.sparse import linalg
 from scipy.sparse import csc_matrix
@@ -21,10 +22,9 @@ def create_matrix_p(transitions_map, matrix_dimension):
     # create transition matrix from all concepts
 
     print("==================================================================")
-    print("                 CREATING MATRIX P")
+    print("                         CREATING MATRIX P")
     print("==================================================================")
 
-    print("creating transition matrix P of dimension", matrix_dimension, "x", matrix_dimension)
     transition_row = []
     transition_col = []
 
@@ -89,9 +89,21 @@ def create_matrix_p(transitions_map, matrix_dimension):
 
 def create_matrix_j(initial_concepts, all_concepts, matrix_dimension):
     # creates transition matrix from initial concepts
+    matrix_j_file_path = './temp/linkGraph-matrix-J-dump.npz'
+
+    # check if matrix J exists already and just read it from file dump if it does
+    if os.path.isfile(matrix_j_file_path):
+        print("==================================================================")
+        print("                         READING MATRIX J")
+        print("==================================================================")
+        print("reading file", matrix_j_file_path)
+        matrix_J = sparse.load_npz(matrix_j_file_path)
+        print("file", matrix_j_file_path, "read")
+
+        return matrix_J
 
     print("==================================================================")
-    print("                 CREATING MATRIX J")
+    print("                      CREATING MATRIX J")
     print("==================================================================")
 
     print("creating initial concept transition matrix J")
@@ -108,45 +120,39 @@ def create_matrix_j(initial_concepts, all_concepts, matrix_dimension):
     print("transition values vector created")
 
     # create sparse matrix
-    sparse = csc_matrix((transition_values, (transition_row, transition_col)), (matrix_dimension, matrix_dimension))
-    print("matrix J created with shape", sparse.shape)
+    matrix_J = csc_matrix((transition_values, (transition_row, transition_col)), (matrix_dimension, matrix_dimension))
+    print("matrix J created with shape", matrix_J.shape)
 
     # remove values for sparse matrix
     del transition_col
     del transition_row
     del transition_values
+    del all_concepts
+    del initial_concepts
 
-    return sparse
+    print("storing matrix J as sparse npz")
+    sparse.save_npz(matrix_j_file_path, matrix_J)
+    print("storing matrix J as sparse npz completed")
 
-
-def normalize_data(array):
-    # normalizes data (0 - 1)
-    return (array - array.min()) / (array.max() - array.min())
+    return matrix_J
 
 
 # check if value is close enough to given value (used for comparing float values)
-def is_close(a, b, rel_tol=1e-03, abs_tol=0.0):
+def is_close(a, b, rel_tol=1e-7, abs_tol=0.0):
     return abs(a - b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
 
 
-def calc_neighbourhood(matrix_dim,
-                       concept_mappings,
+def calc_neighbourhood(matrix_J,
                        entry_concepts,
                        matrix_P,
+                       id_string_txt_path,
                        number_of_wanted_concepts,
                        alfa):
     # method calculates neighbourhood based on concept mappings and initial concepts
 
-    # create matrix that contains transition probabilities from each concept back to initial concept
-    matrix_J = create_matrix_j(entry_concepts, concept_mappings, matrix_dim)
-
     print("creating P1 matrix from matrix P and matrix J")
     matrix_P1 = csc_matrix(((1 - alfa) * matrix_P) + ((alfa / float(len(entry_concepts))) * matrix_J))
     print("matrix P1 created")
-
-    # remove matrix J and P from memory
-    del matrix_J
-    del matrix_P
 
     print("Transposing matrix P1...")
     transposed = matrix_P1.transpose()
@@ -156,9 +162,6 @@ def calc_neighbourhood(matrix_dim,
     # extract EigenValues and EigenVectors
     print("extracting eigenvalues and eigenvectors")
     [eigenvalues, vectors] = linalg.eigs(transposed, k=1)
-
-    print("eigenvalues", eigenvalues)
-    print("eigenvectors", vectors)
 
     # extract only the column where EigenValue is 1.0
     print("extracting column of eigenvectors where eigenvalue is 1")
@@ -174,32 +177,47 @@ def calc_neighbourhood(matrix_dim,
         exit(3)
     print("extracted eigenvectors successfully")
 
-    # remove eigen values from memory
-    del eigenvalues
-
     # only keep real value
     print("converting vectors to keep only real values")
     resultArray = vectors.real
+    resultArray = resultArray.T[result_array_idx]
 
-    # remove eigen vectors from memory
+    # remove unused variables from memory
+    del eigenvalues
     del vectors
+    del matrix_P1
+    del transposed
+    del result_array_idx
 
-    # normalize data from column with index result_array_idx because that column represents our results
-    print("normalizing data")
-    normalizedArray = normalize_data(resultArray.T[result_array_idx])
-    print("data normalized")
+    # get rid of possible numerical error -> if value is less than 0, set it to zero
+    corrected_array = []
+    array_sum = 0
+    for value in resultArray:
+        if value < 0:
+            value = 0
+        corrected_array.append(value)
+        array_sum = array_sum + value
+
+    # all values should sum up to ONE
+    normalizedArray = []
+    for value in corrected_array:
+        if value == 0:
+            normalizedArray.append(value)
+        else:
+            new_value = value / array_sum
+            normalizedArray.append(new_value)
 
     print("creating array of similar concepts")
     similar_concepts = {}
-    for concept_id in range(len(normalizedArray.T)):
-        value = normalizedArray.T[concept_id]
+    for concept_id in range(len(normalizedArray)):
+        value = normalizedArray[concept_id]
 
         # if ID is not the same as initial concept, extract the value
         if concept_id not in entry_concepts:
             similar_concepts[concept_id] = value
 
     # sort descending - most similar concept is the highest
-    print("sorting array of similar concepts descdending by probability")
+    print("sorting array of similar concepts descending by probability")
     sorted_similar_concepts = sorted(similar_concepts.items(), key=operator.itemgetter(1), reverse=True)
 
     # extract as many concepts as wanted by variable number_of_wanted_concepts
@@ -210,16 +228,26 @@ def calc_neighbourhood(matrix_dim,
     for final_concept in extracted_concepts:
         id = final_concept[0]
         probability = final_concept[1]
-        # word = id_string_map[id] TODO read this word from file
-        word = "test" # TODO remove
 
-        json_object = {'concept_id', id, 'probability', probability, 'string', word}
+        # get line from ID + 1 (because readings starts with 1 and our indices start at 0)
+        line = linecache.getline(id_string_txt_path, id + 1).strip()
+        split = line.split("\t")
+        word = split[1]
+
+        json_object = {}
+        json_object["concept_id"] = id
+        json_object["probability"] = probability
+        json_object["string"] = word
+
         list.append(json_object)
 
-        print("Concept ID", id, "probability", probability, "word", word)
+    # dict to json
+    response = json.dumps(list)
+
+    print("Constructed JSON object for response.")
 
     # return results as a list
-    return list
+    return response
 
 
 def create_id_string_map(default_concept_file,
@@ -229,7 +257,7 @@ def create_id_string_map(default_concept_file,
     # it just reads it from a dump file
 
     print("==================================================================")
-    print("                 CREATING ID -> STRING MAP")
+    print("                    CREATING ID -> STRING MAP")
     print("==================================================================")
 
     new_old_id_dict = {}
@@ -285,8 +313,11 @@ def create_id_string_map(default_concept_file,
                     if lineN % 1000000 == 0:
                         print(lineN / 1000000)
 
+        sorted_ids = [x for _,x in sorted(zip(ids,ids))]
+        sorted_strings = [x for _,x in sorted(zip(ids,strings))]
+
         # create arrays and store the data to text file
-        data = np.array([ids, strings])
+        data = np.array([sorted_ids, sorted_strings])
         data = data.T
 
         print("Storing dictionary of new ID -> string concept...")
@@ -304,7 +335,7 @@ def create_concept_mappings_dict(default_concept_mapping_file,
     # method creates concept mapping if it doesn't exist yet. If it does, it just reads if from a dump file
 
     print("==================================================================")
-    print("                 CREATING TRANSITION MAP")
+    print("                     CREATING TRANSITION MAP")
     print("==================================================================")
 
     concept_transition_map = defaultdict(list)
@@ -425,13 +456,20 @@ def create_concept_mappings_dict(default_concept_mapping_file,
         return new_id_concept_transition_map
 
 
-def init_dictionaries():
+def init_dictionaries(test=False):
     default_concept_file = './linkGraph-en-verts.txt'
     default_concept_mapping_file = './linkGraph-en-edges.txt'
     id_string_mapping_txt_path = './temp/linkGraph-en-verts-id-string-mapping.txt'
     default_concept_mapping_json_dump_path = './temp/linkGraph-en-edges-dump.json'
     default_concept_mapping_json_both_transitions_dump_path = './temp/linkGraph-en-edges-both-transitions-dump.json'
     matrix_p_file_path = './temp/linkGraph-matrix-P-dump.npz'
+
+    if test:
+        print("======================================================================================")
+        print("RUNNING IN TEST MODE! TRANSITION AND MAPPINGS USED WILL BE SMALLER THAN REAL ONES")
+        print("======================================================================================")
+        default_concept_file = './linkGraph-en-verts-test.txt'
+        default_concept_mapping_file = './linkGraph-en-edges-test.txt'
 
     # check if matrix P exists. If it does, we don't need to calculate concept mappings for both transitions,
     # if it doesn't, we need to calculate it
@@ -469,7 +507,7 @@ def init_dictionaries():
         default_concept_mapping_json_dump_path,
         should_return_old_new_id_map=False)
 
-    return concept_mappings, matrix_P
+    return concept_mappings, matrix_P, id_string_mapping_txt_path
 
 
 def handler(signum, frame):
@@ -504,7 +542,7 @@ if __name__ == '__main__':
                           "timestamp BIGINT NOT NULL, "
                           "alpha REAL NOT NULL,"
                           "concepts INT NOT NULL,"
-                          "result VARCHAR)")
+                          "result jsonb)")
 
     # start API as subprocess
     apiProcess = subprocess.Popen(["python", "api.py"])
@@ -519,44 +557,54 @@ if __name__ == '__main__':
     ##################################################################################
 
     # init dictionaries needed for API and concepts needed for API
-    concept_mappings, matrix_P = init_dictionaries()
+    concept_mappings, matrix_P, id_string_txt_path = init_dictionaries(True)
 
     # calculate matrix dimension based on concept mappings length
     matrix_dimension = len(concept_mappings)
 
     # initial concepts will be given as array of strings API parameter
     # TODO map strings to concept IDs
-    initial_concepts = [9000, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 1000, 54324, 11241, 11100, 10101]
+    initial_concepts = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+    # create matrix that contains transition probabilities from each concept back to initial concept
+    matrix_J = create_matrix_j(initial_concepts, concept_mappings, matrix_dimension)
 
     ##################################################################################
-    #                            PROCESSING OF REQUESTS
+    #                            REQUEST PROCESSOR
     ##################################################################################
+
+    print("==================================================================")
+    print("                 STARTING REQUEST PROCESSOR")
+    print("==================================================================")
 
     while True:
         # query database for next task
         result = database.query("SELECT id, alpha, concepts FROM concepts WHERE result IS NULL")
-        print(result)
         if not result:
+            print("No task at", time.time())
             # no task ahead, just wait for 10 seconds
             time.sleep(10)
+            continue
 
         # extract alpha and number of new concepts and start processing
         id = result[0][0]
         alpha = result[0][1]
         new_concepts_number = result[0][2]
 
-        print(id)
-        print(alpha)
-        print(new_concepts_number)
-
-        # # # calculate neighbourhood and store result into database
-        list = calc_neighbourhood(matrix_dimension,
-                                  concept_mappings,
+        # calculate neighbourhood and store result into database
+        result = calc_neighbourhood(matrix_J,
                                   initial_concepts,
                                   matrix_P,
+                                  id_string_txt_path,
                                   new_concepts_number,
                                   alpha)
 
-        """Update mobile set price = %s where id = %s"""
+
         # insert result into database
-        database.execute("UPDATE concepts set result = %s WHERE id = %s;", (list, id))
+        database.execute("UPDATE concepts SET result = %s WHERE id = %s;", (result, id))
+
+        # remove requests that are at least 1 day old from the database
+        one_day_ago = round(time.time() - (24 * 60 * 60))
+        database.execute("DELETE FROM concepts WHERE timestamp < %s;", (one_day_ago,))
+
+        print("Finished processing request with ID:", id)

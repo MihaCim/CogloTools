@@ -99,10 +99,6 @@ class Database:
         :param parameters:
         :return:
         """
-        if parameters is not None:
-            print("Query with line", line, "and parameters", parameters)
-        else:
-            print("Query with line", line)
         result = None
         try:
             self.connection = self.get_connection()
@@ -131,10 +127,6 @@ class Database:
         :param parameters:
         :return:
         """
-        if parameters is not None:
-            print("Executing with line", content, "and parameters", parameters)
-        else:
-            print("Executing with line", content)
         row_id = None
         try:
             self.connection = self.get_connection()
@@ -153,30 +145,3 @@ class Database:
             if self.connection is not None:
                 self.close()
             return row_id
-
-
-    # TODO EXAMPLES TO BE REMOVED
-    # database.drop_table("concepts")
-
-    # # # TODO insert
-    # # database.execute("INSERT INTO concepts(id, timestamp, alpha, concepts, result) VALUES(DEFAULT, 431234124, 0.2, 10, 'asdasdasdasdasdasdasdasdasdasdasdasd')")
-    # # database.execute("INSERT INTO concepts(id, timestamp, alpha, concepts) VALUES(DEFAULT, 523523, 0.2, 0.5)")
-    # # result = database.query("SELECT * FROM concepts")
-    # # print(result)
-    # #
-    # # # TODO select
-    # # result = database.query("SELECT * FROM concepts WHERE id = %s", (9,))
-    # # print(result)
-    # #
-    # # # TODO update
-    # # database.execute("UPDATE concepts set result = %s where id = %s", ("testtest", 6))
-    # # now = int(round(time.time()))
-    # # result = database.query("SELECT * FROM concepts WHERE timestamp < %s;", (now,))
-    # # print(result)
-    # #
-    # # # TODO clean database
-    # # print("now: ", now)
-    # # database.execute("DELETE FROM concepts WHERE timestamp < %s;", (now,))
-    # result = database.query("SELECT * FROM concepts")
-    # print(result)
-    #
