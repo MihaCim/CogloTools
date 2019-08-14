@@ -323,7 +323,7 @@ def create_concept_mappings_dict(default_concept_mapping_file,
         print("file", default_concept_mapping_json_both_dump_path, "read")
 
         # do not return calculate old_new_id_dict because we don't need it
-        if not should_return_old_new_id_map:
+        if should_return_old_new_id_map:
             print("creating hashmap of old -> new ID")
             # create mapping of old ID to new ID
             old_new_id_dict = {}
@@ -428,7 +428,7 @@ def create_concept_mappings_dict(default_concept_mapping_file,
 def init_dictionaries():
     default_concept_file = './linkGraph-en-verts.txt'
     default_concept_mapping_file = './linkGraph-en-edges.txt'
-    id_concept_mapping_json_dump_path = './temp/linkGraph-en-verts-id-concept-mapping-dump.txt'
+    id_string_mapping_txt_path = './temp/linkGraph-en-verts-id-string-mapping.txt'
     default_concept_mapping_json_dump_path = './temp/linkGraph-en-edges-dump.json'
     default_concept_mapping_json_both_transitions_dump_path = './temp/linkGraph-en-edges-both-transitions-dump.json'
     matrix_p_file_path = './temp/linkGraph-matrix-P-dump.npz'
@@ -449,7 +449,7 @@ def init_dictionaries():
 
         # indices_array is a 1D array where position presents index (new ID) and value presents old ID value
         create_id_string_map(default_concept_file,
-                             id_concept_mapping_json_dump_path,
+                             id_string_mapping_txt_path,
                              old_new_id_temp_dict)
 
         # matrix dimension is the length of all transitions
