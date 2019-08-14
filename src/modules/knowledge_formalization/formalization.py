@@ -17,8 +17,13 @@ from collections import defaultdict
 from db import Database
 
 
-def create_matrix_P(transitions_map, matrix_dimension):
+def create_matrix_p(transitions_map, matrix_dimension):
     # create transition matrix from all concepts
+
+    print("==================================================================")
+    print("                 CREATING MATRIX P")
+    print("==================================================================")
+
     print("creating transition matrix P of dimension", matrix_dimension, "x", matrix_dimension)
     transition_row = []
     transition_col = []
@@ -35,9 +40,6 @@ def create_matrix_P(transitions_map, matrix_dimension):
         counter = counter + 1
         if counter % 100000 == 0:
             print("at counter", counter, "current ID is", id)
-
-    # remove transition map from memory
-    del transitions_map
 
     print("creating transition values vector")
     transition_values = np.ones(len(transition_col), dtype=float)
@@ -72,15 +74,26 @@ def create_matrix_P(transitions_map, matrix_dimension):
     matrix_P = csc_matrix((sparse_diagonal_matrix * matrix_Q), (matrix_dimension, matrix_dimension))
     print("matrix P created")
 
-    # remove sparse diagonal matrix
+    # remove resources from memory
+    del transitions_map
+    del reciprocal_range
+    del qi
+    del reciprocal_transposed
+    del vector_I
+    del transition_values
     del sparse_diagonal_matrix
     del matrix_Q
 
     return matrix_P
 
 
-def create_initial_concept_transition_matrix(initial_concepts, all_concepts, matrix_dimension):
+def create_matrix_j(initial_concepts, all_concepts, matrix_dimension):
     # creates transition matrix from initial concepts
+
+    print("==================================================================")
+    print("                 CREATING MATRIX J")
+    print("==================================================================")
+
     print("creating initial concept transition matrix J")
     transition_row = []
     transition_col = []
@@ -125,7 +138,7 @@ def calc_neighbourhood(matrix_dim,
     # method calculates neighbourhood based on concept mappings and initial concepts
 
     # create matrix that contains transition probabilities from each concept back to initial concept
-    matrix_J = create_initial_concept_transition_matrix(entry_concepts, concept_mappings, matrix_dim)
+    matrix_J = create_matrix_j(entry_concepts, concept_mappings, matrix_dim)
 
     print("creating P1 matrix from matrix P and matrix J")
     matrix_P1 = csc_matrix(((1 - alfa) * matrix_P) + ((alfa / float(len(entry_concepts))) * matrix_J))
@@ -214,6 +227,11 @@ def create_id_string_map(default_concept_file,
                          old_new_id_dict):
     # method extracts concepts IDs and creates new dictionary from them, if dump doesn't exist yet. if dump exists,
     # it just reads it from a dump file
+
+    print("==================================================================")
+    print("                 CREATING ID -> STRING MAP")
+    print("==================================================================")
+
     new_old_id_dict = {}
     if len(old_new_id_dict) != 0:
         # old_new_id_temp_dict contains the mapping old -> new ID for old concepts that contain transitions
@@ -281,8 +299,13 @@ def create_id_string_map(default_concept_file,
 
 def create_concept_mappings_dict(default_concept_mapping_file,
                                  default_concept_mapping_json_both_dump_path,
-                                 should_use_both_transitions):
+                                 should_use_both_transitions=False,
+                                 should_return_old_new_id_map=True):
     # method creates concept mapping if it doesn't exist yet. If it does, it just reads if from a dump file
+
+    print("==================================================================")
+    print("                 CREATING TRANSITION MAP")
+    print("==================================================================")
 
     concept_transition_map = defaultdict(list)
     # contains transitions A -> B (and B -> A with old IDs if should_use_both_transitions flag is set)
@@ -299,14 +322,16 @@ def create_concept_mappings_dict(default_concept_mapping_file,
                                          new_id_mapping_load.items()}  # convert string keys to integers
         print("file", default_concept_mapping_json_both_dump_path, "read")
 
-        print("creating hashmap of old -> new ID")
-        # create mapping of old ID to new ID
-        old_new_id_dict = {}
-        new_id = 0
-        for old_id in new_id_concept_transition_map:
-            old_new_id_dict[old_id] = new_id
-            new_id = new_id + 1
-        print("hashmap of old -> new ID created")
+        # do not return calculate old_new_id_dict because we don't need it
+        if not should_return_old_new_id_map:
+            print("creating hashmap of old -> new ID")
+            # create mapping of old ID to new ID
+            old_new_id_dict = {}
+            new_id = 0
+            for old_id in new_id_concept_transition_map:
+                old_new_id_dict[old_id] = new_id
+                new_id = new_id + 1
+            print("hashmap of old -> new ID created")
 
     elif os.path.isfile(default_concept_mapping_file):
         print("concept file dump doesnt exist. building new one from file", default_concept_mapping_file)
@@ -362,9 +387,8 @@ def create_concept_mappings_dict(default_concept_mapping_file,
             new_id = new_id + 1
         print("hashmap of old -> new ID created")
 
-        print("creating hashmap of new ID -> transactions with new ID")
+        print("creating hashmap of new ID -> transitions with new ID")
 
-        id = 0
         counter = 0
         for old_id in concept_transition_map:
             # array of transitions but with old ids
@@ -379,12 +403,10 @@ def create_concept_mappings_dict(default_concept_mapping_file,
                 new_transition_id = old_new_id_dict[transition]
                 new_id_concept_transition_map[new_id].append(new_transition_id)
 
-                id = id + len(transitions)
                 counter = counter + 1
                 if counter % 10000000 == 0:
-                    print("at counter", counter, "current ID is", id)
-
-        print("hashmap of new ID -> transactions with new ID created")
+                    print("at counter", counter)
+        print("hashmap of new ID -> transitions with new ID created")
 
         # remove transition map from memory
         del concept_transition_map
@@ -397,7 +419,10 @@ def create_concept_mappings_dict(default_concept_mapping_file,
         print("no concept mapping file or json dump, cannot proceed")
         exit(2)
 
-    return new_id_concept_transition_map, old_new_id_dict
+    if should_return_old_new_id_map:
+        return new_id_concept_transition_map, old_new_id_dict
+    else:
+        return new_id_concept_transition_map
 
 
 def init_dictionaries():
@@ -419,7 +444,8 @@ def init_dictionaries():
         # read all concept transitions from a file (or a dump) and create a dictionary with modified IDs
         concept_mappings_both_transitions, old_new_id_temp_dict = create_concept_mappings_dict(
             default_concept_mapping_file,
-            default_concept_mapping_json_both_transitions_dump_path, True)
+            default_concept_mapping_json_both_transitions_dump_path,
+            should_use_both_transitions=True)
 
         # indices_array is a 1D array where position presents index (new ID) and value presents old ID value
         create_id_string_map(default_concept_file,
@@ -430,7 +456,7 @@ def init_dictionaries():
         matrix_dimension = len(concept_mappings_both_transitions)
 
         # create matrix from both transitions maps
-        matrix_P = create_matrix_P(concept_mappings_both_transitions, matrix_dimension)
+        matrix_P = create_matrix_p(concept_mappings_both_transitions, matrix_dimension)
         print("storing matrix P as sparse npz")
         sparse.save_npz(matrix_p_file_path, matrix_P)
         print("storing matrix P as sparse npz completed")
@@ -441,7 +467,7 @@ def init_dictionaries():
     concept_mappings = create_concept_mappings_dict(
         default_concept_mapping_file,
         default_concept_mapping_json_dump_path,
-        False)
+        should_return_old_new_id_map=False)
 
     return concept_mappings, matrix_P
 
@@ -466,50 +492,27 @@ if __name__ == '__main__':
     ##################################################################################
     #                       DATABASE AND API INITIALIZATION
     ##################################################################################
-    print("Start : %s" % time.ctime())
 
-    # # get instance of database connection
-    # db_name = "concepts_db"
-    # database = Database(db_name)
-    # database.create_database(db_name)
-    # # database.drop_table("concepts")
-    # # create table if it doesn't exist
-    # database.create_table("CREATE TABLE IF NOT EXISTS concepts ("
-    #                       "id serial PRIMARY KEY NOT NULL, "
-    #                       "timestamp BIGINT NOT NULL, "
-    #                       "alpha REAL NOT NULL,"
-    #                       "concepts INT NOT NULL,"
-    #                       "result VARCHAR)")
-    #
-    # # # TODO insert
-    # # database.execute("INSERT INTO concepts(id, timestamp, alpha, concepts, result) VALUES(DEFAULT, 431234124, 0.2, 10, 'asdasdasdasdasdasdasdasdasdasdasdasd')")
-    # # database.execute("INSERT INTO concepts(id, timestamp, alpha, concepts) VALUES(DEFAULT, 523523, 0.2, 0.5)")
-    # # result = database.query("SELECT * FROM concepts")
-    # # print(result)
-    # #
-    # # # TODO select
-    # # result = database.query("SELECT * FROM concepts WHERE id = %s", (9,))
-    # # print(result)
-    # #
-    # # # TODO update
-    # # database.execute("UPDATE concepts set result = %s where id = %s", ("testtest", 6))
-    # # now = int(round(time.time()))
-    # # result = database.query("SELECT * FROM concepts WHERE timestamp < %s;", (now,))
-    # # print(result)
-    # #
-    # # # TODO clean database
-    # # print("now: ", now)
-    # # database.execute("DELETE FROM concepts WHERE timestamp < %s;", (now,))
-    # result = database.query("SELECT * FROM concepts")
-    # print(result)
-    #
-    # # start API as subprocess
-    # apiProcess = subprocess.Popen(["python", "api.py"])
-    #
-    # # setup handler that will kill api if signal for abort/kill arrives (ctrl+c, ctrl+z)
-    # signal.signal(signal.SIGABRT, handler)
-    # signal.signal(signal.SIGINT, handler)
-    # signal.signal(signal.SIGTSTP, handler)
+    # get instance of database connection
+    db_name = "concepts_db"
+    database = Database(db_name)
+    database.create_database(db_name)
+
+    # create table if it doesn't exist
+    database.create_table("CREATE TABLE IF NOT EXISTS concepts ("
+                          "id serial PRIMARY KEY NOT NULL, "
+                          "timestamp BIGINT NOT NULL, "
+                          "alpha REAL NOT NULL,"
+                          "concepts INT NOT NULL,"
+                          "result VARCHAR)")
+
+    # start API as subprocess
+    apiProcess = subprocess.Popen(["python", "api.py"])
+
+    # setup handler that will kill api if signal for abort/kill arrives (ctrl+c, ctrl+z)
+    signal.signal(signal.SIGABRT, handler)
+    signal.signal(signal.SIGINT, handler)
+    signal.signal(signal.SIGTSTP, handler)
 
     ##################################################################################
     #                              SCRIPT INITIALIZATION
@@ -524,8 +527,6 @@ if __name__ == '__main__':
     # initial concepts will be given as array of strings API parameter
     # TODO map strings to concept IDs
     initial_concepts = [9000, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 1000, 54324, 11241, 11100, 10101]
-
-    print("Got initial concepts at : %s" % time.ctime())
 
     ##################################################################################
     #                            PROCESSING OF REQUESTS

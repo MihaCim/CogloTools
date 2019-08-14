@@ -153,3 +153,30 @@ class Database:
             if self.connection is not None:
                 self.close()
             return row_id
+
+
+    # TODO EXAMPLES TO BE REMOVED
+    # database.drop_table("concepts")
+
+    # # # TODO insert
+    # # database.execute("INSERT INTO concepts(id, timestamp, alpha, concepts, result) VALUES(DEFAULT, 431234124, 0.2, 10, 'asdasdasdasdasdasdasdasdasdasdasdasd')")
+    # # database.execute("INSERT INTO concepts(id, timestamp, alpha, concepts) VALUES(DEFAULT, 523523, 0.2, 0.5)")
+    # # result = database.query("SELECT * FROM concepts")
+    # # print(result)
+    # #
+    # # # TODO select
+    # # result = database.query("SELECT * FROM concepts WHERE id = %s", (9,))
+    # # print(result)
+    # #
+    # # # TODO update
+    # # database.execute("UPDATE concepts set result = %s where id = %s", ("testtest", 6))
+    # # now = int(round(time.time()))
+    # # result = database.query("SELECT * FROM concepts WHERE timestamp < %s;", (now,))
+    # # print(result)
+    # #
+    # # # TODO clean database
+    # # print("now: ", now)
+    # # database.execute("DELETE FROM concepts WHERE timestamp < %s;", (now,))
+    # result = database.query("SELECT * FROM concepts")
+    # print(result)
+    #
