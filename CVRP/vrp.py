@@ -2,134 +2,140 @@ import unittest
 import numpy as np
 import ortools.linear_solver.pywraplp as pywraplp
 
-def vrp(graph,D,C):
+def vrp(graph_incidence_mat, dispatch_vec, capacity_vec):
     E = []
-    for row in graph:
+    for row in graph_incidence_mat:
         E.append(row + row)
 
     # Additional Variables
-    V = np.size(C)
-    # E=np.tile(graph,2)
-    edges = len(E[1])
-    nodes = len (E)
+    n_cycles = np.size(capacity_vec)
+    n_edges = len(E[1])
+    n_nodes = len(E)
+
+    offset_c = 0
+    offset_k = n_edges*n_cycles
+    offset_o = n_cycles*n_edges + n_cycles*n_nodes
+    offset_a = 2*n_nodes*n_cycles + n_edges*n_cycles   # number of columns in matrix A1+A2+A3, variables X, K, O
 
     # Full A MATRIX
-    # CONSTRAINT IV - UPDATED - there is od number of edges on cycles
+    # CONSTRAINT IV - UPDATED - there is od number of n_edges on cycles
     # the right side of the equation should be zeros(n_edges*n_cycles + n_vert*n_cycles)
-    # b variables = size([C])= n_cycles*n_edges + n_cycles*n_nodes
+    # b variables = size([capacity_vec])= n_cycles*n_edges + n_cycles*n_nodes
 
-    size = 2*nodes*V + nodes*V + edges*V
-    size1 = nodes * V + edges *V 
-    A1 = np.zeros((size, size1))
-    b1 = []
-    for i in range (0, 3*nodes*V+edges*V):
-        b1.append(0)
-    for k in range (0, V):
-        for i in range (0, nodes):
-            for j in range (0, edges):
-                #A1[i*V+k,j]=E[2*i*edges+k*edges+j]
-                A1[k*nodes+i,j+k*edges] = E[i][j]
-                A1[nodes*V+k*nodes+i,j+k*edges] = -E[i][j]
-                A1[k*nodes+i,edges*V+k*nodes+i] = -2
-                A1[nodes*V+k*nodes+i,edges*V+k*nodes+i] = 2
-                A1[2*nodes*V+k*nodes+i,edges*V+k*nodes+i] = -1
-                #A1[3*nodes*V+k*nodes+i,edges*V+k*nodes+i] = -1
-    for k in range (0, V):  
-        for j in range (0, edges):
-            A1[3*nodes*V+k*edges+j,k*edges+j] = -1
-    #print(str('\\n'.join(' '.join([str(int(val)) for val in row]) for row in A1)))
+    rows_A1 = 2*n_nodes*n_cycles + n_nodes*n_cycles + n_edges*n_cycles
+    cols_A1 = n_nodes * n_cycles + n_edges *n_cycles
+
+    A1 = np.zeros((rows_A1, cols_A1))
+    b1 = [0 for _ in range(rows_A1)]
+
+    offset_block0 = 0
+    offset_block1 = n_nodes*n_cycles
+    offset_block2 = 2*n_nodes*n_cycles
+    offset_block3 = 3*n_nodes*n_cycles
+
+    for k in range (n_cycles):
+        for i in range (n_nodes):
+            for j in range (n_edges):
+                # C_kj * E_ij - 2K_ki == 0
+                A1[offset_block0 + k*n_nodes + i, offset_c + k*n_edges + j] = E[i][j]
+                A1[offset_block1 + k*n_nodes + i, offset_c + k*n_edges + j] = -E[i][j]
+                A1[offset_block0 + k*n_nodes + i, offset_k + k*n_nodes + i] = -2
+                A1[offset_block1 + k*n_nodes + i, offset_k + k*n_nodes + i] = 2
+                # K_ki >= 0
+                A1[offset_block2 + k*n_nodes + i, offset_k + k*n_nodes + i] = -1
+
+    for k in range (0, n_cycles):
+        for j in range (0, n_edges):
+            # C_kj >= 0
+            A1[offset_block3 + k*n_edges+j, offset_c + k*n_edges + j] = -1
 
     # CONSTRAINT II - A2 - the number of packets delivered on the node is equal to all total demand on the node
-    #number of rows: 2 * num. of nodes
-    #number of columns: num. nodes * num. of cycles
+    #number of rows: 2 * num. of n_nodes
+    #number of columns: num. n_nodes * num. of cycles
     # variables Oki
-    # B vector = [D, -D]
-    b2 = D + [-val for val in D]
-    for i in range (0, V*nodes):
-        b2.append(0)
-    sizeA2= 2*nodes + nodes*V
-    sizeA21= nodes*V
-    A2 = np.zeros((sizeA2, sizeA21))
-    for i in range (0, nodes):
-        for k in range (0, V):
-                A2[i,i+nodes*k]=1
-                A2[i+nodes,i+nodes*k]=-1
-                A2[i*V+2*nodes+k,i*V+k]=-1
+    # B vector = [dispatch_vec, -dispatch_vec]
+    b2 = dispatch_vec + [-val for val in dispatch_vec] + [0 for _ in range(n_cycles*n_nodes)]
+
+    rows_A2= 2*n_nodes + n_nodes*n_cycles
+    cols_A2= n_nodes*n_cycles
+    A2 = np.zeros((rows_A2, cols_A2))
+    for i in range (0, n_nodes):
+        for k in range (0, n_cycles):
+                A2[i, n_nodes*k + i]=1
+                A2[i+n_nodes, n_nodes*k + i]=-1
+                A2[i*n_cycles+2*n_nodes+k, i*n_cycles + k]=-1
 
     #CONSTRAINT III A3 matrix: sum of load on each vehicles must not exceed vehicle load capacity
     # variables Oki
-    sizeA3=V
-    sizeA31=V*nodes
-    #constants
-    b3=C.copy()
+    rows_A3 = n_cycles
+    cols_A3 = n_cycles*n_nodes
+    b3 = capacity_vec.copy()
     b23=b2+b3
 
-    A3 = np.zeros((sizeA3, sizeA31))
-    for k in range (0, V):                                  # for each vehicle
-        for i in range (0, nodes):                         #take the sum of load on enach node (sum on Ow variables)
-            #print(\"j\", j+i*V)       
-            A3[k,i+k*nodes]=1
-    # A23 - concatenating A2 and A3
+    A3 = np.zeros((rows_A3 , cols_A3 ))
+    for k in range (0, n_cycles):                                  # for each vehicle
+        for i in range (0, n_nodes):                         #take the sum of load on enach node (sum on Ow variables)
+            A3[k,i+k*n_nodes]=1
     A23=A2
     for i in range (0, len(A3)):
         A23=np.vstack([A23, A3[i,:]])
     #print(str('\\n'.join(' '.join([str(int(val)) for val in row]) for row in A23)))
 
-    #CONSTRAINT I - total number of all packets delivered is equal to summ of all D
+    #CONSTRAINT I - total number of all packets delivered is equal to summ of all dispatch_vec
+    n_vars = 2*n_nodes*n_cycles + n_edges*n_cycles   # number of columns in matrix A1+A2+A3, variables X, K, O
+    n_slacks= n_cycles * n_edges * n_nodes
 
-    size1= 2*nodes*V + edges*V   # number of columns in matrix A1+A2+A3, variables X, K, O
-    size2= V*edges*nodes         # number of additional columns in matrix A41, variables Aijk
-    # b vector = d (sum of all parcels). size = 1; D_all = np.sum(D)
+    cols_A4= n_vars + n_slacks
 
     # constraint 4.1. SUM for ijk -> (Eij * Aijk)
-    A41 = np.zeros((1, size1+size2))
-    l=0
-    for i in range (0, nodes):              # itteration by node in E 
-        for j in range (0, edges):         # itteration by edges in E
-            for k in range (0, V):
-                A41[0,(size1+l)]=-(E[i][j])
-                #print(size1+l)
-                l=l+1
-    # Adding constraints 4.2.: Aijk - Cki*di <= 0 
-    size1= V * edges * nodes   
-    size2= 2*V*nodes + V*edges + V*nodes*edges
-    #b vector = [0,0,...0], size = nodes* edges * V
-    offsetA4=0
-    A42 = np.zeros((size1, size2))
-    for i in range (0, nodes):
-        for j in range (0,edges): 
-            for k in range (0, V):
-                A42[i*edges*V+j*V+k, edges*k+j]=-D[i]
-                #print(i*edges*V+j*V+k, edges*k+j)
-                A42[i*edges*V+j*V+k, 2*V*nodes + V*edges + i*edges*V+j*V+k]=1
-    #constraint 4.3.: Aijk - Oki <= 0
-    cycles=V
-    size1= cycles * edges + 2*nodes*cycles + cycles*edges*nodes   
-    size= V*nodes*edges
-    A43 = np.zeros((size, size1))
-    #b vector = [0,0,...0], size = 
+    A41 = np.zeros((n_cycles, n_vars + n_slacks))
+    for k in range(n_cycles):
+        for i in range(n_nodes):
+            A41[k, offset_o + k*n_nodes + i] = 2
+            for j in range(n_edges):
+                # print('(ijk) = ' + str((i,j,k)))
+                A41[k, offset_a + i*n_edges*n_cycles + j*n_cycles + k] = -E[i][j]
 
-    #offset= V*nodes+V*edges
-    #offset1= 2*V*nodes+V*edges
+    # Adding constraints 4.2.: Aijk - Cki*di <= 0 
+    #b vector = [0,0,...0], size = n_nodes* n_edges * n_cycles
+    offsetA4=0
+    A42 = np.zeros((n_slacks, cols_A4))
+    for i in range (0, n_nodes):
+        for j in range (0,n_edges):
+            for k in range (0, n_cycles):
+                A42[i*n_edges*n_cycles+j*n_cycles+k, n_edges*k+j]=-dispatch_vec[i]
+                A42[i*n_edges*n_cycles+j*n_cycles+k, 2*n_cycles*n_nodes + n_cycles*n_edges + i*n_edges*n_cycles+j*n_cycles+k]=1
+
+    #constraint 4.3.: Aijk - Oki <= 0
+    A43 = np.zeros((n_slacks, cols_A4))
+
     offset=0
-    offset1=edges*V+nodes*V
-    offset2=edges*V+2*nodes*V
-    for i in range (0, nodes):
-        for j in range (0, edges):
-            for k in range (0, V):       
-                #print (offset+i*edges*V+j*V+k, offset1 + nodes*k+i)
-                A43[offset+i*edges*V+j*V+k, offset1 + nodes*k+i]=-1
-                A43[offset+i*edges*V+j*V+k,offset2+i*edges*V+j*V+k]=1           
-    #concatenate A4 matrix
+    offset1=n_edges*n_cycles+n_nodes*n_cycles
+    offset2=n_edges*n_cycles+2*n_nodes*n_cycles
+    for i in range (0, n_nodes):
+        for j in range (0, n_edges):
+            for k in range (0, n_cycles):
+                #print (offset+i*n_edges*n_cycles+j*n_cycles+k, offset1 + n_nodes*k+i)
+                A43[offset+i*n_edges*n_cycles+j*n_cycles+k, offset1 + n_nodes*k+i]=-1
+                A43[offset+i*n_edges*n_cycles+j*n_cycles+k,offset2+i*n_edges*n_cycles+j*n_cycles+k]=1
+
     A4=A41.copy()
-    for i in range (0, len(A42)):
+    print('len(A42): ' + str(len(A42)) + ' == ' + str(n_slacks))
+    for i in range (0, n_slacks):
         A4=np.vstack([A4, A42[i,:]])
     for i in range (0, len(A43)):
         A4=np.vstack([A4, A43[i,:]])
 
-    b4=[-2*np.sum(D)]
-    for i in range (0, (2*V*nodes*edges)):
+    b4 = [0 for _ in range(n_cycles)]
+    # b4=[-2*np.sum(dispatch_vec)]
+    for _ in range(2*n_cycles*n_nodes*n_edges):
         b4.append(0)
+
+    print('A4:')
+    for row in A4:
+        print(','.join([str(val) for val in row]))
+    # print('A4=\n' + str(A4))
+    print('b4=\n' + str(b4))
 
     # FINAL MATRIX  - A with all constraints
     #concatenate A1 and A23 = A matrix
@@ -141,60 +147,43 @@ def vrp(graph,D,C):
         A123=np.vstack([A123, A23extend[i,:]])
 
     #Final concate A123 & A4
-    A123extend = np.c_[A123, np.zeros((len(A123), nodes*edges*V))]
+    A123extend = np.c_[A123, np.zeros((len(A123), n_nodes*n_edges*n_cycles))]
     A=A123extend.copy()
     for i in range (0, len(A4)):
         A=np.vstack([A, A4[i,:]])
     b=b1+b23+b4
     non_zero_rows = np.count_nonzero((A != 0).sum(1)); zero_rows = len(A) - non_zero_rows
-    #print (\"number of zero rows in A matirx =\", zero_rows)
-    #print (\"number of variables in A =\", len(A[1]))
-    #print (\"number of constraints in A =\", len(A))           
+
+    print('A:')
+    for row in A:
+        print(','.join([' ' + str(int(val)) for val in row]))
+    # print('A4=\n' + str(A4))
+    print('b=\n' + str(b))
 
     # CREATE VARIABLES  X - vector with c11-cnn variables
-    # vsak vektor v matriki X1n = dolžine len(E). 
-    #Skupno število vseh vektorjev X1n = len (Et)
-    #X variables X[0] to X[len(E) * V -1] -  variables in objective function 
-    #K - X[len(E) * V] to X[len(E) * V + len(A1) -1]  slack variables
-    #Ow - cycles load dispatch variables - X[len(E) * V + len(Et)*V*2] to X[len(E) * V + len(Et)*V*3 -1 ] 
+    #X variables X[0] to X[len(E) * n_cycles -1] -  variables in objective function 
+    #K - X[len(E) * n_cycles] to X[len(E) * n_cycles + len(A1) -1]  slack variables
+    #Ow - cycles load dispatch variables - X[len(E) * n_cycles + len(Et)*n_cycles*2] to X[len(E) * n_cycles + len(Et)*n_cycles*3 -1 ] 
 
-    # C variables
-    X1 = []
-    for i in range (0, edges*V):
-        var='x'+str(i)
-        X1.append(var)
-
+    # capacity_vec variables
+    C = ['C_' + str(k) + '_' + str(j) for k in range(n_cycles) for j in range(n_edges)]
     #K variables
-    K = []
-    for j in range (0, V*nodes):
-        #creating vector with K variables
-        var='k'+str(j)
-        K.append(var)
-
+    K = ['K_' + str(k) + '_' + str(i) for k in range(n_cycles) for i in range(n_nodes)]
     #\"Ow\" variables
-    Ow = []
-    for j in range(0, V*nodes):   # numer of vehicles 
-        var='Ow'+str(j)
-        Ow.append(var)
+    Ow = ['O_' + str(k) + '_' + str(i) for k in range(n_cycles) for i in range(n_nodes)]
 
     #\"Aijk\" variables
     Aijk = []
-    for i in range (0,nodes):
-        for j in range(0, edges):   # numer of vehicles 
-            for k in range (0, V):
-                var='A'+str(i)+str(j)+str(k)
-                Aijk.append(var)
+    for i in range (n_nodes):
+        for j in range(n_edges):   # numer of vehicles 
+            for k in range (n_cycles):
+                Aijk.append('A_' + str(i) + '_' + str(j) + '_' + str(k))
 
     #Final X vector with all variables
-    X=X1.copy()
-    for i in range (0,len(K)):
-        X.append(K[i])
-    for j in range (0,len(Ow)):
-        X.append(Ow[j])
-    for ijk in range (0,len(Aijk)):
-        X.append(Aijk[ijk])
+    X = C + K + Ow + Aijk
+
     print("number of all variables =", len(X))
-    print("number of C variables =", len(X1))
+    print("number of capacity_vec variables =", len(C))
     print("number of K variables =", len(K))
     print("number of O variables =", len(Ow))
     print("number of Aijk variables =", len(Aijk))
@@ -202,30 +191,23 @@ def vrp(graph,D,C):
     #Declaring the solver
     solver = pywraplp.Solver('SolveIntegerProblem',
                                pywraplp.Solver.CBC_MIXED_INTEGER_PROGRAMMING)
-    x_min = -solver.infinity()                   # lower variables border 
+    x_min = 0.0                   # lower variables border 
     x_max = solver.infinity()                  # Upper variables border                        
 
     variables = []
-
-    for varN, xi_name in enumerate(X1):                          # declaring objective variables [C1.... Cn]
-        variables.append(solver.IntVar(0.0, x_max, xi_name))
-
+    for varN, xi_name in enumerate(C):                          # declaring objective variables [C1.... Cn]
+        variables.append(solver.IntVar(x_min, x_max, xi_name))
     for varN, xi_name in enumerate(K):                          # declaring slack variables
-        variables.append(solver.IntVar(0.0, x_max, xi_name))
-
+        variables.append(solver.IntVar(x_min, x_max, xi_name))
     for varN, xi_name in enumerate(Ow):                          # declaring load doispatch variables
-        variables.append(solver.NumVar(0.0, x_max, xi_name))
-
+        variables.append(solver.NumVar(x_min, x_max, xi_name))
     for varN, xi_name in enumerate(Aijk):                          # declaring load doispatch variables
-        variables.append(solver.NumVar(0.0, x_max, xi_name))
+        variables.append(solver.NumVar(x_min, x_max, xi_name))
 
-    #print('Number of variables created =', solver.NumVariables())
-        #for variable in variables:
-            #print('%s = %d' % (variable.name(), variable.solution_value())
+    for varN, var in enumerate(variables):
+        print('var ' + str(varN) + ': ' + str(var))
 
-        #DECLARE CONSTRAINTS
-    #b = np.zeros((1, len(A)))
-
+    #DECLARE CONSTRAINTS
     for rowN, row in enumerate(A):
         left_side = None
         for colN, coeff in enumerate(row):
@@ -242,43 +224,58 @@ def vrp(graph,D,C):
             #solver.Add(left_side <= t[0,rowN])
             solver.Add(left_side <= b[rowN])
 
-    #print('Number of constraints added =', solver.NumConstraints())
-
     # DECLARE OBJECTIVE FUNCTION & INVOKE THE SOLVER
+    print(str(C));
     cost = None
-    coeffs = [1.0 for _ in X1]
-    #coeffs[3] = 100: coeffs[8] = 100: coeffs[1] = 100: coeffs[6] = 100
-    for i in range (0, len(X1)):
-        cost = variables[i]*coeffs[i] if i == 0 else cost + variables[i]*coeffs[i]
-    solver.Minimize(cost)
+    coeffs = [1.0 for _ in C]
+    print('coeffs: ' + str(coeffs))
 
+    #coeffs[3] = 100: coeffs[8] = 100: coeffs[1] = 100: coeffs[6] = 100
+    for coeffN in range (len(C)):
+        cost = variables[offset_c + coeffN]*coeffs[offset_c + coeffN] if coeffN == 0 else cost + variables[offset_c + coeffN]*coeffs[offset_c + coeffN]
+
+    # run the optimization and check if we got an optimal solution
+    solver.Minimize(cost)
     result_status = solver.Solve()
-    # Check if the problem has an optimal solution.
     assert result_status == pywraplp.Solver.OPTIMAL
 
-    objective = solver.Objective().Value()
+    obj_val = solver.Objective().Value()
 
+    for varN, var in enumerate(variables):
+        print('var ' + str(varN) + ': ' + str(var) + ' = ' + str(var.solution_value()))
 
-    routes = []; Omatrix = [];
-    edges_by_2 = int(edges / 2)
-    for k in range (0,V):
-        #print(\"cycle\", k)
+    print('variables: ' + '\n'.join([str(val) + ' = ' + str(val.solution_value()) for val in variables]))
+
+    routes = [];
+    Omatrix = [];
+
+    edges_by_2 = int(0.5*n_edges)
+    for k in range(n_cycles):
         C_row = []
-        for j in range (0, edges_by_2):
-            #print(X[edges*k+j], variables[edges*k+j].solution_value())     
-            val1 = variables[edges*k+j].solution_value()
-            val2 = variables[edges*k+edges_by_2+j].solution_value()
+        for j in range(edges_by_2):
+            idx1 = offset_c + n_edges*k + j
+            idx2 = offset_c + edges_by_2 + n_edges*k + j
+
+            var1 = variables[idx1]
+            var2 = variables[idx2]
+
+            val1 = var1.solution_value()
+            val2 = var2.solution_value()
+
+            print(str(var1) + ' = ' + str(val1))
+            print(str(var2) + ' = ' + str(val2))
+
             C_row.append(val1 + val2)
         routes.append(C_row)
 
-    for k in range (0,V):
+    for k in range (0,n_cycles):
         O_row = []
-        for i in range (0, nodes):
-            O_row.append(variables[V*edges + nodes*k+i].solution_value())
+        for i in range (0, n_nodes):
+            O_row.append(variables[offset_o + n_nodes*k + i].solution_value())
         Omatrix.append(O_row)
 
     #return function - results
-    return routes, Omatrix
+    return routes, Omatrix, obj_val
 
 
 class VrpTest(unittest.TestCase):
@@ -294,10 +291,12 @@ class VrpTest(unittest.TestCase):
             [1, 0, 0, 1],
             [1, 1, 0, 0],
             [0, 1, 1, 0],
-            [0, 0, 1, 1]]
+            [0, 0, 1, 1]
+        ]
 
-        route_mat, dispatch_mat = vrp(graph, dispatch_vec, capacity_vec)
+        route_mat, dispatch_mat, obj_val = vrp(graph, dispatch_vec, capacity_vec)
 
+        print('obj val: ' + str(obj_val))
         print("routes:")
         for row in route_mat:
             print(str(row))
@@ -305,8 +304,12 @@ class VrpTest(unittest.TestCase):
         for row in dispatch_mat:
             print(str(row))
 
+        assert obj_val == 4
+        assert sum(route_mat[0]) == 2
+        assert sum(route_mat[1]) == 2
         assert sum(dispatch_mat[0]) == 4
         assert sum(dispatch_mat[1]) == 3
+
 
 if __name__ == '__main__':
     unittest.main()
