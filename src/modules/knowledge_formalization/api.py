@@ -3,6 +3,7 @@ from flask_restful import Api
 from flask import request
 
 import time
+import json
 
 from db import Database
 
@@ -58,7 +59,7 @@ def get_new_concepts():
 
     # store request to the database and return ID of inserted row
     row_id = database.execute("INSERT INTO concepts (id, timestamp, alpha, concepts) "
-                              "VALUES (DEFAULT, %s, %s, %s) RETURNING id", (timestamp, alpha, value), True)
+                              "VALUES (DEFAULT, %s, %s, %s) RETURNING id;", (timestamp, alpha, value), True)
     # error inserting into database
     if row_id is None:
         return "Error processing/storing request into the database."
@@ -106,13 +107,22 @@ def generate_new_initial_concepts():
     if not isinstance(payload, list) or not payload:
         return 'Value of key concepts should be non empty array'
 
-    # go through the array and check if each key is a string
-    for word in payload:
-        # TODO check if variable is string and return message with result false if not
-        print(type(word))
+    # map unicode words to strings
+    payload = map(str, payload)
 
-    return str(payload)
+    # store payload as json object
+    json_obj = json.dumps(payload)
 
+    # get current timestamp
+    timestamp = int(round(time.time()))
+    # store to the database and return row_id
+    row_id = database.execute("INSERT INTO initial_concepts (id, timestamp, processed, concepts) "
+                              "VALUES (DEFAULT, %s, FALSE, %s) RETURNING id;", (timestamp, json_obj), True)
+
+    # create response as json object
+    response = {'stored': 'success', 'id': row_id}
+
+    return response
 
 
 if __name__ == '__main__':

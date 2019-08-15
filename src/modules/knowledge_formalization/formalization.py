@@ -168,13 +168,20 @@ def calc_neighbourhood(matrix_J,
     result_array_idx = -1
     for eigenValueIdx in range(len(eigenvalues)):
         value = eigenvalues[eigenValueIdx].real
-
         if is_close(value, 1.0):
             result_array_idx = eigenValueIdx
             break
     if result_array_idx == -1:
         print("No EigenValue 1.0 in received eigenvalues. Exiting program...")
-        exit(3)
+
+        # return result false with a reason
+        json_resp = {}
+        json_resp["success"] = False
+        json_resp["reason"] = "Eigenvalue calculated from matrix is not 1."
+        resp = json.dumps(json_resp)
+
+        return resp
+
     print("extracted eigenvectors successfully")
 
     # only keep real value
@@ -325,6 +332,8 @@ def create_id_string_map(default_concept_file,
             np.savetxt(fp, data, delimiter='\t', fmt=['%s', '%s'])
     else:
         print("no concept id file or json dump, cannot proceed")
+        if apiProcess is not None:
+            kill(apiProcess.pid)
         exit(1)
 
 
@@ -448,6 +457,8 @@ def create_concept_mappings_dict(default_concept_mapping_file,
         print("storing new ID -> transitions hashmap for both transitions to json dump completed")
     else:
         print("no concept mapping file or json dump, cannot proceed")
+        if apiProcess is not None:
+            kill(apiProcess.pid)
         exit(2)
 
     if should_return_old_new_id_map:
@@ -535,11 +546,8 @@ def extract_concept_ids(id_string_file_path, words):
 
                 # this word is in a list of words, that we received as new initial concepts ->
                 # save ID (column 0) to array of IDs
-                # TODO check if this works 100% (so that it only recognizes same string as equal)
                 if string.lower() in words:
                     concept_ids.append(int(split[0]))
-
-    print(concept_ids)
 
     return concept_ids
 
@@ -576,14 +584,14 @@ if __name__ == '__main__':
                           "timestamp BIGINT NOT NULL, "
                           "alpha REAL NOT NULL,"
                           "concepts INT NOT NULL,"
-                          "result jsonb)")
+                          "result jsonb);")
 
     # create table that will be used for storing new concepts (used for recreating matrix J)
     database.create_table("CREATE TABLE IF NOT EXISTS initial_concepts ("
                           "id serial PRIMARY KEY NOT NULL, "
                           "timestamp BIGINT NOT NULL, "
                           "processed BOOLEAN NOT NULL DEFAULT FALSE, "
-                          "concepts jsonb)")
+                          "concepts jsonb);")
 
     # start API as subprocess
     apiProcess = subprocess.Popen(["python", "api.py"])
@@ -605,7 +613,7 @@ if __name__ == '__main__':
     matrix_dimension = len(concept_mappings)
 
     # initial concepts -> hardcoded IDs based on the strings given
-    # ""car", "motorhome", "bicycle", "truck", "caravan"
+    # "car", "motorhome", "bicycle", "truck", "caravan"
     initial_concepts = [59328, 115417, 262446, 382724, 524266]
 
     # create matrix that contains transition probabilities from each concept back to initial concept
@@ -626,21 +634,19 @@ if __name__ == '__main__':
 
         # query not processed requests for generating new initial concepts
         available_concepts_result = database.query("SELECT id, concepts FROM initial_concepts WHERE NOT processed;")
-        print(available_concepts_result)
 
         # new request for updating initial concepts
         if available_concepts_result:
-
             print("==================================================================")
             print("     PROCESSING NEW REQUEST FOR GENERATING NEW INITIAL IDs")
             print("==================================================================")
 
             id = available_concepts_result[0][0]
-            json_obj = available_concepts_result[0][1]
-
             # extract array of concepts, it should like something like ->
             # ['car', 'motorhome', 'ship', 'moon', 'sun', 'idea']
-            concepts_arr = json_obj["concepts"]
+            concepts_arr = available_concepts_result[0][1]
+
+            print("Processing request with ID", id, "new concepts", concepts_arr)
 
             # extract new concept IDs from given words
             new_concept_ids = extract_concept_ids(id_string_file_path, concepts_arr)
@@ -661,6 +667,8 @@ if __name__ == '__main__':
                 print("           NEW MATRIX J FROM NEW CONCEPT IDs JUST CREATED")
                 print("==================================================================")
 
+                print("Finished processing request with ID", id)
+
                 # update database
                 database.execute("UPDATE initial_concepts SET processed = %s where id = %s;", (True, id))
 
@@ -669,7 +677,7 @@ if __name__ == '__main__':
                 one_day_ago = round(time.time() - (24 * 60 * 60))
                 database.execute("DELETE FROM initial_concepts WHERE timestamp < %s;", (one_day_ago,))
         else:
-            print("no new request for updating initial concepts at", round(time.time()))
+            print("No task for calculating new initial concepts at", round(time.time()))
 
         ##################################################################################
         #                      CHECKING IF NEW TASK IS AVAILABLE FOR PROCESSING
@@ -678,7 +686,7 @@ if __name__ == '__main__':
         # query database for next task
         result = database.query("SELECT id, alpha, concepts FROM concepts WHERE result IS NULL")
         if not result:
-            print("No task at", round(time.time()))
+            print("No task at for calculating similar concepts at", round(time.time()))
             # no task ahead, just wait for 10 seconds
             time.sleep(10)
             continue
@@ -688,6 +696,8 @@ if __name__ == '__main__':
         alpha = result[0][1]
         new_concepts_number = result[0][2]
 
+        print("Processing request with ID", id, "alpha", alpha, "number of concepts", new_concepts_number)
+
         # calculate neighbourhood and store result into database
         result = calc_neighbourhood(matrix_J,
                                   initial_concepts,
@@ -696,6 +706,7 @@ if __name__ == '__main__':
                                   new_concepts_number,
                                   alpha)
 
+        print("Finished processing request with ID", id)
 
         # insert result into database
         database.execute("UPDATE concepts SET result = %s WHERE id = %s;", (result, id))
@@ -703,5 +714,3 @@ if __name__ == '__main__':
         # remove requests that are at least 1 day old from the database
         one_day_ago = round(time.time() - (24 * 60 * 60))
         database.execute("DELETE FROM concepts WHERE timestamp < %s;", (one_day_ago,))
-
-        print("Finished processing request with ID:", id)
