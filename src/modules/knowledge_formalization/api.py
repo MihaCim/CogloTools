@@ -52,6 +52,9 @@ def get_new_concepts():
     if alpha < 0 or alpha > 1:
         return 'Alpha parameter must be between 0 and 1.'
 
+    if value <= 0:
+        return "Number of new concepts must be more than 0."
+
     # get current timestamp
     timestamp = int(round(time.time()))
     # round value to integer
