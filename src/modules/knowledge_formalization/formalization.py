@@ -147,11 +147,11 @@ def calc_neighbourhood(matrix_J,
                        matrix_P,
                        id_string_txt_path,
                        number_of_wanted_concepts,
-                       alfa):
+                       alpha):
     # method calculates neighbourhood based on concept mappings and initial concepts
 
     print("creating P1 matrix from matrix P and matrix J")
-    matrix_P1 = csc_matrix(((1 - alfa) * matrix_P) + ((alfa / float(len(entry_concepts))) * matrix_J))
+    matrix_P1 = csc_matrix(((1 - alpha) * matrix_P) + ((alpha / float(len(entry_concepts))) * matrix_J))
     print("matrix P1 created")
 
     print("Transposing matrix P1...")

@@ -8,7 +8,7 @@ if __name__ == '__main__':
     #   THAT MEANS THAT ONLY FIRST MAX_INDEX INDICES WILL BE VALID
     ######################################################################################
 
-    MAX_INDEX = 1000000
+    MAX_INDEX = 2000000
 
     # the following lines extract only first MAX_INDEX strings and ids
     default_concept_string_file = './linkGraph-en-verts.txt'
