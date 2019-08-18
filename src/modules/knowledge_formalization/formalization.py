@@ -675,7 +675,7 @@ if __name__ == '__main__':
         # new request for updating initial concepts
         if available_concepts_result:
             print("==================================================================")
-            print("     PROCESSING NEW REQUEST FOR GENERATING NEW INITIAL IDs")
+            print("     PROCESSING NEW REQUEST FOR GENERATING NEW INITIAL CONCEPTS")
             print("==================================================================")
 
             id = available_concepts_result[0][0]
