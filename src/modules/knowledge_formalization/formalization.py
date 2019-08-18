@@ -168,6 +168,7 @@ def calc_neighbourhood(matrix_J,
     result_array_idx = -1
     for eigenValueIdx in range(len(eigenvalues)):
         value = eigenvalues[eigenValueIdx].real
+        print("Eigenvalue", value)
         if is_close(value, 1.0):
             result_array_idx = eigenValueIdx
             break
@@ -238,6 +239,10 @@ def calc_neighbourhood(matrix_J,
 
         # get line from ID + 1 (because readings starts with 1 and our indices start at 0)
         line = linecache.getline(id_string_txt_path, id + 1).strip()
+        if not line:
+            print("Line at ID", id, "not found. Proceeding with next concept.")
+            continue
+
         split = line.split("\t")
         word = split[1]
 
@@ -269,8 +274,8 @@ def create_id_string_map(default_concept_file,
 
     new_old_id_dict = {}
     if len(old_new_id_dict) != 0:
-        # old_new_id_temp_dict contains the mapping old -> new ID for old concepts that contain transitions
-        # so far we have old -> new and new -> old ID dictionary
+        # old_new_id_dict contains the mapping old -> new ID for old concepts that contain transitions
+        # the following commands just reverses the dictionary, it transforms keys of old -> new dict to new -> old dict
         new_old_id_dict = {v: k for k, v in old_new_id_dict.items()}
 
     if os.path.isfile(id_concept_mapping_txt_dump_path):
@@ -299,18 +304,19 @@ def create_id_string_map(default_concept_file,
                 else:
                     if not split[0].isdigit():
                         continue
+                    new_id = counter
 
                     # append each element after previous one. indices are new IDs, values are old IDs
                     old_id = int(split[0])
 
-                    # if its not in old -> new dictionary, its not in new -> old dictionary
-                    new_id = counter
+                    # old id is already used as a key in old_new dictionary, so new ID is the
+                    # value at position old_id in old_new_id_dict
                     if old_id in old_new_id_dict.keys():
                         new_id = old_new_id_dict[old_id]
                     else:
-                        # add new key to old -> new and new old ID to new -> old, increment counter
+                        # add new key to old -> new dictionary and increment counter
                         old_new_id_dict[old_id] = counter
-                        counter = counter + 1
+                        counter += 1
 
                     # append new values to both arrays
                     ids.append(new_id)
@@ -376,6 +382,10 @@ def create_concept_mappings_dict(default_concept_mapping_file,
     elif os.path.isfile(default_concept_mapping_file):
         print("concept file dump doesnt exist. building new one from file", default_concept_mapping_file)
 
+        # =====================================================================================
+        #          GO THROUGH EACH LINE AND EXTRACT ID AND ID TO WHICH IT CAN TRANSIT
+        # =====================================================================================
+
         #  go through each line and build dictionaries for concept transitions
         with open(default_concept_mapping_file, 'r') as concept_mappings_file:
             for lineN, line in enumerate(concept_mappings_file):
@@ -397,7 +407,7 @@ def create_concept_mappings_dict(default_concept_mapping_file,
                     concept_transition_map[old_id].append(value)
 
                     # if this flag is set, old_id points to value and value also points to old_id
-                    if should_use_both_transitions:
+                    if should_use_both_transitions and value != old_id:
                         concept_transition_map[value].append(old_id)
 
                     # print progress every 10M
@@ -405,32 +415,59 @@ def create_concept_mappings_dict(default_concept_mapping_file,
                         print(lineN / 1000000)
         print("created concept transition dictionary")
 
+
+        # =====================================================================================
+        #                           REMOVE IDS WITHOUT TRANSITION
+        # =====================================================================================
+
         # remove concepts from dictionaries that don't have any transitions
         print("removing concepts that don't have any transitions")
         remove_keys = []
-        for concept in concept_transition_map:
+        for concept in concept_transition_map.keys():
             transitions = concept_transition_map[concept]
             if len(transitions) == 0:
                 remove_keys.append(concept)
         for key in remove_keys:
             # remove elements from both dictionaries
             del concept_transition_map[key]
-
         print("concepts without transitions and their IDs successfully removed")
+
+        # =====================================================================================
+        #               CREATE old_new_id_dict WHICH HAS NEW ID FOR EACH OLD ID
+        # =====================================================================================
 
         print("creating hashmap of old -> new ID")
         # create mapping od old ID to new ID
+        # new IDs are from 0 -> N, with step 1
         old_new_id_dict = {}
         new_id = 0
-        for old_id in concept_transition_map:
+        transitions_array = []
+        # go through all OLD ids (keys)
+        for old_id in concept_transition_map.keys():
+            # get transitions for each key and add them to transition array
+            transitions_array.extend(concept_transition_map[old_id])
+
+            # assign new ID to this key which is unique and increment counter
             old_new_id_dict[old_id] = new_id
             new_id = new_id + 1
+
+        # go through all transitions and give them new IDs if they don't have them already
+        for transition in transitions_array:
+            if transition not in old_new_id_dict.keys():
+                new_id += 1
+                old_new_id_dict[transition] = new_id
+
         print("hashmap of old -> new ID created")
 
-        print("creating hashmap of new ID -> transitions with new ID")
+        del transitions_array
 
+        # =====================================================================================
+        #    FOR EACH NEW ID THAT IS USED AS A KEY, APPEND ALL TRANSITIONS, BUT WITH NEW IDS
+        # =====================================================================================
+
+        print("creating hashmap of new ID -> transitions with new ID")
         counter = 0
-        for old_id in concept_transition_map:
+        for old_id in concept_transition_map.keys():
             # array of transitions but with old ids
             transitions = concept_transition_map[old_id]
 

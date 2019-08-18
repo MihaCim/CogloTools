@@ -4,11 +4,11 @@ import os
 if __name__ == '__main__':
 
     ######################################################################################
-    #   MAKE EIXSTING CONCEPT ID AND CONCEPT STRING FILES FOR TESTTING PURPOSES.
+    #   MAKE EXISTING CONCEPT ID AND CONCEPT STRING FILES FOR TESTTING PURPOSES.
     #   THAT MEANS THAT ONLY FIRST MAX_INDEX INDICES WILL BE VALID
     ######################################################################################
 
-    MAX_INDEX = 2000000
+    MAX_INDEX = 1000000
 
     # the following lines extract only first MAX_INDEX strings and ids
     default_concept_string_file = './linkGraph-en-verts.txt'
@@ -29,14 +29,14 @@ if __name__ == '__main__':
                     if not split[0].isdigit():
                         continue
 
-                    # print progress every 100000 lines
-                    if lineN % 100000 == 0:
+                    # print progress every 1000000 lines
+                    if lineN % 1000000 == 0:
                         print(lineN)
 
                     # append each element after previous one. indices are new IDs, values are old IDs
                     old_id = int(split[0])
 
-                    if old_id > MAX_INDEX:
+                    if old_id >= MAX_INDEX:
                         continue
 
                     # append new values to both arrays
@@ -78,11 +78,11 @@ if __name__ == '__main__':
                     old_id = int(split[0])
                     value = int(split[1])
 
-                    # print progress every 10000 lines
-                    if lineN % 100000 == 0:
+                    # print progress every 1000000 lines
+                    if lineN % 1000000 == 0:
                         print(lineN, "old_id:", old_id, "transition to", value)
 
-                    if old_id > MAX_INDEX or value > MAX_INDEX:
+                    if old_id >= MAX_INDEX or value >= MAX_INDEX:
                         continue
 
                     old_ids.append(old_id)
