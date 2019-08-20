@@ -120,7 +120,7 @@ def vrp(graph_incidence_mat, dispatch_vec, capacity_vec):
                 A43[offset+i*n_edges*n_cycles+j*n_cycles+k,offset2+i*n_edges*n_cycles+j*n_cycles+k]=1
 
     A4=A41.copy()
-    print('len(A42): ' + str(len(A42)) + ' == ' + str(n_slacks))
+    #print('len(A42): ' + str(len(A42)) + ' == ' + str(n_slacks))
     for i in range (0, n_slacks):
         A4=np.vstack([A4, A42[i,:]])
     for i in range (0, len(A43)):
@@ -131,11 +131,11 @@ def vrp(graph_incidence_mat, dispatch_vec, capacity_vec):
     for _ in range(2*n_cycles*n_nodes*n_edges):
         b4.append(0)
 
-    print('A4:')
-    for row in A4:
-        print(','.join([str(val) for val in row]))
+    #print('A4:')
+    #for row in A4:
+    #    print(','.join([str(val) for val in row]))
     # print('A4=\n' + str(A4))
-    print('b4=\n' + str(b4))
+    #print('b4=\n' + str(b4))
 
     # FINAL MATRIX  - A with all constraints
     #concatenate A1 and A23 = A matrix
@@ -154,11 +154,11 @@ def vrp(graph_incidence_mat, dispatch_vec, capacity_vec):
     b=b1+b23+b4
     non_zero_rows = np.count_nonzero((A != 0).sum(1)); zero_rows = len(A) - non_zero_rows
 
-    print('A:')
-    for row in A:
-        print(','.join([' ' + str(int(val)) for val in row]))
+    #print('A:')
+    #for row in A:
+    #    print(','.join([' ' + str(int(val)) for val in row]))
     # print('A4=\n' + str(A4))
-    print('b=\n' + str(b))
+    #print('b=\n' + str(b))
 
     # CREATE VARIABLES  X - vector with c11-cnn variables
     #X variables X[0] to X[len(E) * n_cycles -1] -  variables in objective function 
@@ -182,11 +182,11 @@ def vrp(graph_incidence_mat, dispatch_vec, capacity_vec):
     #Final X vector with all variables
     X = C + K + Ow + Aijk
 
-    print("number of all variables =", len(X))
-    print("number of capacity_vec variables =", len(C))
-    print("number of K variables =", len(K))
-    print("number of O variables =", len(Ow))
-    print("number of Aijk variables =", len(Aijk))
+    #print("number of all variables =", len(X))
+    #print("number of capacity_vec variables =", len(C))
+    #print("number of K variables =", len(K))
+    #print("number of O variables =", len(Ow))
+    #print("number of Aijk variables =", len(Aijk))
 
     #Declaring the solver
     solver = pywraplp.Solver('SolveIntegerProblem',
@@ -204,8 +204,8 @@ def vrp(graph_incidence_mat, dispatch_vec, capacity_vec):
     for varN, xi_name in enumerate(Aijk):                          # declaring load doispatch variables
         variables.append(solver.NumVar(x_min, x_max, xi_name))
 
-    for varN, var in enumerate(variables):
-        print('var ' + str(varN) + ': ' + str(var))
+    #for varN, var in enumerate(variables):
+    #    print('var ' + str(varN) + ': ' + str(var))
 
     #DECLARE CONSTRAINTS
     for rowN, row in enumerate(A):
@@ -225,10 +225,10 @@ def vrp(graph_incidence_mat, dispatch_vec, capacity_vec):
             solver.Add(left_side <= b[rowN])
 
     # DECLARE OBJECTIVE FUNCTION & INVOKE THE SOLVER
-    print(str(C));
+    #print(str(C));
     cost = None
     coeffs = [1.0 for _ in C]
-    print('coeffs: ' + str(coeffs))
+    #print('coeffs: ' + str(coeffs))
 
     #coeffs[3] = 100: coeffs[8] = 100: coeffs[1] = 100: coeffs[6] = 100
     for coeffN in range (len(C)):
@@ -241,10 +241,10 @@ def vrp(graph_incidence_mat, dispatch_vec, capacity_vec):
 
     obj_val = solver.Objective().Value()
 
-    for varN, var in enumerate(variables):
-        print('var ' + str(varN) + ': ' + str(var) + ' = ' + str(var.solution_value()))
+    #for varN, var in enumerate(variables):
+    #    print('var ' + str(varN) + ': ' + str(var) + ' = ' + str(var.solution_value()))
 
-    print('variables: ' + '\n'.join([str(val) + ' = ' + str(val.solution_value()) for val in variables]))
+    #Sprint('variables: ' + '\n'.join([str(val) + ' = ' + str(val.solution_value()) for val in variables]))
 
     routes = [];
     Omatrix = [];
@@ -262,8 +262,8 @@ def vrp(graph_incidence_mat, dispatch_vec, capacity_vec):
             val1 = var1.solution_value()
             val2 = var2.solution_value()
 
-            print(str(var1) + ' = ' + str(val1))
-            print(str(var2) + ' = ' + str(val2))
+            #print(str(var1) + ' = ' + str(val1))
+            #print(str(var2) + ' = ' + str(val2))
 
             C_row.append(val1 + val2)
         routes.append(C_row)
@@ -276,40 +276,3 @@ def vrp(graph_incidence_mat, dispatch_vec, capacity_vec):
 
     #return function - results
     return routes, Omatrix, obj_val
-
-
-class VrpTest(unittest.TestCase):
-
-    def test1(self):
-        #SIMPLE CASE
-        dispatch_vec = [0, 3, 0, 4]
-        capacity_vec = [4, 3]
-
-        #network graph, stopci = povezave 12, 23, 13, vrstice = mesta
-            #LJ,MB,CE,KP
-        graph = [
-            [1, 0, 0, 1],
-            [1, 1, 0, 0],
-            [0, 1, 1, 0],
-            [0, 0, 1, 1]
-        ]
-
-        route_mat, dispatch_mat, obj_val = vrp(graph, dispatch_vec, capacity_vec)
-
-        print('obj val: ' + str(obj_val))
-        print("routes:")
-        for row in route_mat:
-            print(str(row))
-        print("dispatch:")
-        for row in dispatch_mat:
-            print(str(row))
-
-        assert obj_val == 4
-        assert sum(route_mat[0]) == 2
-        assert sum(route_mat[1]) == 2
-        assert sum(dispatch_mat[0]) == 4
-        assert sum(dispatch_mat[1]) == 3
-
-
-if __name__ == '__main__':
-    unittest.main()
