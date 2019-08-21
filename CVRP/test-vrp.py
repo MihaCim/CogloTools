@@ -197,8 +197,7 @@ class TestSum(unittest.TestCase):
 
         dispatch_vec = [11, 22, 33, 44, 55, 66]
         capacity_vec = [80, 80, 80]
-        #network graph, stopci = povezave 12, 23, 13, vrstice = mesta
-        #LJ,MB,CE,KP
+
         graph = [
             [1, 0, 0, 0, 0, 1, 1, 0, 0],
             [1, 1, 0, 0, 0, 0, 0, 1, 1],
