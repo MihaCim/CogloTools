@@ -88,13 +88,13 @@ def vrp(graph_incidence_mat, dispatch_vec, capacity_vec):
     cols_A4= n_vars + n_slacks
 
     # constraint 4.1. SUM for ijk -> (Eij * Aijk)
-    A41 = np.zeros((n_cycles, n_vars + n_slacks))
+    A41 = np.zeros((n_nodes*n_cycles, n_vars + n_slacks))
     for k in range(n_cycles):
         for i in range(n_nodes):
-            A41[k, offset_o + k*n_nodes + i] = 2
+            rowN = i*n_cycles + k
+            A41[rowN, offset_o + k*n_nodes + i] = 2
             for j in range(n_edges):
-                # print('(ijk) = ' + str((i,j,k)))
-                A41[k, offset_a + i*n_edges*n_cycles + j*n_cycles + k] = -E[i][j]
+                A41[rowN, offset_a + i*n_edges*n_cycles + j*n_cycles + k] = -E[i][j]
 
     # Adding constraints 4.2.: Aijk - Cki*di <= 0 
     #b vector = [0,0,...0], size = n_nodes* n_edges * n_cycles
@@ -120,13 +120,12 @@ def vrp(graph_incidence_mat, dispatch_vec, capacity_vec):
                 A43[offset+i*n_edges*n_cycles+j*n_cycles+k,offset2+i*n_edges*n_cycles+j*n_cycles+k]=1
 
     A4=A41.copy()
-    #print('len(A42): ' + str(len(A42)) + ' == ' + str(n_slacks))
     for i in range (0, n_slacks):
         A4=np.vstack([A4, A42[i,:]])
     for i in range (0, len(A43)):
         A4=np.vstack([A4, A43[i,:]])
 
-    b4 = [0 for _ in range(n_cycles)]
+    b4 = [0 for _ in range(n_nodes*n_cycles)]
     # b4=[-2*np.sum(dispatch_vec)]
     for _ in range(2*n_cycles*n_nodes*n_edges):
         b4.append(0)
@@ -231,7 +230,7 @@ def vrp(graph_incidence_mat, dispatch_vec, capacity_vec):
     #print('coeffs: ' + str(coeffs))
 
     #coeffs[3] = 100: coeffs[8] = 100: coeffs[1] = 100: coeffs[6] = 100
-    for coeffN in range (len(C)):
+    for coeffN in range(len(C)):
         cost = variables[offset_c + coeffN]*coeffs[offset_c + coeffN] if coeffN == 0 else cost + variables[offset_c + coeffN]*coeffs[offset_c + coeffN]
 
     # run the optimization and check if we got an optimal solution
@@ -241,13 +240,8 @@ def vrp(graph_incidence_mat, dispatch_vec, capacity_vec):
 
     obj_val = solver.Objective().Value()
 
-    #for varN, var in enumerate(variables):
-    #    print('var ' + str(varN) + ': ' + str(var) + ' = ' + str(var.solution_value()))
-
-    #Sprint('variables: ' + '\n'.join([str(val) + ' = ' + str(val.solution_value()) for val in variables]))
-
-    routes = [];
-    Omatrix = [];
+    routes = []
+    Omatrix = []
 
     edges_by_2 = int(0.5*n_edges)
     for k in range(n_cycles):
@@ -262,15 +256,12 @@ def vrp(graph_incidence_mat, dispatch_vec, capacity_vec):
             val1 = var1.solution_value()
             val2 = var2.solution_value()
 
-            #print(str(var1) + ' = ' + str(val1))
-            #print(str(var2) + ' = ' + str(val2))
-
             C_row.append(val1 + val2)
         routes.append(C_row)
 
-    for k in range (0,n_cycles):
+    for k in range(n_cycles):
         O_row = []
-        for i in range (0, n_nodes):
+        for i in range(n_nodes):
             O_row.append(variables[offset_o + n_nodes*k + i].solution_value())
         Omatrix.append(O_row)
 
