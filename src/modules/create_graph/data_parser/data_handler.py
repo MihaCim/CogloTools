@@ -62,6 +62,24 @@ class DataHandler():
         self.ways = handler.ways
         self.nodes = handler.nodes
 
+        ###
+        print(self.nodes)
+        transformed_ids = {}
+        cnt = 0
+        self.new_nodes = {}
+        for node_id, node_value in self.nodes.items():
+            transformed_ids[node_id] = cnt
+            node_value.id = cnt
+            self.new_nodes[cnt] = node_value
+            cnt += 1
+
+        for way in self.ways:
+            nodes = way.get_all_nodes()
+            way.add_path(transformed_ids[nodes[0]], transformed_ids[nodes[1]])
+        ###
+        self.nodes = self.new_nodes
+
+        print(self.ways)
         nodes_filtered = {}
 
         #in this step we remove nodes which are not connected to road
@@ -86,8 +104,6 @@ class DataHandler():
                 nodesDict[node.id] = SearchNode(node.id, None, None, node.lat, node.lon, node.address)
 
 
-
-
         for key, node in roadNodesAnotated.items():
             edgesDict[node.id] = {}
 
@@ -101,7 +117,6 @@ class DataHandler():
             tmpD = edgesDict[way.ids[1]]
             tmpD[way.ids[0]] = {"weight": way.distance}
             edgesDict[way.ids[1]] = tmpD
-            
 
         self.modified_ways = edgesDict
         self.modified_nodes = nodesDict

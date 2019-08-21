@@ -63,9 +63,6 @@ def drawStaticGraph(nodes, ways, results):
 
     for key, value in ways.items():
         for kc, vc in value.items():
-            print(value)
-            print(vc)
-
             G.add_edge(key, kc, weight=vc['weight'])
 
     import matplotlib.pyplot as plt
@@ -208,8 +205,10 @@ def syntic_graph2_constraction():
 
 def run():
 
-    osmHandler = DataHandler("modules/create_graph/data/slovenia-latest.osm",
-                             'modules/create_graph/data/List of Postal Offices (geographical location).csv')
+    osmHandler = DataHandler("modules/create_graph/data/split_export.osm",
+                             {'si':'modules/create_graph/data/List of Postal Offices (geographical location).csv',
+                              'hr':'modules/create_graph/data/PU_Geokoordinate.csv'
+                               })
     G = osmHandler.graph_viz()
     roadNodes = osmHandler.modified_nodes
     roadWays = osmHandler.modified_ways
@@ -218,18 +217,19 @@ def run():
         if v.is_post:
             map_posts_to_nodes[v.post_id] = k
             print("Post_id: " + str(v.post_id) + " node_id" + str(k))
+
     postNode = {}
     postEdge = {}
     tmpRes = []
+
     finder = NeighboursFinder(G)
+
     for postId, nodeId in map_posts_to_nodes.items():
-        #finder = NeighboursFinder()
-        #roadNodes, roadWays = syntic_graph2_constraction()
-        #postId = 'A0'
-        #nodeId = 0
-        res = finder.search_near_posts(roadNodes, roadWays, nodeId, 1.5)
+        #('A7', 1636600227)
+       #finder = NeighboursFinder()
+
+        res = finder.search_near_posts(roadNodes, roadWays, nodeId, 1.3)
         print('PostID ' + str(postId) + ' Node: ' + str(nodeId) + ' r: ' + str(res))
-        #drawStaticGraph(roadNodes, roadWays, res)
 
         tmpRes.append((postId, nodeId, res))
         for res_id, res_dist in res:
@@ -258,6 +258,7 @@ def run():
     f = open("post_edge.json", "w")
     f.write(json_str)
     f.close()
+
     # w = csv.writer(open("edge.csv", "w"))
     # for key, val in postNode.items():
     #    w.writerow([key, val])
