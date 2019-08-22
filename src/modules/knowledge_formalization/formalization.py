@@ -175,9 +175,7 @@ def calc_neighbourhood(matrix_J,
         print("No EigenValue 1.0 in received eigenvalues. Exiting program...")
 
         # return result false with a reason
-        json_resp = {}
-        json_resp["success"] = False
-        json_resp["reason"] = "Eigenvalue calculated from matrix is not 1."
+        json_resp = {"success": False, "reason": "Eigenvalue calculated from matrix is not 1."}
         resp = json.dumps(json_resp)
 
         return resp
@@ -185,8 +183,8 @@ def calc_neighbourhood(matrix_J,
 
     # only keep real value
     print("converting vectors to keep only real values")
-    resultArray = vectors.real
-    resultArray = resultArray.T[result_array_idx]
+    result_array = vectors.real
+    result_array = result_array.T[result_array_idx]
 
     # remove unused variables from memory
     del eigenvalues
@@ -195,39 +193,21 @@ def calc_neighbourhood(matrix_J,
     del transposed
     del result_array_idx
 
-    # get rid of possible numerical error -> if value is less than 0, set it to zero
-    # corrected_array = []
-    # array_sum = 0
-    # for value in resultArray:
-    #     if value < 0:
-    #         value = 0
-    #     corrected_array.append(value)
-    #     array_sum = array_sum + value
-    #
-    # # all values should sum up to ONE
-    # normalizedArray = []
-    # for value in corrected_array:
-    #     if value == 0:
-    #         normalizedArray.append(value)
-    #     else:
-    #         new_value = value / array_sum
-    #         normalizedArray.append(new_value)
-
     array_sum = 0
-    for value in resultArray:
+    for value in result_array:
         array_sum = array_sum + value
 
     # all values should sum up to ONE
-    normalizedArray = []
-    for value in resultArray:
+    normalized_array = []
+    for value in result_array:
         if value == 0:
-            normalizedArray.append(value)
+            normalized_array.append(value)
         else:
             new_value = value / array_sum
-            normalizedArray.append(new_value)
+            normalized_array.append(new_value)
 
     # if any normalized value is less than -10e-7, we throw error and exit
-    for normalized_value in normalizedArray:
+    for normalized_value in normalized_array:
         if normalized_value < -10e-7:
             print("Normalized probability is less than -10e-7.", normalized_value, "Exiting API and program now...")
             if apiProcess is not None:
@@ -236,8 +216,8 @@ def calc_neighbourhood(matrix_J,
 
     print("creating array of similar concepts")
     similar_concepts = {}
-    for concept_id in range(len(normalizedArray)):
-        value = normalizedArray[concept_id]
+    for concept_id in range(len(normalized_array)):
+        value = normalized_array[concept_id]
 
         # if ID is not the same as initial concept, extract the value
         if concept_id not in entry_concepts:
@@ -739,7 +719,8 @@ if __name__ == '__main__':
     matrix_dimension = len(concept_mappings)
 
     # initial concepts -> hardcoded IDs based on the strings given
-    initial_concepts = [32499, 34192, 60263, 70935, 86708, 115417, 115971, 145866, 151754, 187113, 234510, 324125, 331149, 342834, 343823, 358248, 387614, 462022, 522204, 531815, 750793, 782122]
+    initial_concepts = [32499, 34192, 60263, 70935, 86708, 115417, 115971, 145866, 151754, 187113, 234510,
+                        324125, 331149, 342834, 343823, 358248, 387614, 462022, 522204, 531815, 750793, 782122]
 
     # create matrix that contains transition probabilities from each concept back to initial concept
     matrix_J = create_matrix_j(resources_cfg, initial_concepts, concept_mappings, matrix_dimension)
