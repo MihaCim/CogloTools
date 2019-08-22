@@ -20,8 +20,9 @@ class TestSum(unittest.TestCase):
         print('TEST 4 NODES 2 VEHICLES')
         print('=======================================')
         # read file test-vrp
-        dispatch_vec = [0, 3, 0, 4]
-        capacity_vec = [4, 3]
+        dispatch_vec = [0, 3, 4, 4]
+        capacity_vec = [8, 3]
+        start_loc_vec = [0,0]
 
         # 4---3
         # |   |
@@ -34,7 +35,7 @@ class TestSum(unittest.TestCase):
                 [0, 0, 1, 1]
         ]
 
-        route_mat, dispatch_mat, obj_val = vrp(graph, dispatch_vec, capacity_vec)
+        route_mat, dispatch_mat, obj_val = vrp(graph, dispatch_vec, capacity_vec, start_loc_vec)
 
         route_name_vec = getEdgeNameVec(graph)
 
@@ -62,6 +63,7 @@ class TestSum(unittest.TestCase):
         # read file test-vrp
         dispatch_vec = [1, 3, 1, 4]
         capacity_vec = [9]
+        start_loc_vec = [0]
 
         # 4---3
         # |   |
@@ -73,7 +75,7 @@ class TestSum(unittest.TestCase):
                 [0, 0, 1, 1]
         ]
 
-        route_mat, dispatch_mat, obj_val = vrp(graph, dispatch_vec, capacity_vec)
+        route_mat, dispatch_mat, obj_val = vrp(graph, dispatch_vec, capacity_vec, start_loc_vec)
 
         route_name_vec = getEdgeNameVec(graph)
 
@@ -102,6 +104,7 @@ class TestSum(unittest.TestCase):
         # read file test-vrp
         dispatch_vec = [1, 3, 1]
         capacity_vec = [5]
+        start_loc_vec = [0]
 
         #     3
         #   / |
@@ -113,7 +116,7 @@ class TestSum(unittest.TestCase):
                 [0, 1, 1]
         ]
 
-        route_mat, dispatch_mat, obj_val = vrp(graph, dispatch_vec, capacity_vec)
+        route_mat, dispatch_mat, obj_val = vrp(graph, dispatch_vec, capacity_vec, start_loc_vec)
 
         route_name_vec = getEdgeNameVec(graph)
 
@@ -139,6 +142,7 @@ class TestSum(unittest.TestCase):
         # read file test-vrp
         dispatch_vec = [11, 22, 33, 44, 55, 66]
         capacity_vec = [300]
+        start_loc_vec = [0]
 
 
         # TEST:
@@ -158,7 +162,7 @@ class TestSum(unittest.TestCase):
             [0, 0, 0, 0, 1, 1, 0, 0, 0]
         ]
 
-        route_mat, dispatch_mat, obj_val = vrp(graph, dispatch_vec, capacity_vec)
+        route_mat, dispatch_mat, obj_val = vrp(graph, dispatch_vec, capacity_vec, start_loc_vec)
 
         route_name_vec = getEdgeNameVec(graph)
 
@@ -197,6 +201,7 @@ class TestSum(unittest.TestCase):
 
         dispatch_vec = [11, 22, 33, 44, 55, 66]
         capacity_vec = [80, 80, 80]
+        start_loc_vec = [0,0,0]
 
         graph = [
             [1, 0, 0, 0, 0, 1, 1, 0, 0],
@@ -207,7 +212,7 @@ class TestSum(unittest.TestCase):
             [0, 0, 0, 0, 1, 1, 0, 0, 0]
         ]
 
-        route_mat, dispatch_mat, obj_val = vrp(graph, dispatch_vec, capacity_vec)
+        route_mat, dispatch_mat, obj_val = vrp(graph, dispatch_vec, capacity_vec, start_loc_vec)
 
         route_name_vec = getEdgeNameVec(graph)
 

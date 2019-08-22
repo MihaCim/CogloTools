@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 import ortools.linear_solver.pywraplp as pywraplp
 
-def vrp(graph_incidence_mat, dispatch_vec, capacity_vec):
+def vrp(graph_incidence_mat, dispatch_vec, capacity_vec, start_loc_vec):
     E = []
     for row in graph_incidence_mat:
         E.append(row + row)
@@ -22,16 +22,22 @@ def vrp(graph_incidence_mat, dispatch_vec, capacity_vec):
     # the right side of the equation should be zeros(n_edges*n_cycles + n_vert*n_cycles)
     # b variables = size([capacity_vec])= n_cycles*n_edges + n_cycles*n_nodes
 
-    rows_A1 = 2*n_nodes*n_cycles + n_nodes*n_cycles + n_edges*n_cycles
+    if len(start_loc_vec) != len(capacity_vec):
+        raise ValueError('Number of vehicles & number of locations not match!')
+    AddRow = sum(i > -1 for i in start_loc_vec)    
+    rows_A1 = 2*n_nodes*n_cycles + n_nodes*n_cycles + n_edges*n_cycles + AddRow
     cols_A1 = n_nodes * n_cycles + n_edges *n_cycles
 
     A1 = np.zeros((rows_A1, cols_A1))
-    b1 = [0 for _ in range(rows_A1)]
+    b1 = [0 for _ in range(rows_A1-AddRow)]
+    for _ in range(AddRow):
+            b1.append(-1)
 
     offset_block0 = 0
     offset_block1 = n_nodes*n_cycles
     offset_block2 = 2*n_nodes*n_cycles
     offset_block3 = 3*n_nodes*n_cycles
+    offset_block4 = 3*n_nodes*n_cycles + n_cycles*n_edges
 
     for k in range (n_cycles):
         for i in range (n_nodes):
@@ -48,6 +54,15 @@ def vrp(graph_incidence_mat, dispatch_vec, capacity_vec):
         for j in range (0, n_edges):
             # C_kj >= 0
             A1[offset_block3 + k*n_edges+j, offset_c + k*n_edges + j] = -1
+
+    insert_line = 0
+    for k in range (n_cycles):
+        location_node = start_loc_vec[k]
+        #print (location_node)
+        if location_node >= 0:
+            for j in range (n_edges):
+                    A1[offset_block4 + insert_line, offset_c + k*n_edges+j] = -E[location_node][j]
+            insert_line = insert_line+1
 
     # CONSTRAINT II - A2 - the number of packets delivered on the node is equal to all total demand on the node
     #number of rows: 2 * num. of n_nodes
