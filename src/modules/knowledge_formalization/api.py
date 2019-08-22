@@ -6,8 +6,10 @@ import time
 import json
 
 from db import Database
+from formalization import validate_config
 
 # create Flask instance for an app
+
 app = Flask(__name__)
 api = Api(app)
 
@@ -129,9 +131,14 @@ def generate_new_initial_concepts():
 
 
 if __name__ == '__main__':
+    # read config, validate it and extract database config
+    config_file_path = "./config/config.json"
+    config = validate_config(config_file_path)
+    cfg = config["database"]
+
     # get instance of database connection
     db_name = "concepts_db"
-    database = Database(db_name)
+    database = Database(db_name, cfg)
 
     # start API
     app.run(debug=True)

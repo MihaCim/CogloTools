@@ -11,8 +11,8 @@ if __name__ == '__main__':
     MAX_INDEX = 1000000
 
     # the following lines extract only first MAX_INDEX strings and ids
-    default_concept_string_file = './linkGraph-en-verts.txt'
-    default_concept_string_file_test = './linkGraph-en-verts-test.txt'
+    default_concept_string_file = './resources/linkGraph-en-verts.txt'
+    default_concept_string_file_test = './resources/linkGraph-en-verts-test.txt'
 
     if not os.path.isfile(default_concept_string_file_test):
         ids = []
@@ -56,8 +56,8 @@ if __name__ == '__main__':
             np.savetxt(fp1, data, delimiter='\t', fmt=['%s', '%s', '%s'])
 
     # the following lines extract only first 1000 mappings
-    default_concept_mapping_file = './linkGraph-en-edges.txt'
-    default_concept_mapping_file_test = './linkGraph-en-edges-test.txt'
+    default_concept_mapping_file = './resources/linkGraph-en-edges.txt'
+    default_concept_mapping_file_test = './resources/linkGraph-en-edges-test.txt'
 
     if not os.path.isfile(default_concept_mapping_file_test):
         old_ids = []
