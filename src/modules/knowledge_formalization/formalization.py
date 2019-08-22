@@ -160,16 +160,16 @@ def calc_neighbourhood(matrix_J,
     # simulation
     # extract EigenValues and EigenVectors
     print("extracting eigenvalues and eigenvectors")
-    [eigenvalues, vectors] = linalg.eigs(transposed, k=1, )
+    [eigenvalues, vectors] = linalg.eigs(transposed, k=1)
 
     # extract only the column where EigenValue is 1.0
     print("extracting column of eigenvectors where eigenvalue is 1")
     result_array_idx = -1
-    for eigenValueIdx in range(len(eigenvalues)):
-        value = eigenvalues[eigenValueIdx].real
+    for eigen_value_idx in range(len(eigenvalues)):
+        value = eigenvalues[eigen_value_idx].real
         print("Eigenvalue", value)
         if is_close(value, 1.0):
-            result_array_idx = eigenValueIdx
+            result_array_idx = eigen_value_idx
             break
     if result_array_idx == -1:
         print("No EigenValue 1.0 in received eigenvalues. Exiting program...")
@@ -245,10 +245,7 @@ def calc_neighbourhood(matrix_J,
         split = line.split("\t")
         word = split[1]
 
-        json_object = {}
-        json_object["concept_id"] = id
-        json_object["probability"] = probability
-        json_object["string"] = word
+        json_object = {"concept_id": id, "probability": probability, "string": word}
 
         list.append(json_object)
 
