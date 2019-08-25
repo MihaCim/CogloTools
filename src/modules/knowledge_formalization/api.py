@@ -51,7 +51,7 @@ def get_new_concepts():
 
     # extract alpha parameter from request
     alpha = received_request['alpha']
-    if alpha < 0 or alpha > 1:
+    if alpha <= 0 or alpha > 1:
         return 'Alpha parameter must be between 0 and 1.'
 
     if value <= 0:

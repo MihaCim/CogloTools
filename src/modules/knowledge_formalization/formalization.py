@@ -172,7 +172,7 @@ def calc_neighbourhood(matrix_J,
             result_array_idx = eigen_value_idx
             break
     if result_array_idx == -1:
-        print("No EigenValue 1.0 in received eigenvalues. Exiting program...")
+        print("No EigenValue 1.0 in received eigenvalues.")
 
         # return result false with a reason
         json_resp = {"success": False, "reason": "Eigenvalue calculated from matrix is not 1."}
