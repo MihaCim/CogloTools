@@ -1,0 +1,62 @@
+{
+  "vehicles": [
+    {
+      "UUID": "carflowF1",
+      "location": {
+        "latitude": 111111,
+        "longitude": 222222
+      },
+      "route": [
+        {
+          "locationId": 3,
+          "dropoffWeightKg": 130,
+          "dropoffVolumeM3": 5
+        },
+        {
+          "locationId": 5,
+          "dropoffWeightKg": 40,
+          "dropoffVolumeM3": 5
+        },
+        {
+          "locationId": 9,
+          "dropoffWeightKg": 30,
+          "dropoffVolumeM3": 1
+        },
+        {
+          "locationId": 12,
+          "dropoffWeightKg": 130,
+          "dropoffVolumeM3": 5
+        }
+      ]
+    },
+    {
+      "UUID": "carflowF3",
+      "location": {
+        "latitude": 111111,
+        "longitude": 222222
+      },
+      "route": [
+        {
+          "locationId": 13,
+          "dropoffWeightKg": 130,
+          "dropoffVolumeM3": 5
+        },
+        {
+          "locationId": 6,
+          "dropoffWeightKg": 40,
+          "dropoffVolumeM3": 5
+        },
+        {
+          "locationId": 13,
+          "dropoffWeightKg": 30,
+          "dropoffVolumeM3": 1
+        },
+        {
+          "locationId": 10,
+          "dropoffWeightKg": 130,
+          "dropoffVolumeM3": 5
+        }
+      ]
+    }
+  ]
+}
