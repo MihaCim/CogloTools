@@ -322,11 +322,11 @@ class NeighboursFinder():
                 print("All paths exhausted! Terminating the algorithm!")
                 break
 
-            # if time.time() - start_time >= 0.01:
-            #     print("results:" + str(results))
-            #     self.drawGraph(self.G, front, results, node_id_node_map)
-            #     start_time = time.time()
-            #     print("visited:" + str(visited_node_ids))
+            # if time.time() - start_time >= 0.1:
+            #      print("results:" + str(results))
+            #      self.drawGraph(self.G, front, results, node_id_node_map)
+            #      start_time = time.time()
+            #      print("visited:" + str(visited_node_ids))
 
 
         print("Runtime: {}".format(time.time() - start_time))

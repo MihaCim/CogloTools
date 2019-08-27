@@ -224,15 +224,17 @@ def run():
 
     finder = NeighboursFinder(G)
 
-    for postId, nodeId in map_posts_to_nodes.items():
+    #for postId, nodeId in map_posts_to_nodes.items():
+
         #('A7', 1636600227)
        #finder = NeighboursFinder()
+    nodeId = 0
+    postId = 0
+    res = finder.search_near_posts(roadNodes, roadWays, nodeId, 1.3)
+    print('PostID ' + str(postId) + ' Node: ' + str(nodeId) + ' r: ' + str(res))
 
-        res = finder.search_near_posts(roadNodes, roadWays, nodeId, 1.3)
-        print('PostID ' + str(postId) + ' Node: ' + str(nodeId) + ' r: ' + str(res))
-
-        tmpRes.append((postId, nodeId, res))
-        for res_id, res_dist in res:
+    tmpRes.append((postId, nodeId, res))
+    for res_id, res_dist in res:
             if nodeId in postEdge:
                 tmp = postEdge[nodeId]
                 tmp[roadNodes[map_posts_to_nodes[res_id]].node_id] = {'weight': res_dist}
