@@ -3,15 +3,17 @@
 from vrp import vrp
 import unittest
 
+
 def getEdgeNameVec(graph_incidence_mat):
     edge_name_vec = []
     for colN in range(len(graph_incidence_mat[0])):
         edge_str = ''
         for rowN, row in enumerate(graph_incidence_mat):
             if row[colN] != 0:
-                edge_str += str(rowN+1)
+                edge_str += str(rowN + 1)
         edge_name_vec.append(edge_str)
     return edge_name_vec
+
 
 class TestSum(unittest.TestCase):
 
@@ -22,17 +24,17 @@ class TestSum(unittest.TestCase):
         # read file test-vrp
         dispatch_vec = [0, 3, 4, 4]
         capacity_vec = [8, 3]
-        start_loc_vec = [0,0]
+        start_loc_vec = [0, 0]
 
         # 4---3
         # |   |
         # 1---2
         # network graph, columns = edges 12, 23, 13, vrstice = mesta
         graph = [
-                [1, 0, 0, 1],
-                [1, 1, 0, 0],
-                [0, 1, 1, 0],
-                [0, 0, 1, 1]
+            [1, 0, 0, 1],
+            [1, 1, 0, 0],
+            [0, 1, 1, 0],
+            [0, 0, 1, 1]
         ]
 
         route_mat, dispatch_mat, obj_val = vrp(graph, dispatch_vec, capacity_vec, start_loc_vec)
@@ -69,10 +71,10 @@ class TestSum(unittest.TestCase):
         # |   |
         # 1---2
         graph = [
-                [1, 0, 0, 1],
-                [1, 1, 0, 0],
-                [0, 1, 1, 0],
-                [0, 0, 1, 1]
+            [1, 0, 0, 1],
+            [1, 1, 0, 0],
+            [0, 1, 1, 0],
+            [0, 0, 1, 1]
         ]
 
         route_mat, dispatch_mat, obj_val = vrp(graph, dispatch_vec, capacity_vec, start_loc_vec)
@@ -111,9 +113,9 @@ class TestSum(unittest.TestCase):
         # 1---2
         # network graph, columns = edges 12, 23, 13, vrstice = mesta
         graph = [
-                [1, 0, 1],
-                [1, 1, 0],
-                [0, 1, 1]
+            [1, 0, 1],
+            [1, 1, 0],
+            [0, 1, 1]
         ]
 
         route_mat, dispatch_mat, obj_val = vrp(graph, dispatch_vec, capacity_vec, start_loc_vec)
@@ -143,7 +145,6 @@ class TestSum(unittest.TestCase):
         dispatch_vec = [11, 22, 33, 44, 55, 66]
         capacity_vec = [300]
         start_loc_vec = [0]
-
 
         # TEST:
         # 6---5---4
@@ -186,7 +187,6 @@ class TestSum(unittest.TestCase):
         print()
         print()
 
-
     def test6Nodes3Vehicles(self):
         print('=======================================')
         print('TEST 6 NODES 3 VEHICLES')
@@ -201,7 +201,7 @@ class TestSum(unittest.TestCase):
 
         dispatch_vec = [11, 22, 33, 44, 55, 66]
         capacity_vec = [80, 80, 80]
-        start_loc_vec = [0,0,0]
+        start_loc_vec = [0, 0, 0]
 
         graph = [
             [1, 0, 0, 0, 0, 1, 1, 0, 0],

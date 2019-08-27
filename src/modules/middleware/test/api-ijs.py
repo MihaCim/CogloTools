@@ -1,55 +1,76 @@
-from flask import Flask, request
-from flask_restful import Resource, Api, reqparse
-import asyncio
-import requests
-from flask_jsonpify import jsonify
 import json
+
+from flask import Flask, request
+from flask_jsonpify import jsonify
+from flask_restful import Resource, Api
+
+from modules.middleware.test.vrp import VRP
 
 SIOT_URL = 'http://151.97.13.227:8080/SIOT-war/SIoT/Server/'
 
+class GraphProcessor:
+    def map_vehicles(self, data):
+        vehicles = []
+        for v in data["vehicles"]:
+            vehicles.append(
+                {"id": v["UUID"],
+                 "latitude": v["location"]["latitude"],
+                 "longitude": v["location"]["longitude"]})
+        return vehicles
 
-class LocalSioT():
-    def retrieve_local_vehicles(self, json):
+    def get_graph(self):
+        pass
+
+class LocalSioT:
+    def retrieve_local_vehicles(self, payload):
         with open('vehicles.json', 'r') as f:
             return json.load(f)
 
+    def load_demand(self):
+        with open('parcels.json', 'r') as f:
+            return json.load(f)
+
+
+class VrpProcessor:
+    def __init__(self):
+        self.vrp = VRP()
+
+    def process(self, post_mapping, graph, dispatch, capacities):
+        start = [x["nodeId"] for x in post_mapping]
+        capacity = [x["metadata"]["capacityKg"] for x in capacities]
+
+        return self.vrp.vrp(graph, dispatch, capacity, start)
+
 
 siot = LocalSioT()
-graphProcessor = None
+graphProcessor = GraphProcessor()
+vrpProcessor = VrpProcessor()
 
 
-class Event(Resource):
+class RecReq(Resource):
 
     def get(self):
         return jsonify({"success": True, "message": "Please use POST request"})
 
     def post(self):
-        json = request.get_json(force=True)
-        event = json['event']
-        vehicle = json['vehicle']
+        data = request.get_json(force=True)
+        event = data['event']
+        vehicle = data['vehicle']
+        v_metadata = data["vehicles"]
 
-        siot = LocalSioT()
-        vehicle_data = siot.retrieve_local_vehicles(json)
+        v_locs = siot.retrieve_local_vehicles(data)
 
-        vehicles = []
-        for v in vehicle_data:
-            vehicles.append(
-                {"id": v["UUID"],
-                 "latitude": v["location"]["latitude"],
-                 "longitude": v["location"]["longitude"]})
-
-        nearPostMapping = graphProcessor.map_vehicles(vehicles)
+        near_post_map = graphProcessor.map_vehicles(v_locs)
         graph = graphProcessor.get_graph()
+        loads = siot.load_demand()
 
-        
 
+        routes, dispatch, objc = vrpProcessor.process(near_post_map, graph, loads, v_metadata)
 
         return jsonify({
             "success": True,
             "message": "Processing event for vehicle {}".format(vehicle['vehicleId'])
         })
-
-
 
 
 class CognitiveAdvisorAPI:
@@ -61,7 +82,7 @@ class CognitiveAdvisorAPI:
         self._add_endpoints()
 
     def _add_endpoints(self):
-        self._register_endpoint('/api/adhoc/newEvent', Event)
+        self._register_endpoint('/api/adhoc/recRequest', RecReq)
 
     def _register_endpoint(self, endpoint_name, class_ref):
         self._api.add_resource(class_ref, endpoint_name)
