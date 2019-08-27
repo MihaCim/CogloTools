@@ -224,24 +224,19 @@ def run():
 
     finder = NeighboursFinder(G)
 
-    #for postId, nodeId in map_posts_to_nodes.items():
+    for postId, nodeId in map_posts_to_nodes.items():
+        res = finder.search_near_posts(roadNodes, roadWays, nodeId, 1.3)
+        print('PostID ' + str(postId) + ' Node: ' + str(nodeId) + ' r: ' + str(res))
 
-        #('A7', 1636600227)
-       #finder = NeighboursFinder()
-    nodeId = 0
-    postId = 0
-    res = finder.search_near_posts(roadNodes, roadWays, nodeId, 1.3)
-    print('PostID ' + str(postId) + ' Node: ' + str(nodeId) + ' r: ' + str(res))
-
-    tmpRes.append((postId, nodeId, res))
-    for res_id, res_dist in res:
-            if nodeId in postEdge:
-                tmp = postEdge[nodeId]
-                tmp[roadNodes[map_posts_to_nodes[res_id]].node_id] = {'weight': res_dist}
-                postEdge[nodeId] = tmp
-                print(res_id)
-            else:
-                postEdge[nodeId] = {roadNodes[map_posts_to_nodes[res_id]].node_id: {'weight': res_dist}}
+        tmpRes.append((postId, nodeId, res))
+        for res_id, res_dist in res:
+                if nodeId in postEdge:
+                    tmp = postEdge[nodeId]
+                    tmp[roadNodes[map_posts_to_nodes[res_id]].node_id] = {'weight': res_dist}
+                    postEdge[nodeId] = tmp
+                    print(res_id)
+                else:
+                    postEdge[nodeId] = {roadNodes[map_posts_to_nodes[res_id]].node_id: {'weight': res_dist}}
     for k, v in roadNodes.items():
         if v.post_id != None:
             postNode[k] = v.__dict__
@@ -249,22 +244,20 @@ def run():
         print('PostID ' + str(postId) + ' Node: ' + str(nodeId) + ' r: ' + str(res))
     if len(postEdge) != 0:
         drawGraph(G, postNode, postEdge)
-    postNode = {}
-    postEdge = {}
+
     import json
-    json_str = json.dumps(postNode)
-    f = open("post_nodes.json", "w")
-    f.write(json_str)
-    f.close()
-    json_str = json.dumps(postEdge)
-    f = open("post_edge.json", "w")
-    f.write(json_str)
+    edges = []
+    for source, value in postEdge.items():
+        print(source)
+        for dest, w in value.items():
+            weight = w['weight']
+            edges.append((source, dest, weight))
+    graph = {'nodes': postNode,
+             'edge': edges}
+    f = open("posts.json", "w")
+    f.write(json.dumps(graph))
     f.close()
 
-    # w = csv.writer(open("edge.csv", "w"))
-    # for key, val in postNode.items():
-    #    w.writerow([key, val])
-    # drawStaticGraph(roadNodes, roadWays, res)
 
 
 if __name__ == "__main__":
