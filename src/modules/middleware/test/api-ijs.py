@@ -5,29 +5,37 @@ from flask_jsonpify import jsonify
 from flask_restful import Resource, Api
 
 from modules.middleware.test.vrp import VRP
+from modules.create_graph.mockup_graph import MockupGraph
 
 SIOT_URL = 'http://151.97.13.227:8080/SIOT-war/SIoT/Server/'
 
+
 class GraphProcessor:
+    def __init__(self):
+        self.g = MockupGraph()
+
     def map_vehicles(self, data):
         vehicles = []
         for v in data["vehicles"]:
             vehicles.append(
-                {"id": v["UUID"],
+                {"id": v["vehicleId"],
                  "latitude": v["location"]["latitude"],
                  "longitude": v["location"]["longitude"]})
-        return vehicles
+        print("Mapping vehicles to posts")
+        return self.g.map_vehicles(vehicles)
 
     def get_graph(self):
-        pass
+        return self.g.get_graph()
+
 
 class LocalSioT:
     def retrieve_local_vehicles(self, payload):
-        with open('vehicles.json', 'r') as f:
+        print("Loading vehicle data from local file")
+        with open('modules/middleware/test/vehicles.json', 'r') as f:
             return json.load(f)
 
     def load_demand(self):
-        with open('parcels.json', 'r') as f:
+        with open('modules/middleware/test/parcels.json', 'r') as f:
             return json.load(f)
 
 
@@ -35,11 +43,54 @@ class VrpProcessor:
     def __init__(self):
         self.vrp = VRP()
 
-    def process(self, post_mapping, graph, dispatch, capacities):
-        start = [x["nodeId"] for x in post_mapping]
-        capacity = [x["metadata"]["capacityKg"] for x in capacities]
+    def process(self, post_mapping, graph, dispatch, capacities, nodes):
+
+        start = [nodes.index(x[1]) for x in post_mapping]
+        capacity = [int(x["metadata"]["capacityKg"]) for x in capacities]
 
         return self.vrp.vrp(graph, dispatch, capacity, start)
+
+    def make_route(self, v_routes, loads, mapping, nodes, edges):
+        routes = []
+        for i in range(len(v_routes)):
+            route_edges = v_routes[i]
+            route = []
+            startend = int(mapping[i][1])
+            curr_node = int(mapping[i][1])
+
+            #run until all loads have been picked up
+            while sum(route_edges) != 0.0:
+                #check all edges
+                for j in range(len(route_edges)):
+                    edge_start = int(edges[j].split('_')[0])
+                    edge_end = int(edges[j].split('_')[1])
+
+                    #are we on this edge and do we need to pick up anything?
+                    if edge_start == curr_node and route_edges[j] > 0:
+                        if route_edges[j] == 1.0 and sum(route_edges) != 1.0 and startend == edge_end:
+                            continue
+                        route_edges[j] -= 1 #decrement edge visit counter
+                        #create route node
+                        route.append({"locationId": curr_node, "dropoffWeightKg": round(loads[i][nodes.index(curr_node)], 3)})
+                        #reset load weight on node, since we visited it
+                        loads[i][nodes.index(curr_node)] = 0
+                        #set current node to opposite from where we came on this node
+                        curr_node = edge_end
+                        break
+                    #are we on this edge and do we need to pick up anything?
+                    if edge_end == curr_node and route_edges[j] > 0:
+                        if route_edges[j] == 1.0 and sum(route_edges) != 1.0 and startend == edge_start:
+                            continue
+                        route_edges[j] -= 1
+                        route.append({"locationId": curr_node, "dropoffWeightKg": round(loads[i][nodes.index(curr_node)], 3)})
+                        loads[i][nodes.index(curr_node)] = 0
+                        curr_node = edge_start
+                        break
+
+            #append end location
+            route.append({"locationId": startend, "dropoffWeightKg": 0})
+            routes.append(route)
+        return routes
 
 
 siot = LocalSioT()
@@ -61,15 +112,16 @@ class RecReq(Resource):
         v_locs = siot.retrieve_local_vehicles(data)
 
         near_post_map = graphProcessor.map_vehicles(v_locs)
-        graph = graphProcessor.get_graph()
+        nodes, edges, incident_matrix = graphProcessor.get_graph()
         loads = siot.load_demand()
 
+        print("Processing VRP data.")
+        routes, dispatch, objc = vrpProcessor.process(near_post_map, incident_matrix, loads, v_metadata, nodes)
 
-        routes, dispatch, objc = vrpProcessor.process(near_post_map, graph, loads, v_metadata)
+        route = vrpProcessor.make_route(routes, dispatch, near_post_map, nodes, edges)
 
         return jsonify({
-            "success": True,
-            "message": "Processing event for vehicle {}".format(vehicle['vehicleId'])
+            "route": route
         })
 
 

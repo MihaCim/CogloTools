@@ -1,10 +1,11 @@
 import json
 from math import sin, cos, sqrt, atan2, radians, inf
+
+
 class MockupGraph:
 
-    def __init__(self, path):
+    def __init__(self, path='modules/create_graph/data/posts-small.json'):
         self.nodes, self.edges = self.__load_graph(path)
-
 
     def __load_graph(self, path):
         with open(path, "r") as read_file:
@@ -50,29 +51,17 @@ class MockupGraph:
                     tmp_arr[index] = 1
             incident_matrix.append(tmp_arr)
 
-        return (node_array, edge_array, incident_matrix)
+        return node_array, edge_array, incident_matrix
 
-    def map_truck(self, trucks):
+    def map_vehicles(self, vehicles):
         map_trucks = []
-        for truck in trucks:
+        for truck in vehicles:
             min = inf
-            id  = inf
+            id = inf
             for key, value in self.nodes.items():
-                dist =self.__distance(truck['latitude'], truck['longitude'], value['lat'], value['lon'])
+                dist = self.__distance(truck['latitude'], truck['longitude'], value['lat'], value['lon'])
                 if dist < min:
                     min = dist
                     id = value['node_id']
             map_trucks.append([truck['id'], id])
         return map_trucks
-
-if __name__ == "__main__":
-    mp = MockupGraph("data/posts.json")
-    print(mp.get_graph())
-    trucks = json.loads("[{\"id\": \"carflowF1\", \"latitude\": 43.5104144, \"longitude\": 16.4390596}, "
-                        "{\"id\": \"carflowF3\", \"latitude\": 43.5124174, \"longitude\": 16.4322733}]")
-
-    print(mp.map_truck(trucks))
-
-
-
-

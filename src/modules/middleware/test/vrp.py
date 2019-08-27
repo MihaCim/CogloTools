@@ -6,6 +6,14 @@ import ortools.linear_solver.pywraplp as pywraplp
 class VRP():
 
     def vrp(self, graph_incidence_mat, dispatch_vec, capacity_vec, start_loc_vec):
+        # Data validity
+        if len(start_loc_vec) != len(capacity_vec):
+            raise ValueError('Number of vehicles & number of locations not match!')
+        if sum(capacity_vec) <= sum(dispatch_vec):
+            raise ValueError('Total vehicles capacity to low!')
+        if len(graph_incidence_mat) != len(dispatch_vec):
+            raise ValueError('Number of nodes in dispatch and incidence matrix dont match!')
+
         E = []
         for row in graph_incidence_mat:
             E.append(row + row)
@@ -150,14 +158,6 @@ class VRP():
         for _ in range(2 * n_cycles * n_nodes * n_edges):
             b4.append(0)
 
-        # print('A4:')
-        # for row in A4:
-        #    print(','.join([str(val) for val in row]))
-        # print('A4=\n' + str(A4))
-        # print('b4=\n' + str(b4))
-
-        # FINAL MATRIX  - A with all constraints
-        # concatenate A1 and A23 = A matrix
         A1extend = np.c_[A1, np.zeros((len(A1), len(A23[0])))]
         A23extend = np.c_[np.zeros((len(A23), len(A1[0]))), A23]
 
@@ -171,7 +171,7 @@ class VRP():
         for i in range(0, len(A4)):
             A = np.vstack([A, A4[i, :]])
         b = b1 + b23 + b4
-        non_zero_rows = np.count_nonzero((A != 0).sum(1));
+        non_zero_rows = np.count_nonzero((A != 0).sum(1))
         zero_rows = len(A) - non_zero_rows
 
         # capacity_vec variables

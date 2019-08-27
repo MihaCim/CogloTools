@@ -3,6 +3,16 @@ import numpy as np
 import ortools.linear_solver.pywraplp as pywraplp
 
 def vrp(graph_incidence_mat, dispatch_vec, capacity_vec, start_loc_vec):
+
+
+    #Data validity
+    if len(start_loc_vec) != len(capacity_vec):
+        raise ValueError('Number of vehicles & number of locations not match!')
+    if sum(capacity_vec) <= sum(dispatch_vec):
+        raise ValueError('Total vehicles capacity to low!')
+    if len(graph_incidence_mat) != len(dispatch_vec):
+        raise ValueError('Number of nodes in dispatch and incidence matrix dont match!')
+
     E = []
     for row in graph_incidence_mat:
         E.append(row + row)
@@ -22,8 +32,6 @@ def vrp(graph_incidence_mat, dispatch_vec, capacity_vec, start_loc_vec):
     # the right side of the equation should be zeros(n_edges*n_cycles + n_vert*n_cycles)
     # b variables = size([capacity_vec])= n_cycles*n_edges + n_cycles*n_nodes
 
-    if len(start_loc_vec) != len(capacity_vec):
-        raise ValueError('Number of vehicles & number of locations not match!')
     AddRow = sum(i > -1 for i in start_loc_vec)    
     rows_A1 = 2*n_nodes*n_cycles + n_nodes*n_cycles + n_edges*n_cycles + AddRow
     cols_A1 = n_nodes * n_cycles + n_edges *n_cycles

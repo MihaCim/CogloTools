@@ -1,62 +1,20 @@
 {
   "vehicles": [
     {
-      "UUID": "carflowF1",
+      "vehicleId": "F1",
       "location": {
-        "latitude": 111111,
-        "longitude": 222222
+        "latitude": 43.5104134,
+        "longitude": 16.4390580
       },
-      "route": [
-        {
-          "locationId": 3,
-          "dropoffWeightKg": 130,
-          "dropoffVolumeM3": 5
-        },
-        {
-          "locationId": 5,
-          "dropoffWeightKg": 40,
-          "dropoffVolumeM3": 5
-        },
-        {
-          "locationId": 9,
-          "dropoffWeightKg": 30,
-          "dropoffVolumeM3": 1
-        },
-        {
-          "locationId": 12,
-          "dropoffWeightKg": 130,
-          "dropoffVolumeM3": 5
-        }
-      ]
+      "route": []
     },
     {
-      "UUID": "carflowF3",
+      "vehicleId": "F2",
       "location": {
-        "latitude": 111111,
-        "longitude": 222222
+        "latitude": 43.506460,
+        "longitude": 16.4789689
       },
-      "route": [
-        {
-          "locationId": 6,
-          "dropoffWeightKg": 130,
-          "dropoffVolumeM3": 5
-        },
-        {
-          "locationId": 6,
-          "dropoffWeightKg": 40,
-          "dropoffVolumeM3": 5
-        },
-        {
-          "locationId": 13,
-          "dropoffWeightKg": 30,
-          "dropoffVolumeM3": 1
-        },
-        {
-          "locationId": 10,
-          "dropoffWeightKg": 130,
-          "dropoffVolumeM3": 5
-        }
-      ]
+      "route": []
     }
   ]
 }
