@@ -58,38 +58,40 @@ class VrpProcessor:
             startend = int(mapping[i][1])
             curr_node = int(mapping[i][1])
 
-            #run until all loads have been picked up
+            # run until all loads have been picked up
             while sum(route_edges) != 0.0:
-                #check all edges
+                # check all edges
                 for j in range(len(route_edges)):
                     edge_start = int(edges[j].split('_')[0])
                     edge_end = int(edges[j].split('_')[1])
 
-                    #are we on this edge and do we need to pick up anything?
+                    # are we on this edge and do we need to pick up anything?
                     if edge_start == curr_node and route_edges[j] > 0:
                         if route_edges[j] == 1.0 and sum(route_edges) != 1.0 and startend == edge_end:
                             continue
-                        route_edges[j] -= 1 #decrement edge visit counter
-                        #create route node
-                        route.append({"locationId": curr_node, "dropoffWeightKg": round(loads[i][nodes.index(curr_node)], 3)})
-                        #reset load weight on node, since we visited it
+                        route_edges[j] -= 1  # decrement edge visit counter
+                        # create route node
+                        route.append(
+                            {"locationId": curr_node, "dropoffWeightKg": round(loads[i][nodes.index(curr_node)], 3)})
+                        # reset load weight on node, since we visited it
                         loads[i][nodes.index(curr_node)] = 0
-                        #set current node to opposite from where we came on this node
+                        # set current node to opposite from where we came on this node
                         curr_node = edge_end
                         break
-                    #are we on this edge and do we need to pick up anything?
+                    # are we on this edge and do we need to pick up anything?
                     if edge_end == curr_node and route_edges[j] > 0:
                         if route_edges[j] == 1.0 and sum(route_edges) != 1.0 and startend == edge_start:
                             continue
                         route_edges[j] -= 1
-                        route.append({"locationId": curr_node, "dropoffWeightKg": round(loads[i][nodes.index(curr_node)], 3)})
+                        route.append(
+                            {"locationId": curr_node, "dropoffWeightKg": round(loads[i][nodes.index(curr_node)], 3)})
                         loads[i][nodes.index(curr_node)] = 0
                         curr_node = edge_start
                         break
 
-            #append end location
+            # append end location
             route.append({"locationId": startend, "dropoffWeightKg": 0})
-            routes.append(route)
+            routes.append({"vehicleId": mapping[i][0], "route": route})
         return routes
 
 
@@ -120,9 +122,9 @@ class RecReq(Resource):
 
         route = vrpProcessor.make_route(routes, dispatch, near_post_map, nodes, edges)
 
-        return jsonify({
-            "route": route
-        })
+        return jsonify(
+            route
+        )
 
 
 class CognitiveAdvisorAPI:
