@@ -3,6 +3,7 @@ import json
 from flask import Flask, request
 from flask_jsonpify import jsonify
 from flask_restful import Resource, Api
+import requests
 
 from modules.middleware.test.vrp import VRP
 from modules.create_graph.mockup_graph import MockupGraph
@@ -18,7 +19,7 @@ class GraphProcessor:
         vehicles = []
         for v in data["vehicles"]:
             vehicles.append(
-                {"id": v["vehicleId"],
+                {"id": v["UUID"],
                  "latitude": v["location"]["latitude"],
                  "longitude": v["location"]["longitude"]})
         print("Mapping vehicles to posts")
@@ -32,7 +33,13 @@ class LocalSioT:
     def retrieve_local_vehicles(self, payload):
         print("Loading vehicle data from local file")
         with open('modules/middleware/test/vehicles.json', 'r') as f:
-            return json.load(f)
+            data = json.load(f)["vehicles"]
+            vehicles = []
+            for i in range(len(payload)):
+                d = data[i]
+                d['UUID'] = payload[i]["UUID"]
+                vehicles.append(d)
+            return {"vehicles": vehicles}
 
     def load_demand(self):
         with open('modules/middleware/test/parcels.json', 'r') as f:
@@ -91,7 +98,7 @@ class VrpProcessor:
 
             # append end location
             route.append({"locationId": startend, "dropoffWeightKg": 0})
-            routes.append({"vehicleId": mapping[i][0], "route": route})
+            routes.append({"UUID": mapping[i][0], "route": route})
         return routes
 
 
@@ -107,12 +114,12 @@ class RecReq(Resource):
 
     def post(self):
         data = request.get_json(force=True)
+        print(data)
         event = data['event']
         vehicle = data['vehicle']
         v_metadata = data["vehicles"]
 
-        v_locs = siot.retrieve_local_vehicles(data)
-
+        v_locs = siot.retrieve_local_vehicles(v_metadata)
         near_post_map = graphProcessor.map_vehicles(v_locs)
         nodes, edges, incident_matrix = graphProcessor.get_graph()
         loads = siot.load_demand()
@@ -122,9 +129,7 @@ class RecReq(Resource):
 
         route = vrpProcessor.make_route(routes, dispatch, near_post_map, nodes, edges)
 
-        return jsonify(
-            route
-        )
+        return jsonify(route)
 
 
 class CognitiveAdvisorAPI:
@@ -136,7 +141,7 @@ class CognitiveAdvisorAPI:
         self._add_endpoints()
 
     def _add_endpoints(self):
-        self._register_endpoint('/api/adhoc/recRequest', RecReq)
+        self._register_endpoint('/api/adhoc/recommendationRequest', RecReq)
 
     def _register_endpoint(self, endpoint_name, class_ref):
         self._api.add_resource(class_ref, endpoint_name)
