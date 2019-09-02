@@ -17,11 +17,14 @@ class GraphProcessor:
 
     def map_vehicles(self, data):
         vehicles = []
-        for v in data["vehicles"]:
+        for v in data:
+            loc = v["currLocation"]["locationId"]
+            loc = loc.split(',')
+
             vehicles.append(
                 {"id": v["UUID"],
-                 "latitude": v["location"]["latitude"],
-                 "longitude": v["location"]["longitude"]})
+                 "latitude": float(loc[0]),
+                 "longitude": float(loc[1])})
         print("Mapping vehicles to posts")
         return self.g.map_vehicles(vehicles)
 
@@ -114,13 +117,9 @@ class RecReq(Resource):
 
     def post(self):
         data = request.get_json(force=True)
-        print(data)
-        event = data['event']
-        vehicle = data['vehicle']
-        v_metadata = data["vehicles"]
+        v_metadata = data['CLOS']
 
-        v_locs = siot.retrieve_local_vehicles(v_metadata)
-        near_post_map = graphProcessor.map_vehicles(v_locs)
+        near_post_map = graphProcessor.map_vehicles(v_metadata)
         nodes, edges, incident_matrix = graphProcessor.get_graph()
         loads = siot.load_demand()
 

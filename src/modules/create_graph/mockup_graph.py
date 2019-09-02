@@ -4,7 +4,7 @@ from math import sin, cos, sqrt, atan2, radians, inf
 
 class MockupGraph:
 
-    def __init__(self, path='modules/create_graph/data/posts-small.json'):
+    def __init__(self, path='modules/create_graph/data/posts.json'):
         self.nodes, self.edges = self.__load_graph(path)
 
     def __load_graph(self, path):

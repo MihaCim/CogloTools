@@ -1,3 +1,3 @@
-import modules.create_graph.read_osm_paths as rd
-
-rd.run()
+from modules.middleware.test.api_ijs import CognitiveAdvisorAPI
+server = CognitiveAdvisorAPI()
+server.serve()
