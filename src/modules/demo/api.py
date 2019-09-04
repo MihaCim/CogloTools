@@ -15,7 +15,7 @@ class RecRequest(Resource):
         resp = {
             "vehicles": [
                 {
-                    "UUID": "92C199BD42E6None",
+                    "UUID": "352003092913241",
                     "route": [
                         {
                             "locationId": 3,
@@ -40,7 +40,7 @@ class RecRequest(Resource):
                     ]
                 },
                 {
-                    "UUID": "92C199BD42E6None",
+                    "UUID": "352003092913241",
                     "route": [
                         {
                             "locationId": 13,

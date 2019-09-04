@@ -3,13 +3,11 @@ import json
 from flask import Flask, request
 from flask_jsonpify import jsonify
 from flask_restful import Resource, Api
-import requests
-
-from modules.middleware.test.vrp import VRP
-from modules.create_graph.mockup_graph import MockupGraph
+import random as ran
+from modules.demo.vrp import VRP
+from modules.demo.mockup_graph import MockupGraph
 
 SIOT_URL = 'http://151.97.13.227:8080/SIOT-war/SIoT/Server/'
-
 
 class GraphProcessor:
     def __init__(self):
@@ -18,13 +16,13 @@ class GraphProcessor:
     def map_vehicles(self, data):
         vehicles = []
         for v in data:
-            loc = v["currLocation"]["locationId"]
+            loc = v["currlocation"]["currentPosition"]
             loc = loc.split(',')
 
             vehicles.append(
-                {"id": v["UUID"],
-                 "latitude": float(loc[0]),
-                 "longitude": float(loc[1])})
+                {"id": v["vehicleId"],
+                 "latitude": float(loc[1]),
+                 "longitude": float(loc[0])})
         print("Mapping vehicles to posts")
         return self.g.map_vehicles(vehicles)
 
@@ -57,8 +55,10 @@ class VrpProcessor:
 
         start = [nodes.index(x[1]) for x in post_mapping]
         capacity = [int(x["metadata"]["capacityKg"]) for x in capacities]
-
-        return self.vrp.vrp(graph, dispatch, capacity, start)
+        r = [ran.random() * sum(capacity) for i in range(0, 7)]
+        r = [i * 100.0 / sum(r) for i in r]
+        print(r)
+        return self.vrp.vrp(graph, r, capacity, start)
 
     def make_route(self, v_routes, loads, mapping, nodes, edges):
         routes = []
@@ -82,7 +82,8 @@ class VrpProcessor:
                         route_edges[j] -= 1  # decrement edge visit counter
                         # create route node
                         route.append(
-                            {"locationId": curr_node, "dropoffWeightKg": round(loads[i][nodes.index(curr_node)], 3)})
+                            {"locationId": curr_node, "dropoffWeightKg": round(loads[i][nodes.index(curr_node)], 3),
+                             "dropoffVolumeM3": round(loads[i][nodes.index(curr_node)], 3) / 10})
                         # reset load weight on node, since we visited it
                         loads[i][nodes.index(curr_node)] = 0
                         # set current node to opposite from where we came on this node
@@ -94,13 +95,14 @@ class VrpProcessor:
                             continue
                         route_edges[j] -= 1
                         route.append(
-                            {"locationId": curr_node, "dropoffWeightKg": round(loads[i][nodes.index(curr_node)], 3)})
+                            {"locationId": curr_node, "dropoffWeightKg": round(loads[i][nodes.index(curr_node)], 3),
+                             "dropoffVolumeM3": round(loads[i][nodes.index(curr_node)], 3) / 10})
                         loads[i][nodes.index(curr_node)] = 0
                         curr_node = edge_start
                         break
 
             # append end location
-            route.append({"locationId": startend, "dropoffWeightKg": 0})
+            route.append({"locationId": startend, "dropoffWeightKg": 0, "dropoffVolumeM3": 0})
             routes.append({"UUID": mapping[i][0], "route": route})
         return routes
 
@@ -117,7 +119,74 @@ class RecReq(Resource):
 
     def post(self):
         data = request.get_json(force=True)
-        v_metadata = data['CLOS']
+        print(data)
+
+        dummy_resp = {
+            "vehicles": [
+                {
+                    "UUID": "352003092913241",
+                    "route": [
+                        {
+                            "locationId": 17906,
+                            "dropoffVolumeM3": 1.5981999999999998,
+                            "dropoffWeightKg": 15.982
+                        },
+                        {
+                            "locationId": 175,
+                            "dropoffVolumeM3": 1.5608,
+                            "dropoffWeightKg": 15.608
+                        },
+                        {
+                            "locationId": 17906,
+                            "dropoffVolumeM3": 0,
+                            "dropoffWeightKg": 0,
+                        }
+                    ]
+                },
+                {
+                    "UUID": "truck4F0",
+                    "route": [
+                        {
+                            "locationId": 11560,
+                            "dropoffVolumeM3": 1.1644999999999999,
+                            "dropoffWeightKg": 11.645,
+                        },
+                        {
+                            "locationId": 36151,
+                            "dropoffVolumeM3": 1.4777,
+                            "dropoffWeightKg": 14.777,
+                        },
+                        {
+                            "locationId": 8525,
+                            "dropoffVolumeM3": 1.3255000000000001,
+                            "dropoffWeightKg": 13.255,
+                        },
+                        {
+                            "locationId": 74,
+                            "dropoffVolumeM3": 1.3006,
+                            "dropoffWeightKg": 13.006,
+                        },
+                        {
+                            "locationId": 53,
+                            "dropoffVolumeM3": 1.5727,
+                            "dropoffWeightKg": 15.727,
+                        },
+                        {
+                            "locationId": 11560,
+                            "dropoffVolumeM3": 0,
+                            "dropoffWeightKg": 0,
+                        }
+                    ]
+                }
+            ]
+        }
+
+        return jsonify(dummy_resp)
+
+        v_metadata = data['vehicles']
+
+        if len(v_metadata) < 1:
+            return jsonify({"msg": "No vehicles"})
 
         near_post_map = graphProcessor.map_vehicles(v_metadata)
         nodes, edges, incident_matrix = graphProcessor.get_graph()
@@ -128,7 +197,7 @@ class RecReq(Resource):
 
         route = vrpProcessor.make_route(routes, dispatch, near_post_map, nodes, edges)
 
-        return jsonify(route)
+        return jsonify({"vehicles": route})
 
 
 class CognitiveAdvisorAPI:
