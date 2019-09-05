@@ -205,7 +205,7 @@ def syntic_graph2_constraction():
 
 def run():
 
-    osmHandler = DataHandler("modules/create_graph/data/split_export.osm",
+    osmHandler = DataHandler("modules/create_graph/data/split_salvadore.osm",
                              {'si':'modules/create_graph/data/List of Postal Offices (geographical location).csv',
                               'hr':'modules/create_graph/data/PU_Geokoordinate.csv'
                                })
@@ -224,8 +224,9 @@ def run():
 
     finder = NeighboursFinder(G)
 
+
     for postId, nodeId in map_posts_to_nodes.items():
-        res = finder.search_near_posts(roadNodes, roadWays, nodeId, 1.3)
+        res = finder.search_near_posts(roadNodes, roadWays, nodeId, 0.8)
         print('PostID ' + str(postId) + ' Node: ' + str(nodeId) + ' r: ' + str(res))
 
         tmpRes.append((postId, nodeId, res))

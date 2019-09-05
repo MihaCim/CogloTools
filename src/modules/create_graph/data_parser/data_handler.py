@@ -29,7 +29,7 @@ class DataHandler():
                     nodeKey = key
 
             tmpNode = nodesL[nodeKey]
-            if utils.calcDistance(post.latitude, post.longitude, tmpNode.lat, tmpNode.lon) < 1:
+            if utils.calcDistance(post.latitude, post.longitude, tmpNode.lat, tmpNode.lon) < 0.1:
                 print(nodeKey)
                 print(post.address)
                 print(utils.calcDistance(post.latitude, post.longitude, tmpNode.lat, tmpNode.lon))

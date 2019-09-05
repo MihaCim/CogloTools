@@ -1,5 +1,7 @@
 import json
 from math import sin, cos, sqrt, atan2, radians, inf
+from modules.mockup_demo.mockup_partitioning import MockupPartitioning
+
 class MockupGraph:
 
     def __init__(self, path):
@@ -66,12 +68,14 @@ class MockupGraph:
         return map_trucks
 
 if __name__ == "__main__":
-    mp = MockupGraph("data/posts.json")
-    print(mp.get_graph())
+    mg = MockupGraph("data/posts.json")
+    print(mg.get_graph())
     trucks = json.loads("[{\"id\": \"carflowF1\", \"latitude\": 43.5104144, \"longitude\": 16.4390596}, "
                         "{\"id\": \"carflowF3\", \"latitude\": 43.5124174, \"longitude\": 16.4322733}]")
 
-    print(mp.map_truck(trucks))
+    print(mg.map_truck(trucks))
+    mp = MockupPartitioning(mg.nodes, mg.edges)
+    mp.partitioning_graph()
 
 
 
