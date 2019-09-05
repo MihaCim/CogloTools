@@ -38,7 +38,7 @@ class MockupGraph:
         edge_array = []
         incident_matrix = []
         for index, node in enumerate(self.edges):
-            edge_array.append(str(node[0]) + "_" + str(node[1]))
+            edge_array.append({'start': node[0], 'end': node[1]})
 
         for key, value in self.nodes.items():
             node_array.append(value["node_id"])

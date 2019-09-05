@@ -9,6 +9,7 @@ from modules.demo.mockup_graph import MockupGraph
 
 SIOT_URL = 'http://151.97.13.227:8080/SIOT-war/SIoT/Server/'
 
+
 class GraphProcessor:
     def __init__(self):
         self.g = MockupGraph()
@@ -33,7 +34,7 @@ class GraphProcessor:
 class LocalSioT:
     def retrieve_local_vehicles(self, payload):
         print("Loading vehicle data from local file")
-        with open('modules/middleware/test/vehicles.json', 'r') as f:
+        with open('modules/middleware/demo/data/vehicles.json', 'r') as f:
             data = json.load(f)["vehicles"]
             vehicles = []
             for i in range(len(payload)):
@@ -43,7 +44,7 @@ class LocalSioT:
             return {"vehicles": vehicles}
 
     def load_demand(self):
-        with open('modules/middleware/test/parcels.json', 'r') as f:
+        with open('modules/middleware/demo/data/parcels.json', 'r') as f:
             return json.load(f)
 
 
@@ -65,25 +66,26 @@ class VrpProcessor:
         for i in range(len(v_routes)):
             route_edges = v_routes[i]
             route = []
-            startend = int(mapping[i][1])
-            curr_node = int(mapping[i][1])
+            home_node = mapping[i][1]
+            curr_node = mapping[i][1]
 
             # run until all loads have been picked up
             while sum(route_edges) != 0.0:
                 # check all edges
                 for j in range(len(route_edges)):
-                    edge_start = int(edges[j].split('_')[0])
-                    edge_end = int(edges[j].split('_')[1])
+                    edge_start = edges[j][0]
+                    edge_end = edges[j][1]
+                    load = round(loads[i][nodes.index(curr_node)], 3)
 
                     # are we on this edge and do we need to pick up anything?
                     if edge_start == curr_node and route_edges[j] > 0:
-                        if route_edges[j] == 1.0 and sum(route_edges) != 1.0 and startend == edge_end:
+                        if route_edges[j] == 1.0 and sum(route_edges) != 1.0 and home_node == edge_end:
                             continue
                         route_edges[j] -= 1  # decrement edge visit counter
                         # create route node
                         route.append(
-                            {"locationId": curr_node, "dropoffWeightKg": round(loads[i][nodes.index(curr_node)], 3),
-                             "dropoffVolumeM3": round(loads[i][nodes.index(curr_node)], 3) / 10})
+                            {"locationId": curr_node, "dropoffWeightKg": load,
+                             "dropoffVolumeM3": load / 10})
                         # reset load weight on node, since we visited it
                         loads[i][nodes.index(curr_node)] = 0
                         # set current node to opposite from where we came on this node
@@ -91,7 +93,7 @@ class VrpProcessor:
                         break
                     # are we on this edge and do we need to pick up anything?
                     if edge_end == curr_node and route_edges[j] > 0:
-                        if route_edges[j] == 1.0 and sum(route_edges) != 1.0 and startend == edge_start:
+                        if route_edges[j] == 1.0 and sum(route_edges) != 1.0 and home_node == edge_start:
                             continue
                         route_edges[j] -= 1
                         route.append(
@@ -102,7 +104,7 @@ class VrpProcessor:
                         break
 
             # append end location
-            route.append({"locationId": startend, "dropoffWeightKg": 0, "dropoffVolumeM3": 0})
+            route.append({"locationId": home_node, "dropoffWeightKg": 0, "dropoffVolumeM3": 0})
             routes.append({"UUID": mapping[i][0], "route": route})
         return routes
 
@@ -121,67 +123,67 @@ class RecReq(Resource):
         data = request.get_json(force=True)
         print(data)
 
-        dummy_resp = {
-            "vehicles": [
-                {
-                    "UUID": "352003092913241",
-                    "route": [
-                        {
-                            "locationId": 17906,
-                            "dropoffVolumeM3": 1.5981999999999998,
-                            "dropoffWeightKg": 15.982
-                        },
-                        {
-                            "locationId": 175,
-                            "dropoffVolumeM3": 1.5608,
-                            "dropoffWeightKg": 15.608
-                        },
-                        {
-                            "locationId": 17906,
-                            "dropoffVolumeM3": 0,
-                            "dropoffWeightKg": 0,
-                        }
-                    ]
-                },
-                {
-                    "UUID": "truck4F0",
-                    "route": [
-                        {
-                            "locationId": 11560,
-                            "dropoffVolumeM3": 1.1644999999999999,
-                            "dropoffWeightKg": 11.645,
-                        },
-                        {
-                            "locationId": 36151,
-                            "dropoffVolumeM3": 1.4777,
-                            "dropoffWeightKg": 14.777,
-                        },
-                        {
-                            "locationId": 8525,
-                            "dropoffVolumeM3": 1.3255000000000001,
-                            "dropoffWeightKg": 13.255,
-                        },
-                        {
-                            "locationId": 74,
-                            "dropoffVolumeM3": 1.3006,
-                            "dropoffWeightKg": 13.006,
-                        },
-                        {
-                            "locationId": 53,
-                            "dropoffVolumeM3": 1.5727,
-                            "dropoffWeightKg": 15.727,
-                        },
-                        {
-                            "locationId": 11560,
-                            "dropoffVolumeM3": 0,
-                            "dropoffWeightKg": 0,
-                        }
-                    ]
-                }
-            ]
-        }
-
-        return jsonify(dummy_resp)
+        # dummy_resp = {
+        #     "vehicles": [
+        #         {
+        #             "UUID": "352003092913241",
+        #             "route": [
+        #                 {
+        #                     "locationId": 17906,
+        #                     "dropoffVolumeM3": 1.5981999999999998,
+        #                     "dropoffWeightKg": 15.982
+        #                 },
+        #                 {
+        #                     "locationId": 175,
+        #                     "dropoffVolumeM3": 1.5608,
+        #                     "dropoffWeightKg": 15.608
+        #                 },
+        #                 {
+        #                     "locationId": 17906,
+        #                     "dropoffVolumeM3": 0,
+        #                     "dropoffWeightKg": 0,
+        #                 }
+        #             ]
+        #         },
+        #         {
+        #             "UUID": "truck4F0",
+        #             "route": [
+        #                 {
+        #                     "locationId": 11560,
+        #                     "dropoffVolumeM3": 1.1644999999999999,
+        #                     "dropoffWeightKg": 11.645,
+        #                 },
+        #                 {
+        #                     "locationId": 36151,
+        #                     "dropoffVolumeM3": 1.4777,
+        #                     "dropoffWeightKg": 14.777,
+        #                 },
+        #                 {
+        #                     "locationId": 8525,
+        #                     "dropoffVolumeM3": 1.3255000000000001,
+        #                     "dropoffWeightKg": 13.255,
+        #                 },
+        #                 {
+        #                     "locationId": 74,
+        #                     "dropoffVolumeM3": 1.3006,
+        #                     "dropoffWeightKg": 13.006,
+        #                 },
+        #                 {
+        #                     "locationId": 53,
+        #                     "dropoffVolumeM3": 1.5727,
+        #                     "dropoffWeightKg": 15.727,
+        #                 },
+        #                 {
+        #                     "locationId": 11560,
+        #                     "dropoffVolumeM3": 0,
+        #                     "dropoffWeightKg": 0,
+        #                 }
+        #             ]
+        #         }
+        #     ]
+        # }
+        #
+        # return jsonify(dummy_resp)
 
         v_metadata = data['vehicles']
 
