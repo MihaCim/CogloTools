@@ -34,7 +34,7 @@ class GraphProcessor:
 class LocalSioT:
     def retrieve_local_vehicles(self, payload):
         print("Loading vehicle data from local file")
-        with open('modules/middleware/demo/data/vehicles.json', 'r') as f:
+        with open('modules/demo/data/vehicles.json', 'r') as f:
             data = json.load(f)["vehicles"]
             vehicles = []
             for i in range(len(payload)):
@@ -44,7 +44,7 @@ class LocalSioT:
             return {"vehicles": vehicles}
 
     def load_demand(self):
-        with open('modules/middleware/demo/data/parcels.json', 'r') as f:
+        with open('modules/demo/data/parcels.json', 'r') as f:
             return json.load(f)
 
 
@@ -52,17 +52,18 @@ class VrpProcessor:
     def __init__(self):
         self.vrp = VRP()
 
-    def process(self, post_mapping, graph, dispatch, capacities, nodes):
+    def process(self, post_mapping, graph, capacities, nodes):
 
         start = [nodes.index(x[1]) for x in post_mapping]
         capacity = [int(x["metadata"]["capacityKg"]) for x in capacities]
-        r = [ran.random() * sum(capacity) for i in range(0, 7)]
-        r = [i * 100.0 / sum(r) for i in r]
-        print(r)
-        return self.vrp.vrp(graph, r, capacity, start)
+        # generate random load demands
+        load_demand = [ran.random() * sum(capacity) for i in range(0, 7)]
+        load_demand = [i * 100.0 / sum(load_demand) for i in load_demand]
+        return self.vrp.vrp(graph, load_demand, capacity, start)
 
     def make_route(self, v_routes, loads, mapping, nodes, edges):
         routes = []
+        print("Building route from VRP output...")
         for i in range(len(v_routes)):
             route_edges = v_routes[i]
             route = []
@@ -73,8 +74,8 @@ class VrpProcessor:
             while sum(route_edges) != 0.0:
                 # check all edges
                 for j in range(len(route_edges)):
-                    edge_start = edges[j][0]
-                    edge_end = edges[j][1]
+                    edge_start = edges[j]['start']
+                    edge_end = edges[j]['end']
                     load = round(loads[i][nodes.index(curr_node)], 3)
 
                     # are we on this edge and do we need to pick up anything?
@@ -195,7 +196,7 @@ class RecReq(Resource):
         loads = siot.load_demand()
 
         print("Processing VRP data.")
-        routes, dispatch, objc = vrpProcessor.process(near_post_map, incident_matrix, loads, v_metadata, nodes)
+        routes, dispatch, objc = vrpProcessor.process(near_post_map, incident_matrix, v_metadata, nodes)
 
         route = vrpProcessor.make_route(routes, dispatch, near_post_map, nodes, edges)
 
