@@ -2,17 +2,17 @@ import unittest
 import numpy as np
 import ortools.linear_solver.pywraplp as pywraplp
 
-def vrp(graph_incidence_mat, dispatch_vec, capacity_vec, start_loc_vec):
-
-
+def vrp(graph_incidence_mat, dispatch_vec, capacity_vec, start_loc_vec,Edges_length):
+    
     #Data validity
     if len(start_loc_vec) != len(capacity_vec):
-        raise ValueError('Number of vehicles & number of locations not match!')
-    if sum(capacity_vec) <= sum(dispatch_vec):
+        raise ValueError('Number of vehicles & number of start locations not match!')
+    if sum(capacity_vec) < sum(dispatch_vec):
         raise ValueError('Total vehicles capacity to low!')
     if len(graph_incidence_mat) != len(dispatch_vec):
         raise ValueError('Number of nodes in dispatch and incidence matrix dont match!')
-
+    if len(Edges_length) != len(graph_incidence_mat[1]):
+        raise ValueError('Size of edges_length and n_edges do not match!')
     E = []
     for row in graph_incidence_mat:
         E.append(row + row)
@@ -249,13 +249,13 @@ def vrp(graph_incidence_mat, dispatch_vec, capacity_vec, start_loc_vec):
     # DECLARE OBJECTIVE FUNCTION & INVOKE THE SOLVER
     #print(str(C));
     cost = None
-    coeffs = [1.0 for _ in C]
-    #print('coeffs: ' + str(coeffs))
-
+    #coeffs = [1.0 for _ in C]
+    coeffs = Edges_length + Edges_length
     #coeffs[3] = 100: coeffs[8] = 100: coeffs[1] = 100: coeffs[6] = 100
-    for coeffN in range(len(C)):
-        cost = variables[offset_c + coeffN]*coeffs[offset_c + coeffN] if coeffN == 0 else cost + variables[offset_c + coeffN]*coeffs[offset_c + coeffN]
-
+    for k in range(n_cycles):
+        for coeffN in range(len(coeffs)):
+            cost = variables[offset_c + k*len(coeffs) + coeffN]*coeffs[offset_c + coeffN] if coeffN == 0 else cost + variables[offset_c + k*len(coeffs) + coeffN]*coeffs[offset_c + coeffN]
+            #print (variables[offset_c + k*len(coeffs) + coeffN], coeffs[offset_c + coeffN])
     # run the optimization and check if we got an optimal solution
     solver.Minimize(cost)
     result_status = solver.Solve()
