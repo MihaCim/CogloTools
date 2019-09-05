@@ -13,7 +13,6 @@ def vrp(graph_incidence_mat, dispatch_vec, capacity_vec, start_loc_vec,Edges_len
         raise ValueError('Number of nodes in dispatch and incidence matrix dont match!')
     if len(Edges_length) != len(graph_incidence_mat[1]):
         raise ValueError('Size of edges_length and n_edges do not match!')
-
     E = []
     for row in graph_incidence_mat:
         E.append(row + row)

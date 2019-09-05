@@ -1,5 +1,9 @@
 # Python files
 *.pyc
-
+.idea
+venv
 # Vim files
 .vimrc
+.idea/*
+*.osm
+*.pbf
