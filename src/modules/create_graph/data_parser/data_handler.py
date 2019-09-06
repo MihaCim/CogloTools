@@ -134,9 +134,9 @@ class DataHandler():
         for edge in self.ways:
             l = edge.get_all_nodes()
             if l[0] not in n:
-                G.add_node(l[0], pos=(self.nodes[l[0]].lat, self.nodes[l[0]].lon))
+                G.add_node(l[0], pos=(self.nodes[l[0]].lon, self.nodes[l[0]].lat))
             if l[1] not in n:
-                G.add_node(l[1], pos=(self.nodes[l[1]].lat, self.nodes[l[1]].lon))
+                G.add_node(l[1], pos=(self.nodes[l[1]].lon, self.nodes[l[1]].lat))
             G.add_edge(l[0], l[1], weight=edge.distance)
             n.add(l[0])
             n.add(l[1])
