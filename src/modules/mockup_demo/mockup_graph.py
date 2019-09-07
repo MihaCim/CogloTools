@@ -3,6 +3,7 @@ from math import sin, cos, sqrt, atan2, radians, inf
 from modules.mockup_demo.mockup_partitioning import MockupPartitioning
 
 
+
 class MockupGraph:
 
     def __init__(self, path='modules/demo/data/posts.json'):

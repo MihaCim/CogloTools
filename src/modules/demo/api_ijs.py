@@ -1,18 +1,20 @@
 import json
+from math import inf
 
 from flask import Flask, request
 from flask_jsonpify import jsonify
 from flask_restful import Resource, Api
 import random as ran
-from modules.demo.vrp import VRP
+from modules.cvrp.vrp import VRP
 from modules.demo.mockup_graph import MockupGraph
+import time
 
 SIOT_URL = 'http://151.97.13.227:8080/SIOT-war/SIoT/Server/'
 
 
 class GraphProcessor:
     def __init__(self):
-        self.g = MockupGraph()
+        self.g = MockupGraph('modules/demo/data/9node.json')
 
     def map_vehicles(self, data):
         vehicles = []
@@ -48,70 +50,84 @@ class LocalSioT:
             return json.load(f)
 
 
+siot = LocalSioT()
+graphProcessor = GraphProcessor()
+
+
 class VrpProcessor:
     def __init__(self):
         self.vrp = VRP()
 
-    def process(self, post_mapping, graph, capacities, nodes):
+    def process(self, post_mapping, graph, capacities, nodes, edges):
 
-        start = [nodes.index(x[1]) for x in post_mapping]
+        start = [nodes.index(x) for x in post_mapping]
         capacity = [int(x["metadata"]["capacityKg"]) for x in capacities]
         # generate random load demands
-        load_demand = [ran.random() * sum(capacity) for i in range(0, 7)]
-        load_demand = [i * 100.0 / sum(load_demand) for i in load_demand]
-        return self.vrp.vrp(graph, load_demand, capacity, start)
+        load_demand = [ran.random() * sum(capacity) for i in range(0, len(nodes))]
+        load_demand = [int(i * 100.0 / sum(load_demand)) for i in load_demand]
+        costs = [e.cost for e in edges]
+        return self.vrp.vrp(graph, load_demand, capacity, start, costs)
 
-    def make_route(self, v_routes, loads, mapping, nodes, edges):
+    def find_closest_post(self, loads, start, nodes):
+        min_dist = inf
+        min_idx = -1
+        for post_idx, load in enumerate(loads):
+            if load > 0:
+                cur_dist = graphProcessor.g.distance(start, nodes[post_idx])
+                if cur_dist < min_dist:
+                    min_dist = cur_dist
+                    min_idx = post_idx
+        return min_idx
+
+    def make_route(self, graph_routes, loads, start_nodes, nodes, edges):
         routes = []
         print("Building route from VRP output...")
-        for i in range(len(v_routes)):
-            route_edges = v_routes[i]
+        print(len(edges))
+        start_time = time.time()
+        routes = []
+
+        for i, vehicle in enumerate(loads):
             route = []
-            home_node = mapping[i][1]
-            curr_node = mapping[i][1]
+            start_node = start_nodes[i]
+            current_node = start_node
+            vehicle[nodes.index(current_node)] -= vehicle[nodes.index(current_node)]
+            cost_astar = 0
+            old = vehicle.copy()
 
-            # run until all loads have been picked up
-            while sum(route_edges) != 0.0:
-                # check all edges
-                for j in range(len(route_edges)):
-                    edge_start = edges[j]['start']
-                    edge_end = edges[j]['end']
-                    load = round(loads[i][nodes.index(curr_node)], 3)
+            while sum(vehicle) > 1:
+                post_idx = self.find_closest_post(vehicle, current_node, nodes)
+                target = nodes[post_idx]
+                vehicle[post_idx] -= vehicle[post_idx]
+                partial_path = graphProcessor.g.get_path(current_node, target)
+                for node in partial_path.path:
+                    for idx, val in enumerate(vehicle):
+                        if val > 0 and nodes.index(node) == idx:
+                            vehicle[idx] -= vehicle[idx]
 
-                    # are we on this edge and do we need to pick up anything?
-                    if edge_start == curr_node and route_edges[j] > 0:
-                        if route_edges[j] == 1.0 and sum(route_edges) != 1.0 and home_node == edge_end:
-                            continue
-                        route_edges[j] -= 1  # decrement edge visit counter
-                        # create route node
-                        route.append(
-                            {"locationId": curr_node, "dropoffWeightKg": load,
-                             "dropoffVolumeM3": load / 10})
-                        # reset load weight on node, since we visited it
-                        loads[i][nodes.index(curr_node)] = 0
-                        # set current node to opposite from where we came on this node
-                        curr_node = edge_end
-                        break
-                    # are we on this edge and do we need to pick up anything?
-                    if edge_end == curr_node and route_edges[j] > 0:
-                        if route_edges[j] == 1.0 and sum(route_edges) != 1.0 and home_node == edge_start:
-                            continue
-                        route_edges[j] -= 1
-                        route.append(
-                            {"locationId": curr_node, "dropoffWeightKg": round(loads[i][nodes.index(curr_node)], 3),
-                             "dropoffVolumeM3": round(loads[i][nodes.index(curr_node)], 3) / 10})
-                        loads[i][nodes.index(curr_node)] = 0
-                        curr_node = edge_start
-                        break
+                current_node = target
+                cost_astar += partial_path.cost
 
-            # append end location
-            route.append({"locationId": home_node, "dropoffWeightKg": 0, "dropoffVolumeM3": 0})
-            routes.append({"UUID": mapping[i][0], "route": route})
-        return routes
+                #avoid adding duplicate node on start of route
+                route += partial_path.path if len(partial_path.path) == 1 else partial_path.path[1:]
+
+            edges_vrp = sum(graph_routes[i])
+            edges_astar = len(route)
+            print("VRP: {}, A*:{}".format(edges_vrp, edges_astar))
+            cost_vrp = 0
+            for i,c in enumerate(graph_routes[i]):
+                cost_vrp += c * edges[i].cost
+
+            print("Cost VRP: {}, Cost A*:{}".format(cost_vrp, cost_astar))
+            graphProcessor.g.print_path(route)
+            print([item if x > 0 else -1 for item,x in enumerate(old)])
+            print(old)
+
+            routes.append(route)
+
+        print("Route build took: {}s".format(time.time() - start_time))
+        return {}
 
 
-siot = LocalSioT()
-graphProcessor = GraphProcessor()
 vrpProcessor = VrpProcessor()
 
 
@@ -124,68 +140,6 @@ class RecReq(Resource):
         data = request.get_json(force=True)
         print(data)
 
-        # dummy_resp = {
-        #     "vehicles": [
-        #         {
-        #             "UUID": "352003092913241",
-        #             "route": [
-        #                 {
-        #                     "locationId": 17906,
-        #                     "dropoffVolumeM3": 1.5981999999999998,
-        #                     "dropoffWeightKg": 15.982
-        #                 },
-        #                 {
-        #                     "locationId": 175,
-        #                     "dropoffVolumeM3": 1.5608,
-        #                     "dropoffWeightKg": 15.608
-        #                 },
-        #                 {
-        #                     "locationId": 17906,
-        #                     "dropoffVolumeM3": 0,
-        #                     "dropoffWeightKg": 0,
-        #                 }
-        #             ]
-        #         },
-        #         {
-        #             "UUID": "truck4F0",
-        #             "route": [
-        #                 {
-        #                     "locationId": 11560,
-        #                     "dropoffVolumeM3": 1.1644999999999999,
-        #                     "dropoffWeightKg": 11.645,
-        #                 },
-        #                 {
-        #                     "locationId": 36151,
-        #                     "dropoffVolumeM3": 1.4777,
-        #                     "dropoffWeightKg": 14.777,
-        #                 },
-        #                 {
-        #                     "locationId": 8525,
-        #                     "dropoffVolumeM3": 1.3255000000000001,
-        #                     "dropoffWeightKg": 13.255,
-        #                 },
-        #                 {
-        #                     "locationId": 74,
-        #                     "dropoffVolumeM3": 1.3006,
-        #                     "dropoffWeightKg": 13.006,
-        #                 },
-        #                 {
-        #                     "locationId": 53,
-        #                     "dropoffVolumeM3": 1.5727,
-        #                     "dropoffWeightKg": 15.727,
-        #                 },
-        #                 {
-        #                     "locationId": 11560,
-        #                     "dropoffVolumeM3": 0,
-        #                     "dropoffWeightKg": 0,
-        #                 }
-        #             ]
-        #         }
-        #     ]
-        # }
-        #
-        # return jsonify(dummy_resp)
-
         v_metadata = data['vehicles']
 
         if len(v_metadata) < 1:
@@ -193,10 +147,9 @@ class RecReq(Resource):
 
         near_post_map = graphProcessor.map_vehicles(v_metadata)
         nodes, edges, incident_matrix = graphProcessor.get_graph()
-        loads = siot.load_demand()
 
         print("Processing VRP data.")
-        routes, dispatch, objc = vrpProcessor.process(near_post_map, incident_matrix, v_metadata, nodes)
+        routes, dispatch, objc = vrpProcessor.process(near_post_map, incident_matrix, v_metadata, nodes, edges)
 
         route = vrpProcessor.make_route(routes, dispatch, near_post_map, nodes, edges)
 
