@@ -30,7 +30,7 @@ class GraphProcessor:
         return self.g.map_vehicles(vehicles)
 
     def get_graph(self):
-        return self.g.get_graph()
+        return self.g.nodes, self.g.edges, self.g.incident_matrix
 
 
 class LocalSioT:

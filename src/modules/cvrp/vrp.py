@@ -44,7 +44,7 @@ class VRP:
         cols_A1 = n_nodes * n_cycles + n_edges * n_cycles
 
         A1 = np.zeros((rows_A1, cols_A1))
-        b1 = [0 for _ in range(rows_A1 - AddRow)] + [-1 for _ in range(AddRow)]
+        b1 = ([0] * (rows_A1 - AddRow)) + ([-1] * AddRow)
 
         offset_block0 = 0
         offset_block1 = n_nodes * n_cycles
@@ -82,7 +82,7 @@ class VRP:
         # number of columns: num. n_nodes * num. of cycles
         # variables Oki
         # B vector = [dispatch_vec, -dispatch_vec]
-        b2 = demand + [-val for val in demand] + [0 for _ in range(n_cycles * n_nodes)]
+        b2 = demand + [-val for val in demand] + ([0] *(n_cycles * n_nodes))
 
         rows_A2 = 2 * n_nodes + n_nodes * n_cycles
         cols_A2 = n_nodes * n_cycles
@@ -150,17 +150,13 @@ class VRP:
         A4 = np.vstack([A41.copy(), A42[0:n_slacks, :]])
         A4 = np.vstack([A4, A43])
 
-        b4 = [0 for _ in range(n_nodes * n_cycles)]
-        # b4=[-2*np.sum(dispatch_vec)]
-        for _ in range(2 * n_cycles * n_nodes * n_edges):
-            b4.append(0)
+        b4 = [0] * ((n_nodes * n_cycles) + (2 * n_cycles * n_nodes * n_edges))
 
         # FINAL MATRIX  - A with all constraints
         # concatenate A1 and A23 = A matrix
         A1extend = np.c_[A1, np.zeros((len(A1), len(A23[0])))]
         A23extend = np.c_[np.zeros((len(A23), len(A1[0]))), A23]
 
-        A123 = A1extend.copy()
         A123 = np.vstack([A1extend.copy(), A23extend[0:len(A23)]])
 
         # Final concate A123 & A4
@@ -205,9 +201,6 @@ class VRP:
         for varN, xi_name in enumerate(Aijk):  # declaring load dispatch variables
             variables.append(solver.NumVar(x_min, x_max, xi_name))
 
-        # for varN, var in enumerate(variables):
-        #    print('var ' + str(varN) + ': ' + str(var))
-
         # DECLARE CONSTRAINTS
         for rowN, row in enumerate(A):
             left_side = None
@@ -230,7 +223,7 @@ class VRP:
         coeffs = edges_length
         for k in range(n_cycles):
             for coeffN in range(n_edges):
-                cost = cost + variables[offset_c + k * n_edges + coeffN] * coeffs[offset_c + coeffN]
+                cost += variables[offset_c + k * n_edges + coeffN] * coeffs[offset_c + coeffN]
 
         solvetime = time.time()
         # run the optimization and check if we got an optimal solution

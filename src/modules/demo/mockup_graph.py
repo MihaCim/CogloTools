@@ -30,6 +30,9 @@ class MockupGraph:
     def __init__(self, path='modules/demo/data/posts.json'):
         self.nodes, self.edges, self.edge_map = self.__load_graph(path)
         self.paths = self.__calculate_shortest_paths()
+        self.incident_matrix = []
+        self.make_matrix()
+
 
     def _backtrack_path(self, came_from, goal, start):
         """Produces a list of nodes from A* output by backtracking over nodes"""
@@ -145,7 +148,7 @@ class MockupGraph:
         print("No such path")
         return None
 
-    def get_graph(self):
+    def make_matrix(self):
         incident_matrix = []
 
         for ni, n in enumerate(self.nodes):
@@ -153,9 +156,8 @@ class MockupGraph:
             for ne, e in enumerate(self.edges):
                 if e.start == n.id:
                     tmp_arr[ne] = 1
-            incident_matrix.append(tmp_arr)
+            self.incident_matrix.append(tmp_arr)
 
-        return self.nodes, self.edges, incident_matrix
 
     def map_vehicles(self, vehicles):
         map_trucks = []
