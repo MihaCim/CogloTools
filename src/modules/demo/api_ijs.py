@@ -58,15 +58,20 @@ class VrpProcessor:
     def __init__(self):
         self.vrp = VRP()
 
-    def process(self, post_mapping, graph, capacities, nodes, edges):
+    def process(self, post_mapping, graph, metadata, nodes, edges):
+        dropoff = [0] * len(nodes)
+        for v in metadata:
+            for loc in v['dropOffLocations']:
+                target = graphProcessor.g.node_from_id(loc['locationId'])
+                idx = nodes.index(target)
+                dropoff[idx] += loc['dropoffWeightKg']
 
         start = [nodes.index(x) for x in post_mapping]
-        capacity = [int(x["metadata"]["capacityKg"]) for x in capacities]
+        capacity = [int(x["metadata"]["capacityKg"]) for x in metadata]
         # generate random load demands
-        load_demand = [ran.random() * sum(capacity) for i in range(0, len(nodes))]
-        load_demand = [int(i * 100.0 / sum(load_demand)) for i in load_demand]
+
         costs = [e.cost for e in edges]
-        return self.vrp.vrp(graph, load_demand, capacity, start, costs)
+        return self.vrp.vrp(graph, dropoff, capacity, start, costs)
 
     def find_closest_post(self, loads, start, nodes):
         min_dist = inf
@@ -80,7 +85,6 @@ class VrpProcessor:
         return min_idx
 
     def make_route(self, graph_routes, loads, start_nodes, nodes, edges):
-        routes = []
         print("Building route from VRP output...")
         print(len(edges))
         start_time = time.time()
@@ -94,6 +98,9 @@ class VrpProcessor:
             cost_astar = 0
             old = vehicle.copy()
 
+            # always find closest post with parcels to pick/drop off.
+            # start at closest node
+            # get route and clear up any packages on this route
             while sum(vehicle) > 1:
                 post_idx = self.find_closest_post(vehicle, current_node, nodes)
                 target = nodes[post_idx]
@@ -107,19 +114,20 @@ class VrpProcessor:
                 current_node = target
                 cost_astar += partial_path.cost
 
-                #avoid adding duplicate node on start of route
+                # avoid adding duplicate node on start of route
                 route += partial_path.path if len(partial_path.path) == 1 else partial_path.path[1:]
 
+            # debug info
             edges_vrp = sum(graph_routes[i])
             edges_astar = len(route)
             print("VRP: {}, A*:{}".format(edges_vrp, edges_astar))
             cost_vrp = 0
-            for i,c in enumerate(graph_routes[i]):
-                cost_vrp += c * edges[i].cost
+            for j, count in enumerate(graph_routes[i]):
+                cost_vrp += count * edges[j].cost
 
             print("Cost VRP: {}, Cost A*:{}".format(cost_vrp, cost_astar))
             graphProcessor.g.print_path(route)
-            print([item if x > 0 else -1 for item,x in enumerate(old)])
+            print([item if x > 0 else -1 for item, x in enumerate(old)])
             print(old)
 
             routes.append(route)
@@ -140,16 +148,16 @@ class RecReq(Resource):
         data = request.get_json(force=True)
         print(data)
 
-        v_metadata = data['vehicles']
+        vehicle_metadata = data['vehicles']
 
-        if len(v_metadata) < 1:
+        if len(vehicle_metadata) < 1:
             return jsonify({"msg": "No vehicles"})
 
-        near_post_map = graphProcessor.map_vehicles(v_metadata)
+        near_post_map = graphProcessor.map_vehicles(vehicle_metadata)
         nodes, edges, incident_matrix = graphProcessor.get_graph()
 
         print("Processing VRP data.")
-        routes, dispatch, objc = vrpProcessor.process(near_post_map, incident_matrix, v_metadata, nodes, edges)
+        routes, dispatch, objc = vrpProcessor.process(near_post_map, incident_matrix, vehicle_metadata, nodes, edges)
 
         route = vrpProcessor.make_route(routes, dispatch, near_post_map, nodes, edges)
 

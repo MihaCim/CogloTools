@@ -44,9 +44,7 @@ class VRP:
         cols_A1 = n_nodes * n_cycles + n_edges * n_cycles
 
         A1 = np.zeros((rows_A1, cols_A1))
-        b1 = [0 for _ in range(rows_A1 - AddRow)]
-        for _ in range(AddRow):
-            b1.append(-1)
+        b1 = [0 for _ in range(rows_A1 - AddRow)] + [-1 for _ in range(AddRow)]
 
         offset_block0 = 0
         offset_block1 = n_nodes * n_cycles
@@ -106,10 +104,7 @@ class VRP:
         for k in range(0, n_cycles):  # for each vehicle
             for i in range(0, n_nodes):  # take the sum of load on enach node (sum on Ow variables)
                 A3[k, i + k * n_nodes] = 1
-        A23 = A2
-        for i in range(0, len(A3)):
-            A23 = np.vstack([A23, A3[i, :]])
-        # print(str('\\n'.join(' '.join([str(int(val)) for val in row]) for row in A23)))
+        A23 = np.vstack([A2, A3])
 
         # CONSTRAINT I - total number of all packets delivered is equal to summ of all dispatch_vec
         n_vars = 2 * n_nodes * n_cycles + n_edges * n_cycles  # number of columns in matrix A1+A2+A3, variables X, K, O
@@ -152,11 +147,8 @@ class VRP:
                         offset + i * n_edges * n_cycles + j * n_cycles + k,
                         offset2 + i * n_edges * n_cycles + j * n_cycles + k] = 1
 
-        A4 = A41.copy()
-        for i in range(0, n_slacks):
-            A4 = np.vstack([A4, A42[i, :]])
-        for i in range(0, len(A43)):
-            A4 = np.vstack([A4, A43[i, :]])
+        A4 = np.vstack([A41.copy(), A42[0:n_slacks, :]])
+        A4 = np.vstack([A4, A43])
 
         b4 = [0 for _ in range(n_nodes * n_cycles)]
         # b4=[-2*np.sum(dispatch_vec)]
@@ -169,14 +161,16 @@ class VRP:
         A23extend = np.c_[np.zeros((len(A23), len(A1[0]))), A23]
 
         A123 = A1extend.copy()
-        for i in range(0, len(A23)):
-            A123 = np.vstack([A123, A23extend[i, :]])
+        A123 = np.vstack([A1extend.copy(), A23extend[0:len(A23)]])
 
         # Final concate A123 & A4
         A123extend = np.c_[A123, np.zeros((len(A123), n_nodes * n_edges * n_cycles))]
-        A = A123extend.copy()
-        for i in range(0, len(A4)):
-            A = np.vstack([A, A4[i, :]])
+        timea = time.time()
+        # A = A123extend.copy()
+        A = np.vstack([A123extend.copy(), A4])
+        endtime = time.time() - timea
+        print("Vstack took: {} for {}".format(endtime, A.shape))
+
         b = b1 + b23 + b4
 
         # CREATE VARIABLES  X - vector with c11-cnn variables
@@ -206,9 +200,9 @@ class VRP:
             variables.append(solver.IntVar(x_min, x_max, xi_name))
         for varN, xi_name in enumerate(K):  # declaring slack variables
             variables.append(solver.IntVar(x_min, x_max, xi_name))
-        for varN, xi_name in enumerate(Ow):  # declaring load doispatch variables
+        for varN, xi_name in enumerate(Ow):  # declaring load dispatch variables
             variables.append(solver.NumVar(x_min, x_max, xi_name))
-        for varN, xi_name in enumerate(Aijk):  # declaring load doispatch variables
+        for varN, xi_name in enumerate(Aijk):  # declaring load dispatch variables
             variables.append(solver.NumVar(x_min, x_max, xi_name))
 
         # for varN, var in enumerate(variables):
@@ -220,7 +214,7 @@ class VRP:
             for colN, coeff in enumerate(row):
                 if coeff == 0:
                     continue
-                if left_side is None:
+                elif left_side is None:
                     left_side = coeff * variables[colN]
                 else:
                     left_side += coeff * variables[colN]
@@ -238,10 +232,13 @@ class VRP:
             for coeffN in range(n_edges):
                 cost = cost + variables[offset_c + k * n_edges + coeffN] * coeffs[offset_c + coeffN]
 
+        solvetime = time.time()
         # run the optimization and check if we got an optimal solution
         solver.Minimize(cost)
         result_status = solver.Solve()
         assert result_status == pywraplp.Solver.OPTIMAL
+        endsolve = time.time() - solvetime
+        print("Solver took: {}".format(endsolve))
 
         obj_val = solver.Objective().Value()
 
@@ -249,6 +246,7 @@ class VRP:
         Omatrix = []
 
         for k in range(n_cycles):
+            # edges
             C_row = []
             for j in range(n_edges):
                 idx1 = offset_c + n_edges * k + j
@@ -256,7 +254,7 @@ class VRP:
                 C_row.append(val1)
             routes.append(C_row)
 
-        for k in range(n_cycles):
+            # nodes
             O_row = []
             for i in range(n_nodes):
                 O_row.append(variables[offset_o + n_nodes * k + i].solution_value())
