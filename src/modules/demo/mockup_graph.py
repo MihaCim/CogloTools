@@ -44,7 +44,7 @@ class MockupGraph:
         return nodes
 
     def print_path(self, path):
-        print("Path found, {0} nodes".format(len(path)))
+        print("{0} nodes: ".format(len(path)), end='')
         print(" -> ".join([str(n.id) for n in path]))
 
     def _get_neighbours(self, node):
@@ -98,7 +98,7 @@ class MockupGraph:
         return paths
 
     def _load_graph(self, path):
-        with open(path, "r") as read_file:
+        with open(path, "r", encoding='UTF-8') as read_file:
             data = json.load(read_file)
             nodes = []
             edge_map = {}

@@ -102,30 +102,28 @@ class VrpProcessor:
             # always find closest post with parcels to pick/drop off.
             # start at closest node
             # get route and clear up any packages on this route
-            while sum(vehicle_load) > 1:
-                post_idx = self.find_closest_post(vehicle_load, current_node, nodes)
-                target = nodes[post_idx]
-                vehicle_load[post_idx] -= vehicle_load[post_idx]
-                partial_path = graphProcessor.g.get_path(current_node, target)
-                for node in partial_path.path:
+            while sum(vehicle_load) > 1: #run until all parcels have been delivered
+                post_idx = self.find_closest_post(vehicle_load, current_node, nodes) #idx of closest post with parcel demand
+                target = nodes[post_idx] #convert idx to node object
+                vehicle_load[post_idx] -= vehicle_load[post_idx] #take/drop all parcels
+                partial_path = graphProcessor.g.get_path(current_node, target) #get path from current to next dropoff node
+                for node in partial_path.path: #drop off parcels along the way to targer
                     for idx, val in enumerate(vehicle_load):
                         if val > 0 and nodes.index(node) == idx:
                             vehicle_load[idx] -= vehicle_load[idx]
 
-                current_node = target
+                current_node = target #we are now at new node
                 cost_astar += partial_path.cost
 
-                # avoid adding duplicate node on start of route
+                # merge existing and new route, avoid adding duplicate node on start of route
                 route += partial_path.path if len(partial_path.path) == 1 else partial_path.path[1:]
 
             # debug info
             print("Vehicle: {}".format(vehicles[i]['vehicleId']))
-            edges_vrp = sum(graph_routes[i])
-            edges_astar = len(route)
-            print("Edges: VRP: {}, A*:{}".format(edges_vrp, edges_astar))
-            cost_vrp = 0
-            for j, count in enumerate(graph_routes[i]):
-                cost_vrp += count * edges[j].cost
+            print("Edges: VRP: {}, A*:{}".format(sum(graph_routes[i]), len(route)))
+
+            #calculate theoretical cost of all visited edges in vrp, to compare to A*
+            cost_vrp = sum([count*edges[j].cost for j, count in enumerate(graph_routes[i])])
 
             print("Cost VRP: {}, Cost A*:{}".format(cost_vrp, cost_astar))
             graphProcessor.g.print_path(route)
@@ -136,6 +134,7 @@ class VrpProcessor:
             converted_routes.append({
                 "UUID": vehicles[i]["vehicleId"],
                 "route": self.route_to_sumo_format(route, original_vehicle_load, nodes)})
+
 
         print("Route build took: {}s".format(time.time() - start_time))
         return converted_routes
@@ -185,7 +184,6 @@ class RecReq(Resource):
 
 class CognitiveAdvisorAPI:
     def __init__(self, port=5000):
-        # http://151.97.13.227:8080/SIOT-war/SIoT/Server/proposedPlan
         self._port = port
         self._app = Flask(__name__)
         self._api = Api(self._app)
@@ -199,10 +197,6 @@ class CognitiveAdvisorAPI:
 
     def serve(self):
         self._app.run(host='0.0.0.0', port=self._port)
-
-    # ================================
-    #  API ENDPOINTS
-    # ================================
 
 
 if __name__ == '__main__':
