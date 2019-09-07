@@ -84,32 +84,33 @@ class VrpProcessor:
                     min_idx = post_idx
         return min_idx
 
-    def make_route(self, graph_routes, loads, start_nodes, nodes, edges):
+    def make_route(self, graph_routes, loads, start_nodes, nodes, edges, vehicles):
         print("Building route from VRP output...")
         print(len(edges))
         start_time = time.time()
         routes = []
+        converted_routes = []
 
-        for i, vehicle in enumerate(loads):
+        for i, vehicle_load in enumerate(loads):
             route = []
             start_node = start_nodes[i]
             current_node = start_node
-            vehicle[nodes.index(current_node)] -= vehicle[nodes.index(current_node)]
+            vehicle_load[nodes.index(current_node)] -= vehicle_load[nodes.index(current_node)]
             cost_astar = 0
-            old = vehicle.copy()
+            original_vehicle_load = vehicle_load.copy()
 
             # always find closest post with parcels to pick/drop off.
             # start at closest node
             # get route and clear up any packages on this route
-            while sum(vehicle) > 1:
-                post_idx = self.find_closest_post(vehicle, current_node, nodes)
+            while sum(vehicle_load) > 1:
+                post_idx = self.find_closest_post(vehicle_load, current_node, nodes)
                 target = nodes[post_idx]
-                vehicle[post_idx] -= vehicle[post_idx]
+                vehicle_load[post_idx] -= vehicle_load[post_idx]
                 partial_path = graphProcessor.g.get_path(current_node, target)
                 for node in partial_path.path:
-                    for idx, val in enumerate(vehicle):
+                    for idx, val in enumerate(vehicle_load):
                         if val > 0 and nodes.index(node) == idx:
-                            vehicle[idx] -= vehicle[idx]
+                            vehicle_load[idx] -= vehicle_load[idx]
 
                 current_node = target
                 cost_astar += partial_path.cost
@@ -118,22 +119,40 @@ class VrpProcessor:
                 route += partial_path.path if len(partial_path.path) == 1 else partial_path.path[1:]
 
             # debug info
+            print("Vehicle: {}".format(vehicles[i]['vehicleId']))
             edges_vrp = sum(graph_routes[i])
             edges_astar = len(route)
-            print("VRP: {}, A*:{}".format(edges_vrp, edges_astar))
+            print("Edges: VRP: {}, A*:{}".format(edges_vrp, edges_astar))
             cost_vrp = 0
             for j, count in enumerate(graph_routes[i]):
                 cost_vrp += count * edges[j].cost
 
             print("Cost VRP: {}, Cost A*:{}".format(cost_vrp, cost_astar))
             graphProcessor.g.print_path(route)
-            print([item if x > 0 else -1 for item, x in enumerate(old)])
-            print(old)
+            print([item if x > 0 else -1 for item, x in enumerate(original_vehicle_load)])
+            print(original_vehicle_load)
 
             routes.append(route)
+            converted_routes.append({
+                "UUID": vehicles[i]["vehicleId"],
+                "route": self.route_to_sumo_format(route, original_vehicle_load, nodes)})
 
         print("Route build took: {}s".format(time.time() - start_time))
-        return {}
+        return converted_routes
+
+    def route_to_sumo_format(self, route, loads, nodes):
+        converted_route = []
+
+        for idx, node in enumerate(route):
+            node_idx = nodes.index(node)
+
+            converted_route.append({
+                "locationId": node.id,
+                "dropoffWeightKg": int(loads[node_idx]),
+                "dropoffVolumeM3": int(loads[node_idx] / 10)
+            })
+
+        return converted_route
 
 
 vrpProcessor = VrpProcessor()
@@ -159,7 +178,7 @@ class RecReq(Resource):
         print("Processing VRP data.")
         routes, dispatch, objc = vrpProcessor.process(near_post_map, incident_matrix, vehicle_metadata, nodes, edges)
 
-        route = vrpProcessor.make_route(routes, dispatch, near_post_map, nodes, edges)
+        route = vrpProcessor.make_route(routes, dispatch, near_post_map, nodes, edges, vehicle_metadata)
 
         return jsonify({"vehicles": route})
 

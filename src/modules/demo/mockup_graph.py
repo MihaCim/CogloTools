@@ -28,8 +28,8 @@ class Path:
 class MockupGraph:
 
     def __init__(self, path='modules/demo/data/posts.json'):
-        self.nodes, self.edges, self.edge_map = self.__load_graph(path)
-        self.paths = self.__calculate_shortest_paths()
+        self.nodes, self.edges, self.edge_map = self._load_graph(path)
+        self.paths = self._calculate_shortest_paths()
         self.incident_matrix = []
         self.make_matrix()
 
@@ -87,7 +87,7 @@ class MockupGraph:
 
 
 
-    def __calculate_shortest_paths(self):
+    def _calculate_shortest_paths(self):
         paths = {}
         for i, start in enumerate(self.nodes):
             for j, end in enumerate(self.nodes):
@@ -97,7 +97,7 @@ class MockupGraph:
                 paths[start].append(path)
         return paths
 
-    def __load_graph(self, path):
+    def _load_graph(self, path):
         with open(path, "r") as read_file:
             data = json.load(read_file)
             nodes = []

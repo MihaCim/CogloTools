@@ -65,13 +65,11 @@ class VRP:
 
         for k in range(0, n_cycles):
             for j in range(0, n_edges):
-                # C_kj >= 0
                 A1[offset_block3 + k * n_edges + j, offset_c + k * n_edges + j] = -1
 
         insert_line = 0
         for k in range(n_cycles):
             location_node = start_loc_vec[k]
-            # print (location_node)
             if location_node >= 0:
                 for j in range(n_edges):
                     A1[offset_block4 + insert_line, offset_c + k * n_edges + j] = -E[location_node][j]
@@ -162,7 +160,6 @@ class VRP:
         # Final concate A123 & A4
         A123extend = np.c_[A123, np.zeros((len(A123), n_nodes * n_edges * n_cycles))]
         timea = time.time()
-        # A = A123extend.copy()
         A = np.vstack([A123extend.copy(), A4])
         endtime = time.time() - timea
         print("Vstack took: {} for {}".format(endtime, A.shape))
