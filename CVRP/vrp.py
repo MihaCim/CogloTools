@@ -11,11 +11,11 @@ def vrp(graph_incidence_mat, dispatch_vec, capacity_vec, start_loc_vec,Edges_len
         raise ValueError('Total vehicles capacity to low!')
     if len(graph_incidence_mat) != len(dispatch_vec):
         raise ValueError('Number of nodes in dispatch and incidence matrix dont match!')
-    if len(Edges_length) != len(graph_incidence_mat[1]):
+    if len(Edges_length) != len(graph_incidence_mat[0]):
         raise ValueError('Size of edges_length and n_edges do not match!')
     E = []
     for row in graph_incidence_mat:
-        E.append(row + row)
+        E.append(row)
 
     # Additional Variables
     n_cycles = np.size(capacity_vec)
@@ -121,7 +121,7 @@ def vrp(graph_incidence_mat, dispatch_vec, capacity_vec, start_loc_vec,Edges_len
 
     # Adding constraints 4.2.: Aijk - Cki*di <= 0 
     #b vector = [0,0,...0], size = n_nodes* n_edges * n_cycles
-    offsetA4=0
+    
     A42 = np.zeros((n_slacks, cols_A4))
     for i in range (0, n_nodes):
         for j in range (0,n_edges):
@@ -174,7 +174,8 @@ def vrp(graph_incidence_mat, dispatch_vec, capacity_vec, start_loc_vec,Edges_len
     for i in range (0, len(A4)):
         A=np.vstack([A, A4[i,:]])
     b=b1+b23+b4
-    non_zero_rows = np.count_nonzero((A != 0).sum(1)); zero_rows = len(A) - non_zero_rows
+    non_zero_rows = np.count_nonzero((A != 0).sum(1))
+    #zero_rows = len(A) - non_zero_rows
 
     #print('A:')
     #for row in A:
@@ -248,14 +249,12 @@ def vrp(graph_incidence_mat, dispatch_vec, capacity_vec, start_loc_vec,Edges_len
 
     # DECLARE OBJECTIVE FUNCTION & INVOKE THE SOLVER
     #print(str(C));
-    cost = None
-    #coeffs = [1.0 for _ in C]
-    coeffs = Edges_length + Edges_length
-    #coeffs[3] = 100: coeffs[8] = 100: coeffs[1] = 100: coeffs[6] = 100
+    cost = 0
+    coeffs = Edges_length
     for k in range(n_cycles):
-        for coeffN in range(len(coeffs)):
-            cost = variables[offset_c + k*len(coeffs) + coeffN]*coeffs[offset_c + coeffN] if coeffN == 0 else cost + variables[offset_c + k*len(coeffs) + coeffN]*coeffs[offset_c + coeffN]
-            #print (variables[offset_c + k*len(coeffs) + coeffN], coeffs[offset_c + coeffN])
+        for coeffN in range(n_edges):
+            cost = cost + variables[offset_c + k*n_edges + coeffN]*coeffs[offset_c + coeffN]
+            
     # run the optimization and check if we got an optimal solution
     solver.Minimize(cost)
     result_status = solver.Solve()
@@ -266,20 +265,12 @@ def vrp(graph_incidence_mat, dispatch_vec, capacity_vec, start_loc_vec,Edges_len
     routes = []
     Omatrix = []
 
-    edges_by_2 = int(0.5*n_edges)
     for k in range(n_cycles):
         C_row = []
-        for j in range(edges_by_2):
+        for j in range(n_edges):
             idx1 = offset_c + n_edges*k + j
-            idx2 = offset_c + edges_by_2 + n_edges*k + j
-
-            var1 = variables[idx1]
-            var2 = variables[idx2]
-
-            val1 = var1.solution_value()
-            val2 = var2.solution_value()
-
-            C_row.append(val1 + val2)
+            val1 = variables[idx1].solution_value()
+            C_row.append(val1)
         routes.append(C_row)
 
     for k in range(n_cycles):
