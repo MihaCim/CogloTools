@@ -5,16 +5,16 @@ from queue import PriorityQueue
 
 class Node:
     def __init__(self, node):
-        self.id = node['node_id']
+        self.id = node['post_id']
         self.name = node['post_id']
         self.lat = node['lat']
         self.lon = node['lon']
 
 
 class Edge:
-    def __init__(self, edge):
-        self.start = edge[0]
-        self.end = edge[1]
+    def __init__(self, edge, nodes):
+        self.start = nodes[str(edge[0])]['post_id']
+        self.end = nodes[str(edge[1])]['post_id']
         self.cost = round(edge[2], 3)
 
 class Path:
@@ -109,9 +109,9 @@ class MockupGraph:
 
             edges = []
             for e in data["edge"]:
-                edge = Edge(e)
+                edge = Edge(e, data["nodes"])
                 edge_map[edge.start].append(edge)
-                edges.append(Edge(e))
+                edges.append(edge)
 
         return nodes, edges, edge_map
 

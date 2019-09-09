@@ -148,7 +148,8 @@ class VrpProcessor:
             converted_route.append({
                 "locationId": node.id,
                 "dropoffWeightKg": int(loads[node_idx]),
-                "dropoffVolumeM3": int(loads[node_idx] / 10)
+                "dropoffVolumeM3": int(loads[node_idx] / 10),
+                "info": "This parcel must be delivered to location {}".format(node.id)
             })
 
         return converted_route
