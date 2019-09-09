@@ -20,8 +20,6 @@ class VRP:
         if len(edges_length) != len(graph_incidence_mat[0]):
             raise ValueError('Size of edges_length and n_edges do not match!')
         E = graph_incidence_mat
-        # for row in graph_incidence_mat:
-        #     E.append(row)
 
         # Additional Variables
         n_cycles = np.size(capacity_vec)
@@ -126,8 +124,7 @@ class VRP:
             for j in range(0, n_edges):
                 for k in range(0, n_cycles):
                     A42[i * n_edges * n_cycles + j * n_cycles + k, n_edges * k + j] = -demand[i]
-                    A42[
-                        i * n_edges * n_cycles + j * n_cycles + k,
+                    A42[i * n_edges * n_cycles + j * n_cycles + k,
                         2 * n_cycles * n_nodes + n_cycles * n_edges + i * n_edges * n_cycles + j * n_cycles + k] = 1
 
         # constraint 4.3.: Aijk - Oki <= 0
