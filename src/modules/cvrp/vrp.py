@@ -152,6 +152,8 @@ class VRP:
         A1extend = np.c_[A1, np.zeros((len(A1), len(A23[0])))]
         A23extend = np.c_[np.zeros((len(A23), len(A1[0]))), A23]
 
+
+
         A123 = np.vstack([A1extend.copy(), A23extend[0:len(A23)]])
 
         # Final concate A123 & A4

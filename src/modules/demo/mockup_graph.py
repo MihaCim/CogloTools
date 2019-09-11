@@ -1,7 +1,7 @@
 import json
 from math import sin, cos, sqrt, atan2, radians, inf
 from queue import PriorityQueue
-
+import matplotlib.pyplot as plt
 
 class Node:
     def __init__(self, node):
@@ -32,7 +32,6 @@ class MockupGraph:
         self.paths = self._calculate_shortest_paths()
         self.incident_matrix = []
         self.make_matrix()
-
 
     def _backtrack_path(self, came_from, goal, start):
         """Produces a list of nodes from A* output by backtracking over nodes"""
