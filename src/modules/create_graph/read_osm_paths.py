@@ -100,17 +100,19 @@ def run():
     finder = NeighboursFinder(G)
 
 
-    for postId, nodeId in map_posts_to_nodes.items():
-        res = finder.search_near_posts(roadNodes, roadWays, nodeId, 0.6)
-        print('PostID ' + str(postId) + ' Node: ' + str(nodeId) + ' r: ' + str(res))
+    #for postId, nodeId in map_posts_to_nodes.items():
+    postId = 'A8'
+    nodeId = 50
+    res = finder.search_near_posts(roadNodes, roadWays, nodeId, 0.6)
+    print('PostID ' + str(postId) + ' Node: ' + str(nodeId) + ' r: ' + str(res))
 
-        tmpRes.append((postId, nodeId, res))
-        for res_id, res_dist in res:
+    tmpRes.append((postId, nodeId, res))
+    for res_id, res_dist in res:
             dist = math.floor(res_dist*1000)
             postEdge.add((nodeId, map_posts_to_nodes[res_id], dist))
             postEdge.add((map_posts_to_nodes[res_id], nodeId, dist))
             print(res_id)
-        break
+
 
     for k, v in roadNodes.items():
         if v.post_id != None:
