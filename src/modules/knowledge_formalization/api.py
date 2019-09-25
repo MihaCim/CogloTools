@@ -141,4 +141,4 @@ if __name__ == '__main__':
     database = Database(db_name, cfg)
 
     # start API
-    app.run(debug=True)
+    app.run(debug=False, port=5000)
