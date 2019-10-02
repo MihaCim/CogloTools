@@ -5,18 +5,19 @@ class Database:
     """
     Class used for communication with postgreSQL database.
     """
-    def __init__(self, db_name):
+    def __init__(self, db_name, config):
         self.db_name = db_name
-        self.connection = self.connect(db_name)
+        self.config = config
+        self.connection = self.connect(db_name, config)
         self.connection.autocommit = True
         self.cursor = self.connection.cursor()
 
     @staticmethod
-    def connect(db_name):
-        username = "postgres"
-        password = "testtest"
-        hostname = "localhost"
-        port = "5432"
+    def connect(db_name, config):
+        username = config["username"]
+        password = config["password"]
+        hostname = config["hostname"]
+        port = config["port"]
 
         # create connection
         connection = psycopg2.connect(user=username,
@@ -41,7 +42,7 @@ class Database:
         if self.connection is not None:
             return self.connection
         else:
-            return self.connect(self.db_name)
+            return self.connect(self.db_name, self.config)
 
     def get_cursor(self):
         # get cursor for database manipulation

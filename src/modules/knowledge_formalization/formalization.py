@@ -87,9 +87,9 @@ def create_matrix_p(transitions_map, matrix_dimension):
     return matrix_P
 
 
-def create_matrix_j(initial_concepts, all_concepts, matrix_dimension, recreate=False):
+def create_matrix_j(resources_config, initial_concepts, all_concepts, matrix_dimension, recreate=False):
     # creates transition matrix from initial concepts
-    matrix_j_file_path = './temp/linkGraph-matrix-J-dump.npz'
+    matrix_j_file_path = resources_config["matrix_j_file_path"]
 
     # check if matrix J exists already and we do not need to recreate it because initial concepts are still valid ->
     # just read it from file dump
@@ -149,7 +149,6 @@ def calc_neighbourhood(matrix_J,
                        number_of_wanted_concepts,
                        alpha):
     # method calculates neighbourhood based on concept mappings and initial concepts
-
     print("creating P1 matrix from matrix P and matrix J")
     matrix_P1 = csc_matrix(((1 - alpha) * matrix_P) + ((alpha / float(len(entry_concepts))) * matrix_J))
     print("matrix P1 created")
@@ -166,29 +165,26 @@ def calc_neighbourhood(matrix_J,
     # extract only the column where EigenValue is 1.0
     print("extracting column of eigenvectors where eigenvalue is 1")
     result_array_idx = -1
-    for eigenValueIdx in range(len(eigenvalues)):
-        value = eigenvalues[eigenValueIdx].real
+    for eigen_value_idx in range(len(eigenvalues)):
+        value = eigenvalues[eigen_value_idx].real
         print("Eigenvalue", value)
         if is_close(value, 1.0):
-            result_array_idx = eigenValueIdx
+            result_array_idx = eigen_value_idx
             break
     if result_array_idx == -1:
-        print("No EigenValue 1.0 in received eigenvalues. Exiting program...")
+        print("No EigenValue 1.0 in received eigenvalues.")
 
         # return result false with a reason
-        json_resp = {}
-        json_resp["success"] = False
-        json_resp["reason"] = "Eigenvalue calculated from matrix is not 1."
+        json_resp = {"success": False, "reason": "Eigenvalue calculated from matrix is not 1."}
         resp = json.dumps(json_resp)
 
         return resp
-
     print("extracted eigenvectors successfully")
 
     # only keep real value
     print("converting vectors to keep only real values")
-    resultArray = vectors.real
-    resultArray = resultArray.T[result_array_idx]
+    result_array = vectors.real
+    result_array = result_array.T[result_array_idx]
 
     # remove unused variables from memory
     del eigenvalues
@@ -197,28 +193,31 @@ def calc_neighbourhood(matrix_J,
     del transposed
     del result_array_idx
 
-    # get rid of possible numerical error -> if value is less than 0, set it to zero
-    corrected_array = []
     array_sum = 0
-    for value in resultArray:
-        if value < 0:
-            value = 0
-        corrected_array.append(value)
+    for value in result_array:
         array_sum = array_sum + value
 
     # all values should sum up to ONE
-    normalizedArray = []
-    for value in corrected_array:
+    normalized_array = []
+    for value in result_array:
         if value == 0:
-            normalizedArray.append(value)
+            normalized_array.append(value)
         else:
             new_value = value / array_sum
-            normalizedArray.append(new_value)
+            normalized_array.append(new_value)
+
+    # if any normalized value is less than -10e-7, we throw error and exit
+    for normalized_value in normalized_array:
+        if normalized_value < -10e-7:
+            print("Normalized probability is less than -10e-7.", normalized_value, "Exiting API and program now...")
+            if apiProcess is not None:
+                kill(apiProcess.pid)
+            exit(3)
 
     print("creating array of similar concepts")
     similar_concepts = {}
-    for concept_id in range(len(normalizedArray)):
-        value = normalizedArray[concept_id]
+    for concept_id in range(len(normalized_array)):
+        value = normalized_array[concept_id]
 
         # if ID is not the same as initial concept, extract the value
         if concept_id not in entry_concepts:
@@ -246,10 +245,7 @@ def calc_neighbourhood(matrix_J,
         split = line.split("\t")
         word = split[1]
 
-        json_object = {}
-        json_object["concept_id"] = id
-        json_object["probability"] = probability
-        json_object["string"] = word
+        json_object = {"concept_id": id, "probability": probability, "string": word}
 
         list.append(json_object)
 
@@ -504,19 +500,20 @@ def create_concept_mappings_dict(default_concept_mapping_file,
         return new_id_concept_transition_map
 
 
-def init_dictionaries(id_string_mapping_txt_path, test=False):
-    default_concept_file = './linkGraph-en-verts.txt'
-    default_concept_mapping_file = './linkGraph-en-edges.txt'
-    default_concept_mapping_json_dump_path = './temp/linkGraph-en-edges-dump.json'
-    default_concept_mapping_json_both_transitions_dump_path = './temp/linkGraph-en-edges-both-transitions-dump.json'
-    matrix_p_file_path = './temp/linkGraph-matrix-P-dump.npz'
+def init_dictionaries(resources_config, mode='production'):
+    default_concept_file = resources_config["concept_file_path"]
+    default_concept_mapping_file = resources_config["concept_mapping_file_path"]
+    default_concept_mapping_json_dump_path = resources_config["concept_mapping_json_dump_path"]
+    default_concept_mapping_json_both_transitions_dump_path = resources_config["concept_mapping_json_both_transitions_dump_path"]
+    matrix_p_file_path = resources_config["matrix_p_file_path"]
+    id_string_mapping_txt_path = resources_config["concept_string_file_path"]
 
-    if test:
+    if mode == "development":
         print("======================================================================================")
         print("RUNNING IN TEST MODE! TRANSITION AND MAPPINGS USED WILL BE SMALLER THAN REAL ONES")
         print("======================================================================================")
-        default_concept_file = './linkGraph-en-verts-test.txt'
-        default_concept_mapping_file = './linkGraph-en-edges-test.txt'
+        default_concept_file = resources_config["concept_file_path_test"]
+        default_concept_mapping_file = resources_config["concept_mapping_file_path_test"]
 
     # check if matrix P exists. If it does, we don't need to calculate concept mappings for both transitions,
     # if it doesn't, we need to calculate it
@@ -557,8 +554,11 @@ def init_dictionaries(id_string_mapping_txt_path, test=False):
     return concept_mappings, matrix_P, id_string_mapping_txt_path
 
 
-def extract_concept_ids(id_string_file_path, words):
+def extract_concept_ids(resources_config, words):
     # extract concept IDs from strings in an array called 'words'
+
+    # get file path from config
+    id_string_file_path = resources_config["concept_string_file_path"]
 
     # open file and iterate through all the lines
     concept_ids = []
@@ -605,14 +605,81 @@ def kill(proc_pid):
     process.kill()
 
 
+def validate_config(config_path):
+    '''
+    method validates the config and exists program if a key is missing or something
+    :param config_path:
+    :return:
+    '''
+    # check if config file exists and if it doesn't, just exit the program
+    if not os.path.isfile(config_path):
+        print("file not found in path:", config_path)
+        exit(4)
+
+    # open file and read json config
+    with open(config_path, 'r') as config_file:
+        config = json.load(config_file)
+
+    # check if database credentials are present
+    if "database" not in config:
+        print("key 'database' is missing from", config_path)
+        exit(5)
+
+    databse_config = config["database"]
+    if "username" not in databse_config or "password" not in databse_config or "hostname" not in databse_config or "port" not in databse_config:
+        print("'database' config must contain keys 'username', 'password', 'hostname' and 'port")
+        exit(6)
+
+    if "resources" not in config:
+        print("key 'resources' is missing from", config_path)
+        exit(7)
+
+    resources_config = config['resources']
+    if ("concept_file_path" not in resources_config or "concept_mapping_file_path" not in resources_config or
+            "concept_mapping_json_dump_path" not in resources_config or
+            "concept_mapping_json_both_transitions_dump_path" not in resources_config or
+            "concept_string_file_path" not in resources_config or "matrix_p_file_path" not in resources_config or
+            "matrix_j_file_path" not in resources_config):
+        print("'resources' config must contain keys 'concept_file_path', 'concept_mapping_file_path', "
+              "'concept_mapping_json_dump_path', 'concept_mapping_json_both_transitions_dump_path', "
+              "'concept_string_file_path', 'matrix_p_file_path', 'matrix_j_file_path'")
+        exit(8)
+
+    if "mode" not in config:
+        print("key 'mode' is missing from", config_path)
+        exit(9)
+
+    mode = config["mode"]
+    if mode != 'development' and mode != "production":
+        print("'mode' must be 'development' or 'production'")
+        exit(10)
+
+    return config
+
+
 if __name__ == '__main__':
+    ##################################################################################
+    #                               CONFIG INITIALIZATION
+    ##################################################################################
+
+    # this config should always exist, but shouldn't be commited to repo
+    config_file_path = "./config/config.json"
+
+    # validate config
+    config = validate_config(config_file_path)
+
+    # extract database config (postgres), resources config (paths to files) and mode (development or production)
+    databse_cfg = config["database"]
+    resources_cfg = config["resources"]
+    mode = config["mode"]
+
     ##################################################################################
     #                       DATABASE AND API INITIALIZATION
     ##################################################################################
 
     # get instance of database connection
     db_name = "concepts_db"
-    database = Database(db_name)
+    database = Database(db_name, databse_cfg)
     database.create_database(db_name)
 
     # create table if it doesn't exist - it will be used for storing/retrieving requests for concepts nearby
@@ -643,18 +710,17 @@ if __name__ == '__main__':
     ##################################################################################
 
     # init dictionaries needed for API and concepts needed for API
-    id_string_file_path = './temp/linkGraph-en-verts-id-string-mapping.txt'
-    concept_mappings, matrix_P, id_string_txt_path = init_dictionaries(id_string_file_path, True)
+    concept_mappings, matrix_P, id_string_txt_path = init_dictionaries(resources_cfg, mode)
 
     # calculate matrix dimension based on concept mappings length
     matrix_dimension = len(concept_mappings)
 
     # initial concepts -> hardcoded IDs based on the strings given
-    # "car", "motorhome", "bicycle", "truck", "caravan"
-    initial_concepts = [59328, 115417, 262446, 382724, 524266]
+    initial_concepts = [32499, 34192, 60263, 70935, 86708, 115417, 115971, 145866, 151754, 187113, 234510,
+                        324125, 331149, 342834, 343823, 358248, 387614, 462022, 522204, 531815, 750793, 782122]
 
     # create matrix that contains transition probabilities from each concept back to initial concept
-    matrix_J = create_matrix_j(initial_concepts, concept_mappings, matrix_dimension)
+    matrix_J = create_matrix_j(resources_cfg, initial_concepts, concept_mappings, matrix_dimension)
 
     ##################################################################################
     #                            REQUEST PROCESSOR
@@ -686,7 +752,7 @@ if __name__ == '__main__':
             print("Processing request with ID", id, "new concepts", concepts_arr)
 
             # extract new concept IDs from given words
-            new_concept_ids = extract_concept_ids(id_string_file_path, concepts_arr)
+            new_concept_ids = extract_concept_ids(resources_cfg, concepts_arr)
 
             # new concepts are valid (not an empty list) - make them initial concepts
             if new_concept_ids:
@@ -698,7 +764,7 @@ if __name__ == '__main__':
                 print("==================================================================")
 
                 # create matrix that contains transition probabilities from each concept back to initial concept
-                matrix_J = create_matrix_j(initial_concepts, concept_mappings, matrix_dimension, True)
+                matrix_J = create_matrix_j(resources_cfg, initial_concepts, concept_mappings, matrix_dimension, True)
 
                 print("==================================================================")
                 print("           NEW MATRIX J FROM NEW CONCEPT IDs JUST CREATED")
