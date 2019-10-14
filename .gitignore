@@ -1,5 +1,5 @@
 # Python files
 *.pyc
-
+.idea/
 # Vim files
 .vimrc
