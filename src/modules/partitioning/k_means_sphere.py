@@ -15,13 +15,13 @@ def kMeansSphere(X, k):
     def calc_centroid(X):
         return np.mean(X, 0)
 
-    def get_min(a, prev_a):
+    def count_diff(a, prev_a):
         diff = np.abs(a - prev_a)
         diff[diff > 1] = 1
 
         return np.sum(diff)
 
-    samples = np.random.randint(0, k)
+    samples = np.random.randint(0, high=n, size=k)
     C = X[samples, :]
     C = np.zeros((k, d))  # ???
     rands = np.random.randint(0, n)
@@ -79,9 +79,11 @@ def kMeansSphere(X, k):
             Yn = X[assignment == clustN, :]
             C[clustN, :] = calc_centroid(Yn)
 
-        diff = get_min(assignment, prev_assignment)
-        change = np.sum(diff) > 0
+        diff = count_diff(assignment, prev_assignment)
+        change = diff > 0
+        tmp = prev_assignment
         prev_assignment = assignment
+        assignment = tmp
         print('Diff', diff)
 
 
