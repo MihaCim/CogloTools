@@ -9,27 +9,22 @@ threshold = 1
 eps = threshold * eps_rel
 colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w']
 shapes = ['.', 'v', '+', 'p', '*', 'p', '1', 'D']
-sizes = [
-    100,
-    100,
-    100,
-    50,
-    50
-    ]
 
-draw_sphere = True
+sizes = [200,200,100,100,100]
+
+draw_sphere = False
 
 n = sum(sizes)
-k = 4
+k = 3
 
-A_orig = eps_rel * np.random.rand(n, n)
+A_orig = np.random.rand(n, n)
 print(A_orig.shape)
 
 prev_end = 0
 
 for clusterN in range(len(sizes)):
     ni = sizes[clusterN]
-    A_orig[ni:(ni+prev_end), ni:(ni+prev_end)] = A_orig[ni:(ni+prev_end), ni:(ni+prev_end)] + threshold - 0.5 * eps
+    A_orig[prev_end:(ni+prev_end), prev_end:(ni+prev_end)] += threshold - 0.5 * eps
     prev_end = prev_end + ni
 
 for i in range(n):
