@@ -1,7 +1,6 @@
 import numpy as np
-import scipy.io as sio
 from modules.partitioning.k_means_sphere import kMeansSphere
-from mpl_toolkits.mplot3d import Axes3D
+from mpl_toolkits.mplot3d import Axes3D #must be included to support 3D scatter
 import matplotlib.pyplot as plt
 
 eps_rel = 1.5
@@ -10,7 +9,7 @@ eps = threshold * eps_rel
 colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w']
 shapes = ['.', 'v', '+', 'p', '*', 'p', '1', 'D']
 
-sizes = [200,200,100,100,100]
+sizes = [200, 200, 100, 100, 100]
 
 draw_sphere = False
 
@@ -24,7 +23,7 @@ prev_end = 0
 
 for clusterN in range(len(sizes)):
     ni = sizes[clusterN]
-    A_orig[prev_end:(ni+prev_end), prev_end:(ni+prev_end)] += threshold - 0.5 * eps
+    A_orig[prev_end:(ni + prev_end), prev_end:(ni + prev_end)] += threshold - 0.5 * eps
     prev_end = prev_end + ni
 
 for i in range(n):
