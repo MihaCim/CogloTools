@@ -1,5 +1,6 @@
+from waitress import serve
+
 from flask import Flask
-from flask_restful import Api
 from flask import request
 
 import time
@@ -11,7 +12,6 @@ from formalization import validate_config
 # create Flask instance for an app
 
 app = Flask(__name__)
-api = Api(app)
 
 
 @app.route('/getNewConcepts', methods=['POST'])
@@ -141,4 +141,6 @@ if __name__ == '__main__':
     database = Database(db_name, cfg)
 
     # start API
-    app.run(debug=False, port=5000)
+    serve(app, host='localhost', port=5000)
+
+    # app.run(debug=False, port=5000)
