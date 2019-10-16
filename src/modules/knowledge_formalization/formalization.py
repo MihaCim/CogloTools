@@ -698,7 +698,7 @@ if __name__ == '__main__':
                           "concepts jsonb);")
 
     # start API as subprocess
-    apiProcess = subprocess.Popen(["python", "api.py"])
+    apiProcess = subprocess.Popen(["python3", "api.py"])
 
     # setup handler that will kill api if signal for abort/kill arrives (ctrl+c, ctrl+z)
     signal.signal(signal.SIGABRT, handler)
