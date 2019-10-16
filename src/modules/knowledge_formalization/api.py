@@ -142,5 +142,3 @@ if __name__ == '__main__':
 
     # start API
     serve(app, host='localhost', port=5000)
-
-    # app.run(debug=False, port=5000)
