@@ -1,83 +1,115 @@
 import numpy as np
 
-def discretesample(p,n):
+
+def discretesample(p, n):
     return np.random.choice(len(p), n, p=p)
 
-def kMeansSphere(X, k):
+
+def similarity(x1, x2):
+    norm_x1 = np.linalg.norm(x1)
+    norm_x2 = np.linalg.norm(x2)
+    return np.dot(x1, x2) / (norm_x1 * norm_x2)
+
+
+def calc_centroid(X):
+    return np.mean(X, 0)
+
+
+def count_diff(a, prev_a):
+    diff = np.abs(a - prev_a)
+    diff[diff > 1] = 1
+
+    return np.sum(diff)
+
+
+def do_k_means(X, k, iters=10):
+    # TODO
+    results = [k_means_sphere(X, k) for _ in range(iters)]
+
+    best = results[0]
+
+    return best
+
+
+def k_means_sphere(X, k, max_iter=100):
     n = X.shape[0]
     d = X.shape[1]
 
-    def similarity(x1, x2):
-        norm_x1 = np.linalg.norm(x1)
-        norm_x2 = np.linalg.norm(x2)
-        return np.dot(x1, x2) / (norm_x1 * norm_x2)
+    def kmeanspp(_X, _k):
+        n_inst = _X.shape[0]
+        dim = _X.shape[1]
 
-    def calc_centroid(X):
-        return np.mean(X, 0)
+        C = np.zeros((_k, dim))  # k++ means
+        rands = np.random.randint(0, n_inst)
 
-    def count_diff(a, prev_a):
-        diff = np.abs(a - prev_a)
-        diff[diff > 1] = 1
+        C[0, :] = _X[rands]
 
-        return np.sum(diff)
+        probs = np.zeros(n_inst)
 
-    samples = np.random.randint(0, high=n, size=k)
-    C = X[samples, :]
-    C = np.zeros((k, d))  # ???
-    rands = np.random.randint(0, n)
+        for centroidN in range(1, _k):
+            for recN in range(0, n_inst):
+                rec = _X[recN, :]
+                nearest_dist = np.inf
 
-    C[0, :] = X[rands]
+                for exist_centroidN in range(0, centroidN):
+                    centroid = C[exist_centroidN, :]
+                    clust_rec_sim = similarity(rec, centroid)
+                    clust_rec_dist = 0.5 * (1 - clust_rec_sim)
 
-    probs = np.zeros(n)
+                    if clust_rec_dist < nearest_dist:
+                        nearest_dist = clust_rec_dist
+                probs[recN] = nearest_dist * nearest_dist
+            norm_factor = 1.0 / np.sum(probs)
+            probs = probs * norm_factor
 
-    for centroidN in range(1, k):
-        for recN in range(0, n):
-            rec = X[recN, :]
-            nearest_dist = np.inf
+            chosenN = discretesample(probs, 1)[0]
+            C[centroidN, :] = _X[chosenN, :]
 
-            for exist_centroidN in range(0, centroidN):
-                centroid = C[exist_centroidN, :]
-                clust_rec_sim = similarity(rec, centroid)
-                clust_rec_dist = 0.5 * (1 - clust_rec_sim)
+            print('Chosen centroid {}, probability: {}, max probability: {} '.format(chosenN, probs[centroidN],
+                                                                                     probs.max()))
+        return C
 
-                if clust_rec_dist < nearest_dist:
-                    nearest_dist = clust_rec_dist
-            probs[recN] = nearest_dist * nearest_dist
-        norm_factor = 1.0 / np.sum(probs)
-        probs = probs * norm_factor
-
-        chosenN = discretesample(probs, 1)[0]
-        C[centroidN, :] = X[chosenN, :]
-
-        print('Chosen centroid {}, probability: {}, max probability: {} '.format(chosenN, probs[centroidN],
-                                                                                 probs.max()))
-
+    C = kmeanspp(X, k)
     prev_assignment = np.zeros(n)
     assignment = np.zeros(n)
-    assignment.fill(0)
-    prev_assignment.fill(0)
 
     change = True
+    iterN = 0
 
-    while change:
-        for recN in range(0, n):
-            xi = X[recN, :]
+    while change and iterN < max_iter:
+        iterN += 1
 
-            best_idx = -1
-            best_sim = np.NINF
+        lost_centroid = True
+
+        while lost_centroid:
+            lost_centroid = False
+
+            for recN in range(0, n):
+                xi = X[recN, :]
+
+                best_idx = -1
+                best_sim = np.NINF
+
+                for clustN in range(0, k):
+                    sim = similarity(xi, C[clustN, :])
+
+                    if sim > best_sim:
+                        best_idx = clustN
+                        best_sim = sim
+
+                assignment[recN] = best_idx
 
             for clustN in range(0, k):
-                sim = similarity(xi, C[clustN, :])
 
-                if sim > best_sim:
-                    best_idx = clustN
-                    best_sim = sim
+                assigned_idxs = assignment == clustN
 
-            assignment[recN] = best_idx
-
-        for clustN in range(0, k):
-            Yn = X[assignment == clustN, :]
-            C[clustN, :] = calc_centroid(Yn)
+                if assigned_idxs.astype(dtype=int).sum() > 0:
+                    Yn = X[assigned_idxs, :]
+                    C[clustN, :] = calc_centroid(Yn)
+                else:
+                    C = kmeanspp(X, k)
+                    lost_centroid = True
+                    print("Lost a centroid, reinitialized at {}".format(iterN))
 
         diff = count_diff(assignment, prev_assignment)
         change = diff > 0
@@ -85,7 +117,6 @@ def kMeansSphere(X, k):
         prev_assignment = assignment
         assignment = tmp
         print('Diff', diff)
-
 
     print("kMeans done")
     return assignment

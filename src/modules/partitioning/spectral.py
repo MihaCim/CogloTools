@@ -1,20 +1,21 @@
 import numpy as np
-from modules.partitioning.k_means_sphere import kMeansSphere
+from modules.partitioning.k_means_sphere import k_means_sphere
 from mpl_toolkits.mplot3d import Axes3D #must be included to support 3D scatter
 import matplotlib.pyplot as plt
 
-eps_rel = 1.5
-threshold = 1
+
+eps_rel = 1.2
+threshold = 2
 eps = threshold * eps_rel
 colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w']
 shapes = ['.', 'v', '+', 'p', '*', 'p', '1', 'D']
 
-sizes = [200, 200, 100, 100, 100]
+sizes = [300, 100, 100, 20, 20, 20]
 
-draw_sphere = False
+draw_sphere = True
 
 n = sum(sizes)
-k = 3
+k = 4
 
 A_orig = np.random.rand(n, n)
 print(A_orig.shape)
@@ -53,7 +54,7 @@ Y_mean = np.mean(Y, 0)
 norms = np.sqrt(np.sum(Y * Y, 1, keepdims=True))
 Y_norm = Y / norms
 
-assignment = kMeansSphere(Y_norm, k)
+assignment = k_means_sphere(Y_norm, k)
 
 d = Y.shape[1]  # column count
 
