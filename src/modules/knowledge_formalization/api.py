@@ -14,7 +14,7 @@ from formalization import validate_config
 app = Flask(__name__)
 
 
-@app.route('/getNewConcepts', methods=['POST'])
+@app.route('/getConceptRelationships', methods=['POST'])
 def get_new_concepts():
     # received data must be in JSON format
     received_request = request.json
@@ -75,7 +75,7 @@ def get_new_concepts():
     return response
 
 
-@app.route('/getConceptResult', methods=['POST'])
+@app.route('/getConceptRelationshipsResult', methods=['POST'])
 def get_concept_results():
     received_request = request.json
     if received_request == 'null' or received_request is None:
@@ -95,7 +95,7 @@ def get_concept_results():
         return {'result': result[0], 'id': id}
 
 
-@app.route('/generateInitialConcepts', methods=['POST'])
+@app.route('/addNewConcepts', methods=['POST'])
 def generate_new_initial_concepts():
     received_request = request.json
     if received_request == 'null' or received_request is None:
@@ -113,7 +113,7 @@ def generate_new_initial_concepts():
         return 'Value of key concepts should be non empty array'
 
     # map unicode words to strings
-    payload = map(str, payload)
+    # payload = map(str, payload)
 
     # store payload as json object
     json_obj = json.dumps(payload)
