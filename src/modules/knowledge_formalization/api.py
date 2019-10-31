@@ -21,6 +21,18 @@ def get_new_concepts():
     if received_request == 'null' or received_request is None:
         return 'Error parsing request. It should be in JSON format'
 
+    # Return response, because we received request with ID for result query.
+    if 'id' in received_request:
+        id = received_request['id']
+        if not isinstance(id, int):
+            return 'id parameter should be an integer.'
+
+        result = database.query("SELECT result FROM concepts WHERE id = %s;", (id,))
+        if result is None or not result:
+            return {'result': 'null', 'id': id}
+        else:
+            return {'result': result[0], 'id': id}
+
     if 'alpha' not in received_request:
         return 'JSON object in request must contain key "alpha".'
 
@@ -31,7 +43,7 @@ def get_new_concepts():
     if 'number' in received_request and 'percentage' in received_request:
         return 'Request must contain only key "number" or "percentage", not both.'
 
-    # parameter for retireving concepts can be given as number of new concepts or as percentage of new
+    # parameter for retrieving concepts can be given as number of new concepts or as percentage of new
     # concepts in respect to the number of all concepts which is 13500000
     if 'number' in received_request:
         # number value must be an integer
@@ -62,40 +74,24 @@ def get_new_concepts():
     # round value to integer
     value = int(round(value))
 
+    concepts_array = None
+    if 'concepts' in received_request:
+        payload = received_request['concepts']
+        concepts_array = json.dumps(payload)
+
     # store request to the database and return ID of inserted row
-    row_id = database.execute("INSERT INTO concepts (id, timestamp, alpha, concepts) "
-                              "VALUES (DEFAULT, %s, %s, %s) RETURNING id;", (timestamp, alpha, value), True)
+    row_id = database.execute("INSERT INTO concepts (id, timestamp, alpha, concepts_number, concepts) "
+                              "VALUES (DEFAULT, %s, %s, %s, %s) RETURNING id;", (timestamp, alpha, value, concepts_array), True)
     # error inserting into database
     if row_id is None:
         return "Error processing/storing request into the database."
 
     # create response as json object
-    response = {'stored': 'success', 'id': row_id}
+    response = {'stored': True, 'processed': False, 'id': row_id}
 
     return response
 
-
-@app.route('/getConceptRelationshipsResult', methods=['POST'])
-def get_concept_results():
-    received_request = request.json
-    if received_request == 'null' or received_request is None:
-        return 'Error parsing request. It should be in JSON format'
-
-    if 'id' not in received_request:
-        return 'JSON object in request must contain key "id" which you received when you sent request to getNewConcept.'
-
-    id = received_request['id']
-    if not isinstance(id, int):
-        return 'id parameter should be an integer.'
-
-    result = database.query("SELECT result FROM concepts WHERE id = %s;", (id,))
-    if result is None or not result:
-        return {'result': 'null', 'id': id}
-    else:
-        return {'result': result[0], 'id': id}
-
-
-@app.route('/addNewConcepts', methods=['POST'])
+@app.route('/initializeKnowledgeBase', methods=['POST'])
 def generate_new_initial_concepts():
     received_request = request.json
     if received_request == 'null' or received_request is None:
@@ -121,13 +117,10 @@ def generate_new_initial_concepts():
     # get current timestamp
     timestamp = int(round(time.time()))
     # store to the database and return row_id
-    row_id = database.execute("INSERT INTO initial_concepts (id, timestamp, processed, concepts) "
+    database.execute("INSERT INTO initial_concepts (id, timestamp, processed, concepts) "
                               "VALUES (DEFAULT, %s, FALSE, %s) RETURNING id;", (timestamp, json_obj), True)
 
-    # create response as json object
-    response = {'stored': 'success', 'id': row_id}
-
-    return response
+    return {'success': True}
 
 
 if __name__ == '__main__':
