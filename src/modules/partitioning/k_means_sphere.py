@@ -28,7 +28,6 @@ def count_diff(a, prev_a):
 def k_means_sphere(X, k, max_iter=100):
     # kmeans++ init
     n = X.shape[0]
-    d = X.shape[1]
 
     def kmeanspp(_X, _k):
         n_inst = _X.shape[0]
@@ -105,6 +104,7 @@ def k_means_sphere(X, k, max_iter=100):
                     C = kmeanspp(X, k)
                     lost_centroid = True
                     print("Lost a centroid, reinitialized at {}".format(iterN))
+                    break
 
         diff = count_diff(assignment, prev_assignment)
         change = diff > 0
