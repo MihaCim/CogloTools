@@ -22,15 +22,6 @@ def count_diff(a, prev_a):
     return np.sum(diff)
 
 
-def do_k_means(X, k, iters=10):
-    # TODO
-    results = [k_means_sphere(X, k) for _ in range(iters)]
-
-    best = results[0]
-
-    return best
-
-
 def k_means_sphere(X, k, max_iter=100):
     n = X.shape[0]
     d = X.shape[1]
