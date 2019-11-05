@@ -1,6 +1,7 @@
 # Python files
+venv/
 *.pyc
-
+.idea/
 # Vim files
 .vimrc
 
