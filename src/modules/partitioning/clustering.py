@@ -1,9 +1,8 @@
 import numpy as np
 from modules.partitioning.k_means_sphere import k_means_sphere
-from mpl_toolkits.mplot3d import Axes3D #must be included to support 3D scatter
+from mpl_toolkits.mplot3d import Axes3D  # must be included to support 3D scatter
 import matplotlib.pyplot as plt
 from modules.partitioning.spectral import spectral_part
-
 
 eps_rel = 1.2
 threshold = 2
@@ -92,7 +91,6 @@ elif d == 3:
             shape = shapes[clustN]
 
             Yi = Y[I, :]
-
 
             if draw_sphere:
                 Yi_norm = Y_norm[I, :]
