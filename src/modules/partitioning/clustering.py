@@ -4,8 +4,8 @@ from mpl_toolkits.mplot3d import Axes3D  # must be included to support 3D scatte
 import matplotlib.pyplot as plt
 from modules.partitioning.spectral import spectral_part
 
-eps_rel = 1.2
-threshold = 2
+eps_rel = 1
+threshold = 15
 eps = threshold * eps_rel
 colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k', 'w']
 shapes = ['.', 'v', '+', 'p', '*', 'p', '1', 'D']

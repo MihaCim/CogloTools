@@ -13,11 +13,6 @@ def cut_intensity(Q, part, n_part):
     c = np.dot(np.dot(ones_k.T, Q_p), ones_k) - np.trace(Q_p)
     return c
 
-
-def cut_size(Q, part, n_part):
-    return cut_intensity((Q > 0).astype(dtype=int), part, n_part)
-
-
 def spectral_part(Q, k):
     """
         % A spectral partitoning algorithm that
@@ -61,26 +56,12 @@ def spectral_part(Q, k):
     best_part = 0
     best_cut = np.inf
 
-    total_intensity = np.dot(np.dot(ones_n.T, Q), ones_n)
-    total_edges = np.dot(np.dot(ones_n.T, (Q > 0).astype(dtype=int)), ones_n)
-
-    mean_rnd_cut_intens = 0
-
     total_tries = 10  # attempt multiple tries to get best clustering - due to randomness
     for i in range(total_tries):
         part = k_means_sphere(Y_norm, k, 200)
 
         # clustering evaluation
         cut_sum = cut_intensity(Q, part, k)
-        cut_edges = cut_size(Q, part, k)
-
-        avg_cut_intens = cut_sum / cut_edges
-
-        rnd_part = 1 + np.floor(k * np.random.rand(n))
-        rnd_cut_sum = cut_intensity(Q, rnd_part, k)
-        avg_rnd_cut_intens = rnd_cut_sum / cut_edges
-        rnd_cut_edges = cut_size(Q, rnd_part, k)
-        mean_rnd_cut_intens = mean_rnd_cut_intens + (avg_rnd_cut_intens / total_tries)
 
         if cut_sum < best_cut:
             print('Got better clustering in try', i)
