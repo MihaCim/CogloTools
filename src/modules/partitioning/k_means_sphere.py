@@ -26,7 +26,7 @@ def count_diff(a, prev_a):
 
 
 def k_means_sphere(X, k, max_iter=100):
-    #kmeans++ init
+    # kmeans++ init
     n = X.shape[0]
     d = X.shape[1]
 
@@ -34,7 +34,7 @@ def k_means_sphere(X, k, max_iter=100):
         n_inst = _X.shape[0]
         dim = _X.shape[1]
 
-        #select initial centroids
+        # select initial centroids
         C = np.zeros((_k, dim))  # k++ means
         rands = np.random.randint(0, n_inst)
         C[0, :] = _X[rands]
@@ -62,7 +62,6 @@ def k_means_sphere(X, k, max_iter=100):
 
             chosenN = discretesample(probs, 1)[0]
             C[centroidN, :] = _X[chosenN, :]
-
             print('Chosen centroid {}, probability: {}, max probability: {} '.format(chosenN, probs[centroidN],
                                                                                      probs.max()))
         return C
@@ -76,7 +75,6 @@ def k_means_sphere(X, k, max_iter=100):
 
     while change and iterN < max_iter:
         iterN += 1
-
         lost_centroid = True
 
         while lost_centroid:
@@ -85,13 +83,11 @@ def k_means_sphere(X, k, max_iter=100):
             # assign vectors
             for recN in range(0, n):
                 xi = X[recN, :]
-
                 best_idx = -1
                 best_sim = np.NINF
 
                 for clustN in range(0, k):
                     sim = similarity(xi, C[clustN, :])
-
                     if sim > best_sim:
                         best_idx = clustN
                         best_sim = sim
@@ -100,7 +96,6 @@ def k_means_sphere(X, k, max_iter=100):
 
             # recompute centroids
             for clustN in range(0, k):
-
                 assigned_idxs = assignment == clustN
 
                 if assigned_idxs.astype(dtype=int).sum() > 0:

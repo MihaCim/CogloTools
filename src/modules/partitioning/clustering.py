@@ -24,7 +24,7 @@ draw_sphere = True
 
 n = sum(sizes)
 k = 4
-
+# generating random noisy matrix
 A_orig = np.random.rand(n, n)
 print(A_orig.shape)
 
@@ -41,6 +41,7 @@ for i in range(n):
 A = A_orig + eps * np.random.rand(n, n)
 A = A - np.diag(np.diag(A))
 
+#partition graph
 assignment, Y = spectral_part(A, k)
 Y_mean = np.mean(Y, 0)
 norms = np.sqrt(np.sum(Y * Y, 1, keepdims=True))
@@ -48,9 +49,9 @@ Y_norm = Y / norms
 
 d = Y.shape[1]  # column count
 
+# plot graphs
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
-
 if d == 2:
     offset = 0
     for real_clustN in range(len(sizes)):
