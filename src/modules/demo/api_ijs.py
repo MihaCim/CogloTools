@@ -42,6 +42,8 @@ class VrpProcessor:
 
     def process(self, metadata):
         global brokenVehicle
+        if len(metadata) == 0:
+            return []
         nodes, edges, graph = self.graphProcessor.get_graph()
 
         post_mapping = self.graphProcessor.map_vehicles(metadata)
@@ -91,6 +93,7 @@ class VrpProcessor:
         for i, vehicle_load in enumerate(loads):
             route = []
             start_node = start_nodes[i]
+            route = [start_node]
             current_node = start_node
             vehicle_load[nodes.index(current_node)] -= vehicle_load[nodes.index(current_node)]
             cost_astar = 0
@@ -139,6 +142,9 @@ class VrpProcessor:
 
     def route_to_sumo_format(self, route, loads, nodes):
         converted_route = []
+
+        if len(route) == 1 and loads[nodes.index(route[0])] == 0:
+            return []
 
         for idx, node in enumerate(route):
             node_idx = nodes.index(node)
