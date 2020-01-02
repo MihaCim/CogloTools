@@ -1,7 +1,8 @@
 import json
-from math import sin, cos, sqrt, atan2, radians, inf
 from queue import PriorityQueue
-import matplotlib.pyplot as plt
+
+from math import sin, cos, sqrt, atan2, radians, inf
+
 
 class Node:
     def __init__(self, node):

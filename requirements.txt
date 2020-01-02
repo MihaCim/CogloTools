@@ -9,3 +9,5 @@ flask
 flask-jsonpify
 flask-restful
 pytest
+markupsafe
+matplotlib

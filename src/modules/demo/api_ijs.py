@@ -4,7 +4,7 @@ from math import inf
 from flask import Flask, request
 from flask_jsonpify import jsonify
 from flask_restful import Resource, Api
-
+import datetime
 from modules.cvrp.vrp import VRP
 from modules.demo.mockup_graph import MockupGraph
 
@@ -12,6 +12,8 @@ SIOT_URL = 'http://151.97.13.227:8080/SIOT-war/SIoT/Server/'
 
 brokenVehicle = None
 parcelData = None
+
+
 class GraphProcessor:
     def __init__(self, path='modules/demo/data/9node.json'):
         self.g = MockupGraph(path)
@@ -32,6 +34,7 @@ class GraphProcessor:
     def get_graph(self):
         return self.g.nodes, self.g.edges, self.g.incident_matrix
 
+
 class VrpProcessor:
     def __init__(self, graphProcessor):
         self.vrp = VRP()
@@ -47,7 +50,6 @@ class VrpProcessor:
         non_broken_vehicles = []
         for i, v in enumerate(metadata):
             for loc in v['dropOffLocations']:
-
                 target = self.graphProcessor.g.node_from_id(loc['locationId'])
 
                 idx = nodes.index(target)
@@ -58,12 +60,12 @@ class VrpProcessor:
                 del post_mapping[i]
 
         start = [nodes.index(x) for x in post_mapping]
-        capacity = [int(x["metadata"]["capacityKg"]) for x in non_broken_vehicles]
-        # generate random load demands
+        # extract capacities from individual vehicles
+        capacity = [int(x["metadata"]["LoadCapacity"]) for x in non_broken_vehicles]
 
         costs = [e.cost for e in edges]
         brokenVehicle = None
-        routes, dispatch, objc =  self.vrp.vrp(graph, dropoff, capacity, start, costs)
+        routes, dispatch, objc = self.vrp.vrp(graph, dropoff, capacity, start, costs)
 
         return self.make_route(routes, dispatch, nodes, edges, non_broken_vehicles)
 
@@ -97,17 +99,19 @@ class VrpProcessor:
             # always find closest post with parcels to pick/drop off.
             # start at closest node
             # get route and clear up any packages on this route
-            while sum(vehicle_load) > 1: #run until all parcels have been delivered
-                post_idx = self.find_closest_post(vehicle_load, current_node, nodes) #idx of closest post with parcel demand
-                target = nodes[post_idx] #convert idx to node object
-                vehicle_load[post_idx] -= vehicle_load[post_idx] #take/drop all parcels
-                partial_path = self.graphProcessor.g.get_path(current_node, target) #get path from current to next dropoff node
-                for node in partial_path.path: #drop off parcels along the way to targer
+            while sum(vehicle_load) > 1:  # run until all parcels have been delivered
+                post_idx = self.find_closest_post(vehicle_load, current_node,
+                                                  nodes)  # idx of closest post with parcel demand
+                target = nodes[post_idx]  # convert idx to node object
+                vehicle_load[post_idx] -= vehicle_load[post_idx]  # take/drop all parcels
+                partial_path = self.graphProcessor.g.get_path(current_node,
+                                                              target)  # get path from current to next dropoff node
+                for node in partial_path.path:  # drop off parcels along the way to targer
                     for idx, val in enumerate(vehicle_load):
                         if val > 0 and nodes.index(node) == idx:
                             vehicle_load[idx] -= vehicle_load[idx]
 
-                current_node = target #we are now at new node
+                current_node = target  # we are now at new node
                 cost_astar += partial_path.cost
 
                 # merge existing and new route, avoid adding duplicate node on start of route
@@ -117,8 +121,8 @@ class VrpProcessor:
             print("Vehicle: {}".format(vehicles[i]['UUID']))
             print("Edges: VRP: {}, A*:{}".format(sum(graph_routes[i]), len(route)))
 
-            #calculate theoretical cost of all visited edges in vrp, to compare to A*
-            cost_vrp = sum([count*edges[j].cost for j, count in enumerate(graph_routes[i])])
+            # calculate theoretical cost of all visited edges in vrp, to compare to A*
+            cost_vrp = sum([count * edges[j].cost for j, count in enumerate(graph_routes[i])])
 
             print("Cost VRP: {}, Cost A*:{}".format(cost_vrp, cost_astar))
             self.graphProcessor.g.print_path(route)
@@ -129,7 +133,6 @@ class VrpProcessor:
             converted_routes.append({
                 "UUID": vehicles[i]["UUID"],
                 "route": self.route_to_sumo_format(route, original_vehicle_load, nodes)})
-
 
         print("Route build took: {}s".format(time.time() - start_time))
         return converted_routes
@@ -150,7 +153,8 @@ class VrpProcessor:
 
         return converted_route
 
-generalVrpProcessor = VrpProcessor(graphProcessor=GraphProcessor)
+
+generalVrpProcessor = VrpProcessor(graphProcessor=GraphProcessor())
 xborderVrpA3 = VrpProcessor(graphProcessor=GraphProcessor('modules/demo/data/9node_A3.json'))
 xborderVrpA6 = VrpProcessor(graphProcessor=GraphProcessor('modules/demo/data/9node_A6.json'))
 
@@ -168,11 +172,9 @@ class Event(Resource):
 
         print(json)
 
-
-
         print("Posting to SIOT 1")
-        #data = requests.post(SIOT_URL + "newEvent", json=json)
-        #print(data.content)
+        # data = requests.post(SIOT_URL + "newEvent", json=json)
+        # print(data.content)
         if "broken" in event["type"].lower():
             vehicle = json['vehicle']
             brokenVehicle = vehicle['UUID']
@@ -185,7 +187,6 @@ class Event(Resource):
         })
 
 
-
 class RecReq(Resource):
 
     def get(self):
@@ -196,18 +197,18 @@ class RecReq(Resource):
         global brokenVehicle
         print(data)
 
-
         vehicle_metadata = data['CLOS']
         routes = []
+        evt_type = data["event"]["event_type"]
         if "event" in data:
-            if "broken" in data["event"]["type"]:
+            if "broken" in evt_type:
                 brokenVehicle = vehicle_metadata[0]["UUID"]
                 print("Processing VRP data.")
                 routes = generalVrpProcessor.process(vehicle_metadata)
-            elif "parcel" in data["event"]["type"]:
+            elif "parcel" in evt_type:
                 print("Processing VRP data.")
                 routes = generalVrpProcessor.process(vehicle_metadata)
-            elif "xborder" in data["event"]["type"]:
+            elif "xborder" in evt_type:
                 xvehiclesA3 = []
                 xvehiclesA6 = []
                 for v in vehicle_metadata:
@@ -224,6 +225,7 @@ class RecReq(Resource):
             return jsonify({"msg": "No vehicles"})
 
         return jsonify({"CLOS": routes})
+
 
 class CognitiveAdvisorAPI:
     def __init__(self, port=5000):
