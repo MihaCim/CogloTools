@@ -10,9 +10,13 @@ class Node:
         self.lat = lat
         self.lon = lon
 
-    def add_post(self, address):
+    def add_post(self, address, post):
         self.post = True
-        self.address = address;
+        self.address = address
+        self.post = post
 
     def get_id(self):
         return self.id
+
+
+

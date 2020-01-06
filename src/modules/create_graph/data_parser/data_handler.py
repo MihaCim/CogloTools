@@ -29,12 +29,12 @@ class DataHandler():
                     nodeKey = key
 
             tmpNode = nodesL[nodeKey]
-            if utils.calcDistance(post.latitude, post.longitude, tmpNode.lat, tmpNode.lon) < 0.1:
+            if utils.calcDistance(post.latitude, post.longitude, tmpNode.lat, tmpNode.lon) < 0.5:
                 print(nodeKey)
                 print(post.address)
                 print(utils.calcDistance(post.latitude, post.longitude, tmpNode.lat, tmpNode.lon))
                 postsNodes.append(nodeKey)
-                tmpNode.add_post(post.address)
+                tmpNode.add_post(post.address, post)
                 nodesL[nodeKey] = tmpNode
         return (nodesL, postsNodes)
 
@@ -98,7 +98,7 @@ class DataHandler():
         i = 1
         for key, node in roadNodesAnotated.items():
             if node.post:
-                nodesDict[node.id] = SearchNode(node.id, 'A' + str(i), node.post, node.lat, node.lon, node.address,)
+                nodesDict[node.id] = SearchNode(node.id, 'A' + str(i), node.post, node.lat, node.lon, node.address,node.post)
                 i = i + 1
             else:
                 nodesDict[node.id] = SearchNode(node.id, None, None, node.lat, node.lon, node.address)

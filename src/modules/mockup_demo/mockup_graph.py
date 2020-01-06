@@ -68,7 +68,8 @@ class MockupGraph:
         return map_trucks
 
 if __name__ == "__main__":
-    mg = MockupGraph("data/posts_9nodes_16edges.json")
+
+    mg = MockupGraph("../../posts_11nodes_21edges.json")
     print(mg.get_graph())
     trucks = json.loads("[{\"id\": \"carflowF1\", \"latitude\": 43.5104144, \"longitude\": 16.4390596}, "
                         "{\"id\": \"carflowF3\", \"latitude\": 43.5124174, \"longitude\": 16.4322733}]")

@@ -480,4 +480,4 @@ class NeighboursFinder():
 
     def search_near_posts(self, node_id_node_map_tmp, node_id_edge_map, start_node_id, eps_km):
         (front, visited_node_ids) = self.__fist_step_alg(node_id_node_map_tmp, node_id_edge_map, start_node_id, eps_km)
-        return self.__second_step_alg(node_id_node_map_tmp, node_id_edge_map, front, visited_node_ids, eps_km/2)
+        return self.__second_step_alg(node_id_node_map_tmp, node_id_edge_map, front, visited_node_ids, eps_km)
