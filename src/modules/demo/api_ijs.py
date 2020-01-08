@@ -18,6 +18,14 @@ class GraphProcessor:
     def __init__(self, path='modules/demo/data/9node.json'):
         self.g = MockupGraph(path)
 
+    def has_all(self, nodes):
+        graph_nodes = [x.name for x in self.g.nodes]
+        for n in nodes:
+            if n not in graph_nodes:
+                return False
+
+        return True
+
     def map_vehicles(self, data):
         vehicles = []
         for v in data:
@@ -55,7 +63,7 @@ class VrpProcessor:
                 target = self.graphProcessor.g.node_from_id(loc['locationId'])
 
                 idx = nodes.index(target)
-                dropoff[idx] += loc['dropoffWeightKg']
+                dropoff[idx] += loc['dropoffVolumeM3']
             if v['UUID'] != brokenVehicle:
                 non_broken_vehicles.append(v)
             else:
@@ -159,10 +167,20 @@ class VrpProcessor:
 
         return converted_route
 
+    def has_all_nodes_from(self, vehicles):
+        nodes = []
+        for clo in vehicles:
+            for node in clo['dropOffLocations']:
+                nodes.append(node['locationId'])
+        return self.graphProcessor.has_all(nodes)
+
+
 
 generalVrpProcessor = VrpProcessor(graphProcessor=GraphProcessor())
-xborderVrpA3 = VrpProcessor(graphProcessor=GraphProcessor('modules/demo/data/9node_A3.json'))
-xborderVrpA6 = VrpProcessor(graphProcessor=GraphProcessor('modules/demo/data/9node_A6.json'))
+xborderVrpSouth = VrpProcessor(graphProcessor=GraphProcessor('modules/demo/data/zagreb_south.json'))
+zagrebSVrP = VrpProcessor(graphProcessor=GraphProcessor('modules/demo/data/zagreb_south.json'))
+zagrebNVrp = VrpProcessor(graphProcessor=GraphProcessor('modules/demo/data/zagreb_north.json'))
+xborderVrpNorth = VrpProcessor(graphProcessor=GraphProcessor('modules/demo/data/zagreb_north.json'))
 
 
 class Event(Resource):
@@ -204,16 +222,30 @@ class RecReq(Resource):
         print(data)
 
         vehicle_metadata = data['CLOS']
+        filtered = [] #ignore posts
+        for clo in vehicle_metadata:
+            if 'LoadCapacity' in clo['metadata']:
+                filtered.append(clo)
+
+        vehicle_metadata = filtered
+
         routes = []
         evt_type = data["event"]["event_type"]
         if "event" in data:
             if "broken" in evt_type:
                 brokenVehicle = vehicle_metadata[0]["UUID"]
                 print("Processing VRP data.")
-                routes = generalVrpProcessor.process(vehicle_metadata)
+
+                if zagrebNVrp.has_all_nodes_from(vehicle_metadata):
+                    routes = zagrebNVrp.process(vehicle_metadata)
+                else:
+                    routes = zagrebSVrP.process(vehicle_metadata)
             elif "parcel" in evt_type:
                 print("Processing VRP data.")
-                routes = generalVrpProcessor.process(vehicle_metadata)
+                if zagrebNVrp.has_all_nodes_from(vehicle_metadata):
+                    routes = zagrebNVrp.process(vehicle_metadata)
+                else:
+                    routes = zagrebSVrP.process(vehicle_metadata)
             elif "xborder" in evt_type:
                 xvehiclesA3 = []
                 xvehiclesA6 = []
@@ -223,9 +255,9 @@ class RecReq(Resource):
                     else:
                         xvehiclesA6.append(v)
                 print("Running VRP 1")
-                routes1 = xborderVrpA3.process(xvehiclesA3)
+                routes1 = xborderVrpSouth.process(xvehiclesA3)
                 print("Running VRP 2")
-                routes2 = xborderVrpA6.process(xvehiclesA6)
+                routes2 = xborderVrpNorth.process(xvehiclesA6)
                 routes = routes1 + routes2
         if len(vehicle_metadata) < 1:
             return jsonify({"msg": "No vehicles"})
