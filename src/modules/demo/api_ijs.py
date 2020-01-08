@@ -30,6 +30,7 @@ class GraphProcessor:
         vehicles = []
         for v in data:
             loc = v["currlocation"]["currentPosition"]
+
             loc = loc.split(',')
 
             vehicles.append(
@@ -37,10 +38,14 @@ class GraphProcessor:
                  "latitude": float(loc[1]),
                  "longitude": float(loc[0])})
         print("Mapping vehicles to posts")
-        return self.g.map_vehicles(vehicles)
+        return [self.g.node_from_id(v["currlocation"]["locationId"]) for v in data]
+        # return self.g.map_vehicles(vehicles)
 
     def get_graph(self):
         return self.g.nodes, self.g.edges, self.g.incident_matrix
+
+    def node_names(self):
+        return [v.name for v in self.g.nodes]
 
 
 class VrpProcessor:
@@ -55,6 +60,8 @@ class VrpProcessor:
         nodes, edges, graph = self.graphProcessor.get_graph()
 
         post_mapping = self.graphProcessor.map_vehicles(metadata)
+        for p in post_mapping:
+            print(p.name)
         print("Got broken vehicle: {}".format(brokenVehicle))
         dropoff = [0] * len(nodes)
         non_broken_vehicles = []
@@ -174,6 +181,8 @@ class VrpProcessor:
                 nodes.append(node['locationId'])
         return self.graphProcessor.has_all(nodes)
 
+    def get_node_names(self):
+        return self.graphProcessor.node_names()
 
 
 generalVrpProcessor = VrpProcessor(graphProcessor=GraphProcessor())
@@ -233,7 +242,8 @@ class RecReq(Resource):
         evt_type = data["event"]["event_type"]
         if "event" in data:
             if "broken" in evt_type:
-                brokenVehicle = vehicle_metadata[0]["UUID"]
+                brokenVehicle = data["event"]["initiator"]
+                print("Broken event initiator:", brokenVehicle)
                 print("Processing VRP data.")
 
                 if zagrebNVrp.has_all_nodes_from(vehicle_metadata):
@@ -246,18 +256,18 @@ class RecReq(Resource):
                     routes = zagrebNVrp.process(vehicle_metadata)
                 else:
                     routes = zagrebSVrP.process(vehicle_metadata)
-            elif "xborder" in evt_type:
-                xvehiclesA3 = []
-                xvehiclesA6 = []
+            elif "CrossBorder" in evt_type:
+                xvehiclesSouth = []
+                xvehiclesNorth = []
                 for v in vehicle_metadata:
-                    if v["UUID"] in ["truck5F0", "truck6F0", "truck7F0", "truck8F0"]:
-                        xvehiclesA3.append(v)
+                    if v["currlocation"]["locationId"] in xborderVrpNorth.get_node_names():
+                        xvehiclesNorth.append(v)
                     else:
-                        xvehiclesA6.append(v)
+                        xvehiclesSouth.append(v)
                 print("Running VRP 1")
-                routes1 = xborderVrpSouth.process(xvehiclesA3)
+                routes1 = xborderVrpSouth.process(xvehiclesSouth)
                 print("Running VRP 2")
-                routes2 = xborderVrpNorth.process(xvehiclesA6)
+                routes2 = xborderVrpNorth.process(xvehiclesNorth)
                 routes = routes1 + routes2
         if len(vehicle_metadata) < 1:
             return jsonify({"msg": "No vehicles"})

@@ -113,56 +113,56 @@
       "lat": 45.7648767,
       "lon": 15.9883713,
       "node_id": 26615,
-      "post_id": "A12"
+      "post_id": "A4"
     },
     "3701": {
       "address": "Šegrta Hlapića Bb BOTINEC",
       "lat": 45.7551555,
       "lon": 15.93725,
       "node_id": 3701,
-      "post_id": "A2"
+      "post_id": "A5"
     },
     "4398": {
       "address": "J. Laurenčića 8 C ZAGREB",
       "lat": 45.7935546,
       "lon": 16.0050761,
       "node_id": 4398,
-      "post_id": "A3"
+      "post_id": "A6"
     },
     "4617": {
       "address": "Ulica grada Vukovara 86 ZAGREB",
       "lat": 45.7998889,
       "lon": 15.9819031,
       "node_id": 4617,
-      "post_id": "A4"
+      "post_id": "A7"
     },
     "47621": {
       "address": "Zagreb Zagreb",
       "lat": 45.7773841,
       "lon": 15.9544592,
       "node_id": 47621,
-      "post_id": "A11"
+      "post_id": "A8"
     },
     "5016": {
       "address": "Meštrovićev trg bb ZAGREB",
       "lat": 45.779362,
       "lon": 15.9955752,
       "node_id": 5016,
-      "post_id": "A1"
+      "post_id": "A9"
     },
     "7674": {
       "address": "Albaharijeva 7 ZAGREB",
       "lat": 45.7909169,
       "lon": 15.9506906,
       "node_id": 7674,
-      "post_id": "A8"
+      "post_id": "A10"
     },
     "1254": {
       "address": "Zagreb Zagreb",
       "lat": 45.7648748,
       "lon": 15.9639925,
       "node_id": 1254,
-      "post_id": "A5"
+      "post_id": "A11"
     }
   }
 }
