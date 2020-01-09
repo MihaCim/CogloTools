@@ -70,7 +70,11 @@ class VrpProcessor:
         non_broken_vehicles = []
         for i, v in enumerate(metadata):
             for loc in v['dropOffLocations']:
+                print(loc['locationId'])
                 target = self.graphProcessor.g.node_from_id(loc['locationId'])
+
+                if target is None: #skip deliveries to nodes not in my graph
+                    continue
 
                 idx = nodes.index(target)
                 dropoff[idx] += loc['dropoffVolumeM3']
