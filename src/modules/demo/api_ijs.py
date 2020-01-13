@@ -1,15 +1,17 @@
+import string
 import time
+import requests
+from datetime import datetime
 from math import inf
-
+import uuid
 from flask import Flask, request
 from flask_jsonpify import jsonify
 from flask_restful import Resource, Api
-import datetime
+from random import randint
 from modules.cvrp.vrp import VRP
 from modules.demo.mockup_graph import MockupGraph
 
-SIOT_URL = 'http://151.97.13.227:8080/SIOT-war/SIoT/Server/'
-
+MSB_FWD = 'http://116.203.13.198/api/postRecommendation'
 brokenVehicle = None
 parcelData = None
 
@@ -236,6 +238,44 @@ class RecReq(Resource):
     def get(self):
         return jsonify({"success": True, "message": "Please use POST request"})
 
+    def msb_forward(self, payload):
+
+
+        data = {"recommendations": []}
+        counter = 1
+        for clo in payload:
+            route_plan = {
+                "clo": clo["UUID"],
+                "plan": {
+                    "organization": "PS-HP-plan-{}".format(counter),
+                    "execution_date": datetime.strftime(datetime.now(), "%Y-%m-%dT%H:%M:%S.000Z"),
+                    "steps": []
+                }
+            }
+            counter += 1
+
+            for step in clo["route"]:
+                location_split = step["position"].split(',')
+
+                transformed_step = {
+                    "location": {
+                        "lat": float(location_split[1]),
+                        "lng": float(location_split[0])
+                    },
+                    "station": step["locationId"],
+                    "station_type": "post",
+                    "load": [str(uuid.uuid4()) for _ in range(randint(0, 4))],
+                    "unload": [str(uuid.uuid4()) for _ in range(randint(0, 4))]
+                }
+                route_plan["plan"]["steps"].append(transformed_step)
+
+            data["recommendations"].append(route_plan)
+
+        print(data)
+        response = requests.post(MSB_FWD, json=data)
+        print("Posted data to", MSB_FWD)
+        print(response.content)
+
     def post(self):
         data = request.get_json(force=True)
         global brokenVehicle
@@ -257,6 +297,12 @@ class RecReq(Resource):
             routes = self.process_zagreb(data, evt_type, routes, vehicle_metadata)
         if len(vehicle_metadata) < 1:
             return jsonify({"msg": "No vehicles"})
+
+        try:
+            self.msb_forward(routes)
+        except Exception as e:
+            print("Something went wrong at forwarding to MSB", e)
+
 
         return jsonify({"CLOS": routes})
 
