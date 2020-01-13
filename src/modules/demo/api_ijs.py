@@ -15,6 +15,33 @@ MSB_FWD = 'http://116.203.13.198/api/postRecommendation'
 brokenVehicle = None
 parcelData = None
 
+postmap = {
+    "SlovenianPostpost26615": "A4",
+    "SlovenianPostpost3701": "A5",
+    "CroatianPostpost4617": "A7",
+    "SlovenianPostpost47621": "A8",
+    "SlovenianPostpost5016": "A9",
+    "CroatianPostpost7674": "A10",
+    "SlovenianPostpost1254": "A11",
+    "CroatianPostpost3148": "A1",
+    "CroatianPostpost320": "A2",
+    "CroatianPostpost4398": "A6",
+    "CroatianPostpost639": "A3",
+    "ELTApost282": "A1",
+    "ELTApost890": "A2",
+    "ELTApost4647": "A3",
+    "ELTApost5992": "A4",
+    "ELTApost4476": "A5",
+    "ELTApost1490": "A6",
+    "ELTApost12188": "A7",
+    "ELTApost6156": "A8",
+    "ELTApost17247": "A9",
+    "ELTApost30259": "A10",
+    "ELTApost31073": "A11",
+    "ELTApost32140": "A12",
+    "ELTApost4323": "A13"
+}
+
 
 class GraphProcessor:
     def __init__(self, path='modules/demo/data/9node.json'):
@@ -42,7 +69,6 @@ class GraphProcessor:
 
     def map_vehicles(self, data):
         return [self.g.node_from_id(v["currlocation"]["locationId"]) for v in data]
-
 
     def get_graph(self):
         return self.g.nodes, self.g.edges, self.g.incident_matrix
@@ -75,7 +101,7 @@ class VrpProcessor:
                 print(loc['locationId'])
                 target = self.graphProcessor.g.node_from_id(loc['locationId'])
 
-                if target is None: #skip deliveries to nodes not in my graph
+                if target is None:  # skip deliveries to nodes not in my graph
                     continue
 
                 idx = nodes.index(target)
@@ -193,6 +219,7 @@ class VrpProcessor:
     def get_node_names(self):
         return self.graphProcessor.node_names()
 
+
 xborderVrpSouthZagreb = VrpProcessor(graphProcessor=GraphProcessor('modules/demo/data/zagreb_south.json'))
 zagrebSVrP = VrpProcessor(graphProcessor=GraphProcessor('modules/demo/data/zagreb_south.json'))
 zagrebNVrp = VrpProcessor(graphProcessor=GraphProcessor('modules/demo/data/zagreb_north.json'))
@@ -203,7 +230,6 @@ athensSVrP = VrpProcessor(graphProcessor=GraphProcessor('modules/demo/data/atene
 athensNVrp = VrpProcessor(graphProcessor=GraphProcessor('modules/demo/data/atene_north.json'))
 xborderVrpNorthAthens = VrpProcessor(graphProcessor=GraphProcessor('modules/demo/data/atene_north.json'))
 generalAthens = VrpProcessor(graphProcessor=GraphProcessor('modules/demo/data/atene.json'))
-
 
 
 class Event(Resource):
@@ -263,7 +289,7 @@ class RecReq(Resource):
                         "lat": float(location_split[1]),
                         "lng": float(location_split[0])
                     },
-                    "station": "{}Post-{}".format(key, step["locationId"]) if key == "Croatian" else "{}-{}".format("ELTA", step["locationId"]),
+                    "station": postmap[step["locationId"]],
                     "station_type": "post",
                     "load": [str(uuid.uuid4()) for _ in range(randint(0, 4))],
                     "unload": [str(uuid.uuid4()) for _ in range(randint(0, 4))]
@@ -283,7 +309,7 @@ class RecReq(Resource):
         print(data)
 
         vehicle_metadata = data['CLOS']
-        filtered = [] #ignore posts
+        filtered = []  # ignore posts
         for clo in vehicle_metadata:
             if 'LoadCapacity' in clo['metadata']:
                 filtered.append(clo)
@@ -305,7 +331,6 @@ class RecReq(Resource):
             self.msb_forward(routes, key)
         except Exception as e:
             print("Something went wrong at forwarding to MSB", e)
-
 
         return jsonify({"CLOS": routes})
 
