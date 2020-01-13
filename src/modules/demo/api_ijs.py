@@ -238,7 +238,7 @@ class RecReq(Resource):
     def get(self):
         return jsonify({"success": True, "message": "Please use POST request"})
 
-    def msb_forward(self, payload):
+    def msb_forward(self, payload, key):
 
         timestamp = datetime.strftime(datetime.now(), "%Y-%m-%dT%H:%M:%S.000Z")
         data = {"recommendations": []}
@@ -248,7 +248,7 @@ class RecReq(Resource):
                 "clo": clo["UUID"],
                 "plan": {
                     "uuid": "PS-HP-plan-{}-{}".format(timestamp, counter),
-                    "organization": "PS-HP-plan-{}".format(counter),
+                    "organization": "{} post".format(key),
                     "execution_date": timestamp,
                     "steps": []
                 }
@@ -291,8 +291,10 @@ class RecReq(Resource):
         vehicle_metadata = filtered
 
         routes = []
+        key = "Croatian "
         evt_type = data["event"]["event_type"]
         if "info" in data["event"] and "athens" in data["event"]["info"].lower():
+            key = "Greek "
             routes = self.process_athens(data, evt_type, routes, vehicle_metadata)
         else:
             routes = self.process_zagreb(data, evt_type, routes, vehicle_metadata)
@@ -300,7 +302,7 @@ class RecReq(Resource):
             return jsonify({"msg": "No vehicles"})
 
         try:
-            self.msb_forward(routes)
+            self.msb_forward(routes, key)
         except Exception as e:
             print("Something went wrong at forwarding to MSB", e)
 
