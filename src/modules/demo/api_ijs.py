@@ -248,7 +248,7 @@ class RecReq(Resource):
                 "clo": clo["UUID"],
                 "plan": {
                     "uuid": "PS-HP-plan-{}-{}".format(timestamp, counter),
-                    "organization": "{} post".format(key),
+                    "organization": "{} Post".format(key) if key == "Croatian" else "ELTA",
                     "execution_date": timestamp,
                     "steps": []
                 }
