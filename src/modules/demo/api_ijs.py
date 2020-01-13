@@ -240,15 +240,16 @@ class RecReq(Resource):
 
     def msb_forward(self, payload):
 
-
+        timestamp = datetime.strftime(datetime.now(), "%Y-%m-%dT%H:%M:%S.000Z")
         data = {"recommendations": []}
         counter = 1
         for clo in payload:
             route_plan = {
                 "clo": clo["UUID"],
                 "plan": {
+                    "uuid": "PS-HP-plan-{}-{}".format(timestamp, counter),
                     "organization": "PS-HP-plan-{}".format(counter),
-                    "execution_date": datetime.strftime(datetime.now(), "%Y-%m-%dT%H:%M:%S.000Z"),
+                    "execution_date": timestamp,
                     "steps": []
                 }
             }
