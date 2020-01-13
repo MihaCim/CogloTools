@@ -291,10 +291,10 @@ class RecReq(Resource):
         vehicle_metadata = filtered
 
         routes = []
-        key = "Croatian "
+        key = "Croatian"
         evt_type = data["event"]["event_type"]
         if "info" in data["event"] and "athens" in data["event"]["info"].lower():
-            key = "Greek "
+            key = "Greek"
             routes = self.process_athens(data, evt_type, routes, vehicle_metadata)
         else:
             routes = self.process_zagreb(data, evt_type, routes, vehicle_metadata)
