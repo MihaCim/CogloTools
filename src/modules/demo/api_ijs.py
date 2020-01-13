@@ -263,7 +263,7 @@ class RecReq(Resource):
                         "lat": float(location_split[1]),
                         "lng": float(location_split[0])
                     },
-                    "station": "{}-post-{}".format(key, step["locationId"]),
+                    "station": "{}-post-{}".format(key, step["locationId"]) if key == "Croatian" else "{}-{}".format("ELTA", step["locationId"]),
                     "station_type": "post",
                     "load": [str(uuid.uuid4()) for _ in range(randint(0, 4))],
                     "unload": [str(uuid.uuid4()) for _ in range(randint(0, 4))]
