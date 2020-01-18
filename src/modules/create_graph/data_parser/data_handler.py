@@ -2,10 +2,10 @@ import sys
 
 import xml.sax
 import networkx as nx
-from modules.create_graph.utils import utils
-from modules.create_graph.data_parser.parse_osm import OsmParsers
-from modules.create_graph.data_parser.parse_posts import PostHandler
-from modules.create_graph.pojo.search_node import SearchNode
+from utils import utils
+from data_parser.parse_osm import OsmParsers
+from data_parser.parse_posts import PostHandler
+from pojo.search_node import SearchNode
 
 class DataHandler():
 

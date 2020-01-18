@@ -1,6 +1,6 @@
 import math
 import copy
-from modules.create_graph.pojo.front_data import FrontData
+from pojo.front_data import FrontData
 import time
 import networkx as nx
 import matplotlib.pyplot as plt
