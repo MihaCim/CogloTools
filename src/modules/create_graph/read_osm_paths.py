@@ -156,7 +156,7 @@ def syntetic_graph1_construction():
 
 def run():
 
-    osmHandler = DataHandler("modules/create_graph/data/zagreb.osm",
+    osmHandler = DataHandler("modules/create_graph/data/atene.osm",
                              {'si':'modules/create_graph/data/List of Postal Offices (geographical location).csv',
                               'hr':'modules/create_graph/data/PU_Geokoordinate.csv'
                                })
@@ -208,7 +208,7 @@ def run():
     print('nodes'+str(len(postNode)))
     print('edge'+str(len(postEdge)))
     graph = {'nodes': postNodePlain, 'edge': list(postEdge)}
-    f = open("zagreb.json", "w")
+    f = open("atene.json", "w")
     f.write(json.dumps(graph))
     f.close()
 
