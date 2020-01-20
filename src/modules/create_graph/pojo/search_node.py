@@ -9,6 +9,7 @@ class SearchNode:
         self.lon = lon
         self.address = address
         self.post = post
+        self.tagged = {}
 
     def set_lat_lon(self, lat, lon):
         self.lat = lat
@@ -16,5 +17,15 @@ class SearchNode:
 
     def set_address(self, address):
         self.address = address
+
+
+    def isTaggedby(self, start_node_id):
+        if start_node_id in self.tagged:
+            return True
+        return False
+
+    def addTag(self, tuple):
+        start_node_id, current_dist = tuple
+        self.tagged[start_node_id] = current_dist
 
 

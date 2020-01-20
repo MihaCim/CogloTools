@@ -337,7 +337,7 @@ class NeighboursFinder():
 
         return results
 
-    def __fist_step_alg(self, node_id_node_map, node_id_edge_map, start_node_id, origin_id, eps_km):
+    def __fist_step_alg(self, node_id_node_map, node_id_edge_map, start_node_id, eps_km):
         # front = [(start_node_id, 0, [])]
         F = [(start_node_id,0)]
         visited_ids = set()
@@ -348,17 +348,18 @@ class NeighboursFinder():
             current_dist = current_tup[1]
             edge_map = node_id_edge_map[current_id]  # get neighbors od te tocke
             for neighbour_id in edge_map:
-                current_neigbour_dist = edge_map[neigbour_id]["weight"]
+                current_neighbour_dist = node_id_edge_map[current_id][neighbour_id]['weight']
                 if neighbour_id in visited_ids:
                     continue
-                if current_dist + current_neigbour_dist > eps_km:
+                if current_dist + current_neighbour_dist > eps_km:
                     continue
                 F.append((neighbour_id, current_dist+current_neighbour_dist))
             visited_ids.add(current_id)
-            current_node = node_id_node_map(current_id)
-            if not current_node.isTaggedby (origin_id):
-               current_node.addTag ((start_node_id, current_dist))
-    
+            current_node = node_id_node_map[current_id]
+            if not current_node.isTaggedby(start_node_id):
+               current_node.addTag((start_node_id, current_dist))
+                #
+            print(current_node)
     def search_near_posts(self, node_id_node_map_tmp, node_id_edge_map, start_node_id, eps_km):
-        (front, visited_node_ids) = self.__fist_step_alg(node_id_node_map_tmp, node_id_edge_map, start_node_id, eps_km)
+        self.__fist_step_alg(node_id_node_map_tmp, node_id_edge_map, start_node_id, eps_km)
         return self.__second_step_alg(node_id_node_map_tmp, node_id_edge_map, front, visited_node_ids, eps_km)
