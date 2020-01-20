@@ -11,6 +11,7 @@ class NeighboursFinder():
     def __init__(self, G=None):
         self.G = G
 
+
     def drawGraph(self, H_roads, front, postsRes, node_id_node_map_tmp):
         plt.clf()
         plt.cla()
@@ -47,6 +48,7 @@ class NeighboursFinder():
         G_front.clear()
         K_posts.clear()
         # H_roads.clear()
+
 
     def search_near_posts(self, node_id_node_map_tmp, node_id_edge_map, start_node_id, eps_km):
         # front = [(start_node_id, 0, [])]
@@ -322,7 +324,7 @@ class NeighboursFinder():
                 print("All paths exhausted! Terminating the algorithm!")
                 break
 
-            # if time.time() - start_time >= 0.1:
+            # if time.time() - start_time >= 0.001:
             #      print("results:" + str(results))
             #      self.drawGraph(self.G, front, results, node_id_node_map)
             #      start_time = time.time()
