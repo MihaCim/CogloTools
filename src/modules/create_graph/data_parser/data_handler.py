@@ -30,9 +30,9 @@ class DataHandler():
 
             tmpNode = nodesL[nodeKey]
             if utils.calcDistance(post.latitude, post.longitude, tmpNode.lat, tmpNode.lon) < 0.5:
-                print(nodeKey)
-                print(post.address)
-                print(utils.calcDistance(post.latitude, post.longitude, tmpNode.lat, tmpNode.lon))
+                #print(nodeKey)
+                #print(post.address)
+                #print(utils.calcDistance(post.latitude, post.longitude, tmpNode.lat, tmpNode.lon))
                 postsNodes.append(nodeKey)
                 tmpNode.add_post(post.address, post)
                 nodesL[nodeKey] = tmpNode
@@ -63,7 +63,7 @@ class DataHandler():
         self.nodes = handler.nodes
 
         ###
-        print(self.nodes)
+        #print(self.nodes)
         transformed_ids = {}
         cnt = 0
         self.new_nodes = {}
@@ -79,7 +79,7 @@ class DataHandler():
         ###
         self.nodes = self.new_nodes
 
-        print(self.ways)
+        #print(self.ways)
         nodes_filtered = {}
 
         #in this step we remove nodes which are not connected to road

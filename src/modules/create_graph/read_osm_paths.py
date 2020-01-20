@@ -87,9 +87,9 @@ def drawStaticGraph(nodes, ways, results):
 
 def run():
 
-    osmHandler = DataHandler("./data/atene.osm",
-                             {'si':'./data/List of Postal Offices (geographical location).csv',
-                              'hr':'./data/PU_Geokoordinate.csv'
+    osmHandler = DataHandler("./data/domaciraji.osm_01.osm",
+                             {'si':'./data/List of Postal Offices (geographical location).csv'
+                              #,'hr':'./data/PU_Geokoordinate.csv'
                                })
     G = osmHandler.graph_viz()
     roadNodes = osmHandler.modified_nodes
@@ -133,8 +133,8 @@ def run():
                 postNode[k] = v.__dict__
                 postNodePlain[k] = d
 
-        if len(postEdge) != 0:
-            drawGraph(G, postNode, postEdge)
+    if len(postEdge) != 0:
+           drawGraph(G, postNode, postEdge)
 
     print('nodes'+str(len(postNode)))
     print('edge'+str(len(postEdge)))

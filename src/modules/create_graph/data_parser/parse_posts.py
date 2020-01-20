@@ -15,7 +15,7 @@ class PostHandler:
 
     def posts_si(self, post_path):
         posts = []
-        with open(post_path) as csv_file:
+        with open(post_path, encoding="utf8") as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
 
             for row in csv_reader:
@@ -27,7 +27,7 @@ class PostHandler:
 
     def posts_hr(self, post_path):
         posts = []
-        with open(post_path) as csv_file:
+        with open(post_path, encoding="utf8") as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
             next(csv_reader)
             for row in csv_reader:
