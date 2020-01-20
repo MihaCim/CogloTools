@@ -337,147 +337,28 @@ class NeighboursFinder():
 
         return results
 
-
-    def __fist_step_alg(self, node_id_node_map_tmp, node_id_edge_map, start_node_id, eps_km):
+    def __fist_step_alg(self, node_id_node_map, node_id_edge_map, start_node_id, origin_id, eps_km):
         # front = [(start_node_id, 0, [])]
-        node_id_node_map = copy.deepcopy(node_id_node_map_tmp)
-        node_id_edge_map = copy.deepcopy(node_id_edge_map)
-        front = {
-            start_node_id: FrontData(0, [], [])
-        }
-        visited_node_ids = set()
-        results = []
-        start_time = time.time()
+        F = [(start_node_id,0)]
+        visited_ids = set()
 
-        visited_node_ids.add(start_node_id)
-
-
-        while len(front) != 0:
-
-            active_node_id = None
-            prev_node_id = None
-            current_visited_points = None  # TODO: do we need this in the loop??
-            min_distance = math.inf
-
-            for node_id, node_data in front.items():
-
-                if node_id not in node_id_edge_map:
+        while len(F) > 0:
+            current_tup = F.pop(0)
+            current_id = current_tup[0]
+            current_dist = current_tup[1]
+            edge_map = node_id_edge_map[current_id]  # get neighbors od te tocke
+            for neighbour_id in edge_map:
+                current_neigbour_dist = edge_map[neigbour_id]["weight"]
+                if neighbour_id in visited_ids:
                     continue
-
-                node_dist = node_data.origin_dist
-                neigbours = node_id_edge_map[node_id]  # get neighbors od te tocke
-
-                for neigbour in neigbours:
-                    edge_dist = neigbours[neigbour]["weight"]
-                    # najdi najblizjega soseda, ki se ni bil obiskan in je znotraj epsilona
-                    if ((node_dist + edge_dist) < min_distance) and (neigbour not in visited_node_ids) and (node_dist + edge_dist) < eps_km and node_id_node_map[neigbour].post_id is None:
-                        min_distance = node_dist + edge_dist
-                        active_node_id = neigbour
-                        current_visited_points = [val for val in node_data.prev_posts]
-                        prev_node_id = node_id
-
-
-            if active_node_id is None:
-                # we were unable to find any new neighbours to extend the front
-                # that means that we have searched through the entire graph
-                # we can safely exit the loop
-                print('Cannot extend the front. No neigbours available. Finishing search.')
-                print(str(front))
-                break
-
-            if active_node_id not in node_id_node_map:
-                raise ValueError('WTF!? Found an invalid node: ' + str(active_node_id))
-
-            # check if the active node is a post office. if so, add it to the results
-            is_post = node_id_node_map[active_node_id].post_id is not None
-            if is_post:
-                current_visited_points += [active_node_id]
-                if len(current_visited_points) == 1:
-                    results += [(node_id_node_map[active_node_id].post_id, min_distance)]
-
-
-            # extend the front with the active node
-            prev_node_data = front[prev_node_id]
-
-            # compute the history of the new node
-            active_node_history = prev_node_data.eps_history + [(prev_node_id, prev_node_data.origin_dist)]
-
-            active_node_dist_origin = min_distance
-            while len(active_node_history) > 0:
-                oldest_node_id, oldest_node_dist_origin = active_node_history[0]
-                # newest_node_id, newest_node_dist_origin = active_node_history[-1]
-                dist_diff = active_node_dist_origin - oldest_node_dist_origin
-                if dist_diff <= eps_km:
-                    break
-                active_node_history.pop(0)
-
-            # add the active node to the list of visited nodes
-            visited_node_ids.add(active_node_id)
-
-            # only add the active node to the front if it has any
-            # non-visited neighbours
-            active_node_neigh_ids = node_id_edge_map[active_node_id]
-            all_neighbours_visited = True
-            for neigh_id in active_node_neigh_ids:
-                if neigh_id not in visited_node_ids:
-                    all_neighbours_visited = False
-                    break
-
-            # if all the neighbours of the active node are visited, we need
-            # to check if we can delete them now after one of their neighbours
-            # (the active node) has been visited
-            for neigh_id in active_node_neigh_ids:
-                if neigh_id == prev_node_id or neigh_id not in front:
+                if current_dist + current_neigbour_dist > eps_km:
                     continue
-                all_neigh_of_neigh_visited = True
-                neigh_of_neigh_ids = node_id_edge_map[neigh_id]
-                for neigh_of_neigh_id in neigh_of_neigh_ids:
-                    if neigh_of_neigh_id not in visited_node_ids:
-                        all_neigh_of_neigh_visited = False
-                        break
-                if all_neigh_of_neigh_visited:
-                    if len(front[neigh_id].prev_posts) >= 2:
-                        print('decreased cnt')
-                    del front[neigh_id]
-                    print('deleted neighbour of neighbour: ' + str(neigh_of_neigh_id))
-
-            if not all_neighbours_visited:
-                # add the node to the front
-                front[active_node_id] = FrontData(
-                    min_distance,
-                    current_visited_points,
-                    active_node_history
-                )
-                print("Added : "+ str(active_node_id) + " n_posts: " + str(len(current_visited_points)))
-
-
-            # from the front
-            # TODO: optimize this - have a counter in each node that counts
-            # TODO: how many neighbours have been visited
-
-            prev_node_neighbour_ids = node_id_edge_map[prev_node_id]
-            all_neighbours_visited = True
-            for neighbour_id in prev_node_neighbour_ids:
-                if (node_id_node_map_tmp[neighbour_id].is_post and node_id_node_map_tmp[neighbour_id].node_id != start_node_id) or neighbour_id not in visited_node_ids:
-                    all_neighbours_visited = False
-                    break
-
-            prev_node_visited = [(neigh_id, neigh_id in visited_node_ids) for neigh_id in prev_node_neighbour_ids]
-            print('checking if node exhausted: ' + str(prev_node_id) + ', neigh: ' + str(prev_node_visited) + ': ' + str(all_neighbours_visited))
-            if all_neighbours_visited:
-                print('Node deleted: ' + str(prev_node_id) + ' n_posts: '+ str(len(front[prev_node_id].prev_posts)))
-                del front[prev_node_id]
-            print('node in front ' + str(prev_node_id) + ': ' + str(prev_node_id in front))
-
-
-
-        print("Runtime: {}".format(time.time() - start_time))
-
-        return (front, visited_node_ids)
-
-
-
-
+                F.append((neighbour_id, current_dist+current_neighbour_dist))
+            visited_ids.add(current_id)
+            current_node = node_id_node_map(current_id)
+            if not current_node.isTaggedby (origin_id):
+               current_node.addTag ((start_node_id, current_dist))
+    
     def search_near_posts(self, node_id_node_map_tmp, node_id_edge_map, start_node_id, eps_km):
         (front, visited_node_ids) = self.__fist_step_alg(node_id_node_map_tmp, node_id_edge_map, start_node_id, eps_km)
         return self.__second_step_alg(node_id_node_map_tmp, node_id_edge_map, front, visited_node_ids, eps_km)
