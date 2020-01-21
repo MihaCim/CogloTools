@@ -1,16 +1,16 @@
-import math
 import copy
-from modules.create_graph.pojo.front_data import FrontData
+import math
 import time
-import networkx as nx
+
 import matplotlib.pyplot as plt
+import networkx as nx
+from pojo.front_data import FrontData
 
 
 class NeighboursFinder():
 
     def __init__(self, G=None):
         self.G = G
-
 
     def drawGraph(self, H_roads, front, postsRes, node_id_node_map_tmp):
         plt.clf()
@@ -49,23 +49,18 @@ class NeighboursFinder():
         K_posts.clear()
         # H_roads.clear()
 
-
-    def search_near_posts(self, node_id_node_map_tmp, node_id_edge_map, start_node_id, eps_km):
-        # front = [(start_node_id, 0, [])]
-        node_id_node_map = copy.deepcopy(node_id_node_map_tmp)
+    #return self.__second_step_alg(node_id_node_map_tmp, node_id_edge_map, origin_node_id)
+    def __second_step_alg(self, node_id_node_map_temp, node_id_edge_map, origin_node_id):
+        front = [(origin_node_id, 0, [])]
+        node_id_node_map = copy.deepcopy(node_id_node_map_temp)
         node_id_edge_map = copy.deepcopy(node_id_edge_map)
-        front = {
-            start_node_id: FrontData(0, [], [])
-        }
+
+
         visited_node_ids = set()
         results = []
-        posts_in_front_count = 0
 
-        visited_node_ids.add(start_node_id)
-
-        i = 0
+        visited_node_ids.add(origin_node_id)
         start_time = time.time()
-
         exhausted_paths_count = 0
 
         # the counter is increased when have aleready one post office and than increase to the 3
@@ -80,9 +75,10 @@ class NeighboursFinder():
 
             active_node_id = None
             prev_node_id = None
-            current_visited_points = None  # TODO: do we need this in the loop??
+            current_visited_post_ids = None  # TODO: do we need this in the loop??
             min_distance = math.inf
 
+            # The FRONT: this loop finds the node that is closest to the front
             for node_id, node_data in front.items():
                 # print(node_id)
                 # print(node_data)
@@ -98,7 +94,7 @@ class NeighboursFinder():
                     if ((node_dist + edge_dist) < min_distance) and (neigbour not in visited_node_ids):
                         min_distance = node_dist + edge_dist
                         active_node_id = neigbour
-                        current_visited_points = [val for val in node_data.prev_posts]
+                        current_visited_post_ids = [val for val in node_data.prev_posts]
                         prev_node_id = node_id
 
             # print(active_node_id)
@@ -113,40 +109,26 @@ class NeighboursFinder():
                 print('Cannot extend the front. No neigbours available. Finishing search.')
                 print(str(front))
                 break
-
-            print('active node: ' + str(active_node_id))
+            #print('active node: ' + str(active_node_id))
 
             if active_node_id not in node_id_node_map:
-                raise ValueError('WTF!? Found an invalid node: ' + str(active_node_id))
+                raise ValueError('Found an invalid node: ' + str(active_node_id))
 
             # check if the active node is a post office. if so, add it to the results
-            is_post = node_id_node_map[active_node_id].post_id is not None
+
+             #is_post = node_id_node_map[active_node_id].post_id is not None      ##check the
+             #is_post = active_node_id.isTagged is not None  ##check the
+             #if is_post:
+             #   current_visited_post_ids += [active_node_id]
+             #   if len(current_visited_post_ids) == 1:
+             #       results += [(node_id_node_map[active_node_id].post_id, min_distance)]
+
+            # check if the active node is a post office. if so, add it to the results
+            is_post = node_id_node_map[active_node_id].is_post()
             if is_post:
-                current_visited_points += [active_node_id]
-                if len(current_visited_points) == 1:
-                    results += [(node_id_node_map[active_node_id].post_id, min_distance)]
-
-            # if active_node_id in nodes and nodes[active_node_id].get("post"):
-            #    current_visited_points.append(prev_node_id)
-            #    ##prestavi ..............
-            #    print(current_visited_points)
-            #    if len(current_visited_points) == 1:
-            #        results.append(active_node_id)
-
-            # extend the front with the active node
-            prev_node_data = front[prev_node_id]
-
-            # compute the history of the new node
-            active_node_history = prev_node_data.eps_history + [(prev_node_id, prev_node_data.origin_dist)]
-
-            active_node_dist_origin = min_distance
-            while len(active_node_history) > 0:
-                oldest_node_id, oldest_node_dist_origin = active_node_history[0]
-                # newest_node_id, newest_node_dist_origin = active_node_history[-1]
-                dist_diff = active_node_dist_origin - oldest_node_dist_origin
-                if dist_diff <= eps_km:
-                    break
-                active_node_history.pop(0)
+                current_visited_post_ids += [active_node_id]
+                if len(current_visited_post_ids) == 1:
+                    results += [(node_id_node_map[active_node_id].tag_filter(), min_distance)]
 
             # add the active node to the list of visited nodes
             visited_node_ids.add(active_node_id)
@@ -162,7 +144,8 @@ class NeighboursFinder():
 
             # if all the neighbours of the active node are visited, we need
             # to check if we can delete them now after one of their neighbours
-            # (the active node) has been visited
+            # (the active node) has been visited - Handling the use case when cycle/loop has been reached for two edges
+
             for neigh_id in active_node_neigh_ids:
                 if neigh_id == prev_node_id or neigh_id not in front:
                     continue
@@ -180,116 +163,18 @@ class NeighboursFinder():
                     del front[neigh_id]
                     print('deleted neighbour of neighbour: ' + str(neigh_of_neigh_id))
 
+            # adding nodes to the front
             if not all_neighbours_visited:
                 # add the node to the front
                 front[active_node_id] = FrontData(
                     min_distance,
-                    current_visited_points,
-                    active_node_history
+                    current_visited_post_ids
                 )
-                print("Added : "+ str(active_node_id) + " n_posts: " + str(len(current_visited_points)))
-                if len(current_visited_points) >= 2:
+                print("Added : " + str(active_node_id) + " n_posts: " + str(len(current_visited_post_ids)))
+                if len(current_visited_post_ids) >= 2:
                     print('increased cnt')
                     exhausted_paths_count += 1
                     counter_added += 1
-
-            # front.append((active_node_id, min_distance, current_visited_points))
-
-
-
-            # check if we need to snap the current post back to the intersection
-            if is_post:
-                snap_node_id = active_node_id
-                snap_node_history = [node_id for node_id in reversed(active_node_history)]  # TODO: optimize
-                # TODO check if all the naighbors of previous point were visited
-
-                all_visited = False
-                snap_back_to = None
-                if len(snap_node_history) != 0:
-                    snap_back_to = snap_node_history[-1][0]
-                    for node_id, eps_distance in snap_node_history:
-                        # print(node_id_node_map[node_id])
-                        if node_id_node_map[node_id].post_id is not None:
-                            all_visited = True
-                            break
-
-                if not all_visited and snap_back_to is not None and node_id_node_map[snap_back_to].post_id is None:
-                    # we have encountered a post office, but the paths from the intersection
-                    # have not been exhausted. We need to snap the post back to the intersection
-                    node_id_node_map[snap_back_to].post_id = node_id_node_map[snap_node_id].post_id
-                    node_id_node_map[snap_back_to].is_post = True
-                    print('snap variant 1 to: ' + str(snap_back_to))
-
-                    for front_node_id in front:
-                        for hist_node_id, dist in front[front_node_id].eps_history:
-                            if snap_back_to == hist_node_id and front_node_id != snap_node_id:
-                                front_node_prev_posts = front[front_node_id].prev_posts
-                                if snap_node_id in front_node_prev_posts:
-                                    print('adding duplicate!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-                                front_node_prev_posts.append(snap_node_id)
-                                print('currection, post: ' + str(snap_node_id))
-                                if len(front_node_prev_posts) == 2:
-                                    print('increased cnt')
-                                    exhausted_paths_count += 1
-                                    counter_modified += 1
-                                break
-                else:
-                    found_intersec = True
-                    while found_intersec:
-                        # if there is no more history to traverse the procedure is finished (we have already
-                        # searched for eps kilometers back)
-                        if len(snap_node_history) == 0:
-                            break
-
-                        found_intersec = False
-
-                        snap_node = node_id_node_map[snap_node_id]
-                        for hist_nodeN, hist_node_data in enumerate(snap_node_history):
-                            hist_node_id, hist_node_dist_origin = hist_node_data
-                            hist_node = node_id_node_map[hist_node_id]
-                            is_hist_node_post = hist_node.post_id is not None
-                            if is_hist_node_post:
-                                # we have found a post office when searching through the history
-                                # that means that this procedure was already run on that post office
-                                # and we were unable to snap it to an intersection. Hence, there is
-                                # no need to run the procedure again.
-                                break
-
-                            intersects_node_ids = []
-                            for front_node_id in front:
-                                front_node_data = front[front_node_id]
-                                if front_node_data.has_traversed(hist_node_id):
-                                    intersects_node_ids.append(front_node_id)
-
-                            found_intersec = len(intersects_node_ids) > 1
-                            if found_intersec:
-                                # swap the historical node with the current node
-
-                                # swap the post_id of the historical node with the post_id
-                                # of the current node
-                                hist_node.post_id = snap_node.post_id
-                                hist_node.is_post = True
-                                print('snap variant 2 to: ' + str(hist_node_id))
-
-                                # add hist_node_id into prev_posts for all the found nodes
-                                # hist_node_id can be added as the last post office visited
-                                # if this was not the case that other post would have already
-                                # been visited and would have been snapped back to the same
-                                # intersection we are snapping the current post to. Hence, we would
-                                # have terminated in the is_hist_node_post check
-                                for intersec_node_id in intersects_node_ids:
-                                    intersec_node_data = front[intersec_node_id]
-                                    if snap_node_id in intersec_node_data.prev_posts:
-                                        print('adding duplicate!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-                                    intersec_node_data.prev_posts += [snap_node_id]
-                                    if len(intersec_node_data.prev_posts) == 2:
-                                        print('increased cnt')
-                                        exhausted_paths_count += 1
-                                        counter_modified += 1
-
-                                # update the snap node and history
-                                snap_node_id = hist_node_id
-                                snap_node_history = snap_node_history[hist_nodeN + 1:]
 
             # if all the neighbours of the previous point have been visited, remove it
             # from the front
@@ -303,34 +188,56 @@ class NeighboursFinder():
                     all_neighbours_visited = False
                     break
 
-            prev_node_visited = [(neigh_id, neigh_id in visited_node_ids) for neigh_id in prev_node_neighbour_ids]
-            print('checking if node exhausted: ' + str(prev_node_id) + ', neigh: ' + str(prev_node_visited) + ': ' + str(all_neighbours_visited))
+            # delete the nodes that have all the neighbours visited
             if all_neighbours_visited:
                 if len(front[prev_node_id].prev_posts) >= 2:
                     print('decreased cnt')
                     exhausted_paths_count -= 1
                     counter_deleted += 1
-                print('Node deleted: ' + str(prev_node_id) + ' n_posts: '+ str(len(front[prev_node_id].prev_posts)))
+                print('Node deleted: ' + str(prev_node_id) + ' n_posts: ' + str(len(front[prev_node_id].prev_posts)))
                 del front[prev_node_id]
-            print('node in front ' + str(prev_node_id) + ': ' + str(prev_node_id in front))
-
 
             #  check if the algorithm is finished
-            print('total paths: ' + str(len(front)) + ', exhausted paths: ' + str(exhausted_paths_count))
-            print('added: ' + str(counter_added) + ' Deleted:  ' + str(counter_deleted) +
-                  ' Modified : ' + str(counter_modified) + ' Snapped : ' + str(counter_snapped))
+            # print('total paths: ' + str(len(front)) + ', exhausted paths: ' + str(exhausted_paths_count))
+            # print('added: ' + str(counter_added) + ' Deleted:  ' + str(counter_deleted) +
+            #      ' Modified : ' + str(counter_modified) + ' Snapped : ' + str(counter_snapped))
 
+            # when there is more than one post office on in all direction, the search can be terminated
             if exhausted_paths_count == len(front):
                 print("All paths exhausted! Terminating the algorithm!")
                 break
 
-            # if time.time() - start_time >= 0.001:
-            #      print("results:" + str(results))
-            #      self.drawGraph(self.G, front, results, node_id_node_map)
-            #      start_time = time.time()
-            #      print("visited:" + str(visited_node_ids))
-
-
         print("Runtime: {}".format(time.time() - start_time))
-
         return results
+
+    def __fist_step_alg(self, node_id_node_map, node_id_edge_map, start_node_id, origin_node_id, eps_km):
+        # front = [(start_node_id, 0, [])]
+        F = [(start_node_id, 0)]
+        visited_ids = set()
+
+        while len(F) > 0:
+            current_tup = F.pop(0)
+            current_id = current_tup[0]
+            current_dist = current_tup[1]
+            edge_map = node_id_edge_map[current_id]  # get neighbors od te tocke
+            for neighbour_id in edge_map:
+                current_neighbour_dist = node_id_edge_map[current_id][neighbour_id]['weight']
+                if neighbour_id in visited_ids:
+                    continue
+                if current_dist + current_neighbour_dist > eps_km:
+                    continue
+                F.append((neighbour_id, current_dist + current_neighbour_dist))
+            visited_ids.add(current_id)
+            current_node = node_id_node_map[current_id]
+            if not current_node.isTaggedby(origin_node_id):
+                current_node.addTag((start_node_id, current_dist))
+            ##potrebno še pobrisati vse tage razen najbližjega
+            # node_tags = current_node
+            print(current_node)
+
+    def search_near_posts(self, node_id_node_map, node_id_edge_map, origin_node_id,map_posts_to_nodes, eps_km):
+        self.__fist_step_alg(node_id_node_map, node_id_edge_map, origin_node_id, origin_node_id, eps_km)
+        for node_id in map_posts_to_nodes:
+            if map_posts_to_nodes[node_id]!= origin_node_id:
+                self.__fist_step_alg(node_id_node_map, node_id_edge_map, map_posts_to_nodes[node_id], origin_node_id, eps_km)
+        return self.__second_step_alg(node_id_node_map, node_id_edge_map, origin_node_id)

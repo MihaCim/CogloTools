@@ -4,6 +4,7 @@ import modules.create_graph.neighbours_finder as neighbour_alg
 
 class TestCreateGraph(unittest.TestCase):
 
+
     def syntetic_graph1_construction(self):
         nodes = {}
         nodes[0] = search_node.SearchNode(0, 'A0', True)
@@ -198,6 +199,69 @@ class TestCreateGraph(unittest.TestCase):
 
         return nodes_dict, edges_dict
 
+    def syntetic_graph3_construction(self):
+        nodes_dict = {}
+        nodes_dict[0] = search_node.SearchNode(0, "A0", True)
+        nodes_dict[1] = search_node.SearchNode(1, None, False)
+        nodes_dict[2] = search_node.SearchNode(2, None, False)
+        nodes_dict[3] = search_node.SearchNode(3, None, False)
+        nodes_dict[4] = search_node.SearchNode(4, None, False)
+        nodes_dict[5] = search_node.SearchNode(5, None, False)
+        nodes_dict[6] = search_node.SearchNode(6, "A1", True)
+        nodes_dict[7] = search_node.SearchNode(7, None, False)
+        nodes_dict[8] = search_node.SearchNode(8, None, False)
+        nodes_dict[9] = search_node.SearchNode(9, None, False)
+        nodes_dict[10] = search_node.SearchNode(10, None, False)
+        nodes_dict[11] = search_node.SearchNode(11, None, False)
+        nodes_dict[12] = search_node.SearchNode(12, None, False)
+        nodes_dict[13] = search_node.SearchNode(13, "A2", True)
+        nodes_dict[14] = search_node.SearchNode(14, None, False)
+        nodes_dict[15] = search_node.SearchNode(15, None, False)
+        nodes_dict[16] = search_node.SearchNode(16, "A3", True)
+        nodes_dict[17] = search_node.SearchNode(17, None, False)
+        nodes_dict[18] = search_node.SearchNode(18, None, False)
+        nodes_dict[19] = search_node.SearchNode(19, "A4", True)
+        nodes_dict[20] = search_node.SearchNode(20, None, False)
+        nodes_dict[21] = search_node.SearchNode(21, None, False)
+        nodes_dict[22] = search_node.SearchNode(22, "A5", True)
+        nodes_dict[23] = search_node.SearchNode(23, None, False)
+        nodes_dict[24] = search_node.SearchNode(24, "A6", True)
+        nodes_dict[25] = search_node.SearchNode(25, None, False)
+
+
+        edges_dict = {
+            0: {1: {'weight': 2}, 2: {'weight': 2}, 3: {'weight': 2}, 7: {'weight': 2}, 8: {'weight': 2}},
+            1: {2: {'weight': 2}, 9: {'weight': 2}, 0: {'weight': 2}},
+            2: {0: {'weight': 2}, 1: {'weight': 2}, 10: {'weight': 2}},
+            3: {0: {'weight': 2}, 4: {'weight': 2}, 5: {'weight': 2}},
+            4: {3: {'weight': 2}, 11: {'weight': 2}, 5: {'weight': 2}},
+            5: {3: {'weight': 2}, 4: {'weight': 2}, 6: {'weight': 2}},
+            6: {5: {'weight': 2}, 25: {'weight': 2}},
+            7: {0: {'weight': 2},  12: {'weight': 2}},
+            8: {0: {'weight': 2}, 14: {'weight': 2}, 13: {'weight': 2}},
+            9: {1: {'weight': 2}, 15: {'weight': 2}},
+            10: {2: {'weight': 2}, 22: {'weight': 2}},
+            11: {4: {'weight': 2}, 24: {'weight': 2}},
+            12: {7: {'weight': 2}, 18: {'weight': 2}},
+            13: {8: {'weight': 2}, 16: {'weight': 2}, 17: {'weight': 2}},
+            14: {16: {'weight': 2}, 8: {'weight': 2}},
+            15: {9: {'weight': 2}, 21: {'weight': 2}},
+            16: {20: {'weight': 2}, 13: {'weight': 2}, 14: {'weight': 2}},
+            17: {13: {'weight': 2}},
+            18: {12: {'weight': 2}, 19: {'weight': 2}},
+            19: {18: {'weight': 0.5}},
+            20: {16: {'weight': 2}},
+            21: {15: {'weight': 2}},
+            22: {10: {'weight': 2}, 23: {'weight': 2}},
+            23: {22: {'weight': 2}},
+            24: {11: {'weight': 2}},
+            25: {6: {'weight': 0.5}}
+        }
+
+        return nodes_dict, edges_dict
+
+
+    '''
     def test_simple_graph(self):
         nodes_dict, edges_dict = self.syntetic_graph1_construction()
 
@@ -205,7 +269,9 @@ class TestCreateGraph(unittest.TestCase):
         result =finder.search_near_posts(nodes_dict, edges_dict, 0, 1)
 
         print(result)
-        self.assertLessEqual(result, ['A2', 'A5', 'A1'])
+        self.assertLessEqual(result, [('A1', 0.7),
+                                      ('A5', 0.8),
+                                      ('A2', 1.0)])
 
 
     def test_complex_graph(self):
@@ -214,7 +280,22 @@ class TestCreateGraph(unittest.TestCase):
         finder = neighbour_alg.NeighboursFinder()
         result =finder.search_near_posts(nodes_dict, edges_dict, 0, 1)
 
-        self.assertLessEqual(result, ['A8', 'A5', 'A7', 'A10', 'A11', 'A1'])
+        self.assertLessEqual(result, [('A8', 3.0999999999999996),
+                                      ('A5', 4),
+                                      ('A7', 4.3),
+                                      ('A10', 4.5),
+                                      ('A4', 4.7),
+                                      ('A11', 4.8500000000000005),
+                                      ('A1', 6),
+                                      ('A3', 6)])
+    '''
 
+    def test_specific_graph(self):
+        nodes_dict, edges_dict = self.syntetic_graph3_construction()
 
+        finder = neighbour_alg.NeighboursFinder()
+        result =finder.search_near_posts(nodes_dict, edges_dict, 0, 8)
+
+        print(result)
+        #self.assertLessEqual(result, [])
 

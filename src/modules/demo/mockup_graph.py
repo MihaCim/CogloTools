@@ -1,12 +1,11 @@
 import json
 from math import sin, cos, sqrt, atan2, radians, inf
-from modules.mockup_demo.mockup_partitioning import MockupPartitioning
+
 
 class MockupGraph:
 
-    def __init__(self, path):
+    def __init__(self, path='modules/demo/data/posts.json'):
         self.nodes, self.edges = self.__load_graph(path)
-
 
     def __load_graph(self, path):
         with open(path, "r") as read_file:
@@ -39,7 +38,7 @@ class MockupGraph:
         edge_array = []
         incident_matrix = []
         for index, node in enumerate(self.edges):
-            edge_array.append(str(node[0]) + "_" + str(node[1]))
+            edge_array.append({'start': node[0], 'end': node[1]})
 
         for key, value in self.nodes.items():
             node_array.append(value["node_id"])
@@ -52,32 +51,17 @@ class MockupGraph:
                     tmp_arr[index] = 1
             incident_matrix.append(tmp_arr)
 
-        return (node_array, edge_array, incident_matrix)
+        return node_array, edge_array, incident_matrix
 
-    def map_truck(self, trucks):
+    def map_vehicles(self, vehicles):
         map_trucks = []
-        for truck in trucks:
+        for truck in vehicles:
             min = inf
-            id  = inf
+            id = inf
             for key, value in self.nodes.items():
-                dist =self.__distance(truck['latitude'], truck['longitude'], value['lat'], value['lon'])
+                dist = self.__distance(truck['latitude'], truck['longitude'], value['lat'], value['lon'])
                 if dist < min:
                     min = dist
                     id = value['node_id']
             map_trucks.append([truck['id'], id])
         return map_trucks
-
-if __name__ == "__main__":
-
-    mg = MockupGraph("../../atene_south.json")
-    print(mg.get_graph())
-    trucks = json.loads("[{\"id\": \"carflowF1\", \"latitude\": 43.5104144, \"longitude\": 16.4390596}, "
-                        "{\"id\": \"carflowF3\", \"latitude\": 43.5124174, \"longitude\": 16.4322733}]")
-
-    #print(mg.map_truck(trucks))
-    #mp = MockupPartitioning(mg.nodes, mg.edges)
-    #mp.partitioning_graph()
-
-
-
-
