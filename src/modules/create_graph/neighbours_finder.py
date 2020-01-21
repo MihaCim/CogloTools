@@ -127,10 +127,11 @@ class NeighboursFinder():
 
             # check if the active node is a post office. if so, add it to the results
             is_post = node_id_node_map[active_node_id].is_empty_tagged()
-            if is_post:
+            if is_post and not  node_id_node_map[active_node_id].isTaggedby(origin_node_id):
                 current_visited_post_ids += [active_node_id]
+
                 if len(current_visited_post_ids) == 1:
-                    results += [(node_id_node_map[active_node_id].tag_filter(), min_distance)]
+                    results += [(node_id_node_map[node_id_node_map[active_node_id].tag_filter()].post_id, min_distance)]
 
             # add the active node to the list of visited nodes
             visited_node_ids.add(active_node_id)
