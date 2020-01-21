@@ -51,7 +51,9 @@ class NeighboursFinder():
 
     #return self.__second_step_alg(node_id_node_map_tmp, node_id_edge_map, origin_node_id)
     def __second_step_alg(self, node_id_node_map_temp, node_id_edge_map, origin_node_id):
-        front = [(origin_node_id, 0, [])]
+        front = {
+            origin_node_id: FrontData(0, [] )
+        }
         node_id_node_map = copy.deepcopy(node_id_node_map_temp)
         node_id_edge_map = copy.deepcopy(node_id_edge_map)
 
@@ -124,7 +126,7 @@ class NeighboursFinder():
              #       results += [(node_id_node_map[active_node_id].post_id, min_distance)]
 
             # check if the active node is a post office. if so, add it to the results
-            is_post = node_id_node_map[active_node_id].is_post()
+            is_post = node_id_node_map[active_node_id].is_empty_tagged()
             if is_post:
                 current_visited_post_ids += [active_node_id]
                 if len(current_visited_post_ids) == 1:
