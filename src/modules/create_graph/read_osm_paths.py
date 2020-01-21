@@ -111,7 +111,7 @@ def run():
     for postId, nodeId in map_posts_to_nodes.items():
         #postId = 'A8'
         #nodeId = 50
-        res = finder.search_near_posts(roadNodes, roadWays, nodeId, 3)
+        res = finder.search_near_posts(roadNodes, roadWays, nodeId, map_posts_to_nodes, 3)
         print('PostID ' + str(postId) + ' Node: ' + str(nodeId) + ' r: ' + str(res))
 
         tmpRes.append((postId, nodeId, res))

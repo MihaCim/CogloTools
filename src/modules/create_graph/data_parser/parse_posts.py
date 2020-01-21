@@ -47,5 +47,4 @@ class PostHandler:
             elif 'hr' in name:
                 self.posts.extend(self.posts_hr(post_path))
 
-
         return self.posts

@@ -18,11 +18,16 @@ class SearchNode:
     def set_address(self, address):
         self.address = address
 
+    def is_post (self):
+        return len(self.tagged) > 0
 
     def isTaggedby(self, start_node_id):
         if start_node_id in self.tagged:
             return True
         return False
+    def tag_filter(self):
+        id,dist = min(self.tagged, key=lambda x: x[1])
+        return id
 
     def addTag(self, tuple):
         start_node_id, current_dist = tuple
