@@ -87,9 +87,9 @@ def drawStaticGraph(nodes, ways, results):
 
 def run():
 
-    osmHandler = DataHandler("./data/domaciraji.osm_01.osm",
-                             {'si':'./data/List of Postal Offices (geographical location).csv'
-                              #,'hr':'./data/PU_Geokoordinate.csv'
+    osmHandler = DataHandler("./data/atene.osm",
+                             {#'si':'./data/List of Postal Offices (geographical location).csv'
+                              'hr':'./data/PU_Geokoordinate.csv'
                                })
     G = osmHandler.graph_viz()
     roadNodes = osmHandler.modified_nodes
@@ -111,7 +111,7 @@ def run():
     for postId, nodeId in map_posts_to_nodes.items():
         #postId = 'A8'
         #nodeId = 50
-        res = finder.search_near_posts(roadNodes, roadWays, nodeId, map_posts_to_nodes, 3)
+        res = finder.search_near_posts(roadNodes, roadWays, nodeId, map_posts_to_nodes, 15)
         print('PostID ' + str(postId) + ' Node: ' + str(nodeId) + ' r: ' + str(res))
 
         tmpRes.append((postId, nodeId, res))
@@ -136,8 +136,8 @@ def run():
     if len(postEdge) != 0:
            drawGraph(G, postNode, postEdge)
 
-    print('nodes'+str(len(postNode)))
-    print('edge'+str(len(postEdge)))
+    #print('nodes'+str(len(postNode)))
+    #print('edge'+str(len(postEdge)))
     graph = {'nodes': postNodePlain, 'edge': list(postEdge)}
     f = open("atene.json", "w")
     f.write(json.dumps(graph))

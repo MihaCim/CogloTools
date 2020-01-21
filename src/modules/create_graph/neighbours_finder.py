@@ -103,7 +103,7 @@ class NeighboursFinder():
             # print(min_distance)
             # print(current_visited_points)
             # print(prev_node_id)
-
+            print("Runtime second step, finding the neighbour: {}".format(time.time() - start_time))
             if active_node_id is None:
                 # we were unable to find any new neighbours to extend the front
                 # that means that we have searched through the entire graph
@@ -124,15 +124,19 @@ class NeighboursFinder():
              #   current_visited_post_ids += [active_node_id]
              #   if len(current_visited_post_ids) == 1:
              #       results += [(node_id_node_map[active_node_id].post_id, min_distance)]
-
             # check if the active node is a post office. if so, add it to the results
             is_post = node_id_node_map[active_node_id].is_empty_tagged()
             if is_post and not  node_id_node_map[active_node_id].isTaggedby(origin_node_id):
-                current_visited_post_ids += [active_node_id]
-
+                is_found = False
+                for i in range (len(current_visited_post_ids)):
+                    current_post_id = node_id_node_map[active_node_id].tag
+                    if node_id_node_map[current_visited_post_ids[i]].isTaggedby(current_post_id):
+                        is_found = True
+                if not is_found:
+                    current_visited_post_ids += [active_node_id]
                 if len(current_visited_post_ids) == 1:
-                    results += [(node_id_node_map[node_id_node_map[active_node_id].tag_filter()].post_id, min_distance)]
-
+                    results += [(node_id_node_map[node_id_node_map[active_node_id].tag].post_id, min_distance)]
+            print("Runtime second step, check if post on node id & writte results: {}".format(time.time() - start_time))
             # add the active node to the list of visited nodes
             visited_node_ids.add(active_node_id)
 
@@ -164,7 +168,7 @@ class NeighboursFinder():
                         exhausted_paths_count -= 1
                         counter_deleted += 1
                     del front[neigh_id]
-                    print('deleted neighbour of neighbour: ' + str(neigh_of_neigh_id))
+                 #   print('deleted neighbour of neighbour: ' + str(neigh_of_neigh_id))
 
             # adding nodes to the front
             if not all_neighbours_visited:
@@ -173,12 +177,12 @@ class NeighboursFinder():
                     min_distance,
                     current_visited_post_ids
                 )
-                print("Added : " + str(active_node_id) + " n_posts: " + str(len(current_visited_post_ids)))
+                #print("Added : " + str(active_node_id) + " n_posts: " + str(len(current_visited_post_ids)))
                 if len(current_visited_post_ids) >= 2:
                     print('increased cnt')
                     exhausted_paths_count += 1
                     counter_added += 1
-
+            print("Runtime second step, adding nodes to front : {}".format(time.time() - start_time))
             # if all the neighbours of the previous point have been visited, remove it
             # from the front
             # TODO: optimize this - have a counter in each node that counts
@@ -210,13 +214,14 @@ class NeighboursFinder():
                 print("All paths exhausted! Terminating the algorithm!")
                 break
 
-        print("Runtime: {}".format(time.time() - start_time))
+        print("Runtime second step: {}".format(time.time() - start_time))
         return results
 
     def __fist_step_alg(self, node_id_node_map, node_id_edge_map, start_node_id, origin_node_id, eps_km):
         # front = [(start_node_id, 0, [])]
         F = [(start_node_id, 0)]
         visited_ids = set()
+        start_time = time.time()
 
         while len(F) > 0:
             current_tup = F.pop(0)
@@ -234,9 +239,12 @@ class NeighboursFinder():
             current_node = node_id_node_map[current_id]
             if not current_node.isTaggedby(origin_node_id):
                 current_node.addTag((start_node_id, current_dist))
-            ##potrebno še pobrisati vse tage razen najbližjega
-            # node_tags = current_node
-            print(current_node)
+        # Set the id of the nearest post on .tag
+        for id, value in node_id_node_map.items():
+            node_id_node_map[id].tag = node_id_node_map[id].tag_filter()
+
+        print("Runtime first step: {}".format(time.time() - start_time))
+
 
     def search_near_posts(self, node_id_node_map, node_id_edge_map, origin_node_id,map_posts_to_nodes, eps_km):
         self.__fist_step_alg(node_id_node_map, node_id_edge_map, origin_node_id, origin_node_id, eps_km)
