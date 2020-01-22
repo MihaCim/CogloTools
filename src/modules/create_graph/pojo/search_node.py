@@ -10,6 +10,7 @@ class SearchNode:
         self.address = address
         self.post = post
         self.tagged = {}
+        self.tag = None
 
     def set_lat_lon(self, lat, lon):
         self.lat = lat
@@ -27,6 +28,8 @@ class SearchNode:
         return False
 
     def tag_filter(self):
+        if len(self.tagged) == 0:
+            return None
         id,dist = min(self.tagged.items(), key=lambda x: x[1])
         return id
 
