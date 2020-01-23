@@ -42,6 +42,19 @@ postmap = {
     "ELTApost4323": "A13"
 }
 
+def uuid_by_name(name):
+    for key in postmap:
+        if postmap[key] == name:
+            return key
+    return "Unknown"
+
+def org_by_name(name):
+    if name.startswith('ELTA'):
+        return "ELTA"
+    elif name.startswith("Slovenia"):
+        return "Slovenian Post"
+    else:
+        return "Croatian Post"
 
 class GraphProcessor:
     def __init__(self, path='modules/demo/data/9node.json'):
@@ -273,8 +286,8 @@ class RecReq(Resource):
             route_plan = {
                 "clo": clo["UUID"],
                 "plan": {
-                    "uuid": "PS-HP-plan-{}-{}".format(timestamp, counter),
-                    "organization": "{} Post".format(key) if key == "Croatian" else "ELTA",
+                    "uuid": "{}-plan-{}-{}".format(org_by_name(clo["UUID"]).replace(' ', ""), timestamp, counter),
+                    "organization": org_by_name(clo["UUID"]),
                     "execution_date": timestamp,
                     "steps": []
                 }
@@ -289,7 +302,7 @@ class RecReq(Resource):
                         "lat": float(location_split[1]),
                         "lng": float(location_split[0])
                     },
-                    "station": postmap[step["locationId"]],
+                    "station": uuid_by_name(step["locationId"]),
                     "station_type": "post",
                     "load": [str(uuid.uuid4()) for _ in range(randint(0, 4))],
                     "unload": [str(uuid.uuid4()) for _ in range(randint(0, 4))]
