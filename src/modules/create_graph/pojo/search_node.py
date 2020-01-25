@@ -9,8 +9,8 @@ class SearchNode:
         self.lon = lon
         self.address = address
         self.post = post
-        self.tagged = {}
-        self.tag = None
+        self.__tagged = {}
+        self.__tag = None
 
     def set_lat_lon(self, lat, lon):
         self.lat = lat
@@ -20,21 +20,26 @@ class SearchNode:
         self.address = address
 
     def is_empty_tagged(self):
-        return len(self.tagged) > 0
+        return len(self.__tagged) > 0
+
+    def clean_tagged(self):
+        self.__tag = None
+        self.__tagged = {}
 
     def isTaggedby(self, start_node_id):
-        if start_node_id in self.tagged:
+        if start_node_id in self.__tagged:
             return True
         return False
 
     def tag_filter(self):
-        if len(self.tagged) == 0:
-            return None
-        id,dist = min(self.tagged.items(), key=lambda x: x[1])
-        return id
+        if len(self.__tagged) == 0:
+            return (None,None)
+        return min(self.__tagged.items(), key=lambda x: x[1])
 
     def addTag(self, tuple):
         start_node_id, current_dist = tuple
-        self.tagged[start_node_id] = current_dist
+        self.__tagged[start_node_id] = current_dist
+        self.__tag = start_node_id
 
-
+    def getTagId(self):
+        return self.__tag

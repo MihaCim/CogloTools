@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-import os
 import sys
 import math
 import json
@@ -11,7 +10,35 @@ import matplotlib.pyplot as plt
 import pojo.search_node as search_node
 
 
-def drawGraph(H, postalNodes, postalWays):
+def graph_viz(self, nodes, way):
+    labeled_G = nx.Graph()
+    not_labeled_G = nx.Graph()
+    n = set()
+
+    colors = [];
+    colorMap = {};
+    i = 0
+    for edge in self.ways:
+        l = edge.get_all_nodes()
+        if l[0] not in n:
+            not_labeled_G.add_node(l[0], pos=(nodes[l[0]].lon, nodes[l[0]].lat))
+            labeled_G.add_node(l[0], pos=(nodes[l[0]].lon, nodes[l[0]].lat))
+        if l[1] not in n:
+            not_labeled_G.add_node(l[1], pos=(nodes[l[1]].lon, nodes[l[1]].lat))
+            not_labeled_G.add_node(l[1], pos=(nodes[l[1]].lon, nodes[l[1]].lat))
+
+        if nodes[l[1]].is_empty_tagged() == True or nodes[l[0]].is_empty_tagged() == True:
+            labeled_G.add_edge(l[0], l[1], weight=edge.distance, edge_color='b')
+        else:
+            not_labeled_G.add_edge(l[0], l[1], weight=edge.distance, edge_color='b')
+        n.add(l[0])
+        n.add(l[1])
+
+    return (not_labeled_G, labeled_G, colors)
+
+
+def drawGraph(t, postalNodes, postalWays):
+    (not_labeled_G, labeled_G, colors) = t
     G = nx.Graph()
     D = nx.Graph()
     li = []
@@ -34,14 +61,16 @@ def drawGraph(H, postalNodes, postalWays):
         # plt.figure(1)
 
     #pos = nx.spring_layout(G, k=0.25, iterations=40)
-    pos = nx.get_node_attributes(H, 'pos', )
-    nx.draw(H, pos=pos, node_size=0.1, node_color='g', edge_color='g',)
-    nx.draw_networkx_nodes(D, pos, nodelist=li, node_color='b')
+    pos = nx.get_node_attributes(not_labeled_G, 'pos', )
+    #pos = nx.get_node_attributes(not_labeled_G, 'pos', )
+    nx.draw(not_labeled_G, pos=pos, node_size=0.1, node_color='g', edge_color='g',)
+    nx.draw(labeled_G, pos=pos, node_size=0.0, edge_size = 1, node_color='r', edge_color='r')
     nx.draw_networkx_nodes(G, pos, nodelist=tmpDifColoring, node_color='g')
-    col = nx.draw_networkx_edges(G, pos, nodelist=li, node_color='g',edge_color='r')
-    col.set_zorder(20)
-    nx.draw_networkx_labels(G, pos, labels, font_size=16)
-
+    if len(postalWays) != 0:
+        nx.draw_networkx_nodes(D, pos, nodelist=li, node_color='b')
+        col = nx.draw_networkx_edges(G, pos, nodelist=li, node_color='g',edge_color='r')
+        col.set_zorder(20)
+        nx.draw_networkx_labels(G, pos, labels, font_size=16)
     plt.show()
 
 
@@ -86,14 +115,19 @@ def drawStaticGraph(nodes, ways, results):
 
 
 def run():
-
-    osmHandler = DataHandler("./data/atene.osm",
-                             {#'si':'./data/List of Postal Offices (geographical location).csv'
-                              'hr':'./data/PU_Geokoordinate.csv'
+    import time
+    start_time = time.time()
+    osmHandler = DataHandler("./data/domaciraji.osm_01.osm",
+                             #   "./data/slo.small3.osm_01.osm",
+                             {'si':'./data/List of Postal Offices (geographical location)_full.csv'
+                              #'hr':'./data/List of Postal Offices (geographical location)_full.csv'
                                })
-    G = osmHandler.graph_viz()
+    print("Pre-step  {}".format(time.time() - start_time))
+
+    #G = osmHandler.graph_viz()
     roadNodes = osmHandler.modified_nodes
     roadWays = osmHandler.modified_ways
+    ways = osmHandler.ways
     map_posts_to_nodes = {}
     for k, v in roadNodes.items():
         if v.is_post:
@@ -105,13 +139,13 @@ def run():
     postEdge = set()
     tmpRes = []
 
-    finder = NeighboursFinder(G)
+    finder = NeighboursFinder(None)
 
 
     for postId, nodeId in map_posts_to_nodes.items():
         #postId = 'A8'
         #nodeId = 50
-        res = finder.search_near_posts(roadNodes, roadWays, nodeId, map_posts_to_nodes, 15)
+        res = finder.search_near_posts(roadNodes, roadWays, ways, nodeId, map_posts_to_nodes, 6)
         print('PostID ' + str(postId) + ' Node: ' + str(nodeId) + ' r: ' + str(res))
 
         tmpRes.append((postId, nodeId, res))
@@ -119,7 +153,7 @@ def run():
                 dist = math.floor(res_dist*1000)
                 postEdge.add((nodeId, map_posts_to_nodes[res_id], dist))
                 postEdge.add((map_posts_to_nodes[res_id], nodeId, dist))
-                print(res_id)
+                #print(res_id)
 
 
         for k, v in roadNodes.items():
@@ -133,8 +167,12 @@ def run():
                 postNode[k] = v.__dict__
                 postNodePlain[k] = d
 
-    if len(postEdge) != 0:
-           drawGraph(G, postNode, postEdge)
+        #if len(postEdge) != 0:
+        #(not_labeled_G, labeled_G, colors) = osmHandler.graph_viz(roadNodes, roadWays)
+        #drawGraph((not_labeled_G, labeled_G, colors), postNode, postEdge)
+        break
+
+
 
     #print('nodes'+str(len(postNode)))
     #print('edge'+str(len(postEdge)))
