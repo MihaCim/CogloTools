@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import pojo.search_node as search_node
 
 
-def graph_viz(self, nodes, way):
+def graph_viz(nodes, ways):
     labeled_G = nx.Graph()
     not_labeled_G = nx.Graph()
     n = set()
@@ -18,7 +18,7 @@ def graph_viz(self, nodes, way):
     colors = [];
     colorMap = {};
     i = 0
-    for edge in self.ways:
+    for edge in ways:
         l = edge.get_all_nodes()
         if l[0] not in n:
             not_labeled_G.add_node(l[0], pos=(nodes[l[0]].lon, nodes[l[0]].lat))
@@ -167,10 +167,10 @@ def run():
                 postNode[k] = v.__dict__
                 postNodePlain[k] = d
 
-        #if len(postEdge) != 0:
-        #(not_labeled_G, labeled_G, colors) = osmHandler.graph_viz(roadNodes, roadWays)
-        #drawGraph((not_labeled_G, labeled_G, colors), postNode, postEdge)
-        break
+        if len(postEdge) != 0:
+            (not_labeled_G, labeled_G, colors) = graph_viz(roadNodes, ways)
+            drawGraph((not_labeled_G, labeled_G, colors), postNode, postEdge)
+        #break
 
 
 
