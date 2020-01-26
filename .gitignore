@@ -1,4 +1,5 @@
 # Python files
+venv/
 *.pyc
 .idea
 venv
@@ -7,3 +8,4 @@ venv
 .idea/*
 *.osm
 *.pbf
+*.csv
