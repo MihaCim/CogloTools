@@ -245,7 +245,7 @@ def calc_neighbourhood(matrix_J,
         split = line.split("\t")
         word = split[1]
 
-        json_object = {"concept_id": id, "probability": probability, "string": word}
+        json_object = {"concept_id": id, "probability": probability, "concept": word}
 
         list.append(json_object)
 
@@ -686,8 +686,9 @@ if __name__ == '__main__':
     database.create_table("CREATE TABLE IF NOT EXISTS concepts ("
                           "id serial PRIMARY KEY NOT NULL, "
                           "timestamp BIGINT NOT NULL, "
-                          "alpha REAL NOT NULL,"
-                          "concepts INT NOT NULL,"
+                          "alpha REAL NOT NULL, "
+                          "concepts_number INT NOT NULL, "
+                          "concepts jsonb, "
                           "result jsonb);")
 
     # create table that will be used for storing new concepts (used for recreating matrix J)
@@ -769,16 +770,18 @@ if __name__ == '__main__':
                 print("==================================================================")
                 print("           NEW MATRIX J FROM NEW CONCEPT IDs JUST CREATED")
                 print("==================================================================")
+            else:
+                print("No concept IDs retrieved for concepts", concepts_arr)
 
-                print("Finished processing request with ID", id)
+            # update database
+            database.execute("UPDATE initial_concepts SET processed = %s where id = %s;", (True, id))
 
-                # update database
-                database.execute("UPDATE initial_concepts SET processed = %s where id = %s;", (True, id))
+            # remove request older than one day
+            # remove requests that are at least 1 day old from the database
+            one_day_ago = round(time.time() - (24 * 60 * 60))
+            database.execute("DELETE FROM initial_concepts WHERE timestamp < %s;", (one_day_ago,))
 
-                # remove request older than one day
-                # remove requests that are at least 1 day old from the database
-                one_day_ago = round(time.time() - (24 * 60 * 60))
-                database.execute("DELETE FROM initial_concepts WHERE timestamp < %s;", (one_day_ago,))
+            print("Finished processing request with ID", id)
         else:
             print("No task for calculating new initial concepts at", round(time.time()))
 
@@ -787,9 +790,9 @@ if __name__ == '__main__':
         ##################################################################################
 
         # query database for next task
-        result = database.query("SELECT id, alpha, concepts FROM concepts WHERE result IS NULL")
+        result = database.query("SELECT id, alpha, concepts_number, concepts FROM concepts WHERE result IS NULL")
         if not result:
-            print("No task at for calculating similar concepts at", round(time.time()))
+            print("No task for calculating similar concepts at", round(time.time()))
             # no task ahead, just wait for 10 seconds
             time.sleep(10)
             continue
@@ -798,11 +801,22 @@ if __name__ == '__main__':
         id = result[0][0]
         alpha = result[0][1]
         new_concepts_number = result[0][2]
+        concepts = result[0][3] # new concepts to knowledge base
 
-        print("Processing request with ID", id, "alpha", alpha, "number of concepts", new_concepts_number)
+        print("Processing request with ID", id, "alpha", alpha, "number of concepts", new_concepts_number,
+              "new concepts for knowledge base", concepts)
+
+        # assign old matrix J value to new one
+        new_matrix_J = matrix_J
+        if concepts:
+            # recreate matrix J just for this iteration
+            print("Creating matrix J for this iteration from concepts", concepts)
+            concept_ids = extract_concept_ids(resources_cfg, concepts)
+            new_matrix_J = create_matrix_j(resources_cfg, concept_ids, concept_mappings, matrix_dimension, True)
+            print("Matrix J recreated, calculating neighbourhood in progress.")
 
         # calculate neighbourhood and store result into database
-        result = calc_neighbourhood(matrix_J,
+        result = calc_neighbourhood(new_matrix_J,
                                   initial_concepts,
                                   matrix_P,
                                   id_string_txt_path,
@@ -810,6 +824,9 @@ if __name__ == '__main__':
                                   alpha)
 
         print("Finished processing request with ID", id)
+
+        # revert matrix J back to its original
+        new_matrix_J = matrix_J
 
         # insert result into database
         database.execute("UPDATE concepts SET result = %s WHERE id = %s;", (result, id))
