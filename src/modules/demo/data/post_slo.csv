@@ -1,0 +1,550 @@
+PLC LJ,1002,Ljubljana,1102,Ljubljana,PLC,#N/A,,,,,,dostavna,Ljubljana,Cesta v Mestni log,81,,463610,460070,98950,"46� 2' 0.7616""","14� 28' 45.7453""",46.03354489,14.47937369,,,,,
+LJ,1101,Ljubljana,1101,Ljubljana,dostavna,#N/A,,,,,,dostavna,Ljubljana,Slovenska cesta,32,,133718,461951,100975,"46� 3' 6.7399""","14� 30' 12.6362""",46.05187219,14.50351006,,,,,
+LJ,1101,Ljubljana,1104,Ljubljana,prevzemna,#N/A,,,,,,okenska,Ljubljana,Poljanski nasip,30,,134689,462812,100837,"46� 3' 2.4414""","14� 30' 52.7295""",46.05067817,14.51464708,,,,,
+LJ,1101,Ljubljana,1106,Ljubljana,izro?ilna,#N/A,,,,,,izro?ilna,Ljubljana,Pra�akova ulica,3,,134163,462200,101539,"46� 3' 25.0581""","14� 30' 24.0578""",46.05696058,14.50668272,,,,,
+LJ,1107,Ljubljana,1107,Ljubljana,dostavna,#N/A,,,,,,dostavna,Ljubljana,Celov�ka cesta,121,,135488,460810,102988,"46� 4' 11.7084""","14� 29' 18.9567""",46.069919,14.48859908,,,,,
+LJ,1108,Ljubljana,1108,Ljubljana,dostavna,#N/A,,,,,,dostavna,Ljubljana,Dolenjska cesta,43,,247669,463581,99185,"46� 2' 9.0821""","14� 31' 28.9602""",46.03585614,14.52471117,,,,,
+LJ,1116,Ljubljana,1109,Ljubljana,izro?ilna,#N/A,,,,,,izro?ilna,Ljubljana,Linhartova cesta,9,,119153,462462,102374,"46� 3' 52.1562""","14� 30' 36.009""",46.06448783,14.5100025,,,,,
+LJ,1110,Ljubljana,1110,Ljubljana,dostavna,#N/A,,,,,,dostavna,Ljubljana,Zalo�ka cesta,57,,136742,464369,101454,"46� 3' 22.7264""","14� 32' 4.9935""",46.05631289,14.53472042,,,,,
+LJ,1002,Ljubljana,1111,Ljubljana,izro?ilna,#N/A,,,,,,izro?ilna,Ljubljana,Tr�a�ka cesta,68,A,199452,460213,100062,"46� 2' 36.8098""","14� 28' 52.0597""",46.04355828,14.48112769,,,,,
+LJ,1116,Ljubljana,1112,Ljubljana,izro?ilna,#N/A,,,,,,izro?ilna,Ljubljana,Luize Pesjakove ulica,9,,125740,463465,102154,"46� 3' 45.227""","14� 31' 22.741""",46.06256306,14.52298361,,,,,
+LJ,1113,Ljubljana,1113,Ljubljana,dostavna,#N/A,,,,,,dostavna,Ljubljana,Dunajska cesta,141,,134250,462652,104112,"46� 4' 48.4882""","14� 30' 44.3561""",46.08013561,14.51232114,,,,,
+LJ,1110,Ljubljana,1114,Ljubljana,prevzemna,#N/A,,,,,,okenska,Ljubljana,Zalo�ka cesta,7,,133330,463330,101173,"46� 3' 13.4258""","14� 31' 16.733""",46.05372939,14.52131472,,,,,
+LJ,1002,Ljubljana,1115,Ljubljana,izro?ilna,#N/A,,,,,,izro?ilna,Ljubljana,Riharjeva ulica,38,,157256,461620,99549,"46� 2' 20.4843""","14� 29' 57.6537""",46.03902342,14.49934825,,,,,
+LJ,1116,Ljubljana,1116,Ljubljana,dostavna,#N/A,,,,,,dostavna,Ljubljana,Dunajska cesta,19,,133948,462227,101975,"46� 3' 39.1856""","14� 30' 25.1888""",46.06088489,14.50699689,,,,,
+LJ,1117,Ljubljana,1117,Ljubljana,dostavna,#N/A,,,,,,dostavna,Ljubljana,Vodnikova cesta,235,,147752,459565,103963,"46� 4' 43.0263""","14� 28' 20.7202""",46.07861842,14.47242228,,,,,
+LJ,1117,Ljubljana,1118,Ljubljana,izro?ilna,#N/A,2/ 4/ 2013,,,,,izro?ilna,Ljubljana,Ulica bratov U?akar,52,,150923,459632,103179,"46� 4' 17.6469""","14� 28' 24.0793""",46.07156858,14.47335536,,,,,
+LJ,1119,Ljubljana,1119,Ljubljana,dostavna,#N/A,,,,,,dostavna,Ljubljana,Litijska cesta,38,,150828,465192,100451,"46� 2' 50.3921""","14� 32' 43.5486""",46.04733114,14.54543017,,,,,
+LJ,1120,Ljubljana,1120,Ljubljana,dostavna,#N/A,,,,,,dostavna,Ljubljana,Nove Fu�ine,33,,138310,466232,101290,"46� 3' 17.7566""","14� 33' 31.7109""",46.05493239,14.55880858,,,,,
+LJ,1113,Ljubljana,1121,Ljubljana,zaprta,#N/A,,,,30/ 12/ 2016,,okenska,Ljubljana,Dunajska cesta,158,,134261,462825,104338,"46� 4' 55.8426""","14� 30' 52.3443""",46.0821785,14.51454008,,,,,
+LJ,1122,Ljubljana,1122,Ljubljana,dostavna,#N/A,,,,,,dostavna,Ljubljana,�martinska cesta,152,,135942,464937,102750,"46� 4' 4.8107""","14� 32' 31.0738""",46.06800297,14.54196494,,,,,
+LJ,1002,Ljubljana,1123,Ljubljana,zaprta,#N/A,,,,30/ 12/ 2016,,izro?ilna,Ljubljana,Cesta v Mestni log,55,,221987,460861,99240,"46� 2' 10.3201""","14� 29' 22.4447""",46.03620003,14.48956797,,,,,
+LJ,1101,Ljubljana,1124,Ljubljana,prevzemna,#N/A,,,,,,okenska,Ljubljana,Resljeva cesta,14,,134447,462536,101245,"46� 3' 15.6022""","14� 30' 39.7739""",46.05433394,14.51104831,,,,,
+LJ,1125,Ljubljana,1125,Ljubljana,dostavna,#N/A,,,,,,dostavna,Ljubljana,Pot za Brdom,100,,499505,458644,100610,"46� 2' 54.223""","14� 27' 38.9083""",46.04839528,14.46080786,,,,,
+LJ,1117,Ljubljana,1126,Ljubljana,izro?ilna,#N/A,2/ 4/ 2013,,,,,izro?ilna,Ljubljana,Krivec,5,,157005,458144,103911,"46� 4' 41.0326""","14� 27' 14.5996""",46.07806461,14.45405544,,,,,
+LJ,1108,Ljubljana,1127,Ljubljana,zaprta,#N/A,1/ 10/ 2012,,,30/ 12/ 2016,,izro?ilna,Ljubljana,Prijateljeva ulica,7,,136473,462534,99953,"46� 2' 33.7534""","14� 30' 40.0487""",46.04270928,14.51112464,,,,,
+LJ,1101,Ljubljana,1128,Ljubljana,zaprta,#N/A,,,,1/ 10/ 2015,,,,,,,,,,,,01-Oct,,,,,,
+LJ,1260,Ljubljana - Polje,1129,Ljubljana,izro?ilna,#N/A,1/ 7/ 2013,,,,,izro?ilna,Ljubljana,Zalo�ka cesta,275,A,458299,470615,101964,"46� 3' 40.3212""","14� 36' 55.4736""",46.06120033,14.61540933,,,,,
+LJ,1116,Ljubljana,1130,Ljubljana,izro?ilna,#N/A,,,,,,izro?ilna,Ljubljana,�tihova ulica,24,,134734,462836,102236,"46� 3' 47.7603""","14� 30' 53.4507""",46.06326675,14.51484742,,,,,
+LJ,1231,Ljubljana - ?rnu?e,1131,Ljubljana,izro?ilna,#N/A,1/ 7/ 2015,,,,,izro?ilna,Ljubljana,Dunajska cesta,198,A,461204,462832,104939,"46� 5' 15.3105""","14� 30' 52.5001""",46.08758625,14.51458336,,,,,
+LJ,1132,Ljubljana,1132,Ljubljana,dostavna,#N/A,,,,,,dostavna,Ljubljana,Celov�ka cesta,73,,135449,461223,102358,"46� 3' 51.3877""","14� 29' 38.3617""",46.06427436,14.49398936,,,,,
+LJ,1133,Ljubljana,1133,Ljubljana,dostavna,#N/A,,,,,,dostavna,Ljubljana,Tacenska cesta,133,,495158,458741,108018,"46� 6' 54.1892""","14� 27' 41.0952""",46.11505256,14.46141533,,,,,
+LJ,1117,Ljubljana,1210,Ljubljana - �entvid,izro?ilna,#N/A,1/ 9/ 2014,,,,,izro?ilna,Ljubljana,Pru�nikova ulica,2,,143899,459582,105275,"46� 5' 25.5257""","14� 28' 21.1079""",46.09042381,14.47252997,,,,,
+LJ,1133,Ljubljana,1211,Ljubljana - �martno,izro?ilna,#N/A,,,,,,izro?ilna,Ljubljana,Cesta v Gameljne,6,,148316,459992,109038,"46� 7' 27.4963""","14� 28' 39.0475""",46.12430453,14.47751319,,,,,
+LJ,1215,Medvode,1215,Medvode,dostavna,#N/A,,,,,,dostavna,Medvode,Cesta ob Sori,5,,196468,454889,110693,"46� 8' 19.9495""","14� 24' 40.776""",46.13887486,14.41132667,,,,,
+LJ,1215,Medvode,1216,Smlednik,izro?ilna,#N/A,1/ 10/ 2015,,,,,izro?ilna,Smlednik,Smlednik,4,B,140024,456714,113868,"46� 10' 3.2137""","14� 26' 4.7594""",46.16755936,14.43465539,,,,,
+LJ,1218,Komenda,1217,Vodice,izro?ilna,#N/A,1/ 4/ 2017,,,,,izro?ilna,Vodice,Kopitarjev trg,1,,153730,461101,116005,"46� 11' 13.3875""","14� 29' 28.6357""",46.18705208,14.49128769,,,,,
+LJ,1218,Komenda,1218,Komenda,dostavna,#N/A,,,,,,dostavna,Komenda,Glavarjeva cesta,39,,79944,465000,117715,"46� 12' 9.5398""","14� 32' 30.0056""",46.20264994,14.54166822,,,,,
+LJ,1241,Kamnik,1219,Laze v Tuhinju,pogodbena,pogodbena,5/ 1/ 2015,5/ 1/ 2015,,,,pogodbena,Laze v Tuhinju,Laze v Tuhinju,4,A,49062,481794,119374,"46� 13' 5.6577""","14� 45' 33.1924""",46.21823825,14.75922011,,,,05/01/2015,pogodbena
+LJ,3305,Vransko,1221,Motnik,pogodbena,pogodbena,2/ 7/ 2012,3/ 11/ 2014,,,,pogodbena,Motnik,Motnik,56,,93979,491566,118951,"46� 12' 52.6567""","14� 53' 9.2055""",46.21462686,14.88589042,,,,03/11/2014,pogodbena
+LJ,1225,Lukovica,1222,Trojane,pogodbena,pogodbena,3/ 2/ 2014,2/ 6/ 2014,,,,pogodbena,Trojane,Trojane,6,,53236,491563,116019,"46� 11' 17.6871""","14� 53' 9.2589""",46.18824642,14.88590525,,,,01/10/2015,pogodbena
+LJ,1225,Lukovica,1223,Blagovica,pogodbena,pogodbena,2/ 7/ 2012,1/ 9/ 2015,,,,pogodbena,Blagovica,Blagovica,30,,290411,485499,114726,"46� 10' 35.4313""","14� 48' 26.5972""",46.17650869,14.80738811,,,,01/09/2015,pogodbena
+LJ,1225,Lukovica,1225,Lukovica,dostavna,#N/A,,,,,,dostavna,Lukovica pri Dom�alah,Obrtni�ka ulica,1,,476682,476565,113749,"46� 10' 2.8801""","14� 41' 30.2099""",46.16746669,14.69172497,,,,,
+LJ,1230,Dom�ale,1230,Dom�ale,dostavna,#N/A,,,,,,dostavna,Dom�ale,Ljubljanska cesta,74,,17397,468976,110582,"46� 8' 19.2001""","14� 35' 37.173""",46.13866669,14.59365917,,,,,
+LJ,1231,Ljubljana - ?rnu?e,1231,Ljubljana - ?rnu?e,dostavna,#N/A,,,,,,dostavna,Ljubljana,Dunajska cesta,361,,134999,464008,106591,"46� 6' 9.0471""","14� 31' 46.7907""",46.10251308,14.52966408,,,,,
+LJ,1230,Dom�ale,1232,Dom�ale,pogodbena,pogodbena,,1/ 9/ 2015,,,,pogodbena,Vir,Gub?eva ulica,12,A,444916,469862,111927,"46� 9' 2.909""","14� 36' 18.1455""",46.15080806,14.60504042,,,,01/09/2015,pogodbena
+LJ,1230,Dom�ale,1233,Dob,pogodbena,pogodbena,2/ 4/ 2013,3/ 5/ 2016,,,,pogodbena,Dob,Ulica 7. avgusta,29,A,445665,471605,111795,"46� 8' 58.9048""","14� 37' 39.4059""",46.14969578,14.62761275,,,,,pogodbena
+LJ,1234,Menge�,1234,Menge�,dostavna,#N/A,,,,,,dostavna,Menge�,Trdinov trg,8,A,450839,467056,113290,"46� 9' 46.5862""","14� 34' 7.0304""",46.16294061,14.56861956,,,,,
+LJ,1235,Radomlje,1235,Radomlje,dostavna,#N/A,,,,,,dostavna,Radomlje,Cesta borcev,3,,460113,470185,114390,"46� 10' 22.7375""","14� 36' 32.6365""",46.17298264,14.60906569,,,,,
+LJ,1236,Trzin,1236,Trzin,dostavna,#N/A,,,,,,dostavna,Trzin,Blatnica,1,,437020,465530,108570,"46� 7' 13.4317""","14� 32' 57.1398""",46.12039769,14.5492055,,,,,
+LJ,1241,Kamnik,1240,Kamnik,izro?ilna,#N/A,,,,,,izro?ilna,Kamnik,Glavni trg,27,,76557,470434,120272,"46� 13' 33.2948""","14� 36' 42.9116""",46.22591522,14.61191989,,,,,
+LJ,1241,Kamnik,1241,Kamnik,dostavna,#N/A,,,,,,dostavna,Kamnik,Ljubljanska cesta,14,A,537612,469295,118190,"46� 12' 25.6762""","14� 35' 50.2475""",46.20713228,14.59729097,,,,,
+LJ,1241,Kamnik,1242,Stahovica,izro?ilna,#N/A,2/ 1/ 2015,1/ 10/ 2015,,,,pogodbena,Zgornje Stranje,Zgornje Stranje,23,,,,,,,,,,,,01/10/2015,
+LJ,1251,Morav?e,1251,Morav?e,dostavna,#N/A,,,,,,dostavna,Morav?e,Vegova ulica,1,,56252,480642,110185,"46� 8' 7.9052""","14� 44' 40.806""",46.13552922,14.74466833,,,,,
+LJ,1251,Morav?e,1252,Va?e,pogodbena,pogodbena,2/ 11/ 2011,1/ 7/ 2016,,,,pogodbena,Va?e,Va?e,12,,116944,487856,108389,"46� 7' 10.3389""","14� 50' 17.0923""",46.11953858,14.83808119,,,,,pogodbena
+LJ,1260,Ljubljana - Polje,1260,Ljubljana - Polje,dostavna,#N/A,,,,,,dostavna,Ljubljana,Zadobrov�ka cesta,14,,137134,468210,101404,"46� 3' 21.7925""","14� 35' 3.707""",46.05605347,14.58436306,,,,,
+LJ,1260,Ljubljana - Polje,1261,Ljubljana - Dobrunje,pogodbena,pogodbena,1/ 7/ 2013,1/ 9/ 2017,,,,izro?ilna,Ljubljana,Cesta II. grupe odredov,39,,489397,469072,99202,"46� 2' 10.6112""","14� 35' 44.3293""",46.03628089,14.59564703,,,,,
+LJ,1262,Dol pri Ljubljani,1262,Dol pri Ljubljani,dostavna,#N/A,,,,,,dostavna,Videm,Videm,54,,511812,472491,104964,"46� 5' 17.7766""","14� 38' 22.133""",46.08827128,14.63948139,,,,,
+LJ,1270,Litija,1270,Litija,logisti?na,#N/A,,,,,,dostavna,Litija,Ulica Mire Pregljeve,6,,118556,487340,101480,"46� 3' 26.5135""","14� 49' 53.7313""",46.05736486,14.83159203,,,,,
+LJ,1270,Litija,1272,Pol�nik,pogodbena,pogodbena,1/ 12/ 2011,2/ 12/ 2013,,,,pogodbena,Pol�nik,Pol�nik,11,,119665,497287,102839,"46� 4' 10.9476""","14� 57' 36.5037""",46.06970767,14.96013992,,,,02/12/2013,pogodbena
+LJ,1270,Litija,1273,Dole pri Litiji,pogodbena,pogodbena,1/ 12/ 2011,4/ 11/ 2013,,,,pogodbena,Dole pri Litiji,Dole pri Litiji,7,B,482217,502165,98514,"46� 1' 50.8668""","15� 1' 23.4489""",46.03079633,15.02318025,,,,04/11/2013,pogodbena
+LJ,1270,Litija,1274,Gabrovka,pogodbena,pogodbena,1/ 6/ 2016,1/ 9/ 2016,,,,pogodbena,Gabrovka,Gabrovka,4,,104748,499081,95055,"45� 59' 58.8301""","14� 59' 0.0587""",45.99967503,14.98334964,,,,,pogodbena
+LJ,1270,Litija,1275,�martno pri Litiji,izro?ilna,#N/A,1/ 6/ 2016,,,,,izro?ilna,�martno pri Litiji,Pungrt,20,,438901,488238,99812,"46� 2' 32.5433""","14� 50' 35.6633""",46.04237314,14.84323981,,,,,
+LJ,1270,Litija,1276,Primskovo,premi?na,#N/A,,,,,,,,,,,,,,,,,,01-Jun,,,,
+LJ,1270,Litija,1281,Kresnice,izro?ilna,#N/A,1/ 6/ 2016,,,,,izro?ilna,Kresnice,Kresnice,106,,146698,484041,106587,"46� 6' 11.6831""","14� 47' 19.6148""",46.10324531,14.78878189,,,,,
+LJ,1270,Litija,1282,Sava,pismono�ka,#N/A,2/ 11/ 2011,,1/ 8/ 2016,,,,,,,,,,,,,,,,,,,
+LJ,1290,Grosuplje,1290,Grosuplje,logisti?na,#N/A,,,,,,dostavna,Grosuplje,Taborska cesta,5,,63059,473498,90265,"45� 57' 21.8035""","14� 39' 11.974""",45.95605653,14.65332611,,,,,
+LJ,1291,�kofljica,1291,�kofljica,dostavna,#N/A,,,,,,dostavna,�kofljica,Ob po�ti,25,,212625,467225,93633,"45� 59' 9.9148""","14� 34' 19.8145""",45.98608744,14.57217069,,,,,
+LJ,1292,Ig,1292,Ig,dostavna,#N/A,,,,,,dostavna,Ig,Govekarjeva cesta,12,,480837,463761,90726,"45� 57' 35.123""","14� 31' 39.655""",45.95975639,14.52768194,,,,,
+LJ,1290,Grosuplje,1293,�marje - SAP,pogodbena,pogodbena,1/ 9/ 2017,1/ 9/ 2017,,,,dostavna,�marje-Sap,Ljubljanska cesta,39,,89237,470217,92529,"45� 58' 34.6495""","14� 36' 39.0901""",45.97629153,14.61085836,,,,,
+LJ,1295,Ivan?na Gorica,1294,Vi�nja Gora,izro?ilna,#N/A,3/ 3/ 2014,,,,,izro?ilna,Vi�nja Gora,Ciglerjeva ulica,25,,51702,480500,90367,"45� 57' 25.96""","14� 44' 37.1422""",45.95721111,14.74365061,,,,,
+LJ,1295,Ivan?na Gorica,1295,Ivan?na Gorica,dostavna,#N/A,,,,,,dostavna,Ivan?na Gorica,Plo�?ad Osvobodilne fronte,4,,29597,485320,88256,"45� 56' 18.0181""","14� 48' 21.2323""",45.93833836,14.80589786,,,,,
+LJ,1296,�entvid pri Sti?ni,1296,�entvid pri Sti?ni,dostavna,#N/A,,,,,,dostavna,�entvid pri Sti?ni,�entvid pri Sti?ni,77,,30973,487906,89957,"45� 57' 13.3014""","14� 50' 21.1351""",45.95369483,14.83920419,,,,,
+LJ,1295,Ivan?na Gorica,1301,Krka,pogodbena,pogodbena,2/ 4/ 2013,1/ 4/ 2015,,,,pogodbena,Krka,Krka,1,B,37801,483624,82058,"45� 52' 57.1116""","14� 47' 3.2637""",45.882531,14.78423992,,,,01/04/2015,pogodbena
+LJ,1295,Ivan?na Gorica,1303,Zagradec,pogodbena,pogodbena,3/ 3/ 2014,1/ 7/ 2014,,,,pogodbena,Fu�ina,Fu�ina,11,,91954,487408,79682,"45� 51' 40.4381""","14� 49' 58.9954""",45.86123281,14.83305428,,,,01/07/2014,pogodbena
+LJ,1310,Ribnica,1310,Ribnica,dostavna,#N/A,,,,,,dostavna,Ribnica,Kolodvorska ulica,2,,311942,479151,66271,"45� 44' 25.2893""","14� 43' 38.2865""",45.74035814,14.72730181,,,,,
+LJ,1315,Velike La�?e,1311,Turjak,pogodbena,pogodbena,2/ 11/ 2011,6/ 1/ 2014,,,,pogodbena,Turjak,Turjak,17,,187727,470305,81453,"45� 52' 35.8945""","14� 36' 45.6654""",45.87663736,14.61268483,,,,06/01/2014,pogodbena
+LJ,1312,Videm Dobrepolje,1312,Videm Dobrepolje,pogodbena,pogodbena,,2/ 11/ 2017,,,,dostavna,Videm,Videm,35,,22885,476692,78301,"45� 50' 54.6867""","14� 41' 42.4178""",45.84852408,14.69511606,,,,,
+LJ,1313,Struge,1313,Struge,dostavna,#N/A,,,,,,dostavna,Lipa,Lipa,16,,158016,482859,71040,"45� 47' 0.1422""","14� 46' 29.2116""",45.78337283,14.774781,,,,,
+LJ,1315,Velike La�?e,1314,Rob,premi?na,#N/A,,,,,,,,,,,,,,,,,,,,,,
+LJ,1315,Velike La�?e,1315,Velike La�?e,dostavna,#N/A,,,,,,dostavna,Velike La�?e,Javor�kova ulica,5,,533918,472201,76816,"45� 50' 5.9798""","14� 38' 14.5637""",45.83499439,14.63737881,,,,,
+LJ,1315,Velike La�?e,1316,Ortnek,premi?na,#N/A,,,,,,,,,,,,,,,,,,,,,,
+LJ,1310,Ribnica,1317,Sodra�ica,izro?ilna,#N/A,1/ 7/ 2016,,,,,izro?ilna,Sodra�ica,Trg 25. maja,7,,284262,472144,68746,"45� 45' 44.565""","14� 38' 13.6115""",45.76237917,14.63711431,,,,,
+LJ,1386,Stari trg pri Lo�u,1318,Lo�ki Potok,pogodbena,pogodbena,1/ 10/ 2013,2/ 10/ 2017,,,,izro?ilna,Hrib-Lo�ki Potok,Hrib-Lo�ki Potok,16,,273461,468534,61962,"45� 42' 4.2519""","14� 35' 28.1378""",45.70118108,14.59114939,,,,,
+LJ,1386,Stari trg pri Lo�u,1319,Draga,pismono�ka,#N/A,3/ 5/ 2012,,1/ 8/ 2016,,,,,,,,,,,,,,,1,,,,
+LJ,1330,Ko?evje,1330,Ko?evje,logisti?na,#N/A,,,,,,dostavna,Ko?evje,Ljubljanska cesta,23,,107234,489164,55300,"45� 38' 30.7371""","14� 51' 22.414""",45.64187142,14.85622611,,,,,
+LJ,1310,Ribnica,1331,Dolenja vas,pismono�ka,#N/A,1/ 6/ 2013,,1/ 8/ 2017,,,izro?ilna,Dolenja vas,�olska ulica,11,,391124,481144,62198,"45� 42' 13.5602""","14� 45' 11.0645""",45.70376672,14.75307347,,,,,
+LJ,1330,Ko?evje,1332,Stara Cerkev,pismono�ka,#N/A,1/ 12/ 2011,,,,,izro?ilna,Stara Cerkev,Stara Cerkev,67,,177839,487761,58550,"45� 40' 15.931""","14� 50' 17.3216""",45.67109194,14.83814489,,,,,
+LJ,1330,Ko?evje,1336,Kostel,pogodbena,pogodbena,2/ 7/ 2012,1/ 3/ 2014,,,,pogodbena,Petrina,Petrina,10,,485760,489040,35663,"45� 27' 54.6028""","14� 51' 18.3039""",45.46516744,14.85508442,,,,02/11/2015,pogodbena
+LJ,1330,Ko?evje,1337,Osilnica,pogodbena,#N/A,2/ 7/ 2012,3/ 5/ 2013,,,,pogodbena,Osilnica,Osilnica,11,,47320,476854,42796,"45� 31' 44.5861""","14� 41' 56.0767""",45.52905169,14.69891019,,,,03/05/2013,pogodbena
+LJ,1330,Ko?evje,1338,Ko?evska Reka,pogodbena,pogodbena,1/ 9/ 2014,2/ 11/ 2015,,,,pogodbena,Ko?evska Reka,Ko?evska Reka,5,,62508,484948,47849,"45� 34' 29.0821""","14� 48' 8.5529""",45.57474503,14.80237581,,,,02/11/2015,pogodbena
+LJ,1351,Brezovica pri Ljubljani,1351,Brezovica pri Ljubljani,dostavna,#N/A,,,,,,dostavna,Brezovica pri Ljubljani,Podpe�ka cesta,20,,528975,455131,97530,"46� 1' 13.6612""","14� 24' 56.5422""",46.02046144,14.41570617,,,,,
+LJ,1357,Notranje Gorice,1352,Preserje,pogodbena,pogodbena,,1/ 12/ 2016,,,,pogodbena,Jezero,Jezero,21,,171618,455526,92296,"45� 58' 24.2238""","14� 25' 16.6694""",45.9733955,14.42129706,,,,,pogodbena
+LJ,1353,Borovnica,1353,Borovnica,dostavna,#N/A,,,,,,dostavna,Borovnica,Molkov trg,12,,379374,451169,86334,"45� 55' 10.0421""","14� 21' 56.4673""",45.91945614,14.36568536,,,,,
+LJ,1360,Vrhnika,1354,Horjul,izro?ilna,#N/A,1/ 10/ 2016,,,,,izro?ilna,Horjul,Slovenska cesta,7,,244504,445905,97927,"46� 1' 24.1103""","14� 17' 47.4377""",46.02336397,14.29651047,,,,,
+LJ,1355,Polhov Gradec,1355,Polhov Gradec,dostavna,#N/A,,,,,,dostavna,Polhov Gradec,Polhov Gradec,16,,169772,447342,102589,"46� 3' 55.514""","14� 18' 52.3894""",46.06542056,14.31455261,,,,,
+LJ,1356,Dobrova,1356,Dobrova,dostavna,#N/A,,,,,,dostavna,Dobrova,Stara cesta,14,,181462,455380,101154,"46� 3' 11.1014""","14� 25' 6.8923""",46.05308372,14.41858119,,,,,
+LJ,1357,Notranje Gorice,1357,Notranje Gorice,dostavna,#N/A,,,,,,dostavna,Notranje Gorice,Podpe�ka cesta,380,,159952,454100,94094,"45� 59' 22.1217""","14� 24' 9.8017""",45.98947825,14.40272269,,,,,
+LJ,1351,Brezovica pri Ljubljani,1358,Log pri Brezovici,izro?ilna,#N/A,1/ 10/ 2013,,,,,izro?ilna,Log pri Brezovici,Cesta Dolomitskega odreda,2,A,495295,451648,96256,"46� 0' 31.5394""","14� 22' 15.0729""",46.00876094,14.37085358,,,,,
+LJ,1360,Vrhnika,1360,Vrhnika,dostavna,#N/A,,,,,,dostavna,Vrhnika,Po�tna ulica,2,,416237,445771,91270,"45� 57' 48.4553""","14� 17' 43.9374""",45.96345981,14.29553817,,,,,
+LJ,1370,Logatec,1370,Logatec,dostavna,#N/A,,,,,,dostavna,Logatec,Tr�a�ka cesta,50,A,476797,440072,86234,"45� 55' 3.6307""","14� 13' 21.5272""",45.91767519,14.22264644,,,,,
+LJ,1370,Logatec,1371,Logatec,zaprta,#N/A,3/ 5/ 2012,,,30/ 12/ 2016,,izro?ilna,Logatec,Tr�a�ka cesta,105,,170695,438566,85382,"45� 54' 35.5548""","14� 12' 12.0343""",45.90987633,14.20334286,,,,,
+LJ,1370,Logatec,1372,Hotedr�ica,premi?na,#N/A,,,,,,,,,,,,,,,,,,,,,,
+LJ,1370,Logatec,1373,Rovte,pogodbena,pogodbena,1/ 7/ 2015,1/ 10/ 2015,,,,pogodbena,Rovte,Rovte,159,A,245272,436380,93845,"45� 59' 8.9435""","14� 10' 26.5473""",45.98581764,14.17404092,,,,01/10/2015,pogodbena
+LJ,1380,Cerknica,1380,Cerknica,dostavna,#N/A,,,,,,dostavna,Cerknica,Cesta 4. maja,52,,50133,450783,72324,"45� 47' 36.149""","14� 21' 43.7326""",45.79337472,14.36214794,,,,,
+LJ,1381,Rakek,1381,Rakek,dostavna,#N/A,,,,,,dostavna,Rakek,Partizanska cesta,8,A,497071,447480,74490,"45� 48' 45.4276""","14� 19' 9.9401""",45.81261878,14.31942781,,,,,
+LJ,1380,Cerknica,1382,Begunje pri Cerknici,izro?ilna,#N/A,1/ 4/ 2014,2/ 11/ 2016,,,,pogodbena,Begunje pri Cerknici,Begunje pri Cerknici,111,,39231,452431,75303,"45� 49' 13.1243""","14� 22' 58.9328""",45.82031231,14.38303689,,,,,pogodbena
+LJ,1380,Cerknica,1384,Grahovo,pogodbena,pogodbena,3/ 5/ 2012,3/ 3/ 2014,,,,pogodbena,Grahovo,Grahovo,6,,30180,455543,69756,"45� 46' 14.1354""","14� 25' 24.9954""",45.77059317,14.42360983,,,,03/03/2014,pogodbena
+LJ,1386,Stari trg pri Lo�u,1385,Nova vas,pogodbena,pogodbena,1/ 10/ 2013,1/ 9/ 2014,,,,pogodbena,Nova vas,Nova vas,4,A,26979,461998,70063,"45� 46' 25.8303""","14� 30' 23.7737""",45.77384175,14.50660381,,,,01/09/2014,pogodbena
+LJ,1386,Stari trg pri Lo�u,1386,Stari trg pri Lo�u,dostavna,#N/A,,,,,,dostavna,Stari trg pri Lo�u,Cesta Notranjskega odreda,28,,20719,459183,63358,"45� 42' 47.7043""","14� 28' 15.4272""",45.71325119,14.470952,,,,,
+LJ,1410,Zagorje ob Savi,1410,Zagorje ob Savi,dostavna,#N/A,,,,,,dostavna,Zagorje ob Savi,Cesta zmage,28,,471343,500086,109607,"46� 7' 50.1945""","14� 59' 46.7543""",46.13060958,14.99632064,,,,,
+LJ,1410,Zagorje ob Savi,1411,Izlake,izro?ilna,#N/A,1/ 3/ 2014,,,,,izro?ilna,Izlake,Izlake,7,,487087,494957,112258,"46� 9' 15.99""","14� 55' 47.696""",46.15444167,14.92991556,,,,,
+LJ,1410,Zagorje ob Savi,1412,Kisovec,izro?ilna,#N/A,1/ 3/ 2014,,,,,izro?ilna,Kisovec,Trg Pohorskega bataljona,15,,389387,497461,110582,"46� 8' 21.7557""","14� 57' 44.439""",46.13937658,14.96234417,,,,,
+LJ,1410,Zagorje ob Savi,1413,?em�enik,pogodbena,pogodbena,2/ 7/ 2012,2/ 2/ 2015,,,,pogodbena,?em�enik,?em�enik,5,,363930,496130,115074,"46� 10' 47.2318""","14� 56' 42.2802""",46.17978661,14.94507783,,,,02/02/2015,pogodbena
+LJ,1410,Zagorje ob Savi,1414,Podkum,pogodbena,pogodbena,2/ 7/ 2012,1/ 4/ 2014,,,,pogodbena,Podkum,Podkum,11,A,547167,502863,102880,"46� 4' 12.28""","15� 1' 55.9961""",46.07007778,15.03222114,,,,01/04/2014,pogodbena
+LJ,1420,Trbovlje,1420,Trbovlje,dostavna,#N/A,,,,,,dostavna,Trbovlje,Trg revolucije,27,,395242,503591,111564,"46� 8' 53.554""","15� 2' 30.097""",46.14820944,15.04169361,,,,,
+LJ,1422,Trbovlje,1422,Trbovlje,dostavna,#N/A,,,,,,dostavna,Trbovlje,Trg Franca Fakina,4,,369083,504516,112920,"46� 9' 37.4574""","15� 3' 13.2493""",46.16040483,15.05368036,,,,,
+LJ,1420,Trbovlje,1423,Dobovec,pogodbena,pogodbena,2/ 7/ 2012,1/ 3/ 2014,,,,pogodbena,Dobovec,Dobovec,49,,372642,504936,107395,"46� 6' 38.4868""","15� 3' 32.6295""",46.11069078,15.05906375,,,,01/03/2014,pogodbena
+LJ,1430,Hrastnik,1430,Hrastnik,dostavna,#N/A,,,,,,dostavna,Hrastnik,Trg Franca Kozarja,14,A,482521,506872,111454,"46� 8' 49.9043""","15� 5' 2.9969""",46.14719564,15.08416581,,,,,
+LJ,1430,Hrastnik,1431,Dol pri Hrastniku,pogodbena,pogodbena,3/ 5/ 2016,3/ 5/ 2016,,,,pogodbena,Dol pri Hrastniku,Trg borcev NOB,12,,362918,509332,110831,"46� 8' 29.6224""","15� 6' 57.5957""",46.14156178,15.11599881,,,,,pogodbena
+CE,1433,Rade?e,1432,Zidani Most,pismono�ka,pogodbena,1/ 12/ 2011,3/ 5/ 2016,27/ 8/ 2018,,,pogodbena,Zidani Most,Zidani Most,9,,366215,513553,104621,"46� 5' 8.2241""","15� 10' 13.6567""",46.08561781,15.17046019,,,,,pogodbena
+CE,1433,Rade?e,1433,Rade?e,dostavna,#N/A,,,,,,dostavna,Rade?e,Pot na brod,11,,112663,514774,102250,"46� 3' 51.3348""","15� 11' 10.2338""",46.06425967,15.18617606,,,,,
+CE,1433,Rade?e,1434,Loka pri Zidanem mostu,pogodbena,pogodbena,3/ 5/ 2012,1/ 8/ 2014,,,,pogodbena,Loka pri Zidanem Mostu,Loka pri Zidanem Mostu,90,,365943,516505,101302,"46� 3' 20.4874""","15� 12' 30.6647""",46.05569094,15.20851797,,,,01/08/2014,pogodbena
+MB,2116,Maribor,2101,Maribor,izro?ilna,#N/A,,,,,,izro?ilna,Maribor,Slom�kov trg,10,,463916,549785,157390,"46� 33' 31.306""","15� 38' 40.2522""",46.55869611,15.6445145,,,,,
+PLC LJ,2102,Maribor,2102,Maribor,PLC,#N/A,,,,,,dostavna,Maribor,Zagreb�ka cesta,106,,516023,551893,153213,"46� 31' 15.4563""","15� 40' 17.5505""",46.52096008,15.67154181,,,,,
+MB,2103,Maribor,2103,Maribor,dostavna,#N/A,,,,,,dostavna,Maribor,Bor�tnikova ulica,33,A,431893,548226,154985,"46� 32' 13.8229""","15� 37' 26.1607""",46.53717303,15.62393353,,,,,
+MB,2104,Maribor,2104,Maribor,dostavna,#N/A,,,,,,dostavna,Maribor,Istrska ulica,49,,403292,552078,156275,"46� 32' 54.5727""","15� 40' 27.4609""",46.54849242,15.67429469,,,,,
+MB,2105,Maribor,2105,Maribor,dostavna,#N/A,,,,,,dostavna,Maribor,Ptujska cesta,119,,469493,551720,154436,"46� 31' 55.1128""","15� 40' 9.9216""",46.53197578,15.66942267,,,,,
+MB,2106,Maribor,2106,Maribor,dostavna,#N/A,,,,,,dostavna,Maribor,�arhova ulica,59,A,409616,548002,156566,"46� 33' 5.0838""","15� 37' 16.2336""",46.55141217,15.621176,,,,,
+MB,2107,Maribor,2107,Maribor,dostavna,#N/A,,,,,,dostavna,Maribor,Framska ulica,11,,396217,549958,156041,"46� 32' 47.5705""","15� 38' 47.8542""",46.54654736,15.64662617,,,,,
+MB,2116,Maribor,2108,Maribor,zaprta,#N/A,,,,30/ 12/ 2016,,okenska,Maribor,Partizanska cesta,1,,514609,550202,157603,"46� 33' 38.0932""","15� 38' 59.9132""",46.56058144,15.64997589,,,,,
+MB,2107,Maribor,2109,Maribor,izro?ilna,#N/A,1/ 7/ 2011,,,,,izro?ilna,Maribor,Trg revolucije,8,,441836,549846,156880,"46� 33' 14.7726""","15� 38' 42.9199""",46.5541035,15.64525553,,,,,
+MB,2107,Maribor,2110,Maribor,izro?ilna,#N/A,,,,,,izro?ilna,Razvanje,Tr�a�ka cesta,51,,408450,550150,153684,"46� 31' 31.1838""","15� 38' 55.9546""",46.52532883,15.64887628,,,,,
+MB,2103,Maribor,2111,Maribor,izro?ilna,#N/A,2/ 9/ 2013,,,,,izro?ilna,Maribor,Kardeljeva cesta,96,,444205,548859,155324,"46� 32' 24.6384""","15� 37' 55.9965""",46.54017733,15.63222125,,,,,
+MB,2104,Maribor,2112,Maribor,izro?ilna,#N/A,1/ 7/ 2011,,,,,izro?ilna,Maribor,Na trati,3,,450586,553089,154829,"46� 32' 7.4587""","15� 41' 14.3259""",46.53540519,15.68731275,,,,,
+MB,2116,Maribor,2113,Maribor,izro?ilna,#N/A,,,,,,izro?ilna,Maribor,Ulica Vita Kraigherja,5,,487667,550233,157390,"46� 33' 31.1866""","15� 39' 1.2861""",46.55866294,15.65035725,,,,,
+MB,2107,Maribor,2114,Maribor,prevzemna,#N/A,,,,,,okenska,Maribor,Ljubljanska ulica,5,,519355,550101,156748,"46� 33' 10.4297""","15� 38' 54.8402""",46.55289714,15.64856672,,,,,
+MB,2106,Maribor,2115,Maribor,izro?ilna,#N/A,16/ 8/ 2010,,,,,izro?ilna,Maribor,Pohorska ulica,21,B,487673,546779,155100,"46� 32' 17.9133""","15� 36' 18.2911""",46.53830925,15.60508086,,,,,
+MB,2116,Maribor,2116,Maribor,dostavna,#N/A,,,,,,dostavna,Maribor,Partizanska cesta,54,,514650,550872,157972,"46� 33' 49.8634""","15� 39' 31.5162""",46.56385094,15.6587545,,,,,
+MB,2104,Maribor,2117,Maribor,izro?ilna,#N/A,,,,,,izro?ilna,Maribor,Pobre�ka cesta,18,,530132,550451,156871,"46� 33' 14.3195""","15� 39' 11.319""",46.55397764,15.65314417,,,,,
+MB,2201,Zgornja Kungota,2201,Zgornja Kungota,dostavna,#N/A,,,,,,dostavna,Plintovec,Plintovec,7,C,531865,547493,166324,"46� 38' 21.2416""","15� 36' 55.9254""",46.63923378,15.61553483,,,,,
+MB,2102,Maribor,2204,Miklav� na Dravskem polju,izro?ilna,#N/A,4/ 3/ 2013,,,,,izro?ilna,Miklav� na Dravskem polju,Cesta v Dobrovce,4,B,527992,554245,151057,"46� 30' 4.9665""","15� 42' 6.999""",46.50137958,15.70194417,,,,,
+MB,2205,Star�e,2205,Star�e,dostavna,#N/A,,,,,,dostavna,Star�e,Star�e,78,B,525078,559037,147370,"46� 28' 4.1143""","15� 45' 50.0685""",46.46780953,15.76390792,,,,,
+MB,2205,Star�e,2206,Marjeta na Dravskem polju,pogodbena,pogodbena,1/ 1/ 2013,2/ 6/ 2014,,,,pogodbena,Marjeta na Dravskem polju,Marjeta na Dravskem polju,57,A,409365,556762,145709,"46� 27' 11.0204""","15� 44' 2.711""",46.45306122,15.73408639,,,,02/06/2014,pogodbena
+MB,2211,Pesnica pri Mariboru,2211,Pesnica pri Mariboru,dostavna,#N/A,,,,,,dostavna,Pesnica pri Mariboru,Pesnica pri Mariboru,43,A,521250,552298,163009,"46� 36' 32.6007""","15� 40' 40.5122""",46.60905575,15.67792006,,,,,
+MB,2212,�entilj v Slov. goricah,2212,�entilj v Slov. goricah,dostavna,#N/A,,,,,,dostavna,�entilj v Slov. goricah,Maistrova ulica,2,,518376,550347,170712,"46� 40' 42.6052""","15� 39' 11.837""",46.67850144,15.65328806,,,,,
+MB,2213,Zgornja Velka,2213,Zgornja Velka,dostavna,#N/A,,,,,,dostavna,Zgornja Velka,Zgornja Velka,41,C,414708,559411,170622,"46� 40' 37.0276""","15� 46' 18.2861""",46.67695211,15.77174614,,,,,
+MB,2212,�entilj v Slov. goricah,2214,Sladki Vrh,izro?ilna,#N/A,1/ 7/ 2015,1/ 10/ 2015,,,,pogodbena,Sladki Vrh,Sladki Vrh,8,C,554293,557108,172895,"46� 41' 51.3576""","15� 44' 30.936""",46.69759933,15.74192667,,,,01/10/2015,pogodbena
+MB,2212,�entilj v Slov. goricah,2215,Cer�ak,pismono�ka,#N/A,1/ 1/ 2013,,1/ 12/ 2016,,,izro?ilna,Cer�ak,Cer�ak,21,,402123,551494,173025,"46� 41' 57.2008""","15� 40' 6.7347""",46.69922244,15.66853742,,,,,
+MB,2211,Pesnica pri Mariboru,2221,Jarenina,pismono�ka,pogodbena,3/ 5/ 2012,3/ 3/ 2014,3/ 4/ 2018,,,pogodbena,Jareninski Dol,Jareninski Dol,22,,422699,553853,165264,"46� 37' 45.1902""","15� 41' 54.5288""",46.6292195,15.69848022,,,,03/03/2014,pogodbena
+MB,2223,Jurovski Dol,2222,Jakobski Dol,pismono�ka,#N/A,1/ 10/ 2012,,17/ 10/ 2016,,,,,,,,,,,,,ni ve? pogodbena od 3/5/2016,,,,,02/02/2015,
+MB,2223,Jurovski Dol,2223,Jurovski Dol,dostavna,#N/A,,,,,,dostavna,Jurovski Dol,Jurovski Dol,40,A,140572,560579,162712,"46� 36' 20.486""","15� 47' 9.521""",46.60569056,15.78597806,,,,,
+MB,2116,Maribor,2229,Male?nik,izro?ilna,#N/A,2/ 11/ 2012,,,,,izro?ilna,Male?nik,Male?nik,56,,522003,553542,157078,"46� 33' 20.2283""","15� 41' 37.0793""",46.55561897,15.69363314,,,,,
+MB,2230,Lenart v Slov. goricah,2230,Lenart v Slov. goricah,dostavna,#N/A,,,,,,dostavna,Lenart v Slov. goricah,Partizanska cesta,3,,124415,564025,159590,"46� 34' 38.2328""","15� 49' 49.8977""",46.57728689,15.83052714,,,,,
+MB,2211,Pesnica pri Mariboru,2231,Pernica,pogodbena,pogodbena,3/ 3/ 2014,1/ 9/ 2017,,,,izro?ilna,Pernica,Pernica,8,,396967,556030,159645,"46� 34' 42.5752""","15� 43' 34.4319""",46.57849311,15.72623108,,,,,
+MB,2232,Voli?ina,2232,Voli?ina,dostavna,#N/A,,,,,,dostavna,Spodnja Voli?ina,Spodnja Voli?ina,87,,502394,562730,155788,"46� 32' 35.5417""","15� 48' 47.2339""",46.54320603,15.81312053,,,,,
+MB,2233,Sv. Ana v Slov. goricah,2233,Sv. Ana v Slov. goricah,dostavna,#N/A,,,,,,dostavna,Kremberk,Kremberk,36,A,505229,564858,167445,"46� 38' 52.3292""","15� 50' 32.9704""",46.64786922,15.84249178,,,,,
+MB,2234,Benedikt,2234,Benedikt,dostavna,#N/A,,,,,,dostavna,Benedikt,?olnikov trg,9,,117197,568656,162940,"46� 36' 25.0809""","15� 53' 29.1705""",46.60696692,15.89143625,,,,,
+MB,2230,Lenart v Slov. goricah,2235,Sv. Trojica v Slov. goricah,izro?ilna,#N/A,4/ 1/ 2016,,,,,izro?ilna,Sv. Trojica v Slov. goricah,Troji�ki trg,4,,130838,567530,159522,"46� 34' 34.7999""","15� 52' 34.4717""",46.57633331,15.87624214,,,,,
+MB,2236,Cerkvenjak,2236,Cerkvenjak,dostavna,#N/A,,,,,,dostavna,Cerkvenjak,Cerkvenjak,25,,99972,572685,158554,"46� 34' 1.5224""","15� 56' 36.0192""",46.56708956,15.94333867,,,,,
+MB,2241,Spodnji Duplek,2241,Spodnji Duplek,dostavna,#N/A,,,,,,dostavna,Spodnji Duplek,Cesta k Dravi,5,,432060,557925,150967,"46� 30' 0.9535""","15� 44' 59.5519""",46.50026486,15.74987553,,,,,
+MB,2241,Spodnji Duplek,2242,Zgornja Korena,pismono�ka,#N/A,3/ 5/ 2012,,1/ 2/ 2018,,,izro?ilna,Zgornja Korena,Zgornja Korena,26,A,470302,560422,153106,"46� 31' 9.4406""","15� 46' 57.6552""",46.51928906,15.782682,,,,,
+MB,2250,Ptuj,2249,Ptuj,izro?ilna,#N/A,,,,,,izro?ilna,Ptuj,Rogozni�ka cesta,33,,369340,568634,142913,"46� 25' 36.515""","15� 53' 17.5284""",46.42680972,15.88820233,,,,,
+MB,2250,Ptuj,2250,Ptuj,logisti?na,#N/A,,,,,,dostavna,Ptuj,Vodnikova ulica,2,,515128,567456,141987,"46� 25' 6.9516""","15� 52' 21.8775""",46.41859767,15.87274375,,,,,
+MB,2251,Ptuj,2251,Ptuj,dostavna,#N/A,,,,,,dostavna,Ptuj,Mariborska cesta,19,,257801,566470,141753,"46� 24' 59.7239""","15� 51' 35.5859""",46.41658997,15.85988497,,,,,
+MB,2250,Ptuj,2252,Dornava,izro?ilna,#N/A,2/ 6/ 2014,,,,,izro?ilna,Dornava,Dornava,135,A,492588,573481,143774,"46� 26' 2.569""","15� 57' 5.0185""",46.43404694,15.95139403,,,,,
+MB,2254,Trnovska vas,2253,Destrnik,pogodbena,pogodbena,29/ 5/ 2017,,,,,dostavna,Vintarovci,Vintarovci,50,,348668,567576,150043,"46� 29' 27.8059""","15� 52' 31.6842""",46.49105719,15.87546783,,,,,pogodbena
+MB,2254,Trnovska vas,2254,Trnovska vas,dostavna,#N/A,,,,,,dostavna,Trnovska vas,Trnovska vas,41,,302023,568357,153351,"46� 31' 14.6531""","15� 53' 10.0492""",46.52073697,15.88612478,,,,,
+MB,2254,Trnovska vas,2255,Vitomarci,pogodbena,pogodbena,3/ 5/ 2012,1/ 12/ 2016,,,,pogodbena,Vitomarci,Vitomarci,71,,407368,571893,154108,"46� 31' 37.8469""","15� 55' 56.36""",46.52717969,15.93232222,,,,,pogodbena
+MB,2256,Jur�inci,2256,Jur�inci,dostavna,#N/A,,,,,,dostavna,Jur�inci,Jur�inci,3,B,242279,574639,149478,"46� 29' 6.835""","15� 58' 2.5355""",46.48523194,15.96737097,,,,,
+MB,2256,Jur�inci,2257,Polen�ak,pogodbena,pogodbena,1/ 8/ 2011,3/ 1/ 2014,,,,pogodbena,Polenci,Polenci,42,C,505475,577449,147408,"46� 27' 58.6622""","16� 0' 13.0423""",46.46629506,16.00362286,,,,03/01/2014,pogodbena
+MB,2258,Sv. Toma�,2258,Sv. Toma�,dostavna,#N/A,,,,,,dostavna,Sveti Toma�,Sveti Toma�,18,,222117,583132,149503,"46� 29' 4.0776""","16� 4' 40.7236""",46.484466,16.07797878,,,,,
+MB,2259,Ivanjkovci,2259,Ivanjkovci,dostavna,#N/A,,,,,,dostavna,Ivanjkovci,Ivanjkovci,9,B,522528,589254,147132,"46� 27' 44.4887""","16� 9' 26.0945""",46.46235797,16.15724847,,,,,
+MB,2270,Ormo�,2270,Ormo�,dostavna,#N/A,,,,,,dostavna,Ormo�,Po�tna ulica,2,,225807,588690,141083,"46� 24' 28.872""","16� 8' 55.5394""",46.40802,16.14876094,,,,,
+MB,2272,Gori�nica,2272,Gori�nica,dostavna,#N/A,,,,,,dostavna,Gori�nica,Gori�nica,79,,236973,578226,141002,"46� 24' 30.8868""","16� 0' 45.6051""",46.40857967,16.01266808,,,,,
+MB,2270,Ormo�,2273,Podgorci,pogodbena,pogodbena,1/ 12/ 2016,1/ 12/ 2016,,,,pogodbena,Podgorci,Podgorci,23,A,479338,581628,143132,"46� 25' 38.4207""","16� 3' 26.2111""",46.42733908,16.05728086,,,,,pogodbena
+MB,2270,Ormo�,2274,Velika Nedelja,izro?ilna,#N/A,1/ 3/ 2013,,,,,izro?ilna,Velika Nedelja,Velika Nedelja,7,,262607,585599,142252,"46� 25' 8.1589""","16� 6' 31.6023""",46.41893303,16.10877842,,,,,
+MB,2275,Miklav� pri Ormo�u,2275,Miklav� pri Ormo�u,dostavna,#N/A,,,,,,dostavna,Miklav� pri Ormo�u,Miklav� pri Ormo�u,35,,272184,593492,146851,"46� 27' 33.3285""","16� 12' 44.4864""",46.45925792,16.21235733,,,,,
+MB,2275,Miklav� pri Ormo�u,2276,Kog,pogodbena,pogodbena,1/ 8/ 2011,1/ 7/ 2013,,,,pogodbena,La?aves,La?aves,15,,256245,596615,146501,"46� 27' 20.4152""","16� 15' 10.5602""",46.45567089,16.25293339,,,,01/07/2013,pogodbena
+MB,2277,Sredi�?e ob Dravi,2277,Sredi�?e ob Dravi,dostavna,#N/A,,,,,,dostavna,Sredi�?e ob Dravi,Slovenska cesta,42,A,548489,598014,139895,"45� 34' 19.7821""","14� 14' 23.2536""",45.57216169,14.23979267,,,,,
+MB,2281,Markovci,2281,Markovci,dostavna,#N/A,,,,,,dostavna,Markovci,Markovci,43,,267312,571921,139337,"46� 23' 39.4785""","15� 55' 49.4982""",46.39429958,15.93041617,,,,,
+MB,2282,Cirkulane,2282,Cirkulane,dostavna,#N/A,,,,,,dostavna,Cirkulane,Cirkulane,58,,493033,576895,133817,"46� 20' 38.7502""","15� 59' 39.0574""",46.34409728,15.99418261,,,,,
+MB,2282,Cirkulane,2283,Zavr?,pogodbena,pogodbena,3/ 11/ 2014,????,,,,izro?ilna,Hrastovec,Hrastovec,25,B,518064,581482,137636,"46� 22' 40.5013""","16� 3' 15.9366""",46.37791703,16.05442683,,,,,
+MB,2284,Videm pri Ptuju,2284,Videm pri Ptuju,dostavna,#N/A,,,,,,dostavna,Videm pri Ptuju,Videm pri Ptuju,51,A,539633,569796,136518,"46� 22' 8.9823""","15� 54' 8.5267""",46.36916175,15.90236853,,,,,
+MB,2284,Videm pri Ptuju,2285,Zgornji Leskovec,pismono�ka,#N/A,1/ 7/ 2013,,1/ 9/ 2016,,,,,,,,,,,,,,,,,,,
+MB,2284,Videm pri Ptuju,2286,Podlehnik,pogodbena,pogodbena,1/ 7/ 2013,1/ 10/ 2016,,,,pogodbena,Podlehnik,Podlehnik,8,b,513055,568033,132835,"46� 20' 10.3486""","15� 52' 44.1274""",,,,,,,pogodbena
+MB,2322,Maj�perk,2287,�etale,izro?ilna,#N/A,1/ 4/ 2017,,,,,izro?ilna,�etale,�etale,1,,278819,561442,125873,"46� 16' 27.129""","15� 47' 32.6819""",46.2742025,15.79241164,,,,,
+MB,2251,Ptuj,2288,Hajdina,izro?ilna,#N/A,3/ 5/ 2013,,,,,izro?ilna,Zgornja Hajdina,Zgornja Hajdina,44,A,509496,564731,140742,"46� 24' 27.5872""","15� 50' 13.6527""",46.40766311,15.83712575,,,,,
+MB,2322,Maj�perk,2289,Stoperce,pogodbena,pogodbena,1/ 10/ 2011,2/ 6/ 2014,,,,pogodbena,Stoperce,Stoperce,76,,310837,555463,127228,"46� 17' 12.8598""","15� 42' 53.998""",46.2869055,15.71499944,,,,02/06/2014,pogodbena
+MB,2310,Slovenska Bistrica,2310,Slovenska Bistrica,logisti?na,#N/A,,,,,,dostavna,Slovenska Bistrica,Vo�njakova ulica,2,,340646,544470,138742,"46� 23' 28.6783""","15� 34' 24.3326""",46.39129953,15.57342572,,,,,
+MB,2311,Ho?e,2311,Ho?e,dostavna,#N/A,,,,,,dostavna,Spodnje Ho?e,Pohorska cesta,20,,406989,549946,150752,"46� 29' 56.2799""","15� 38' 45.254""",46.49896664,15.64590389,,,,,
+MB,2312,Orehova vas,2312,Orehova vas,dostavna,#N/A,,,,,,dostavna,Slivnica pri Mariboru,Mariborska cesta,37,,538176,550710,148153,"46� 28' 31.9017""","15� 39' 20.0705""",46.47552825,15.65557514,,,,,
+MB,2327,Ra?e,2313,Fram,pogodbena,pogodbena,3/ 5/ 2014,1/ 9/ 2017,,,,izro?ilna,Fram,Turnerjeva ulica,101,,524502,548887,145856,"46� 27' 17.9906""","15� 37' 53.7468""",46.45499739,15.63159633,,,,,
+MB,2310,Slovenska Bistrica,2314,Zgornja Polskava,pogodbena,pogodbena,2/ 6/ 2014,4/ 7/ 2016,,,,pogodbena,Zgornja Polskava,Mariborska ulica,26,,405124,547346,142657,"46� 25' 34.7767""","15� 36' 40.3705""",46.42632686,15.61121403,,,,,pogodbena
+MB,2310,Slovenska Bistrica,2315,�martno na Pohorju,pogodbena,pogodbena,1/ 10/ 2011,1/ 10/ 2016,,,,pogodbena,�martno na Pohorju,�martno na Pohorju,21,,326988,541687,144765,"46� 26' 44.3861""","15� 32' 15.9905""",,,,,,,pogodbena
+MB,2310,Slovenska Bistrica,2316,Zgornja Lo�nica,pogodbena,pogodbena,2/ 6/ 2014,1/ 8/ 2015,,,,pogodbena,Zgornja Lo�nica,Zgornja Lo�nica,23,,336539,540284,138085,"46� 23' 8.3383""","15� 31' 8.1928""",46.38564953,15.51894244,,,,01/08/2015,pogodbena
+MB,2317,Oplotnica,2317,Oplotnica,dostavna,#N/A,,,,,,dostavna,Oplotnica,Ulica Pohorskega bataljona,8,,321099,534799,138179,"46� 23' 12.472""","15� 26' 51.501""",46.38679778,15.44763917,,,,,
+MB,2319,Polj?ane,2318,Laporje,pogodbena,pogodbena,2/ 11/ 2013,1/ 12/ 2014,,,,pogodbena,Laporje,Laporje,56,,335500,545984,133893,"46� 20' 51.2662""","15� 35' 33.4942""",46.34757394,15.59263728,,,,01/12/2014,pogodbena
+MB,2319,Polj?ane,2319,Polj?ane,dostavna,#N/A,,,,,,dostavna,Polj?ane,Bistri�ka cesta,26,,547416,544691,130460,"46� 19' 0.3871""","15� 34' 31.8501""",46.31677419,15.57551392,,,,,
+MB,2319,Polj?ane,2321,Makole,izro?ilna,#N/A,2/ 11/ 2013,,,,,izro?ilna,Makole,Makole,37,,350866,551717,130582,"46� 19' 2.5489""","15� 40' 0.3163""",46.31737469,15.66675453,,,,,
+MB,2322,Maj�perk,2322,Maj�perk,dostavna,#N/A,,,,,,dostavna,Maj�perk,Maj�perk,66,A,522293,557245,133886,"46� 20' 47.9643""","15� 44' 20.1562""",46.34665675,15.73893228,,,,,
+MB,2322,Maj�perk,2323,Ptujska Gora,pogodbena,pogodbena,11/ 10/ 2010,4/ 11/ 2013,,,,pogodbena,Ptujska Gora,Ptujska Gora,36,,300939,558909,134781,"46� 21' 16.4391""","15� 45' 38.3806""",46.35456642,15.76066128,,,,04/11/2013,pogodbena
+MB,2325,Kidri?evo,2324,Lovrenc na Dravskem polju,pogodbena,pogodbena,3/ 11/ 2014,1/ 9/ 2015,,,,pogodbena,Lovrenc na Dravskem polju,Lovrenc na Dravskem polju,8,,279157,560085,136936,"46� 22' 25.8621""","15� 46' 34.3778""",46.37385058,15.77621606,,,,01/09/2015,
+MB,2325,Kidri?evo,2325,Kidri?evo,dostavna,#N/A,,,,,,dostavna,Kidri?evo,Kopali�ka ulica,2,,265864,561654,140243,"46� 24' 12.4581""","15� 47' 49.3542""",46.40346058,15.79704283,,,,,
+MB,2325,Kidri?evo,2326,Cirkovce,pismono�ka,pogodbena,3/ 11/ 2014,1/ 12/ 2015,1/ 8/ 2018,,,pogodbena,Cirkovce,Cirkovce,10,,231063,556341,139169,"46� 23' 39.3371""","15� 43' 40.1558""",46.39426031,15.72782106,,,,01/12/2015,pogodbena
+MB,2327,Ra?e,2327,Ra?e,dostavna,#N/A,,,,,,dostavna,Ra?e,Ljubljanska cesta,14,,505044,552201,145715,"46� 27' 12.5346""","15� 40' 28.9882""",46.45348183,15.67471894,,,,,
+MB,2310,Slovenska Bistrica,2331,Pragersko,pogodbena,pogodbena,2/ 6/ 2014,31/ 12/ 2016,,,,izro?ilna,Pragersko,Kolodvorska ulica,10,,305001,551292,139304,"46� 23' 45.1497""","15� 39' 43.8699""",46.39587492,15.66218608,,,,,pogodbena
+MB,2341,Limbu�,2341,Limbu�,dostavna,#N/A,,,,,,dostavna,Limbu�,Lackova cesta,216,,387721,545506,156460,"46� 33' 2.2724""","15� 35' 19.0223""",46.55063122,15.58861731,,,,,
+MB,2342,Ru�e,2342,Ru�e,dostavna,#N/A,,,,,,dostavna,Ru�e,Falska cesta,7,A,416557,539670,155065,"46� 32' 18.415""","15� 30' 44.627""",46.53844861,15.51239639,,,,,
+MB,2344,Lovrenc na Pohorju,2343,Fala,pismono�ka,#N/A,3/ 5/ 2013,,1/ 8/ 2016,,,,,,,,,,,,,,,,,,,
+MB,2344,Lovrenc na Pohorju,2344,Lovrenc na Pohorju,dostavna,#N/A,,,,,,dostavna,Lovrenc na Pohorju,Spodnji trg,7,,428508,530256,155313,"46� 32' 28.1968""","15� 23' 22.84""",46.54116578,15.38967778,,,,,
+MB,2342,Ru�e,2345,Bistrica ob Dravi,pismono�ka,pogodbena,1/ 10/ 2011,3/ 5/ 2016,22/ 1/ 2018,,,pogodbena,Bistrica ob Dravi,K �eleznici,1,,508551,542997,157087,"46� 33' 23.1703""","15� 33' 21.4471""",46.55643619,15.55595753,,,,,pogodbena
+MB,2351,Kamnica,2351,Kamnica,dostavna,#N/A,,,,,,dostavna,Kamnica,Cesta v Ro�poh,18,,387487,547275,158906,"46� 34' 21.0534""","15� 36' 42.9595""",46.57251483,15.61193319,,,,,
+MB,2352,Selnica ob Dravi,2352,Selnica ob Dravi,dostavna,#N/A,,,,,,dostavna,Selnica ob Dravi,Slovenski trg,4,,404829,538176,156506,"46� 33' 5.3948""","15� 29' 34.9312""",46.55149856,15.49303644,,,,,
+MB,2352,Selnica ob Dravi,2353,Sv. Duh na Ostrem Vrhu,premi?na,#N/A,,,,,,,,,,,,,,,,,,,,,,
+MB,2351,Kamnica,2354,Bresternica,izro?ilna,#N/A,3/ 5/ 2014,,,,,izro?ilna,Bresternica,Obrobna ulica,1,,404984,544704,158286,"46� 34' 1.6037""","15� 34' 42.0034""",46.56711214,15.57833428,,,,,
+MB,2360,Radlje ob Dravi,2360,Radlje ob Dravi,dostavna,#N/A,,,,,,dostavna,Radlje ob Dravi,Mariborska cesta,4,,325159,517445,163424,"46� 36' 52.5178""","15� 13' 22.6028""",46.61458828,15.22294522,,,,,
+MB,2363,Podvelka,2361,O�balt,pismono�ka,#N/A,3/ 3/ 2014,,1/ 8/ 2017,,,izro?ilna,O�balt,O�balt,69,,365878,530259,160076,"46� 35' 2.2684""","15� 23' 23.2443""",46.58396344,15.38979008,,,,,
+MB,2363,Podvelka,2362,Kapla,premi?na,#N/A,,,,,,,,,,,,,,,,,,,,,,
+MB,2363,Podvelka,2363,Podvelka,dostavna,#N/A,,,,,,dostavna,Podvelka,Podvelka,18,,334503,525571,160670,"46� 35' 22.3938""","15� 19' 43.9915""",46.58955383,15.32888653,,,,,
+MB,2363,Podvelka,2364,Ribnica na Pohorju,izro?ilna,#N/A,2/ 6/ 2014,1/ 7/ 2015,,,,izro?ilna,Ribnica na Pohorju,Ribnica na Pohorju,24,,257076,520885,154595,"46� 32' 6.2126""","15� 16' 2.8706""",46.53505906,15.26746406,,,,01/07/2015,pogodbena
+MB,2360,Radlje ob Dravi,2365,Vuhred,pismono�ka,#N/A,2/ 7/ 2012,1/ 8/ 2014,1/ 2/ 2016,,,,,,,,,,,,,,,,,,,
+MB,2366,Muta,2366,Muta,dostavna,#N/A,,,,,,dostavna,Muta,Glavni trg,31,,316719,512882,162906,"46� 36' 36.1063""","15� 9' 48.0833""",46.61002953,15.16335647,,,,,
+MB,2367,Vuzenica,2367,Vuzenica,dostavna,#N/A,,,,,,dostavna,Vuzenica,Mladinska ulica,4,,265489,512940,161754,"46� 35' 58.7911""","15� 9' 50.6952""",46.59966419,15.164082,,,,,
+MB,2370,Dravograd,2370,Dravograd,dostavna,#N/A,,,,,,dostavna,Dravograd,Trg 4. julija,1,,59669,502229,160568,"46� 35' 20.801""","15� 1' 27.3782""",46.58911139,15.02427172,,,,,
+MB,2367,Vuzenica,2371,Trbonje,pismono�ka,#N/A,1/ 9/ 2016,,1/ 9/ 2016,,,pismono�ka,,,,,,,,,,,,,,,,
+MB,2370,Dravograd,2372,Libeli?e,pogodbena,pogodbena,1/ 8/ 2016,,,,,pogodbena,Libeli?e,Libeli?e,11,,26915,496391,164004,"46� 37' 12.0591""","14� 56' 53.0075""",46.62001642,14.94805764,,,,,pogodbena
+MB,2373,�entjan� pri Dravogradu,2373,�entjan� pri Dravogradu,dostavna,#N/A,,,,,,dostavna,�entjan� pri Dravogradu,�entjan� pri Dravogradu,75,,66868,503358,157513,"46� 33' 41.8384""","15� 2' 20.344""",46.56162178,15.03898444,,,,,
+MB,2380,Slovenj Gradec,2380,Slovenj Gradec,logisti?na,#N/A,,,,,,dostavna,Slovenj Gradec,Francetova cesta,1,,365112,506517,151866,"46� 30' 38.8593""","15� 4' 48.4027""",46.51079425,15.08011186,,,,,
+MB,2380,Slovenj Gradec,2381,Podgorje pri Sl. Gradcu,pismono�ka,#N/A,1/ 10/ 2010,1/ 9/ 2014,18/ 7/ 2016,,,,,,,,,,,,,,,,,,01/09/2014,
+MB,2382,Mislinja,2382,Mislinja,dostavna,#N/A,,,,,,dostavna,Mislinja,�olska cesta,55,,519989,515383,144540,"46� 26' 41.0696""","15� 11' 43.4673""",46.44474156,15.19540758,,,,,
+MB,2380,Slovenj Gradec,2383,�martno pri Sl. Gradcu,izro?ilna,#N/A,3/ 1/ 2011,,,,,izro?ilna,�martno pri Slovenj Gradcu,�martno pri Slovenj Gradcu,60,,327419,508564,149951,"46� 29' 36.7544""","15� 6' 24.3085""",46.49354289,15.10675236,,,,,
+MB,2390,Ravne na Koro�kem,2390,Ravne na Koro�kem,logisti?na,#N/A,,,,,,dostavna,Ravne na Koro�kem,Trg svobode,19,,285791,497779,155629,"46� 32' 40.8284""","14� 57' 58.4116""",46.54467456,14.96622544,,,,,
+MB,2390,Ravne na Koro�kem,2391,Prevalje,izro?ilna,#N/A,1/ 2/ 2013,,,,,izro?ilna,Prevalje,Trg,32,A,280167,493815,155681,"46� 32' 42.4187""","14� 54' 52.3331""",46.54511631,14.91453697,,,,,
+MB,2392,Me�ica,2392,Me�ica,dostavna,#N/A,,,,,,dostavna,Me�ica,Partizanska cesta,2,,286339,489051,152973,"46� 31' 14.486""","14� 51' 8.9371""",46.52069056,14.85248253,,,,,
+MB,2393,?rna na Koro�kem,2393,?rna na Koro�kem,dostavna,#N/A,,,,,,dostavna,?rna na Koro�kem,Center,16,,304524,488888,147437,"46� 28' 15.1711""","14� 51' 1.7744""",46.47088086,14.85049289,,,,,
+MB,2390,Ravne na Koro�kem,2394,Kotlje,pogodbena,pogodbena,1/ 10/ 2011,2/ 6/ 2014,,,,pogodbena,Kotlje,Kotlje,3,A,537316,499280,153086,"46� 31' 18.4772""","14� 59' 8.8894""",46.52179922,14.98580261,,,,02/06/2014,pogodbena
+CE,3102,Celje,3101,Celje,izro?ilna,#N/A,3/ 2/ 2014,,,,,izro?ilna,Celje,Krekov trg,9,,37714,520990,120621,"46� 13' 45.8062""","15� 16' 2.3745""",46.22939061,15.26732625,,,,,
+CE,3102,Celje,3102,Celje,pretovorna,#N/A,,,,,,dostavna,Trnovlje pri Celju,Gaji,29,,560588,522906,121936,"46� 14' 28.1788""","15� 17' 32.0245""",46.24116078,15.29222903,,,,,
+CE,3102,Celje,3103,Celje,izro?ilna,#N/A,,,,,,izro?ilna,Celje,Ulica Frankolovskih �rtev,44,,7485,521578,123093,"46� 15' 5.809""","15� 16' 30.2201""",46.25161361,15.27506114,,,,,
+CE,3102,Celje,3104,Celje,izro?ilna,#N/A,1/ 7/ 2016,,,,,izro?ilna,Celje,Ulica V. prekomorske brigade,2,,12506,519734,121248,"46� 14' 6.2487""","15� 15' 3.8484""",46.23506908,15.251069,,,,,
+CE,3102,Celje,3105,Celje,izro?ilna,#N/A,1/ 7/ 2016,,,,,izro?ilna,Celje,Pucova ulica,9,C,501291,519811,122163,"46� 14' 35.8777""","15� 15' 7.5792""",46.24329936,15.25210533,,,,,
+CE,3102,Celje,3106,Celje,izro?ilna,#N/A,,,,,,izro?ilna,Celje,Ulica bratov Vo�njakov,12,,6816,520750,122464,"46� 14' 45.5274""","15� 15' 51.462""",46.24597983,15.264295,,,,,
+CE,3102,Celje,3107,Celje,zaprta,#N/A,,,,30/ 12/ 2016,,okenska,Celje,Oblakova ulica,5,,4506,520621,121202,"46� 14' 4.665""","15� 15' 45.2431""",46.23462917,15.26256753,,,,,
+CE,3212,Vojnik,3201,�martno v Ro�ni dolini,pogodbena,pogodbena,1/ 12/ 2011,1/ 7/ 2013,,,,pogodbena,�martno v Ro�ni dolini,�martno v Ro�ni dolini,32,,8025,519372,127792,"46� 17' 38.2462""","15� 14' 47.9088""",46.29395728,15.24664133,,,,01/07/2013,pogodbena
+CE,3102,Celje,3202,Ljube?na,izro?ilna,#N/A,1/ 2/ 2013,,,,,izro?ilna,Ljube?na,Kocbekova cesta,42,,55591,525160,123861,"46� 15' 30.2453""","15� 19' 17.6105""",46.25840147,15.32155847,,,,,
+CE,3212,Vojnik,3203,Nova Cerkev,pismono�ka,#N/A,1/ 2/ 2012,1/ 10/ 2014,3/ 4/ 2018,,,izro?ilna,Nova Cerkev,Nova Cerkev,22,,7385,522350,129828,"46� 18' 43.8657""","15� 17' 7.4046""",46.31218492,15.28539017,,,,,
+CE,3212,Vojnik,3204,Dobrna,pogodbena,pogodbena,3/ 3/ 2014,2/ 10/ 2017,,,,izro?ilna,Dobrna,Dobrna,19,,9068,517778,132402,"46� 20' 7.7184""","15� 13' 34.0468""",46.33547733,15.22612411,,,,,
+CE,3214,Zre?e,3205,Vitanje,izro?ilna,#N/A,1/ 7/ 2018,,,,,izro?ilna,Vitanje,Na vasi,12,A,449404,523070,137617,"46� 22' 56.0612""","15� 17' 42.4241""",46.38223922,15.29511781,,,,,
+CE,3214,Zre?e,3206,Stranice,premi?na,#N/A,,,,,,,,,,,,,,,,,,,,,,
+CE,3210,Slovenske Konjice,3210,Slovenske Konjice,dostavna,#N/A,,,,,,dostavna,Slovenske Konjice,Mestni trg,3,A,453521,533159,132837,"46� 20' 19.7451""","15� 25' 33.3901""",46.33881808,15.42594169,,,,,
+CE,3102,Celje,3211,�kofja vas,pogodbena,pogodbena,1/ 2/ 2013,1/ 7/ 2015,,,,pogodbena,�kofja vas,�kofja vas,38,,4151,522687,124997,"46� 16' 7.3508""","15� 17' 22.3263""",46.26870856,15.28953508,,,,01/07/2015,pogodbena
+CE,3212,Vojnik,3212,Vojnik,dostavna,#N/A,,,,,,dostavna,Vojnik,Celjska cesta,24,B,523400,523552,127476,"46� 17' 27.5402""","15� 18' 3.1681""",46.29098339,15.30088003,,,,,
+CE,3212,Vojnik,3213,Frankolovo,pismono�ka,pogodbena,2/ 3/ 2015,4/ 5/ 2015,1/ 8/ 2018,,,pogodbena,Frankolovo,Frankolovo,12,A,521996,524722,131626,"46� 19' 41.8086""","15� 18' 58.6133""",46.32828017,15.31628147,,,,04/05/2015,pogodbena
+CE,3214,Zre?e,3214,Zre?e,dostavna,#N/A,,,,,,dostavna,Zre?e,Cesta na Roglo,9,B,464393,530614,135894,"46� 21' 59.1866""","15� 23' 35.0892""",46.36644072,15.39308033,,,,,
+CE,3215,Lo?e,3215,Lo?e,dostavna,#N/A,,,,,,dostavna,Lo?e,Stari trg,15,A,445035,538663,128703,"46� 18' 4.8063""","15� 29' 49.5581""",46.30133508,15.49709947,,,,,
+CE,3102,Celje,3220,�tore,izro?ilna,#N/A,1/ 7/ 2016,,,,,izro?ilna,�tore,Udarni�ka ulica,3,,54712,524690,119737,"46� 13' 16.7305""","15� 18' 54.8936""",46.22131403,15.31524822,,,,,
+CE,3102,Celje,3221,Teharje,pogodbena,pogodbena,1/ 2/ 2012,4/ 11/ 2013,,,,pogodbena,Teharje,Teharje,11,,17827,523607,120639,"46� 13' 46.0834""","15� 18' 4.5167""",46.22946761,15.30125464,,,,04/11/2013,pogodbena
+CE,3230,�entjur,3222,Dramlje,pogodbena,pogodbena,1/ 2/ 2012,3/ 6/ 2014,,,,pogodbena,Dramlje,Dramlje,9,B,328949,530628,125472,"46� 16' 21.6234""","15� 23' 33.3163""",46.27267317,15.39258786,,,,03/06/2014,pogodbena
+CE,3254,Pod?etrtek,3223,Loka pri �usmu,pismono�ka,#N/A,1/ 3/ 2013,1/ 9/ 2015,1/ 12/ 2016,,,pogodbena,Loka pri �usmu,Loka pri �usmu,11,,324555,540164,112884,"46� 9' 32.1291""","15� 30' 54.8834""",46.15892475,15.51524539,,,,01/09/2015,
+CE,3225,Planina pri Sevnici,3224,Dobje pri Planini,premi?na,#N/A,2/ 7/ 2012,?,,,1/ 2/ 2018,izro?ilna,Dobje pri Planini,Dobje pri Planini,26,,416325,530848,110418,"46� 8' 13.9901""","15� 23' 40.0809""",46.13721947,15.39446692,,,,,pogodbena
+CE,3225,Planina pri Sevnici,3225,Planina pri Sevnici,dostavna,#N/A,,,,,,dostavna,Planina pri Sevnici,Planina pri Sevnici,36,,335158,531711,106748,"46� 6' 14.9761""","15� 24' 19.4145""",46.10416003,15.40539292,,,,,
+CE,3230,�entjur,3230,�entjur,dostavna,#N/A,,,,,,dostavna,�entjur,Mestni trg,5,A,443114,530819,119242,"46� 12' 59.8048""","15� 23' 40.7827""",46.21661244,15.39466186,,,,,
+CE,3230,�entjur,3231,Grobelno,pismono�ka,#N/A,2/ 4/ 2012,1/ 10/ 2014,1/ 12/ 2016,,,pogodbena,Grobelno - del,Grobelno - del,1,,324976,535280,119360,"46� 13' 2.8521""","15� 27' 8.9636""",46.21745892,15.45248989,,,,01/10/2014,
+CE,3230,�entjur,3232,Ponikva,izro?ilna,#N/A,1/ 7/ 2016,,,,,izro?ilna,Ponikva,Ponikva,24,D,470983,534495,123257,"46� 15' 9.2181""","15� 26' 33.3539""",46.25256058,15.44259831,,,,,
+CE,3230,�entjur,3233,Kalobje,premi?na,#N/A,,,,,,,,,,,,,,,,,,,,,,
+CE,3240,�marje pri Jel�ah,3240,�marje pri Jel�ah,dostavna,#N/A,,,,,,dostavna,�marje pri Jel�ah,A�ker?ev trg,26,,345151,540360,120625,"46� 13' 42.8142""","15� 31' 6.3838""",46.2285595,15.51843994,,,,,
+CE,3250,Roga�ka Slatina,3241,Podplat,pogodbena,pogodbena,4/ 9/ 2017,4/ 9/ 2017,,,,dostavna,Podplat,Podplat,7,,455867,544723,122499,"46� 14' 42.5338""","15� 34' 30.637""",46.24514828,15.57517694,,,,,
+CE,3250,Roga�ka Slatina,3250,Roga�ka Slatina,logisti?na,#N/A,,,,,,dostavna,Roga�ka Slatina,Kidri?eva ulica,3,,358134,549626,121375,"46� 14' 4.9103""","15� 38' 19.098""",46.23469731,15.63863833,,,,,
+CE,3250,Roga�ka Slatina,3252,Rogatec,izro?ilna,#N/A,1/ 9/ 2017,,,,,dostavna,Rogatec,Celjska cesta,31,A,464202,554177,120354,"46� 13' 30.5971""","15� 41' 51.0874""",46.22516586,15.69752428,,,,,
+CE,3254,Pod?etrtek,3253,Pristava pri Mestinju,pismono�ka,#N/A,1/ 3/ 2013,2/ 6/ 2014,7/ 8/ 2017,,,pogodbena,Pristava pri Mestinju,Pristava pri Mestinju,30,A,490046,546529,116649,"46� 11' 32.625""","15� 35' 52.8817""",46.19239583,15.59802269,,,,02/06/2014,pogodbena
+CE,3254,Pod?etrtek,3254,Pod?etrtek,dostavna,#N/A,,,,,,dostavna,Pod?etrtek,Zdravili�ka cesta,27,C,474568,546759,112110,"46� 9' 5.5545""","15� 36' 2.0027""",46.15154292,15.60055631,,,,,
+CE,3260,Kozje,3255,Bu?e,premi?na,#N/A,,,,,,,,,,,,,,,,,,,,,,
+CE,3260,Kozje,3256,Bistrica ob Sotli,pogodbena,pogodbena,3/ 5/ 2013,1/ 10/ 2014,,,,pogodbena,Bistrica ob Sotli,Bistrica ob Sotli,17,,422462,551692,101721,"46� 3' 27.7886""","15� 39' 47.8454""",46.05771906,15.66329039,,,,01/10/2014,pogodbena
+CE,3260,Kozje,3257,Podsreda,premi?na,#N/A,,,,,,,,,,,,,,,,,,,,,,
+CE,3260,Kozje,3260,Kozje,dostavna,#N/A,,,,,,dostavna,Kozje,Kozje,138,A,460722,543723,103326,"46� 4' 21.7651""","15� 33' 37.6178""",46.07271253,15.56044939,,,,,
+CE,3260,Kozje,3261,Lesi?no,pogodbena,pogodbena,3/ 5/ 2013,4/ 11/ 2013,,,,pogodbena,Lesi?no,Lesi?no,1,A,361198,540498,106429,"46� 6' 2.9824""","15� 31' 8.4793""",46.10082844,15.51902203,,,,04/11/2013,pogodbena
+CE,3260,Kozje,3262,Prevorje,pismono�ka,#N/A,3/ 5/ 2013,3/ 6/ 2014,1/ 12/ 2016,,,pogodbena,Lopaca,Lopaca,10,A,322433,537315,109451,"46� 7' 41.5139""","15� 28' 41.123""",46.12819831,15.47808972,,,,03/06/2014,
+CE,3230,�entjur,3263,Gorica pri Slivnici,izro?ilna,#N/A,2/ 4/ 2012,1/ 4/ 2015,,,,pogodbena,Gorica pri Slivnici,Gorica pri Slivnici,72,,337113,533757,115938,"46� 11' 12.2906""","15� 25' 57.0258""",46.18674739,15.43250717,,,,01/04/2015,
+CE,3240,�marje pri Jel�ah,3264,Sveti �tefan,premi?na,#N/A,,,,,,,,,,,,,,,,,,,,,,
+CE,3270,La�ko,3270,La�ko,dostavna,#N/A,,,,,,dostavna,La�ko,Trubarjeva ulica,9,,115500,518651,112158,"46� 9' 11.928""","15� 14' 12.0229""",46.15331333,15.23667303,,,,,
+CE,3270,La�ko,3271,�entrupert,pismono�ka,#N/A,3/ 3/ 2014,,1/ 8/ 2016,,,,,,,,,,,,,,,,,,,
+CE,3270,La�ko,3272,Rimske Toplice,pogodbena,pogodbena,3/ 5/ 2014,1/ 8/ 2015,,,,pogodbena,Rimske Toplice,Ulica XIV. divizije,5,,112231,515476,108843,"46� 7' 24.8345""","15� 11' 43.6609""",46.12356514,15.19546136,,,,01/08/2015,pogodbena
+CE,3225,Planina pri Sevnici,3273,Jurklo�ter,pogodbena,pogodbena,2/ 7/ 2012,3/ 1/ 2014,,,,pogodbena,Lahov Graben,Lahov Graben,3,,99740,526214,105461,"46� 5' 34.1216""","15� 20' 3.1915""",46.09281156,15.33421986,,,,03/01/2014,pogodbena
+CE,3301,Petrov?e,3301,Petrov?e,dostavna,#N/A,,,,,,dostavna,Petrov?e,Petrov?e,33,,418134,514877,122332,"46� 14' 41.7989""","15� 11' 17.2617""",46.24494414,15.18812825,,,,,
+CE,3301,Petrov?e,3302,Gri�e,izro?ilna,#N/A,3/ 2/ 2014,,,,,izro?ilna,Migojnice,Migojnice,6,,380635,512542,120722,"46� 13' 49.8172""","15� 9' 28.1009""",46.23050478,15.15780581,,,,,
+CE,3305,Vransko,3303,Gomilsko,pogodbena,pogodbena,1/ 10/ 2012,1/ 9/ 2014,,,,pogodbena,Gomilsko,Gomilsko,22,A,537464,503807,122953,"46� 15' 2.4479""","15� 2' 40.474""",46.25067997,15.04457611,,,,01/09/2014,pogodbena
+CE,3305,Vransko,3304,Tabor,pogodbena,pogodbena,1/ 10/ 2012,1/ 7/ 2013,,,,pogodbena,Tabor,Tabor,21,,424411,501485,121156,"46� 14' 4.272""","15� 0' 52.0424""",46.23452,15.01445622,,,,01/07/2013,pogodbena
+CE,3305,Vransko,3305,Vransko,dostavna,#N/A,,,,,,dostavna,Vransko,Vransko,59,,408593,496711,122405,"46� 14' 44.6992""","14� 57' 9.176""",46.24574978,14.95254889,,,,,
+CE,3310,�alec,3310,�alec,dostavna,#N/A,,,,,,dostavna,�alec,Ulica heroja Staneta,1,,402891,512700,123186,"46� 15' 9.6166""","15� 9' 35.7098""",46.25267128,15.15991939,,,,,
+CE,3310,�alec,3311,�empeter v Savinjski dolini,pogodbena,pogodbena,3/ 5/ 2014,3/ 4/ 2017,,,,izro?ilna,�empeter v Savinj. dolini,Rimska cesta,98,A,523204,509310,123740,"46� 15' 27.7545""","15� 6' 57.4636""",46.25770958,15.11596211,,,,,pogodbena
+CE,3313,Polzela,3312,Prebold,izro?ilna,#N/A,1/ 4/ 2015,,,,,izro?ilna,Prebold,Hmeljarska cesta,8,,432777,507516,121583,"46� 14' 17.9662""","15� 5' 33.571""",46.23832394,15.09265861,,,,,
+CE,3313,Polzela,3313,Polzela,dostavna,#N/A,,,,,,dostavna,Polzela,Malte�ka cesta,38,,495850,506247,126290,"46� 16' 50.4723""","15� 4' 34.5512""",46.28068675,15.07626422,,,,,
+CE,3327,�martno ob Paki,3314,Braslov?e,pogodbena,pogodbena,1/ 12/ 2012,1/ 2/ 2016,,,,pogodbena,Braslov?e,Braslov?e,2,A,549183,503554,126843,"46� 17' 8.4509""","15� 2' 28.7604""",46.28568081,15.04132233,,,,01/02/2016,pogodbena
+CE,3320,Velenje,3320,Velenje,logisti?na,#N/A,,,,,,dostavna,Velenje,Kidri?eva cesta,2,A,376890,509536,135159,"46� 21' 37.6052""","15� 7' 8.8312""",46.36044589,15.11911978,,,,,
+CE,3320,Velenje,3321,Velenje,izro?ilna,#N/A,,,,,,izro?ilna,Velenje,Gori�ka cesta,40,,386189,510263,134760,"46� 21' 24.6443""","15� 7' 42.812""",46.35684564,15.12855889,,,,,
+CE,3320,Velenje,3323,Velenje,izro?ilna,#N/A,,,,,,izro?ilna,Velenje,Partizanska cesta,2,A,514667,508642,134993,"46� 21' 32.2706""","15� 6' 26.9961""",46.35896406,15.10749892,,,,,
+CE,3325,�o�tanj,3325,�o�tanj,dostavna,#N/A,,,,,,dostavna,�o�tanj,A�ker?eva cesta,5,F,536248,504044,136849,"46� 22' 32.5356""","15� 2' 51.9461""",46.37570433,15.04776281,,,,,
+CE,3325,�o�tanj,3326,Topol�ica,pogodbena,pogodbena,1/ 12/ 2011,2/ 9/ 2013,,,,pogodbena,Topol�ica,Topol�ica,81,A,494713,501884,139645,"46� 24' 3.1285""","15� 1' 10.9014""",46.40086903,15.01969483,,,,02/09/2013,pogodbena
+CE,3327,�martno ob Paki,3327,�martno ob Paki,dostavna,#N/A,,,,,,dostavna,�martno ob Paki,�martno ob Paki,84,C,539491,502882,131587,"46� 19' 42.1202""","15� 1' 57.4613""",46.32836672,15.03262814,,,,,
+CE,3330,Mozirje,3330,Mozirje,dostavna,#N/A,,,,,,dostavna,Mozirje,Savinjska cesta,3,,185060,497307,132752,"46� 20' 19.8507""","14� 57' 36.7698""",46.33884742,14.96021383,,,,,
+CE,3331,Nazarje,3331,Nazarje,dostavna,#N/A,,,,,,dostavna,Nazarje,Zadre?ka cesta,2,,523114,496513,130474,"46� 19' 6.0523""","14� 56' 59.7032""",46.31834786,14.94991756,,,,,
+CE,3331,Nazarje,3332,Re?ica ob Savinji,izro?ilna,#N/A,3/ 5/ 2013,,,,,izro?ilna,Re?ica ob Savinji,Re?ica ob Savinji,107,A,221404,494414,131004,"46� 19' 23.166""","14� 55' 21.5565""",46.32310167,14.92265458,,,,,
+CE,3333,Ljubno ob Savinji,3333,Ljubno ob Savinji,dostavna,#N/A,,,,,,dostavna,Ljubno ob Savinji,For�t,6,,184774,487533,133305,"46� 20' 37.357""","14� 49' 59.6356""",46.34371028,14.83323211,,,,,
+CE,3334,Lu?e,3334,Lu?e,dostavna,#N/A,,,,,,dostavna,Lu?e,Lu?e,1,,177237,480904,134561,"46� 21' 17.4746""","14� 44' 49.4188""",46.35485406,14.74706078,,,,,
+CE,3334,Lu?e,3335,Sol?ava,pogodbena,pogodbena,1/ 10/ 2012,1/ 3/ 2014,,,,pogodbena,Sol?ava,Sol?ava,29,,183303,476665,141832,"46� 25' 12.4934""","14� 41' 29.8092""",46.42013706,14.69161367,,,,01/03/2014,pogodbena
+CE,3331,Nazarje,3341,�martno ob Dreti,pogodbena,pogodbena,3/ 5/ 2013,1/ 8/ 2014,,,,pogodbena,�martno ob Dreti,�martno ob Dreti,74,,253919,492004,126622,"46� 17' 1.1429""","14� 53' 29.161""",46.28365081,14.89143361,,,,01/08/2014,pogodbena
+CE,3342,Gornji Grad,3342,Gornji Grad,dostavna,#N/A,,,,,,dostavna,Gornji Grad,Attemsov trg,9,,164832,485375,128004,"46� 17' 45.5005""","14� 48' 19.3113""",46.29597236,14.80536425,,,,,
+LJ-4,4260,Bled,4260,Bled,dostavna,#N/A,,,,,,dostavna,Bled,Ljubljanska cesta,10,,275621,431987,136311,"46� 22' 2.7678""","14� 6' 40.406""",46.3674355,14.11122389,,,,,
+LJ-4,4260,Bled,4263,Bohinjska Bela,pogodbena,pogodbena,2/ 7/ 2012,1/ 10/ 2016,,,,pogodbena,Bohinjska Bela,Bohinjska Bela,37,,270364,428565,134362,"46� 20' 58.3755""","14� 4' 1.3855""",46.34954875,14.06705153,po�gana stavba,,,,pogodbena
+LJ-4,4264,Bohinjska Bistrica,4264,Bohinjska Bistrica,dostavna,#N/A,,,,,,dostavna,Bohinjska Bistrica,Trg svobode,2,C,480771,419661,125890,"46� 16' 20.411""","13� 57' 10.2011""",46.27233639,13.95283364,,,,,
+LJ-4,4264,Bohinjska Bistrica,4265,Bohinjsko jezero,pogodbena,pogodbena,2/ 7/ 2012,1/ 12/ 2016,,,,pogodbena,Rib?ev Laz,Rib?ev Laz,47,,261078,414638,126467,"46� 16' 36.8851""","13� 53' 15.2499""",46.27691253,13.88756942,,,,,pogodbena
+LJ-4,4264,Bohinjska Bistrica,4267,Srednja vas v Bohinju,pogodbena,pogodbena,1/ 7/ 2011,4/ 5/ 2015,,,,izro?ilna,Srednja vas v Bohinju,Srednja vas v Bohinju,79,,285647,417853,128630,"46� 17' 48.3642""","13� 55' 44.0407""",46.29676783,13.92890019,,,,04/05/2015,
+LJ-4,4207,Cerklje na Gorenjskem,4207,Cerklje na Gorenjskem,dostavna,#N/A,,,,,,dostavna,Cerklje na Gorenjskem,Trg Davorina Jenka,13,,64065,460842,123352,"46� 15' 11.2981""","14� 29' 14.3521""",46.25313836,14.48732003,,,,,
+LJ-4,4204,Golnik,4204,Golnik,dostavna,#N/A,,,,,,dostavna,Golnik,Golnik,36,,62118,448921,131946,"46� 19' 46.7778""","14� 19' 54.3951""",46.3296605,14.33177642,,,,,
+LJ-4,4224,Gorenja vas,4223,Poljane nad �kofjo Loko,pogodbena,pogodbena,2/ 7/ 2012,1/ 8/ 2015,,,,pogodbena,Poljane nad �kofjo Loko,Poljane nad �kofjo Loko,80,,361026,437343,109089,"46� 7' 22.9909""","14� 11' 4.0482""",46.12305303,14.18445783,,,,01/08/2015,pogodbena
+LJ-4,4224,Gorenja vas,4224,Gorenja vas,dostavna,#N/A,,,,,,dostavna,Gorenja vas,Poljanska cesta,65,A,536829,434020,107205,"46� 6' 20.8418""","14� 8' 30.2179""",46.10578939,14.14172719,,,,,
+LJ-4,4270,Jesenice,4270,Jesenice,logisti?na,#N/A,,,,,,dostavna,Jesenice,Cesta �elezarjev,6,B,540227,428367,143454,"46� 25' 52.7475""","14� 3' 47.1008""",46.43131875,14.06308356,,,,,
+LJ-4,4270,Jesenice,4271,Jesenice,izro?ilna,#N/A,,,,,,izro?ilna,Jesenice,Cesta Cirila Tav?arja,8,,89868,426845,144383,"46� 26' 22.244""","14� 2' 35.2883""",46.43951222,14.04313564,,,,,
+LJ-4,4270,Jesenice,4272,Jesenice,zaprta,#N/A,,,,30/ 12/ 2016,,izro?ilna,Slovenski Javornik,Cesta Borisa Kidri?a,37,C,108792,430377,142862,"46� 25' 34.3343""","14� 5' 21.5641""",46.42620397,14.08932336,,,,,
+LJ-4,4270,Jesenice,4273,Blejska Dobrava,pismono�ka,#N/A,1/ 8/ 2013,2/ 2/ 2015,12/ 3/ 2018,,,pogodbena,Blejska Dobrava,Blejska Dobrava,45,A,51860,431021,140981,"46� 24' 33.6558""","14� 5' 52.7277""",46.40934883,14.09797992,,,,02/02/2015,
+LJ-4,4270,Jesenice,4276,Hru�ica,izro?ilna,#N/A,1/ 8/ 2013,,,,,izro?ilna,Hru�ica,Hru�ica,71,F,83827,424591,145386,"46� 26' 53.8305""","14� 0' 49.1162""",46.44828625,14.01364339,,,,,
+LJ-4,4270,Jesenice,4281,Mojstrana,izro?ilna,#N/A,1/ 8/ 2013,,,,,izro?ilna,Mojstrana,Savska cesta,1,,53312,419086,146913,"46� 27' 40.9796""","13� 56' 30.2458""",46.46138322,13.94173494,,,,,
+LJ-4,4101,Kranj,4101,Kranj,dostavna,#N/A,,,,,,dostavna,Kranj,Dra�go�ka ulica,8,,176211,450756,122916,"46� 14' 54.8035""","14� 21' 23.6063""",46.24855653,14.35655731,,,,,
+LJ-4,4102,Kranj,4102,Kranj,logisti?na,#N/A,,,,,,,,,,,,,,,,,,,,,,
+LJ-4,4103,Kranj,4103,Kranj,dostavna,#N/A,,,,,,dostavna,Kranj,�kofjelo�ka cesta,17,,457286,449946,120967,"46� 13' 51.4646""","14� 20' 46.5389""",46.23096239,14.34626081,,,,,
+LJ-4,4101,Kranj,4104,Kranj,izro?ilna,#N/A,,,,,,izro?ilna,Kranj,Jezerska cesta,41,,122880,451705,122770,"46� 14' 50.321""","14� 22' 7.9649""",46.24731139,14.36887914,,,,,
+LJ-4,4101,Kranj,4105,Kranj,izro?ilna,#N/A,,,,,,izro?ilna,Kranj,Ulica Lojzeta Hrovata,2,,115269,451437,121700,"46� 14' 15.5963""","14� 21' 55.8518""",46.23766564,14.36551439,,,,,
+LJ-4,4101,Kranj,4106,Kranj,izro?ilna,#N/A,,,,,,izro?ilna,Kranj,Po�tna ulica,4,,116152,450714,121853,"46� 14' 20.3636""","14� 21' 22.0472""",46.23898989,14.35612422,,,,,
+LJ-4,4101,Kranj,4201,Zgornja Besnica,pogodbena,pogodbena,1/ 7/ 2014,1/ 7/ 2014,,,,pogodbena,Zgornja Besnica,V ?epuljah,19,,114017,445175,124294,"46� 15' 37.8895""","14� 17' 2.4791""",46.26052486,14.28402197,,,,01/07/2014,pogodbena
+LJ-4,4103,Kranj,4209,�abnica,izro?ilna,#N/A,3/ 2/ 2014,,,,,izro?ilna,�abnica,�abnica,26,,96001,448805,117153,"46� 11' 47.6279""","14� 19' 54.7824""",46.19656331,14.331884,,,,,
+LJ-4,4102,Kranj,4210,Brnik - aerodrom,izro?ilna,#N/A,,,,,,izro?ilna,Zgornji Brnik,Zgornji Brnik,130,A,125357,458402,121006,"46� 13' 54.7887""","14� 27' 21.1769""",46.23188575,14.45588247,,,,,
+LJ-4,4280,Kranjska Gora,4280,Kranjska Gora,dostavna,#N/A,,,,,,dostavna,Kranjska Gora,Borov�ka cesta,92,,38805,406869,149710,"46� 29' 5.8655""","13� 46' 55.7405""",46.48496264,13.78215014,,,,,
+LJ-4,4280,Kranjska Gora,4282,Gozd Martuljek,pogodbena,pogodbena,17/ 2/ 2011,2/ 7/ 2013,,,,pogodbena,Gozd Martuljek,Zgornje Rute,50,A,428341,410685,149615,"46� 29' 4.6524""","13� 49' 54.7011""",46.48462567,13.83186142,,,,02/07/2013,pogodbena
+LJ-4,4280,Kranjska Gora,4283,Rate?e - Planica,premi?na,#N/A,,,,,,,,,,,,,,,,,,,,,,
+LJ-4,4240,Radovljica,4248,Lesce,izro?ilna,#N/A,1/ 7/ 2018,,,,,izro?ilna,Lesce,Alpska cesta,37,B,471945,435585,135588,"46� 21' 40.6236""","14� 9' 29.0948""",46.36128433,14.15808189,,,,,
+LJ-4,4101,Kranj,4211,Mav?i?e,izro?ilna,#N/A,1/ 11/ 2017,,,,,dostavna,Mav?i?e,Mav?i?e,102,,140174,454326,116245,"46� 11' 19.6388""","14� 24' 12.6077""",46.18878856,14.40350214,,,,,
+LJ-4,4202,Naklo,4202,Naklo,dostavna,#N/A,,,,,,dostavna,Naklo,Glavna cesta,24,,116807,447628,125649,"46� 16' 22.4748""","14� 18' 56.4775""",46.27290967,14.31568819,,,,,
+LJ-4,4202,Naklo,4203,Duplje,pogodbena,pogodbena,2/ 11/ 2013,3/ 6/ 2014,,,,pogodbena,Zgornje Duplje,Zgornje Duplje,8,,85300,446061,129165,"46� 18' 15.9069""","14� 17' 41.8332""",46.30441858,14.29495367,,,,03/06/2014,pogodbena
+LJ-4,4205,Preddvor,4205,Preddvor,dostavna,#N/A,,,,,,dostavna,Preddvor,�i�ka,1,,81090,455735,128832,"46� 18' 7.6535""","14� 25' 14.0428""",46.30212597,14.42056744,,,,,
+LJ-4,4205,Preddvor,4206,Zgornje Jezersko,pogodbena,pogodbena,3/ 5/ 2012,2/ 6/ 2014,,,,pogodbena,Zgornje Jezersko,Zgornje Jezersko,82,,81413,461795,138954,"46� 23' 36.8245""","14� 29' 54.253""",46.39356236,14.49840361,,,,02/06/2014,pogodbena
+LJ-4,4205,Preddvor,4212,Visoko,pogodbena,pogodbena,3/ 5/ 2012,1/ 6/ 2015,,,,pogodbena,Visoko,Visoko,67,,90486,455542,125595,"46� 16' 22.7661""","14� 25' 6.13""",46.27299058,14.41836944,,,,01/06/2015,pogodbena
+LJ-4,4240,Radovljica,4240,Radovljica,dostavna,#N/A,,,,,,dostavna,Radovljica,Kranjska cesta,1,,281443,436664,133632,"46� 20' 37.6433""","14� 10' 20.5239""",46.34378981,14.17236775,,,,,
+LJ-4,4240,Radovljica,4243,Brezje,pogodbena,pogodbena,2/ 7/ 2012,3/ 1/ 2014,,,,pogodbena,Brezje,Brezje,63,A,296189,441318,131913,"46� 19' 43.4841""","14� 13' 58.9446""",46.32874558,14.23304017,,,,03/01/2014,pogodbena
+LJ-4,4240,Radovljica,4244,Podnart,izro?ilna,#N/A,2/ 7/ 2012,,,,,izro?ilna,Podnart,Podnart,25,A,277835,443264,127884,"46� 17' 33.594""","14� 15' 31.6825""",46.292665,14.25880069,,,,,
+LJ-4,4240,Radovljica,4245,Kropa,pogodbena,pogodbena,2/ 7/ 2012,5/ 1/ 2016,,,,pogodbena,Kropa,Kropa,3,A,292097,439174,127789,"46� 17' 29.2373""","14� 12' 20.6363""",46.29145481,14.20573231,,,,05/01/2016,pogodbena
+LJ-4,4240,Radovljica,4246,Kamna Gorica,pogodbena,pogodbena,2/ 7/ 2012,3/ 12/ 2013,,,,pogodbena,Kamna Gorica,Kamna Gorica,58,,375193,438289,130585,"46� 18' 59.5025""","14� 11' 37.9632""",46.31652847,14.19387867,,,,03/12/2013,pogodbena
+LJ-4,4240,Radovljica,4275,Begunje na Gorenjskem,izro?ilna,#N/A,2/ 11/ 2013,,,,,izro?ilna,Begunje na Gorenjskem,Begunje na Gorenjskem,15,D,447236,438710,137148,"46� 22' 32.1947""","14� 11' 54.5437""",46.37560964,14.19848436,,,,,
+LJ-4,4228,�elezniki,4229,Sorica,pismono�ka,#N/A,19/ 2/ 2018,,19/ 2/ 2018,,,dostavna,Spodnja Sorica,Spodnja Sorica,18,,340745,425474,119858,"46� 13' 7.4522""","14� 1' 45.1183""",46.21873672,14.02919953,,,,,
+LJ-4,4208,�en?ur,4208,�en?ur,dostavna,#N/A,,,,,,dostavna,�en?ur,Gasilska cesta,2,A,446898,455575,122186,"46� 14' 32.3607""","14� 25' 8.8338""",46.24232242,14.4191205,,,,,
+LJ-4,4220,�kofja Loka,4220,�kofja Loka,dostavna,#N/A,,,,,,dostavna,�kofja Loka,Frankovo naselje,69,,325436,448630,114236,"46� 10' 13.1027""","14� 19' 47.7651""",46.17030631,14.32993475,,,,,
+LJ-4,4220,�kofja Loka,4221,�kofja Loka,izro?ilna,#N/A,,,,,,izro?ilna,�kofja Loka,Kapucinski trg,14,,360563,446769,113867,"46� 10' 0.6351""","14� 18' 21.1577""",46.16684308,14.30587714,,,,,
+LJ-4,4290,Tr�i?,4290,Tr�i?,dostavna,#N/A,,,,,,dostavna,Tr�i?,Predilni�ka cesta,10,,365455,447054,135515,"46� 21' 41.8511""","14� 18' 25.6496""",46.36162531,14.30712489,,,,,
+LJ-4,4290,Tr�i?,4291,Tr�i?,izro?ilna,#N/A,,,,,,izro?ilna,Bistrica pri Tr�i?u,Cesta Ste Marie aux mines,17,,385351,445866,134768,"46� 21' 17.3181""","14� 17' 30.3856""",46.35481058,14.29177378,,,,,
+LJ-4,4290,Tr�i?,4294,Kri�e,pogodbena,pogodbena,2/ 11/ 2013,2/ 11/ 2016,,,,pogodbena,Kri�e,Cesta Kokr�kega odreda,4,,413543,446440,133092,"46� 20' 23.2017""","14� 17' 57.9262""",46.33977825,14.29942394,,,,,pogodbena
+LJ-4,4260,Bled,4247,Zgornje Gorje,izro?ilna,#N/A,1/ 11/ 2017,,,,,dostavna,Zgornje Gorje,Zgornje Gorje,6,B,265924,428743,137824,"46� 22' 50.5619""","14� 4' 7.8095""",46.38071164,14.06883597,,,,,
+LJ-4,4228,�elezniki,4227,Selca,pogodbena,pogodbena,2/ 7/ 2012,1/ 7/ 2014,,,,pogodbena,Selca,Selca,21,,338321,438933,120319,"46� 13' 27.2261""","14� 12' 12.8733""",46.22422947,14.20357592,,,,01/07/2014,pogodbena
+LJ-4,4228,�elezniki,4228,�elezniki,dostavna,#N/A,,,,,,dostavna,�elezniki,Na Kresu,1,,331036,436245,120532,"46� 13' 33.2337""","14� 10' 7.3397""",46.22589825,14.16870547,,,,,
+LJ-4,4226,�iri,4225,Sovodenj,izro?ilna,pogodbena,3/ 5/ 2011,4/ 5/ 2015,,,,pogodbena,Sovodenj,Sovodenj,42,,361108,426069,104954,"46� 5' 4.9988""","14� 2' 21.272""",46.08472189,14.03924222,,,,04/05/2015,pogodbena
+LJ-4,4226,�iri,4226,�iri,dostavna,#N/A,,,,,,dostavna,�iri,Trg svobode,1,,365340,431492,100766,"46� 2' 51.3997""","14� 6' 35.8566""",46.04761103,14.10996017,,,,,
+LJ-4,4274,�irovnica,4274,�irovnica,dostavna,#N/A,,,,,,dostavna,�irovnica,�irovnica,4,,97693,433924,140362,"46� 24' 14.6563""","14� 8' 8.9616""",46.40407119,14.13582267,,,,,
+KP-5,5101,Nova Gorica,5101,Nova Gorica,dostavna,#N/A,,,,,,dostavna,Nova Gorica,Kidri?eva ulica,19,,214928,395577,91033,"45� 57' 19.8456""","13� 38' 53.1981""",45.95551267,13.64811058,,,,,
+KP-5,5102,Nova Gorica,5102,Nova Gorica,pretovorna,#N/A,,,,,,dostavna,Kromberk,Industrijska cesta,9,,507885,397536,90863,"45� 57' 15.4049""","13� 40' 24.2838""",45.95427914,13.67341217,,,,,
+KP-5,5213,Kanal,5210,Deskle,pogodbena,pogodbena,2/ 7/ 2012,1/ 9/ 2016,,,,pogodbena,Deskle,Srebrni?eva ulica,4,,480149,393521,102023,"46� 3' 14.5901""","13� 37' 8.9056""",46.05405281,13.61914044,,,,,pogodbena
+KP-5,5102,Nova Gorica,5211,Kojsko,pogodbena,pogodbena,3/ 3/ 2014,1/ 12/ 2017,,,,izro?ilna,Kojsko,Kojsko,60,,230906,390036,96590,"46� 0' 16.6724""","13� 34' 31.335""",46.00463122,13.57537083,precentralizacija z Dobrovega na 5102 NG 1.9.2016,,,,
+KP-5,5212,Dobrovo v Brdih,5212,Dobrovo v Brdih,dostavna,#N/A,,,,,,dostavna,Dobrovo,Trg 25. maja,2,,220787,386271,95833,"45� 59' 49.9444""","13� 31' 37.0345""",45.99720678,13.52695403,,,,,
+KP-5,5213,Kanal,5213,Kanal,dostavna,#N/A,,,,,,dostavna,Kanal,Gradnikova ulica,2,,495481,394784,105606,"46� 5' 11.3205""","13� 38' 4.7922""",46.08647792,13.6346645,,,,,
+KP-5,5213,Kanal,5214,Kal nad Kanalom,premi?na,#N/A,,,,,,,,,,,,,,,,,,,,,,
+KP-5,5213,Kanal,5215,Ro?inj,pogodbena,pogodbena,2/ 7/ 2012,6/ 1/ 2014,,,,pogodbena,Ro?inj,Ro?inj,4,,204334,397646,107958,"46� 6' 29.0519""","13� 40' 16.1591""",46.10806997,13.67115531,,,,06/01/2014,pogodbena
+KP-5,5220,Tolmin,5216,Most na So?i,izro?ilna,#N/A,1/ 9/ 2014,,,,,izro?ilna,Most na So?i,Most na So?i,5,,343723,403307,112732,"46� 9' 6.6258""","13� 44' 36.2146""",46.1518405,13.74339294,,,,,
+KP-5,5220,Tolmin,5220,Tolmin,logisti?na,#N/A,,,,,,dostavna,Tolmin,Trg mar�ala Tita,10,,355387,402605,116221,"46� 10' 59.2498""","13� 44' 0.9163""",46.18312494,13.73358786,,,,,
+KP-5,5222,Kobarid,5222,Kobarid,dostavna,#N/A,,,,,,dostavna,Kobarid,Markova ulica,18,,340821,390672,123662,"46� 14' 53.664""","13� 34' 38.3972""",46.24824,13.57733256,,,,,
+KP-5,5222,Kobarid,5223,Breginj,pogodbena,pogodbena,2/ 7/ 2012,3/ 5/ 2014,,,,pogodbena,Breginj,Breginj,15,,358267,379444,125406,"46� 15' 43.2848""","13� 25' 52.7634""",46.26202356,13.43132317,,,,03/05/2014,pogodbena
+KP-5,5230,Bovec,5224,Srpenica,premi?na,#N/A,,,,,,,,,,,,,,,,,,,,,,
+KP-5,5230,Bovec,5230,Bovec,dostavna,#N/A,,,,,,dostavna,Bovec,Trg golobarskih �rtev,9,,345323,388880,133714,"46� 20' 18.0986""","13� 33' 6.1956""",46.33836072,13.551721,,,,,
+KP-5,5230,Bovec,5231,Log pod Mangartom,premi?na,#N/A,,,,,,,,,,,,,,,,,,,,,,
+KP-5,5230,Bovec,5232,So?a,premi?na,#N/A,,,,,,,,,,,,,,,,,,,,,,
+KP-5,5220,Tolmin,5242,Grahovo ob Ba?i,pismono�ka,#N/A,2/ 7/ 2012,,1/ 8/ 2016,,,,,,,,,,,,,,,,,,,
+KP-5,5220,Tolmin,5243,Podbrdo,pogodbena,pogodbena,3/ 3/ 2014,2/ 3/ 2015,,,,pogodbena,Podbrdo,Podbrdo,33,,366155,421070,119382,"46� 12' 50.2439""","13� 58' 19.9336""",46.21395664,13.97220378,,,,02/03/2015,pogodbena
+KP-5,5101,Nova Gorica,5250,Solkan,izro?ilna,#N/A,1/ 3/ 2013,,,,,izro?ilna,Solkan,Cesta IX. korpusa,84,,214242,395189,92636,"45� 58' 11.5423""","13� 38' 33.918""",45.96987286,13.642755,,,,,
+KP-5,5251,Grgar,5251,Grgar,dostavna,#N/A,,,,,,dostavna,Grgar,Grgar,28,,198837,397574,95672,"45� 59' 51.1569""","13� 40' 22.3341""",45.99754358,13.67287058,,,,,
+KP-5,5251,Grgar,5252,Trnovo pri Gorici,pogodbena,pogodbena,2/ 7/ 2012,1/ 7/ 2013,,,,pogodbena,Trnovo,Trnovo,37,,242081,402785,92823,"45� 58' 21.6313""","13� 44' 26.554""",45.97267536,13.74070944,,,,01/07/2013,pogodbena
+KP-5,5251,Grgar,5253,?epovan,premi?na,#N/A,,,,,,,,,,,,,,,,,,,,,,
+KP-5,5261,�empas,5261,�empas,dostavna,#N/A,,,,,,dostavna,�empas,�empas,52,B,535441,403239,87891,"45� 55' 42.1428""","13� 44' 51.2339""",45.928373,13.74756497,,,,,
+KP-5,5261,�empas,5262,?rni?e,pogodbena,pogodbena,3/ 5/ 2012,1/ 4/ 2016,,,,pogodbena,?rni?e,?rni?e,27,B,449,405548,85566,"45� 54' 28.0065""","13� 46' 40.0417""",45.90777958,13.77778936,,,,,pogodbena
+KP-5,5270,Ajdov�?ina,5263,Dobravlje,izro?ilna,#N/A,3/ 1/ 2017,,,,,dostavna,Dobravlje,Dobravlje,2,,43346,410439,82917,"45� 53' 4.5772""","13� 50' 28.727""",45.88460478,13.84131306,,,,,
+KP-5,5270,Ajdov�?ina,5270,Ajdov�?ina,logisti?na,#N/A,,,,,,dostavna,Ajdov�?ina,Gori�ka cesta,24,,1917,415239,83150,"45� 53' 14.3166""","13� 54' 11.1727""",45.88731017,13.90310353,,,,,
+KP-5,5271,Vipava,5271,Vipava,dostavna,#N/A,,,,,,dostavna,Vipava,Glavni trg,16,A,479513,419741,78510,"45� 50' 45.9873""","13� 57' 42.7551""",45.84610758,13.96187642,,,,,
+KP-5,5271,Vipava,5272,Podnanos,pogodbena,pogodbena,3/ 1/ 2017,4/ 3/ 2017,,,,dostavna,Podnanos,Podnanos,71,,43629,420483,73100,"45� 47' 51.0804""","13� 58' 20.3611""",45.79752233,13.97232253,,,,,pogodbena
+KP-5,5270,Ajdov�?ina,5273,Col,pogodbena,pogodbena,2/ 3/ 2015,2/ 3/ 2015,,,,pogodbena,Col,Col,77,A,3125,422919,82390,"45� 52' 52.9612""","14� 0' 7.7907""",45.88137811,14.00216408,,,,02/03/2015,pogodbena
+KP-5,5280,Idrija,5274,?rni Vrh nad Idrijo,pogodbena,pogodbena,1/ 7/ 2016,1/ 10/ 2016,,,,pogodbena,?rni Vrh,?rni Vrh,121,,169677,426956,87254,"45� 55' 32.0857""","14� 3' 12.3286""",,,,,,,pogodbena
+KP-5,5280,Idrija,5275,Godovi?,pogodbena,pogodbena,1/ 2/ 2016,1/ 2/ 2016,,,,pogodbena,Godovi?,Godovi?,5,,44071,430000,90751,"45� 57' 26.4908""","14� 5' 31.7583""",45.95735856,14.09215508,,,,01/02/2016,pogodbena
+KP-5,5280,Idrija,5280,Idrija,logisti?na,#N/A,,,,,,dostavna,Idrija,Vodnikova ulica,1,,494011,424942,95698,"46� 0' 4.7817""","14� 1' 34.0792""",46.00132825,14.02613311,,,,,
+KP-5,5280,Idrija,5281,Spodnja Idrija,pismono�ka,pogodbena,1/ 3/ 2013,1/ 7/ 2016,12/ 3/ 2018,,,pogodbena,Spodnja Idrija,Slovenska cesta,29,,64682,424655,99149,"46� 1' 56.4359""","14� 1' 18.775""",46.03234331,14.02188194,,,,,pogodbena
+KP-5,5282,Cerkno,5282,Cerkno,dostavna,#N/A,,,,,,dostavna,Cerkno,Bevkova ulica,9,,69129,422185,109846,"46� 7' 41.876""","13� 59' 17.6075""",46.12829889,13.98822431,,,,,
+KP-5,5220,Tolmin,5283,Slap ob Idrijci,pogodbena,pogodbena,1/ 9/ 2014,1/ 9/ 2014,,,,pogodbena,Slap ob Idrijci,Slap ob Idrijci,29,,376671,408016,108991,"46� 7' 7.8272""","13� 48' 18.2528""",46.11884089,13.80507022,,,,01/09/2014,pogodbena
+KP-5,5290,�empeter pri Gorici,5290,�empeter pri Gorici,dostavna,#N/A,,,,,,dostavna,�empeter pri Gorici,Vrtojbenska cesta,19,C,464779,394939,88025,"45� 55' 42.0862""","13� 38' 25.9551""",45.92835728,13.64054308,,,,,
+KP-5,5291,Miren,5291,Miren,dostavna,#N/A,,,,,,dostavna,Miren,Miren,125,C,481811,392364,84153,"45� 53' 35.2627""","13� 36' 29.5925""",45.89312853,13.60822014,,,,,
+KP-5,5292,Ren?e,5292,Ren?e,dostavna,#N/A,,,,,,dostavna,Ren?e,Trg,69,,278400,397110,83705,"45� 53' 23.3734""","13� 40' 10.0427""",45.88982594,13.66945631,,,,,
+KP-5,5292,Ren?e,5293,Vol?ja Draga,pogodbena,pogodbena,1/ 3/ 2013,1/ 9/ 2016,,,,pogodbena,Vol?ja Draga,Vol?ja Draga,61,A,207480,397702,85343,"45� 54' 16.7365""","13� 40' 36.2382""",45.90464903,13.67673283,,,,,pogodbena
+KP-5,5294,Dornberk,5294,Dornberk,dostavna,#N/A,,,,,,dostavna,Dornberk,Ulica Bojana Vodopivca,5,,204735,402164,83285,"45� 53' 12.4307""","13� 44' 4.7316""",45.88678631,13.73464767,,,,,
+KP-5,5295,Branik,5295,Branik,dostavna,#N/A,,,,,,dostavna,Branik,Branik,46,A,223156,406078,80372,"45� 51' 40.0593""","13� 47' 8.2904""",45.86112758,13.78563622,,,,,
+KP-5,5291,Miren,5296,Kostanjevica na Krasu,pogodbena,pogodbena,1/ 3/ 2013,3/ 5/ 2013,,,,pogodbena,Kostanjevica na Krasu,Kostanjevica na Krasu,75,,200717,394970,78550,"45� 50' 35.2701""","13� 38' 34.8612""",45.84313058,13.643017,,,,03/05/2013,pogodbena
+KP-5,5294,Dornberk,5297,Prva?ina,pismono�ka,pogodbena,1/ 10/ 2015,1/ 12/ 2015,1/ 2/ 2018,,,pogodbena,Prva?ina,Prva?ina,60,A,472922,400618,83582,"45� 53' 21.2498""","13� 42' 52.8178""",45.88923606,13.71467161,,,,01/12/2015,pogodbena
+KP,6101,Koper - Capodistria,6101,Koper - Capodistria,dostavna,#N/A,,,,,,dostavna,Koper,Muzejski trg,3,,56376,401024,45752,"45� 32' 56.319""","13� 43' 39.5008""",45.5489775,13.72763911,,,,,
+KP,6104,Koper - Capodistria,6102,Koper - Capodistria,zaprta,pogodbena,,1/ 10/ 2016,,19/ 2/ 2018,,okenska,Koper,Srebrni?eva ulica,1,,86813,400315,44852,"45� 32' 26.8065""","13� 43' 7.4814""",45.54077958,13.71874483,,,,,pogodbena
+KP,6103,Koper - Capodistria,6103,Koper - Capodistria,dostavna,#N/A,,,,,,dostavna,Koper,Beblerjeva ulica,7,,104655,399486,44832,"45� 32' 25.729""","13� 42' 29.2898""",45.54048028,13.70813606,,,,,
+KP,6104,Koper - Capodistria,6104,Koper - Capodistria,pretovorna,#N/A,,,,,,dostavna,Koper,Kolodvorska cesta,9,,112475,401900,44720,"45� 32' 23.3432""","13� 44' 20.6258""",45.53981756,13.73906272,,,,,
+KP,6104,Koper - Capodistria,6105,Koper - Capodistria,izro?ilna,#N/A,,,,,,izro?ilna,Koper,Cesta Mare�ganskega upora,4,,103991,401852,43519,"45� 31' 44.4224""","13� 44' 19.282""",45.52900622,13.73868944,,,,,
+KP,6210,Se�ana,6210,Se�ana,logisti?na,#N/A,,,,,,dostavna,Se�ana,Partizanska cesta,48,A,391009,412279,63208,"45� 42' 27.1224""","13� 52' 6.9718""",45.707534,13.86860328,,,,,
+KP,6210,Se�ana,6211,Se�ana,pogodbena,pogodbena,,1/ 10/ 2016,,,,izro?ilna,Se�ana,Partizanska cesta,109,,391051,410623,62614,"45� 42' 7.1205""","13� 50' 50.8155""",45.70197792,13.84744875,,,,,pogodbena
+KP,6215,Diva?a,6215,Diva?a,dostavna,#N/A,,,,,,dostavna,Diva?a,Kra�ka cesta,77,,344173,420078,60229,"45� 40' 54.0441""","13� 58' 9.2737""",45.68167892,13.96924269,,,,,
+KP,6275,?rni kal,6216,Podgorje,premi?na,#N/A,,,,,,,,,,,,,,,,,,,,,,
+KP,6215,Diva?a,6217,Vremski Britof,pogodbena,pogodbena,3/ 3/ 2014,2/ 2/ 2015,,,,pogodbena,Vremski Britof,Vremski Britof,24,,301069,424792,57354,"45� 39' 22.8295""","14� 1' 48.7022""",45.65634153,14.03019506,,,,02/02/2015,pogodbena
+KP,6210,Se�ana,6219,Lokev,pismono�ka,#N/A,1/ 2/ 2013,1/ 9/ 2016,1/ 8/ 2017,,,pogodbena,Lokev,Lokev,159,A,287973,417063,57972,"45� 39' 39.6658""","13� 55' 51.3505""",45.66101828,13.93093069,,,,,pogodbena
+KP,6222,�tanjel,6221,Dutovlje,pogodbena,pogodbena,2/ 7/ 2012,31/ 12/ 2016,,,,izro?ilna,Dutovlje,Dutovlje,60,A,298680,409559,68647,"45� 45' 22.0112""","13� 49' 57.5735""",45.75611422,13.83265931,,,,,pogodbena
+KP,6222,�tanjel,6222,�tanjel,dostavna,#N/A,,,,,,dostavna,�tanjel,�tanjel,42,C,446083,410484,76106,"45� 49' 24.0165""","13� 50' 35.383""",45.82333792,13.84316194,,,,,
+KP,6223,Komen,6223,Komen,dostavna,#N/A,,,,,,dostavna,Komen,Komen,118,D,310572,402774,75456,"45� 48' 59.2008""","13� 44' 38.7217""",45.81644467,13.74408936,,,,,
+KP,6210,Se�ana,6224,Seno�e?e,pogodbena,pogodbena,2/ 1/ 2014,31/ 12/ 2016,,,,izro?ilna,Seno�e?e,Seno�e?e,143,,301417,425564,64528,"45� 43' 15.4895""","14� 2' 20.3893""",45.72096931,14.03899703,,,,,pogodbena
+KP,6230,Postojna,6225,Hru�evje,pogodbena,pogodbena,1/ 2/ 2013,2/ 12/ 2013,,,,pogodbena,Hru�evje,Hru�evje,84,,273015,431235,69053,"45� 45' 44.1698""","14� 6' 40.3027""",45.76226939,14.11119519,,,,02/12/2013,pogodbena
+KP,6230,Postojna,6230,Postojna,logisti?na,#N/A,,,,,,dostavna,Postojna,Ulica 1. maja,2,A,253990,439228,70306,"45� 46' 27.4598""","14� 12' 49.6208""",45.77429439,14.21378356,,,,,
+KP,6230,Postojna,6232,Planina,pogodbena,pogodbena,1/ 6/ 2013,4/ 5/ 2015,,,,pogodbena,Planina,Planina,100,,271054,442068,76373,"45� 49' 44.8528""","14� 14' 58.4451""",45.82912578,14.24956808,,,,04/05/2015,pogodbena
+KP,6240,Kozina,6240,Kozina,dostavna,#N/A,,,,,,dostavna,Kozina,Rodi�ka cesta,3,,357837,417571,52245,"45� 36' 34.3959""","13� 56' 18.3128""",45.60955442,13.93842022,,,,,
+KP,6240,Kozina,6242,Materija,pismono�ka,#N/A,1/ 2/ 2012,3/ 12/ 2012,3/ 4/ 2018,,,pogodbena,Pov�ane,Pov�ane,1,E,467301,422488,48604,"45� 34' 38.509""","14� 0' 7.3097""",45.57736361,14.00203047,,,,03/12/2012,pogodbena
+KP,6244,Podgrad,6243,Obrov,pismono�ka,#N/A,1/ 2/ 2012,1/ 9/ 2016,1/ 8/ 2017,,,pogodbena,Obrov,Obrov,66,,361460,429553,44381,"45� 32' 24.437""","14� 5' 35.3639""",45.54012139,14.09315664,,,,,pogodbena
+KP,6244,Podgrad,6244,Podgrad,dostavna,#N/A,,,,,,dostavna,Podgrad,Podgrad,16,,21490,433660,42361,"45� 31' 20.4635""","14� 8' 45.6566""",45.52235097,14.14601572,,,,,
+KP,6250,Ilirska Bistrica,6250,Ilirska Bistrica,dostavna,#N/A,,,,,,dostavna,Ilirska Bistrica,Bazovi�ka cesta,17,,51216,441492,46833,"45� 33' 47.853""","14� 14' 44.6205""",45.5632925,14.24572792,,,,,
+KP,6251,Ilirska Bistrica,6251,Ilirska Bistrica,logisti?na,#N/A,,,,,,dostavna,Ilirska Bistrica,Vilharjeva cesta,4,,73550,441038,47823,"45� 34' 19.7821""","14� 14' 23.2536""",45.57216169,14.23979267,,,,,
+KP,6257,Pivka,6253,Kne�ak,pogodbena,pogodbena,1/ 8/ 2014,3/ 11/ 2014,,,,pogodbena,Kne�ak,Kne�ak,3,,66374,441098,53746,"45� 37' 31.6543""","14� 14' 23.4377""",45.62545953,14.23984381,,,,03/11/2014,pogodbena
+KP,6250,Ilirska Bistrica,6254,Jel�ane,pismono�ka,pogodbena,3/ 3/ 2014,4/ 1/ 2016,8/ 10/ 2018,,,pogodbena,Jel�ane,Jel�ane,7,A,56610,443457,39838,"45� 30' 1.8583""","14� 16' 18.1523""",45.50051619,14.27170897,,,,04/01/2016,pogodbena
+KP,6250,Ilirska Bistrica,6255,Prem,pogodbena,pogodbena,2/ 7/ 2012,3/ 5/ 2016,,,,pogodbena,Prem,Prem,44,,65282,436672,51479,"45� 36' 17.4443""","14� 11' 1.7868""",45.60484564,14.18382967,,,,,pogodbena
+KP,6257,Pivka,6256,Ko�ana,pogodbena,#N/A,2/ 7/ 2012,3/ 5/ 2016,,,,pogodbena,Dolnja Ko�ana,Dolnja Ko�ana,48,,466389,432436,58094,"45� 39' 49.6381""","14� 7' 41.3922""",45.66378836,14.1281645,,,,,pogodbena
+KP,6257,Pivka,6257,Pivka,dostavna,#N/A,,,,,,dostavna,Pivka,Pre?na ulica,1,,306711,437658,60239,"45� 41' 0.8821""","14� 11' 41.6289""",45.68357836,14.19489692,,,,,
+KP,6257,Pivka,6258,Prestranek,pogodbena,pogodbena,1/ 8/ 2014,31/ 12/ 2016,,,,izro?ilna,Prestranek,Ulica padlih borcev,24,,256921,436908,65244,"45� 43' 42.7503""","14� 11' 4.6196""",45.72854175,14.18461656,,,,,pogodbena
+KP,6271,Dekani,6271,Dekani,dostavna,#N/A,,,,,,dostavna,Dekani,Dekani,209,,60244,407670,45651,"45� 32' 56.3414""","13� 48' 45.9195""",45.54898372,13.81275542,,,,,
+KP,6272,Gra?i�?e,6272,Gra?i�?e,dostavna,#N/A,,,,,,dostavna,Gra?i�?e,Gra?i�?e,4,,49090,412408,40402,"45� 30' 8.5436""","13� 52' 27.7115""",45.50237322,13.87436431,,,,,
+KP,6276,Pobegi,6273,Marezige,pogodbena,pogodbena,2/ 7/ 2012,2/ 9/ 2013,,,,pogodbena,Marezige,Marezige,24,,54871,406534,40992,"45� 30' 24.9014""","13� 47' 56.7625""",45.50691706,13.79910069,,,,02/09/2013,pogodbena
+KP,6274,�marje,6274,�marje,dostavna,#N/A,,,,,,dostavna,�marje,�marje,89,,74984,400149,40361,"45� 30' 1.2729""","13� 43' 3.1321""",45.50035358,13.71753669,,,,,
+KP,6275,?rni kal,6275,?rni kal,dostavna,#N/A,,,,,,dostavna,?rni Kal,?rni Kal,70,,80333,412242,45614,"45� 32' 57.2762""","13� 52' 16.6965""",45.54924339,13.87130458,,,,,
+KP,6276,Pobegi,6276,Pobegi,dostavna,#N/A,,,,,,dostavna,Pobegi,Cesta I. Istrske brigade,59,,81457,406620,44569,"45� 32' 20.7931""","13� 47' 58.264""",45.53910919,13.79951778,,,,,
+KP,6280,Ankaran - Ancarano,6280,Ankaran - Ancarano,dostavna,#N/A,,,,,,dostavna,Ankaran,Regentova ulica,2,,52762,401791,49111,"45� 34' 45.497""","13� 44' 12.421""",45.57930472,13.73678361,,,,,
+KP,6281,�kofije,6281,�kofije,dostavna,#N/A,,,,,,dostavna,Spodnje �kofije,Spodnje �kofije,207,,102613,406208,48191,"45� 34' 17.9""","13� 47' 36.7702""",45.57163889,13.79354728,,,,,
+KP,6310,Izola - Isola,6310,Izola - Isola,dostavna,#N/A,,,,,,dostavna,Izola,Cankarjev drevored,1,,41340,395776,44505,"45� 32' 12.742""","13� 39' 37.7873""",45.53687278,13.66049647,,,,,
+KP,6310,Izola - Isola,6311,Izola - Isola,izro?ilna,#N/A,1/ 3/ 2013,,,,,izro?ilna,Izola,Morova ulica,25,E,442863,394926,43774,"45� 31' 49.0378""","13� 38' 59.9558""",45.53028828,13.64998772,,,,,
+KP,6320,Portoro� - Portorose,6320,Portoro� - Portorose,dostavna,#N/A,,,,,,dostavna,Lucija,Obala,107,,238774,391169,41063,"45� 30' 19.1623""","13� 36' 9.0162""",45.50532286,13.6025045,,,,,
+KP,6322,Portoro� - Portorose,6321,Portoro� - Portorose,zaprta,#N/A,,,,3/ 4/ 2015,,,,,,,,,,,,ni ve? pogodbena od 8/9/2014,,03/04/2015,,,,
+KP,6322,Portoro� - Portorose,6322,Portoro� - Portorose,dostavna,#N/A,,,,,,dostavna,Portoro�,Obala,43,A,236800,390265,42106,"45� 30' 52.4288""","13� 35' 26.5396""",45.51456356,13.59070544,,,,,
+KP,6330,Piran - Pirano,6330,Piran - Pirano,dostavna,#N/A,,,,,,dostavna,Piran,Cankarjevo nabre�je,5,,436756,388544,43550,"45� 31' 38.2075""","13� 34' 6.0802""",45.52727986,13.56835561,,,,,
+KP,6333,Se?ovlje - Siccole,6333,Se?ovlje - Siccole,dostavna,#N/A,,,,,,dostavna,Se?ovlje,Se?ovlje,19,,322734,392220,37608,"45� 28' 27.8595""","13� 37' 0.1581""",45.47440542,13.61671058,,,,,
+CE-8,8101,Novo mesto,8101,Novo mesto,pretovorna,#N/A,,,,,,dostavna,Novo mesto,Novi trg,7,,210670,513144,73411,"45� 48' 17.2968""","15� 9' 51.5888""",45.80480467,15.16433022,,,,,
+CE-8,8101,Novo mesto,8102,Novo mesto,izro?ilna,#N/A,2/ 11/ 2016,,,,,izro?ilna,Novo mesto,Ulica Slavka Gruma,7,,465048,512443,72724,"45� 47' 55.0889""","15� 9' 19.0587""",45.79863581,15.15529408,,,,,
+CE-8,8101,Novo mesto,8104,Novo mesto,izro?ilna,#N/A,2/ 11/ 2016,,,,,izro?ilna,Novo mesto,Ljubljanska cesta,27,,227356,512296,74645,"45� 48' 59.5248""","15� 9' 14.422""",45.81653467,15.15400611,,,,,
+CE-8,8102,Novo mesto,8105,Novo mesto,izro?ilna,#N/A,,,,,,okenska,Novo mesto,�mihelska cesta,1,,218287,513107,72895,"45� 48' 0.5846""","15� 9' 49.8255""",45.80016239,15.16384042,,,,,
+CE-8,8210,Trebnje,8210,Trebnje,logisti?na,#N/A,,,,,,dostavna,Trebnje,Goliev trg,11,,356554,500936,84813,"45� 54' 27.072""","15� 0' 26.2216""",45.90752,15.00728378,,,,,
+CE-8,8210,Trebnje,8211,Dobrni?,pogodbena,pogodbena,1/ 10/ 2011,2/ 11/ 2013,,,,pogodbena,Dobrni?,Dobrni?,9,A,515988,498696,81411,"45� 52' 36.868""","14� 58' 42.3211""",45.87690778,14.97842253,,,,02/11/2013,pogodbena
+CE-8,8210,Trebnje,8212,Velika Loka,izro?ilna,#N/A,3/ 2/ 2014,,,,,izro?ilna,Velika Loka,Velika Loka,79,,513863,498048,87503,"45� 55' 54.1963""","14� 58' 12.17""",45.93172119,14.97004722,,,,,
+CE-8,8210,Trebnje,8213,Veliki Gaber,pogodbena,pogodbena,,4/ 11/ 2013,,,,pogodbena,Veliki Gaber,Veliki Gaber,100,,525385,492863,88007,"45� 56' 10.3924""","14� 54' 11.4459""",45.93622011,14.90317942,,,,04/11/2013,pogodbena
+CE-8,8210,Trebnje,8216,Mirna Pe?,izro?ilna,#N/A,3/ 2/ 2014,,,,,izro?ilna,Mirna Pe?,Trg,2,,237541,506876,79432,"45� 51' 32.6536""","15� 5' 1.5785""",45.85907044,15.08377181,,,,,
+CE-8,8220,�marje�ke Toplice,8220,�marje�ke Toplice,dostavna,#N/A,,,,,,dostavna,�marje�ke Toplice,�marje�ke Toplice,115,,257424,519482,80502,"45� 52' 6.4602""","15� 14' 46.1582""",45.86846117,15.24615506,,,,,
+CE-8,8101,Novo mesto,8222,Oto?ec,pogodbena,pogodbena,3/ 5/ 2013,1/ 4/ 2015,,,,pogodbena,Oto?ec,�entpeter,1,,226133,517444,76642,"45� 50' 1.6196""","15� 13' 11.1621""",45.83378322,15.21976725,,,,01/04/2015,pogodbena
+CE-8,8230,Mokronog,8230,Mokronog,dostavna,#N/A,,,,,,dostavna,Mokronog,Pod Gradom,2,,339723,511605,88706,"45� 56' 32.8373""","15� 8' 41.611""",45.94245481,15.14489194,,,,,
+CE-8,8230,Mokronog,8231,Trebelno,premi?na,#N/A,,,,,,,,,,,,,,,,,,,,,,
+CE-8,8233,Mirna,8232,�entrupert,izro?ilna,#N/A,3/ 3/ 2014,,,,,izro?ilna,�entrupert,�entrupert,124,,418904,507229,92517,"45� 58' 36.4941""","15� 5' 18.6314""",45.97680392,15.08850872,,,,,
+CE-8,8233,Mirna,8233,Mirna,dostavna,#N/A,,,,,,dostavna,Mirna,Cesta na Fu�ine,3,,400627,505020,89814,"45� 57' 9.0068""","15� 3' 35.9053""",45.95250189,15.05997369,,,,,
+CE-8,8250,Bre�ice,8250,Bre�ice,dostavna,#N/A,,,,,,dostavna,Bre�ice,Ulica stare pravde,34,,499231,546410,84692,"45� 54' 17.5726""","15� 35' 36.1838""",45.90488128,15.59338439,,,,,
+CE-8,8250,Bre�ice,8251,?ate� ob Savi,pogodbena,pogodbena,,1/ 9/ 2016,,,,pogodbena,?ate� ob Savi,Topli�ka cesta,35,,11562,548586,83411,"45� 53' 35.542""","15� 37' 16.6786""",45.89320611,15.62129961,,,,,pogodbena
+CE-8,8250,Bre�ice,8253,Arti?e,pogodbena,pogodbena,1/ 7/ 2014,1/ 9/ 2016,,,,pogodbena,Arti?e,Arti?e,48,,47121,545726,89702,"45� 57' 0.0134""","15� 35' 6.1591""",45.95000372,15.58504419,,,,,pogodbena
+CE-8,8250,Bre�ice,8254,Globoko,pogodbena,pogodbena,1/ 9/ 2016,1/ 9/ 2016,,,,dostavna,Globoko,Globoko,63,A,16453,549716,90292,"45� 57' 18.1303""","15� 38' 11.6509""",45.95503619,15.63656969,,,,,pogodbena
+CE-8,8250,Bre�ice,8255,Pi�ece,pogodbena,pogodbena,1/ 10/ 2011,2/ 1/ 2015,,,,pogodbena,Pi�ece,Pi�ece,13,,865,550531,95795,"46� 0' 16.1587""","15� 38' 51.5814""",46.00448853,15.6476615,,,,02/01/2015,pogodbena
+CE-8,8250,Bre�ice,8256,Sromlje,premi?na,#N/A,,,,,,,,,,,,,,,,,,,,,,
+CE-8,8250,Bre�ice,8257,Dobova,izro?ilna,#N/A,1/ 6/ 2013,,,,,izro?ilna,Dobova,Ulica bratov Gerjovi?ev,52,,9893,551593,83640,"45� 53' 42.1751""","15� 39' 36.2512""",45.89504864,15.66006978,,,,,
+CE-8,8250,Bre�ice,8258,Kapele,pogodbena,pogodbena,1/ 10/ 2011,1/ 7/ 2013,,,,pogodbena,Kapele,Kapele,20,,34644,552945,87656,"45� 55' 51.8855""","15� 40' 40.5553""",45.93107931,15.67793203,,,,01/10/2015,pogodbena
+CE-8,8250,Bre�ice,8259,Bizeljsko,pogodbena,pogodbena,2/ 10/ 2017,2/ 10/ 2017,,,,dostavna,Bizeljsko,Bizeljska cesta,49,,8130,553994,96797,"46� 0' 47.6667""","15� 41' 32.9449""",46.01324075,15.69248469,,,,,
+CE-8,8250,Bre�ice,8261,Jesenice na Dolenjskem,izro?ilna,#N/A,1/ 10/ 2014,,,,,izro?ilna,Jesenice,Jesenice,9,,19664,553922,79704,"45� 51' 34.0473""","15� 41' 22.7065""",45.85945758,15.68964069,,,,,
+CE-8,8270,Kr�ko,8262,Kr�ka vas,pogodbena,pogodbena,5/ 5/ 2014,2/ 1/ 2015,,,,pogodbena,Kr�ka vas,Kr�ka vas,1,A,9130,544674,83163,"45� 53' 28.4587""","15� 34' 15.1294""",45.89123853,15.57086928,prej je bila dostavna 8250 Bre�ice,05-May,01-Oct,02/01/2015,pogodbena
+CE-8,8270,Kr�ko,8263,Cerklje ob Krki,pogodbena,pogodbena,5/ 5/ 2014,1/ 12/ 2017,,,,izro?ilna,Cerklje ob Krki,Cerklje ob Krki,2,B,21721,540972,82401,"45� 53' 4.6015""","15� 31' 23.1762""",45.88461153,15.5231045,prej je bila dostavna 8250 Bre�ice,05/05/2014,01/10/2015,,
+CE-8,8270,Kr�ko,8270,Kr�ko,logisti?na,#N/A,,,,,,dostavna,Kr�ko,Cesta kr�kih �rtev,135,C,469404,538232,88700,"45� 56' 29.1977""","15� 29' 17.8885""",45.94144381,15.48830236,,,,,
+CE-8,8270,Kr�ko,8271,Kr�ko,izro?ilna,#N/A,1/ 9/ 2012,,,,,izro?ilna,Kr�ko,Trg Matije Gubca,1,,203296,538690,90538,"45� 57' 28.6405""","15� 29' 39.6838""",45.95795569,15.49435661,,,,,
+CE-8,8270,Kr�ko,8272,Zdole,pogodbena,pogodbena,1/ 10/ 2011,5/ 11/ 2012,,,,pogodbena,Zdole,Zdole,29,C,516444,542600,92648,"45� 58' 36.156""","15� 32' 41.9427""",45.97671,15.54498408,,,,05/11/2012,pogodbena
+CE-8,8270,Kr�ko,8273,Leskovec pri Kr�kem,izro?ilna,#N/A,29/ 6/ 2015,,,,,izro?ilna,Leskovec pri Kr�kem,Ulica 11. novembra,4,,87078,537436,88755,"45� 56' 31.136""","15� 28' 40.9471""",45.94198222,15.47804086,,,,,
+CE-8,8270,Kr�ko,8274,Raka,pogodbena,#N/A,3/ 11/ 2014,1/ 3/ 2018,,,,izro?ilna,Raka,Raka,113,,538459,529772,87370,"45� 55' 47.6142""","15� 22' 44.8072""",45.92989283,15.37911311,prej je bila CD na Leskovec,29-Jun,03/11/2014,,
+CE-8,8220,�marje�ke Toplice,8275,�kocjan,izro?ilna,#N/A,1/ 2/ 2016,,,,,izro?ilna,�kocjan,�kocjan,33,,223706,522904,84809,"45� 54' 25.5979""","15� 17' 25.5626""",45.90711053,15.29043406,,,,,
+CE-8,8220,�marje�ke Toplice,8276,Bu?ka,premi?na,#N/A,,,,,,,,,,,,,,,,,,,,,,
+CE-8,8280,Brestanica,8280,Brestanica,dostavna,#N/A,,,,,,dostavna,Brestanica,Cesta prvih borcev,12,,110471,537341,94783,"45� 59' 46.4069""","15� 28' 38.2191""",45.99622414,15.47728308,,,,,
+CE-8,8280,Brestanica,8281,Senovo,izro?ilna,#N/A,3/ 5/ 2013,,,,,izro?ilna,Senovo,Titova cesta,98,,82305,537306,97528,"46� 1' 15.3261""","15� 28' 37.3597""",46.02092392,15.47704436,,,,,
+CE-8,8280,Brestanica,8282,Koprivnica,pogodbena,pogodbena,2/ 7/ 2012,6/ 5/ 2013,,,,pogodbena,Koprivnica,Koprivnica,24,,216577,542263,99105,"46� 2' 5.3752""","15� 32' 28.3322""",46.03482644,15.54120339,,,,06/05/2013,pogodbena
+CE-8,8290,Sevnica,8283,Blanca,pogodbena,pogodbena,3/ 5/ 2012,4/ 11/ 2013,,,,pogodbena,Blanca,Blanca,24,,393601,530602,94329,"45� 59' 32.8952""","15� 23' 24.9244""",45.99247089,15.39025678,,,,04/11/2013,pogodbena
+CE-8,8290,Sevnica,8290,Sevnica,dostavna,#N/A,,,,,,dostavna,Sevnica,Trg svobode,9,,314477,523830,96222,"46� 0' 35.1716""","15� 18' 10.5546""",46.00976989,15.30293183,,,,,
+CE-8,8290,Sevnica,8292,Zabukovje,premi?na,#N/A,,,,,,,,,,,,,,,,,,,,,,
+CE-8,8290,Sevnica,8293,Studenec,pogodbena,pogodbena,1/ 10/ 2014,1/ 7/ 2015,,,,pogodbena,Studenec,Studenec,34,,306766,527482,91978,"45� 58' 17.2151""","15� 20' 59.4509""",45.97144864,15.34984747,,,,01/07/2015,pogodbena
+CE-8,8290,Sevnica,8294,Bo�tanj,pogodbena,pogodbena,1/ 6/ 2013,2/ 2/ 2015,,,,pogodbena,Bo�tanj,Bo�tanj,80,,508363,522680,96617,"46� 0' 48.1052""","15� 17' 17.1622""",46.01336256,15.28810061,,,,02/02/2015,pogodbena
+CE-8,8230,Mokronog,8295,Tr�i�?e,pogodbena,pogodbena,2/ 6/ 2014,1/ 6/ 2015,,,,pogodbena,Tr�i�?e,Tr�i�?e,11,C,281982,515434,91057,"45� 57' 48.724""","15� 11' 39.6617""",45.96353444,15.19435047,,,,01/06/2015,pogodbena
+CE-8,8296,Krmelj,8296,Krmelj,dostavna,#N/A,,,,,,dostavna,Krmelj,Krmelj,21,A,485142,514931,93177,"45� 58' 57.4341""","15� 11' 16.5329""",45.98262058,15.18792581,,,,,
+CE-8,8296,Krmelj,8297,�entjan�,pogodbena,pogodbena,2/ 6/ 2014,1/ 6/ 2015,,,,pogodbena,�entjan�,�entjan�,7,,308961,513493,96312,"46� 0' 39.0878""","15� 10' 10.031""",46.01085772,15.16945306,,,,01/06/2015,pogodbena
+CE-8,8310,�entjernej,8310,�entjernej,dostavna,#N/A,,,,,,dostavna,�entjernej,Prvomajska cesta,3,,497493,526691,77803,"45� 50' 38.1726""","15� 20' 19.8932""",45.84393683,15.33885922,,,,,
+CE-8,8310,�entjernej,8311,Kostanjevica na Krki,izro?ilna,#N/A,1/ 6/ 2013,,,,,izro?ilna,Kostanjevica na Krki,Ora�nova ulica,3,,74805,533060,77951,"45� 50' 41.9805""","15� 25' 15.1166""",45.84499458,15.42086572,,,,,
+CE-8,8270,Kr�ko,8312,Podbo?je,pogodbena,pogodbena,3/ 11/ 2014,1/ 4/ 2016,,,,pogodbena,Podbo?je,Podbo?je,50,,86323,536712,79969,"45� 51' 46.6857""","15� 28' 4.93""",45.86296825,15.46803611,Prej je bila CD na Leskovec,29-Jun,03/11/2014,,pogodbena
+CE-8,8101,Novo mesto,8321,Brusnice,pogodbena,pogodbena,1/ 12/ 2014,3/ 10/ 2016,,,,pogodbena,Velike Brusnice,Velike Brusnice,7,,222518,520463,74096,"45� 48' 38.7895""","15� 15' 30.1211""",45.81077486,15.25836697,,,,,pogodbena
+CE-8,8101,Novo mesto,8322,Stopi?e,pismono�ka,#N/A,1/ 9/ 2011,,30/ 12/ 2016,,,izro?ilna,Stopi?e,Stopi?e,3,A,241687,516388,69504,"45� 46' 10.4919""","15� 12' 21.3671""",45.76958108,15.20593531,,,,,
+CE-8,8351,Stra�a,8323,Ur�na sela,pismono�ka,#N/A,2/ 7/ 2012,,30/ 12/ 2016,,,izro?ilna,Ur�na sela,Splavne,10,,233983,509637,64298,"45� 43' 22.3023""","15� 7' 8.5202""",45.72286175,15.11903339,,,,,
+CE-8,8330,Metlika,8330,Metlika,dostavna,#N/A,,,,,,dostavna,Metlika,Naselje Borisa Kidri?a,2,,186736,525065,55680,"45� 38' 41.7642""","15� 19' 0.4471""",45.6449345,15.31679086,,,,,
+CE-8,8330,Metlika,8331,Suhor,pismono�ka,#N/A,1/ 9/ 2011,,30/ 12/ 2016,,,izro?ilna,Dolnji Suhor pri Metliki,Dolnji Suhor pri Metliki,5,,206778,521694,60611,"45� 41' 21.9007""","15� 16' 25.5455""",45.68941686,15.27376264,,,,,
+CE-8,8330,Metlika,8332,Gradac,pismono�ka,#N/A,1/ 9/ 2014,1/ 9/ 2016,24/ 7/ 2017,,,pogodbena,Gradac,Gradac,98,,213554,519379,52234,"45� 36' 50.7842""","15� 14' 37.3586""",45.61410672,15.24371072,,,,,pogodbena
+CE-8,8333,Semi?,8333,Semi?,dostavna,#N/A,,,,,,dostavna,Semi?,?rnomaljska cesta,2,,33210,514605,56361,"45� 39' 4.888""","15� 10' 57.4356""",45.65135778,15.182621,,,,,
+CE-8,8340,?rnomelj,8340,?rnomelj,logisti?na,#N/A,,,,,,dostavna,?rnomelj,Kolodvorska cesta,30,A,485017,515240,47852,"45� 34' 29.2""","15� 11' 25.8228""",45.57477778,15.19050633,,,,,
+CE-8,8340,?rnomelj,8341,Adle�i?i,pogodbena,pogodbena,1/ 10/ 2011,1/ 4/ 2014,,,,pogodbena,Adle�i?i,Adle�i?i,13,,17280,524731,42000,"45� 31' 18.6604""","15� 18' 42.5512""",45.52185011,15.31181978,,,,01/04/2014,pogodbena
+CE-8,8340,?rnomelj,8342,Stari trg ob Kolpi,pogodbena,pogodbena,3/ 3/ 2014,3/ 3/ 2014,,,,pogodbena,Stari trg ob Kolpi,Stari trg ob Kolpi,39,,18198,506286,39144,"45� 29' 47.597""","15� 4' 32.417""",45.49655472,15.07567139,,,,03/03/2014,pogodbena
+CE-8,8340,?rnomelj,8343,Dragatu�,pismono�ka,pogodbena,2/ 7/ 2012,2/ 9/ 2013,8/ 10/ 2018,,,pogodbena,Dragatu�,Dragatu�,19,,14349,514257,41880,"45� 31' 15.8152""","15� 10' 39.8641""",45.52105978,15.17774003,,,,02/09/2013,pogodbena
+CE-8,8340,?rnomelj,8344,Vinica,pogodbena,pogodbena,28/ 11/ 2016,1/ 12/ 2016,,,,pogodbena,Vinica,Vinica,3,A,32929,520209,35279,"45� 27' 41.4568""","15� 15' 13.1791""",45.46151578,15.25366086,,,,,pogodbena
+CE-8,8351,Stra�a,8350,Dolenjske Toplice,izro?ilna,#N/A,3/ 11/ 2014,,,,,izro?ilna,Dolenjske Toplice,Zdravili�ki trg,3,,256042,504872,68093,"45� 45' 25.4092""","15� 3' 28.2778""",45.75705811,15.05785494,,,,,
+CE-8,8351,Stra�a,8351,Stra�a,dostavna,#N/A,,,,,,dostavna,Stra�a,Ulica talcev,7,,280196,506032,70890,"45� 46' 55.9813""","15� 4' 22.0795""",45.78221703,15.07279986,,,,,
+CE-8,8360,�u�emberk,8360,�u�emberk,dostavna,#N/A,,,,,,dostavna,�u�emberk,Grajski trg,29,,233263,494869,76302,"45� 49' 51.305""","14� 55' 45.0447""",45.83091806,14.92917908,,,,,
+CE-8,8360,�u�emberk,8361,Dvor,pogodbena,pogodbena,1/ 9/ 2014,1/ 10/ 2016,,,,pogodbena,Dvor,Dvor,93,,332056,498062,73566,"45� 48' 22.7407""","14� 58' 13.0455""",,,,,,,pogodbena
+CE-8,8360,�u�emberk,8362,Hinje,pogodbena,pogodbena,1/ 10/ 2011,3/ 5/ 2013,,,,pogodbena,Hrib pri Hinjah,Hrib pri Hinjah,7,,224867,491705,69269,"45� 46' 3.3708""","14� 53' 18.8787""",45.767603,14.88857742,,,,03/05/2013,pogodbena
+MB-9,9101,Murska Sobota,9101,Murska Sobota,logisti?na,#N/A,,,,,,dostavna,Murska Sobota,Trg zmage,6,,180906,589430,169199,"46� 39' 38.9777""","16� 9' 49.6203""",46.66082714,16.16378342,,,,,
+MB-9,9101,Murska Sobota,9102,Murska Sobota,izro?ilna,#N/A,,,,,,izro?ilna,Nem?avci,Nem?avci,1,D,179374,590512,170212,"46� 40' 11.2582""","16� 10' 41.2227""",46.66979394,16.17811742,,,,,
+MB-9,9101,Murska Sobota,9103,Murska Sobota,izro?ilna,#N/A,,,,,,izro?ilna,Raki?an,Ulica dr. Vrbnjaka,6,,486778,591245,168038,"46� 39' 0.5046""","16� 11' 14.1588""",46.65014017,16.18726633,,,,,
+MB-9,9201,Puconci,9201,Puconci,dostavna,#N/A,,,,,,dostavna,Puconci,Puconci,150,,514275,588901,173989,"46� 42' 14.337""","16� 9' 28.0583""",46.7039825,16.15779397,,,,,
+MB-9,9201,Puconci,9202,Ma?kovci,pogodbena,pogodbena,1/ 10/ 2013,2/ 6/ 2014,,,,pogodbena,Ma?kovci,Ma?kovci,48,C,193444,589168,182856,"46� 47' 1.331""","16� 9' 46.8068""",46.78370306,16.16300189,,,,02/06/2014,pogodbena
+MB-9,9203,Petrovci,9203,Petrovci,dostavna,#N/A,,,,,,dostavna,Gornji Petrovci,Gornji Petrovci,40,E,503931,593303,185074,"46� 48' 11.1196""","16� 13' 3.3461""",46.80308878,16.21759614,,,,,
+MB-9,9203,Petrovci,9204,�alovci,pogodbena,pogodbena,3/ 3/ 2014,,,,,izro?ilna,�alovci,�alovci,161,,203060,598178,187236,"46� 49' 18.6094""","16� 16' 54.8885""",46.82183594,16.28191347,,,,,pogodbena
+MB-9,9203,Petrovci,9205,Hodo�,pogodbena,pogodbena,11/ 7/ 2011,1/ 7/ 2013,,,,pogodbena,Hodo�,Hodo�,20,,544773,601568,187337,"46� 49' 20.0548""","16� 19' 34.8741""",46.82223744,16.32635392,,,,01/07/2013,pogodbena
+MB-9,9203,Petrovci,9206,Kri�evci,pismono�ka,#N/A,11/ 7/ 2011,,1/ 2/ 2016,,,,,,,,,,,,,,,ni ve? pogodbena,,,,
+MB-9,9226,Moravske Toplice,9207,Prosenjakovci - Partosfalva,pogodbena,pogodbena,1/ 10/ 2013,1/ 6/ 2015,,,,pogodbena,Prosenjakovci,Prosenjakovci,70,,502416,600681,178210,"46� 44' 25.0165""","16� 18' 45.8344""",46.74028236,16.31273178,,,,01/06/2015,pogodbena
+MB-9,9220,Lendava - Lendva,9220,Lendava - Lendva,dostavna,#N/A,,,,,,dostavna,Lendava,Trg ljudske pravice,7,,282179,611916,158555,"46� 33' 42.215""","16� 27' 17.8433""",46.56172639,16.45495647,,,,,
+MB-9,9226,Moravske Toplice,9221,Martjanci,pogodbena,pogodbena,2/ 4/ 2012,1/ 9/ 2015,,,,pogodbena,Martjanci,Martjanci,36,,173225,591533,171918,"46� 41' 6.002""","16� 11' 30.4665""",46.68500056,16.19179625,,,,01/09/2015,pogodbena
+MB-9,9226,Moravske Toplice,9222,Bogojina,izro?ilna,#N/A,3/ 11/ 2014,,,,,izro?ilna,Bogojina,Bogojina,10,A,191576,598284,170561,"46� 40' 18.6258""","16� 16' 47.0717""",46.6718405,16.27974214,,,,,
+MB-9,9223,Dobrovnik - Dobronak,9223,Dobrovnik - Dobronak,dostavna,#N/A,,,,,,dostavna,Dobrovnik,Dobrovnik,297,H,460813,603829,168398,"46� 39' 5.5854""","16� 21' 6.1524""",46.6515515,16.351709,,,,,
+MB-9,9224,Turni�?e,9224,Turni�?e,dostavna,#N/A,,,,,,dostavna,Turni�?e,Ulica �tefana Kova?a,97,A,435675,600806,165560,"46� 37' 35.3493""","16� 18' 41.7824""",46.62648592,16.31160622,,,,,
+MB-9,9232,?ren�ovci,9225,Velika Polana,izro?ilna,#N/A,11/ 7/ 2011,,,,,izro?ilna,Velika Polana,Velika Polana,111,,473408,603444,159696,"46� 34' 24.0338""","16� 20' 41.0592""",46.57334272,16.34473867,,,,,
+MB-9,9226,Moravske Toplice,9226,Moravske Toplice,dostavna,#N/A,,,,,,dostavna,Moravske Toplice,Kranj?eva ulica,3,,499043,593436,171963,"46� 41' 6.5151""","16� 13' 0.0398""",46.68514308,16.21667772,,,,,
+MB-9,9223,Dobrovnik - Dobronak,9227,Kobilje,pogodbena,pogodbena,11/ 7/ 2011,3/ 6/ 2014,,,,pogodbena,Kobilje,Kobilje,35,,118063,606922,172138,"46� 41' 4.9342""","16� 23' 34.7002""",46.68470394,16.39297228,,,,03/06/2014,pogodbena
+MB-9,9231,Beltinci,9231,Beltinci,dostavna,#N/A,,,,,,dostavna,Beltinci,Ulica �tefana Kova?a,2,,203267,594990,163453,"46� 36' 30.171""","16� 14' 6.8712""",46.60838083,16.235242,,,,,
+MB-9,9232,?ren�ovci,9232,?ren�ovci,dostavna,#N/A,,,,,,dostavna,?ren�ovci,Ulica Prekmurske ?ete,14,,216468,599530,159162,"46� 34' 8.8654""","16� 17' 36.8697""",46.56912928,16.29357492,,,,,
+MB-9,9232,?ren�ovci,9233,Odranci,izro?ilna,#N/A,11/ 7/ 2011,,,,,izro?ilna,Odranci,Panonska ulica,33,A,500286,598228,161114,"46� 35' 12.7599""","16� 16' 37.2259""",46.58687775,16.27700719,,,,,
+MB-9,9240,Ljutomer,9240,Ljutomer,logisti?na,#N/A,,,,,,dostavna,Ljutomer,Rajh Nade ulica,2,,246719,592306,153361,"46� 31' 4.7214""","16� 11' 53.5477""",46.51797817,16.19820769,,,,,
+MB-9,9240,Ljutomer,9241,Ver�ej,izro?ilna,#N/A,1/ 8/ 2012,,,,,izro?ilna,Ver�ej,Ulica bratstva in enotnosti,7,,222268,589562,160245,"46� 34' 48.9696""","16� 9' 49.6005""",46.58026933,16.16377792,,,,,
+MB-9,9240,Ljutomer,9242,Kri�evci pri Ljutomeru,izro?ilna,#N/A,3/ 3/ 2014,,,,,izro?ilna,Kri�evci pri Ljutomeru,Kri�evci pri Ljutomeru,3,B,537089,587917,158275,"46� 33' 45.9569""","16� 8' 31.0053""",46.56276581,16.14194592,,,,,
+MB-9,9240,Ljutomer,9243,Mala Nedelja,pogodbena,pogodbena,2/ 9/ 2013,1/ 9/ 2014,,,,pogodbena,Moravci v Slov. goricah,Moravci v Slov. goricah,34,B,193221,581108,152832,"46� 30' 52.7673""","16� 3' 7.9182""",46.51465758,16.0521995,,,,01/09/2014,pogodbena
+MB-9,9244,Sveti Jurij ob �?avnici,9244,Sveti Jurij ob �?avnici,dostavna,#N/A,,,,,,dostavna,Sveti Jurij ob �?avnici,Videm,28,,47512,578606,158812,"46� 34' 7.4862""","16� 1' 14.1884""",46.56874617,16.02060789,,,,,
+MB-9,9250,Gornja Radgona,9245,Spodnji Ivanjci,pogodbena,pogodbena,1/ 9/ 2011,1/ 2/ 2014,,,,pogodbena,Spodnji Ivanjci,Spodnji Ivanjci,6,A,470708,575669,161910,"46� 35' 49.0206""","15� 58' 58.0972""",46.59695017,15.98280478,,,,01/02/2014,pogodbena
+MB-9,9240,Ljutomer,9246,Razkri�je,pogodbena,pogodbena,,1/ 7/ 2013,,,,pogodbena,�afarsko,�afarsko,42,,226097,598893,153663,"46� 31' 11.1423""","16� 17' 2.7549""",46.51976175,16.28409858,,,,01/07/2013,pogodbena
+MB-9,9250,Gornja Radgona,9250,Gornja Radgona,logisti?na,#N/A,,,,,,dostavna,Gornja Radgona,Cesta na Stadion,1,,535828,576432,170615,"46� 40' 30.6074""","15� 59' 39.1119""",46.67516872,15.99419775,,,,,
+MB-9,9101,Murska Sobota,9251,Ti�ina,izro?ilna,#N/A,3/ 3/ 2014,,,,,izro?ilna,Ti�ina,Ti�ina,4,,197400,584098,168406,"46� 39' 15.7775""","16� 5' 38.3214""",46.65438264,16.09397817,,,,,
+MB-9,9252,Radenci,9252,Radenci,dostavna,#N/A,,,,,,dostavna,Radenci,Panonska cesta,5,,60902,579930,167040,"46� 38' 33.3735""","16� 2' 21.4583""",46.64260375,16.03929397,,,,,
+MB-9,9250,Gornja Radgona,9253,Apa?e,izro?ilna,#N/A,2/ 1/ 2014,,,,,izro?ilna,Apa?e,Apa?e,42,A,40985,569864,173032,"46� 41' 51.4536""","15� 54' 31.415""",46.697626,15.90872639,,,,,
+MB-9,9250,Gornja Radgona,9261,Cankova,pogodbena,pogodbena,1/ 7/ 2015,1/ 4/ 2016,,,,pogodbena,Cankova,Cankova,21,,207545,578362,175262,"46� 43' 0.2895""","16� 1' 12.751""",46.71674708,16.02020861,,,,,pogodbena
+MB-9,9710,Grad,9262,Roga�ovci,pogodbena,pogodbena,1/ 10/ 2013,2/ 1/ 2016,,,,pogodbena,Sveti Jurij,Sveti Jurij,15,B,171060,579469,184778,"46� 48' 7.9697""","16� 2' 10.7867""",46.80221381,16.03632964,,,,02/01/2016,pogodbena
+MB-9,9710,Grad,9263,Kuzma,pogodbena,pogodbena,1/ 7/ 2015,2/ 1/ 2016,,,,pogodbena,Kuzma,Kuzma,60,L,485218,582543,188576,"46� 50' 9.6138""","16� 4' 38.2067""",46.83600383,16.07727964,,,,02/01/2016,pogodbena
+MB-9,9710,Grad,9264,Grad,pogodbena,pogodbena,,1/ 9/ 2016,,,,pogodbena,Grad,Grad,186,B,179318,583609,184461,"46� 47' 55.8874""","16� 5' 25.8072""",46.79885761,16.090502,,,,,pogodbena
+MB-9,9710,Grad,9265,Bodonci,pogodbena,pogodbena,2/ 9/ 2013,3/ 5/ 2014,,,,pogodbena,Bodonci,Bodonci,7,,186014,583675,177995,"46� 44' 26.4785""","16� 5' 24.6846""",46.74068847,16.09019017,,,,03/05/2014,pogodbena
