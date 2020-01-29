@@ -2,13 +2,13 @@
 import sys
 import math
 import json
+import io
 print(sys.path)
 from data_parser.data_handler import DataHandler
 from neighbours_finder import NeighboursFinder
 import networkx as nx
 import matplotlib.pyplot as plt
 import pojo.search_node as search_node
-
 
 def graph_viz(nodes, ways):
     labeled_G = nx.Graph()
@@ -113,13 +113,16 @@ def drawStaticGraph(nodes, ways, results):
 
     plt.show()
 
-
 def run():
+    with open('./config/config.json') as json_data:
+        json_config = json.load(json_data)
     import time
     start_time = time.time()
-    osmHandler = DataHandler("./data/domaciraji.osm_01.osm",
+    osmHandler = DataHandler(json_config["map_basic"],
+                            {json_config["post_loc_type"]:json_config["post_loc"]
+                            #"./data/domaciraji.osm_01.osm",
                              #   "./data/slo.small3.osm_01.osm",
-                             {'si':'./data/List of Postal Offices (geographical location)_full.csv'
+                             #{'si':'./data/List of Postal Offices (geographical location)_full.csv'
                               #'hr':'./data/List of Postal Offices (geographical location)_full.csv'
                                })
     print("Pre-step  {}".format(time.time() - start_time))
@@ -145,7 +148,7 @@ def run():
     for postId, nodeId in map_posts_to_nodes.items():
         #postId = 'A8'
         #nodeId = 50
-        res = finder.search_near_posts(roadNodes, roadWays, ways, nodeId, map_posts_to_nodes, 6)
+        res = finder.search_near_posts(roadNodes, roadWays, ways, nodeId, map_posts_to_nodes, 1)
         print('PostID ' + str(postId) + ' Node: ' + str(nodeId) + ' r: ' + str(res))
 
         tmpRes.append((postId, nodeId, res))
@@ -166,16 +169,11 @@ def run():
                      }
                 postNode[k] = v.__dict__
                 postNodePlain[k] = d
-
-        if len(postEdge) != 0:
+    #print final graph
+    if len(postEdge) != 0:
             (not_labeled_G, labeled_G, colors) = graph_viz(roadNodes, ways)
             drawGraph((not_labeled_G, labeled_G, colors), postNode, postEdge)
-        #break
 
-
-
-    #print('nodes'+str(len(postNode)))
-    #print('edge'+str(len(postEdge)))
     graph = {'nodes': postNodePlain, 'edge': list(postEdge)}
     f = open("atene.json", "w")
     f.write(json.dumps(graph))

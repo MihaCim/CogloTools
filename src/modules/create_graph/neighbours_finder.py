@@ -331,7 +331,8 @@ class NeighboursFinder():
         for node,obj in node_id_node_map.items():
             if obj.getTagId() is not None and obj.getTagId() == 243:
                 print(obj)
-        for node_id,key_node_id in map_posts_to_nodes.items():
-          (not_labeled_G, labeled_G, colors) = self.graph_viz(node_id_node_map, ways, key_node_id)
-          self.drawGraph((not_labeled_G, labeled_G, colors), map_posts_to_nodes)
+        #partial graph printing
+        #for node_id,key_node_id in map_posts_to_nodes.items():
+         # (not_labeled_G, labeled_G, colors) = self.graph_viz(node_id_node_map, ways, key_node_id)
+          #self.drawGraph((not_labeled_G, labeled_G, colors), map_posts_to_nodes)
         return self.__second_step_alg(node_id_node_map, node_id_edge_map, origin_node_id)
