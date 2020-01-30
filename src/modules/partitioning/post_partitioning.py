@@ -72,6 +72,7 @@ class GraphParser:
 
 
 
+
 graph = GraphParser('/home/mikroman/dev/ijs/coglo/src/modules/demo/data/slovenia.json')
 graph.adjacency_matrix()
 start_time = time.time()
