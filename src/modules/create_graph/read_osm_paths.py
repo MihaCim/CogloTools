@@ -174,9 +174,12 @@ def run():
             (not_labeled_G, labeled_G, colors) = graph_viz(roadNodes, ways)
             drawGraph((not_labeled_G, labeled_G, colors), postNode, postEdge)
 
+    # prune graph
     graph = {'nodes': postNodePlain, 'edge': list(postEdge)}
-    f = open("atene.json", "w")
-    f.write(json.dumps(graph))
+    from pojo.pruneG import GraphPrune
+    graph2 = GraphPrune().PruneG(graph)
+    f = open("Graph_final.json", "w")
+    f.write(json.dumps(graph2))
     f.close()
 
     '''
