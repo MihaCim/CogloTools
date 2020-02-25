@@ -10,6 +10,7 @@ class Node:
         self.name = node['post_id']
         self.lat = node['lat']
         self.lon = node['lon']
+        self.cluster = None
 
 
 class Edge:
