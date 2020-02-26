@@ -104,12 +104,8 @@ class VrpProcessor:
             start = self.map_start_nodes(partition, plan.vehicles)
             costs = [e.cost for e in partition.edges]
 
-            try:
-                routes, dispatch, objc = self.vrp.vrp(partition.incident_matrix, dropoff, capacity, start, costs)
-            except:
-                print('Error')
-            paths = partition._calculate_shortest_paths()
-            plan_routes = self.make_route(routes, dispatch, partition, plan.vehicles)
+            computed_routes, dispatch, objc = self.vrp.vrp(partition.incident_matrix, dropoff, capacity, start, costs)
+            plan_routes = self.make_route(computed_routes, dispatch, partition, plan.vehicles)
             routes += plan_routes
         return routes
 
