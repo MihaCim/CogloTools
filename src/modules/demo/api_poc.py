@@ -1,5 +1,8 @@
 import time
+import requests
+from datetime import datetime
 from math import inf
+import uuid
 from flask import Flask, request
 from flask_jsonpify import jsonify
 from flask_restful import Resource, Api
@@ -84,7 +87,7 @@ class VrpProcessor:
         vehicle_map = self.map_vehicles(vehicles)
 
         plans = [Plan(vehicle_map[i], delivery_map[i], self.graphs[i]) for i in range(len(self.graphs))]
-        routes = [[] for _ in self.graphs]
+        routes = []
 
         for i, plan in enumerate(plans):
             if len(plan.deliveries) == 0 or len(plan.vehicles) == 0:
@@ -98,19 +101,17 @@ class VrpProcessor:
                                                                                                   len(partition.nodes)))
             dropoff = self.map_dropoff(plan.partition, plan.deliveries)
             capacity = [v.capacity for v in plan.vehicles]
-            start = self.map_start_nodes(partition, vehicles)
+            start = self.map_start_nodes(partition, plan.vehicles)
             costs = [e.cost for e in partition.edges]
 
             try:
-                computed_routes, dispatch, objc = self.vrp.vrp(partition.incident_matrix, dropoff, capacity, start, costs)
+                routes, dispatch, objc = self.vrp.vrp(partition.incident_matrix, dropoff, capacity, start, costs)
             except:
                 print('Error')
-            # paths = partition._calculate_shortest_paths()
-            plan_routes = self.make_route(computed_routes, dispatch, partition, vehicles)
-            routes.append(plan_routes)
+            paths = partition._calculate_shortest_paths()
+            plan_routes = self.make_route(routes, dispatch, partition, plan.vehicles)
+            routes += plan_routes
         return routes
-
-        # return self.make_route(routes, dispatch, nodes, edges, non_broken_vehicles)
 
     def find_closest_post(self, loads, start, graph):
         nodes = graph.nodes
@@ -205,16 +206,7 @@ class VrpProcessor:
     def parse_vehicles(self, clos):
         vehicles = []
         for clo in clos:
-            lat = clo["currentLocation"]["latitude"]
-            lon = clo["currentLocation"]["longitude"]
-            closest_node = None
-            closest_dist = inf
-            for part in self.graphs:
-                for n in part.nodes:
-                    if closest_node is None or closest_dist > part.arbitrary_distance(lat, lon, closest_node.lat, closest_node.lon):
-                        closest_node = n
-
-            vehicles.append(Vehicle(clo["UUID"], closest_node.id, clo["capacity"]))
+            vehicles.append(Vehicle(clo["UUID"], clo["currentLocation"], clo["capacity"]))
         return vehicles
 
 
@@ -232,43 +224,8 @@ class RecReq(Resource):
 
     def msb_forward(self, payload, key):
         pass
+    #check api_ijs.py for this code
 
-    # timestamp = datetime.strftime(datetime.now(), "%Y-%m-%dT%H:%M:%S.000Z")
-    # data = {"recommendations": []}
-    # counter = 1
-    # for clo in payload:
-    #     route_plan = {
-    #         "clo": clo["UUID"],
-    #         "plan": {
-    #             "uuid": "{}-plan-{}-{}".format(org_by_name(clo["UUID"]).replace(' ', ""), timestamp, counter),
-    #             "organization": org_by_name(clo["UUID"]),
-    #             "execution_date": timestamp,
-    #             "steps": []
-    #         }
-    #     }
-    #     counter += 1
-    #
-    #     for step in clo["route"]:
-    #         location_split = step["position"].split(',')
-    #
-    #         transformed_step = {
-    #             "location": {
-    #                 "lat": float(location_split[1]),
-    #                 "lng": float(location_split[0])
-    #             },
-    #             "station": uuid_by_name(step["locationId"]),
-    #             "station_type": "post",
-    #             "load": [str(uuid.uuid4()) for _ in range(randint(0, 4))],
-    #             "unload": [str(uuid.uuid4()) for _ in range(randint(0, 4))]
-    #         }
-    #         route_plan["plan"]["steps"].append(transformed_step)
-    #
-    #     data["recommendations"].append(route_plan)
-    #
-    # print(data)
-    # response = requests.post(MSB_FWD, json=data)
-    # print("Posted data to", MSB_FWD)
-    # print(response.content)
 
     def process_pickup_requests(self, clos, requests):
         print("Processing Pickup Delivery Request for ", len(clos), 'vehicles')
@@ -325,24 +282,28 @@ class CognitiveAdvisorAPI:
 
 
 if __name__ == '__main__':
+    # server = CognitiveAdvisorAPI()
+
+    # server.serve()
+    min_graph = graphProcessors[0]
+    for g in graphProcessors:
+        if len(g.nodes) < len(min_graph.nodes):
+            min_graph = g
+
+    vehicles = []
+    start_node = random.choice(min_graph.nodes).id
+    for i in range(3):
+        vehicles.append(Vehicle('Vehicle' + str(i), start_node=start_node))
+
+    deliveries = []
+    for i in range(15):
+        deliveries.append(Delivery(random.choice(min_graph.nodes).id, random.randint(1, 30)))
+
+    print(['Vehicle {} at {}'.format(x.name, x.start_node) for x in vehicles])
+    print(['Delivery of {} to {}'.format(x.volume, x.target) for x in deliveries])
+
+    vrpProcessor.process(vehicles, deliveries)
+
     server = CognitiveAdvisorAPI()
 
     server.serve()
-    # min_graph = graphProcessors[0]
-    # for g in graphProcessors:
-    #     if len(g.nodes) < len(min_graph.nodes):
-    #         min_graph = g
-    #
-    # vehicles = []
-    # start_node = random.choice(min_graph.nodes).id
-    # for i in range(3):
-    #     vehicles.append(Vehicle('Vehicle' + str(i), start_node=start_node))
-    #
-    # deliveries = []
-    # for i in range(15):
-    #     deliveries.append(Delivery(random.choice(min_graph.nodes).id, random.randint(1, 30)))
-    #
-    # print(['Vehicle {} at {}'.format(x.name, x.start_node) for x in vehicles])
-    # print(['Delivery of {} to {}'.format(x.volume, x.target) for x in deliveries])
-    #
-    # vrpProcessor.process(vehicles, deliveries)
