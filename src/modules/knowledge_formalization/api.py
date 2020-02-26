@@ -123,8 +123,12 @@ def generate_new_initial_concepts():
 
     return {'success': True}
 
-@app.route('/getConceptMapping', methods=['POST'])
-def get_concept_mapping():
+@app.route('/getConceptMappings', methods=['POST'])
+def get_concept_mappings():
+    """
+    Request should look like: {"concepts": ["Station", "ExchangeHub"]}
+    :return:
+    """
     received_request = request.json
     if received_request == 'null' or received_request is None:
         return 'Error parsing request. It should be in JSON format'
@@ -139,8 +143,23 @@ def get_concept_mapping():
     if not isinstance(payload, list) or not payload:
         return 'Value of key concepts should be non empty array'
 
-    results = ontology_inspector.get_concept_mapping(payload)
+    # result example:
+    # {
+    #     "results": [
+    #         {
+    #             "concept": "TransportationMeans",
+    #             "query_concept": "Truck",
+    #             "relationship": "type"
+    #         }
+    #     ]
+    # }
+    results = ontology_inspector.get_concept_mappings(payload)
     return {'results': results}
+
+
+@app.route('/getOntology', methods=['POST'])
+def get_ontology():
+    return ontology_inspector.get_ontology_json()
 
 
 if __name__ == '__main__':
@@ -159,4 +178,4 @@ if __name__ == '__main__':
     ontology_inspector = OntologyInspector(ontology_path)
 
     # start API
-    # serve(app, host='localhost', port=5000) TODO: uncomment
+    serve(app, host='localhost', port=5000)
