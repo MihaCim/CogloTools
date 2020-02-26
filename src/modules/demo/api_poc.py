@@ -102,11 +102,11 @@ class VrpProcessor:
             costs = [e.cost for e in partition.edges]
 
             try:
-                routes, dispatch, objc = self.vrp.vrp(partition.incident_matrix, dropoff, capacity, start, costs)
+                computed_routes, dispatch, objc = self.vrp.vrp(partition.incident_matrix, dropoff, capacity, start, costs)
             except:
                 print('Error')
-            paths = partition._calculate_shortest_paths()
-            plan_routes = self.make_route(routes, dispatch, partition, vehicles)
+            # paths = partition._calculate_shortest_paths()
+            plan_routes = self.make_route(computed_routes, dispatch, partition, vehicles)
             routes.append(plan_routes)
         return routes
 
@@ -214,7 +214,7 @@ class VrpProcessor:
                     if closest_node is None or closest_dist > part.arbitrary_distance(lat, lon, closest_node.lat, closest_node.lon):
                         closest_node = n
 
-            vehicles.append(Vehicle(clo["UUID"], closest_node, clo["capacity"]))
+            vehicles.append(Vehicle(clo["UUID"], closest_node.id, clo["capacity"]))
         return vehicles
 
 
@@ -300,7 +300,7 @@ class RecReq(Resource):
             return jsonify(recommendations)
         elif evt_type == "pickupRequest":
             clos = data["CLOS"]
-            requests = data["parcels"]
+            requests = data["orders"]
             recommendations = self.process_pickup_requests(clos, requests)
             return jsonify(recommendations)
         else:
