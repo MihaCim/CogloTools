@@ -4,6 +4,8 @@ from waitress import serve
 from flask import request
 from flask import Flask
 
+import time
+
 import json
 
 if __name__ == '__main__':
@@ -46,6 +48,8 @@ if __name__ == '__main__':
         t_start_v = matlab.double(t_start_vec)
         t_end_v = matlab.double(t_end_vec)
 
+        start_tm = time.time()
+
         R, cost = engine.vrptw_solve(
             E,
             C,
@@ -59,13 +63,14 @@ if __name__ == '__main__':
             nargout=2
         )
 
+        end_tm = time.time()
+
         n_rows = R.size[0]
         n_cols = R.size[1]
 
         R_py = [[R[rowN][colN] for colN in range(n_cols)] for rowN in range(n_rows)]
 
-        print str(R)
-        print str(R.size)
+        print 'request processed in ' + str(round(end_tm - start_tm, 2)) + ' seconds'
 
         return json.dumps({
             'routes': R_py,
