@@ -13,6 +13,40 @@ from modules.demo.mockup_graph import MockupGraph
 
 MSB_FWD = 'http://116.203.13.198/api/postRecommendation'
 
+"""
+Example POST MSG:
+{
+	"eventType": "pickupRequest",
+	"CLOS": [{
+			"UUID": "UUID-1",
+			"currentLocation": "A416",
+			"capacity": 200,
+			"parcels": [{
+				"UUIDParcel": "ABCD",
+				"weight": 2,
+				"destination": "A89"
+			}]
+		}
+	],
+	"orders": [{
+			"UUIDParcel": "Parcel UUID1",
+			"UUIDRequest": "Request UUID1",
+			"weight": 15,
+			"destination": "A89",
+			"pickup": "A2",
+			"timestamp": 123456679
+		},
+		{
+			"UUIDParcel": "Parcel UUID2",
+			"UUIDRequest": "Request UUID2",
+			"weight": 15,
+			"destination": "A239",
+			"pickup": "A2",
+			"timestamp": 123456679
+		}
+	]
+}
+"""
 
 class Vehicle:
     def __init__(self, name, start_node, capacity=200):
