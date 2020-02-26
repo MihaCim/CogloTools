@@ -1,5 +1,13 @@
 # Python files
+venv/
 *.pyc
-
+.idea/
 # Vim files
 .vimrc
+
+# Jetbrains files
+.idea
+
+# resource files and configuration for knowledge formalization
+src/modules/knowledge_formalization/config/
+src/modules/knowledge_formalization/resources/
