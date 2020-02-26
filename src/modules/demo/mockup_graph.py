@@ -134,6 +134,9 @@ class MockupGraph:
                 paths[start].append(path)
         return paths
 
+    def arbitrary_distance(self, lat1, lon1, lat2, lon2):
+        return self.__distance(lat1, lon1, lat2, lon2 )
+
     def distance(self, a, b):
         return self.__distance(a.lat, a.lon, a.lon, b.lon)
 

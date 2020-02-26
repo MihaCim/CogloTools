@@ -1,8 +1,5 @@
 import time
-import requests
-from datetime import datetime
 from math import inf
-import uuid
 from flask import Flask, request
 from flask_jsonpify import jsonify
 from flask_restful import Resource, Api
@@ -109,7 +106,7 @@ class VrpProcessor:
             except:
                 print('Error')
             paths = partition._calculate_shortest_paths()
-            plan_routes = self.make_route(routes, dispatch, partition)
+            plan_routes = self.make_route(routes, dispatch, partition, vehicles)
             routes.append(plan_routes)
         return routes
 
@@ -127,7 +124,7 @@ class VrpProcessor:
                     min_idx = post_idx
         return min_idx
 
-    def make_route(self, graph_routes, loads, graph):
+    def make_route(self, graph_routes, loads, graph, vehicles):
         nodes = graph.nodes
         edges = graph.edges
         print("Building route from VRP output...")
@@ -205,6 +202,21 @@ class VrpProcessor:
 
         return converted_route
 
+    def parse_vehicles(self, clos):
+        vehicles = []
+        for clo in clos:
+            lat = clo["currentLocation"]["latitude"]
+            lon = clo["currentLocation"]["longitude"]
+            closest_node = None
+            closest_dist = inf
+            for part in self.graphs:
+                for n in part.nodes:
+                    if closest_node is None or closest_dist > part.arbitrary_distance(lat, lon, closest_node.lat, closest_node.lon):
+                        closest_node = n
+
+            vehicles.append(Vehicle(clo["UUID"], closest_node, clo["capacity"]))
+        return vehicles
+
 
 K = 25
 partitioner = GraphPartitioner('/home/mikroman/dev/ijs/coglo/src/modules/demo/data/slovenia.json')
@@ -258,8 +270,41 @@ class RecReq(Resource):
     # print("Posted data to", MSB_FWD)
     # print(response.content)
 
+    def process_pickup_requests(self, clos, requests):
+        print("Processing Pickup Delivery Request for ", len(clos), 'vehicles')
+        vehicles = vrpProcessor.parse_vehicles(clos)
+        deliveries = [Delivery(x["destination"], x["weight"]) for x in requests]
+        for clo in clos:
+            for parcel in clo["parcels"]:
+                deliveries.append(Delivery(parcel["destination"], parcel["weight"]))
+
+        return vrpProcessor.process(vehicles, deliveries)
+
+    def process_broken_clo(self, clos, broken_clo):
+        print("Processing Broken CLO for ", len(clos), 'vehicles')
+        vehicles = vrpProcessor.parse_vehicles(clos)
+        deliveries = [Delivery(x["destination"], x["weight"]) for x in broken_clo["parcels"]]
+        for clo in clos:
+            for parcel in clo["parcels"]:
+                deliveries.append(Delivery(parcel["destination"], parcel["weight"]))
+
+        return vrpProcessor.process(vehicles, deliveries)
+
     def post(self):
-        return jsonify({})
+        data = request.get_json(force=True)
+        evt_type = data["eventType"]
+        if evt_type == "brokenVehicle":
+            clos = data["CLOS"]
+            broken_clo = data["BrokenVehicle"]
+            recommendations = self.process_broken_clo(clos, broken_clo)
+            return jsonify(recommendations)
+        elif evt_type == "pickupRequest":
+            clos = data["CLOS"]
+            requests = data["parcels"]
+            recommendations = self.process_pickup_requests(clos, requests)
+            return jsonify(recommendations)
+        else:
+            return jsonify({"message": "Invalid event type: {}".format(evt_type)})
 
 
 class CognitiveAdvisorAPI:
@@ -280,24 +325,24 @@ class CognitiveAdvisorAPI:
 
 
 if __name__ == '__main__':
-    # server = CognitiveAdvisorAPI()
+    server = CognitiveAdvisorAPI()
 
-    # server.serve()
-    min_graph = graphProcessors[0]
-    for g in graphProcessors:
-        if len(g.nodes) < len(min_graph.nodes):
-            min_graph = g
-
-    vehicles = []
-    start_node = random.choice(min_graph.nodes).id
-    for i in range(3):
-        vehicles.append(Vehicle('Vehicle' + str(i), start_node=start_node))
-
-    deliveries = []
-    for i in range(15):
-        deliveries.append(Delivery(random.choice(min_graph.nodes).id, random.randint(1, 30)))
-
-    print(['Vehicle {} at {}'.format(x.name, x.start_node) for x in vehicles])
-    print(['Delivery of {} to {}'.format(x.volume, x.target) for x in deliveries])
-
-    vrpProcessor.process(vehicles, deliveries)
+    server.serve()
+    # min_graph = graphProcessors[0]
+    # for g in graphProcessors:
+    #     if len(g.nodes) < len(min_graph.nodes):
+    #         min_graph = g
+    #
+    # vehicles = []
+    # start_node = random.choice(min_graph.nodes).id
+    # for i in range(3):
+    #     vehicles.append(Vehicle('Vehicle' + str(i), start_node=start_node))
+    #
+    # deliveries = []
+    # for i in range(15):
+    #     deliveries.append(Delivery(random.choice(min_graph.nodes).id, random.randint(1, 30)))
+    #
+    # print(['Vehicle {} at {}'.format(x.name, x.start_node) for x in vehicles])
+    # print(['Delivery of {} to {}'.format(x.volume, x.target) for x in deliveries])
+    #
+    # vrpProcessor.process(vehicles, deliveries)
