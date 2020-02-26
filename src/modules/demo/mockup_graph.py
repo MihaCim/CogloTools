@@ -26,14 +26,49 @@ class Path:
         self.path = path
         self.cost = cost
 
+class GraphLoader:
+    def __init__(self, path='modules/demo/data/posts.json'):
+        self. path = path
+
+
+    def _load_graph(self):
+        with open(self.path, "r", encoding='UTF-8') as read_file:
+            data = json.load(read_file)
+            nodes = []
+            edge_map = {}
+            for n in data['nodes']:
+                node = Node(data['nodes'][n])
+                nodes.append(node)
+                edge_map[node.id] = []
+
+            edges = []
+            for e in data["edge"]:
+                edge = Edge(e, data["nodes"])
+                edge_map[edge.start].append(edge)
+                edges.append(edge)
+
+        return nodes, edges
+
 
 class MockupGraph:
 
-    def __init__(self, path='modules/demo/data/posts.json'):
-        self.nodes, self.edges, self.edge_map = self._load_graph(path)
-        self.paths = self._calculate_shortest_paths()
+    def __init__(self, nodes, edges):
+        self.nodes = nodes
+        self.edges = edges
+        self.edge_map = self._map_edges()
+        # self.paths = self._calculate_shortest_paths()
         self.incident_matrix = []
         self.make_matrix()
+        print('Loaded graph with', len(nodes), 'nodes,', len(self.edges), 'edges')
+
+    def _map_edges(self):
+        edge_map = {}
+        for node in self.nodes:
+            edge_map[node.id] = []
+
+        for e in self.edges:
+            edge_map[e.start].append(e)
+        return edge_map
 
     def _backtrack_path(self, came_from, goal, start):
         """Produces a list of nodes from A* output by backtracking over nodes"""
@@ -90,6 +125,7 @@ class MockupGraph:
 
     def _calculate_shortest_paths(self):
         paths = {}
+        print('Computing all paths in partition')
         for i, start in enumerate(self.nodes):
             for j, end in enumerate(self.nodes):
                 path = self._find_shortest(start, end)
@@ -97,24 +133,6 @@ class MockupGraph:
                     paths[start] = []
                 paths[start].append(path)
         return paths
-
-    def _load_graph(self, path):
-        with open(path, "r", encoding='UTF-8') as read_file:
-            data = json.load(read_file)
-            nodes = []
-            edge_map = {}
-            for n in data['nodes']:
-                node = Node(data['nodes'][n])
-                nodes.append(node)
-                edge_map[node.id] = []
-
-            edges = []
-            for e in data["edge"]:
-                edge = Edge(e, data["nodes"])
-                edge_map[edge.start].append(edge)
-                edges.append(edge)
-
-        return nodes, edges, edge_map
 
     def distance(self, a, b):
         return self.__distance(a.lat, a.lon, a.lon, b.lon)
@@ -142,12 +160,7 @@ class MockupGraph:
                 return n
 
     def get_path(self,a,b):
-        possible_paths = self.paths[a]
-        for path in possible_paths:
-            if path.end == b:
-                return path
-        print("No such path")
-        return None
+        return self._find_shortest(a, b)
 
     def make_matrix(self):
         incident_matrix = []

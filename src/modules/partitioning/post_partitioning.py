@@ -1,11 +1,13 @@
+from collections import Set
+import copy
 import numpy as np
-from modules.partitioning.k_means_sphere import k_means_sphere
 from mpl_toolkits.mplot3d import Axes3D  # must be included to support 3D scatter
 import matplotlib.pyplot as plt
 from modules.partitioning.spectral import spectral_part
 from modules.demo.mockup_graph import Node, Edge
 import json
 import time
+from tqdm import tqdm
 
 
 class ClusterRender:
@@ -25,7 +27,7 @@ class ClusterRender:
         plt.show()
 
 
-class GraphParser:
+class GraphPartitioner:
     def __init__(self, path):
         self.path = path
         self.nodes = []
@@ -70,10 +72,11 @@ class GraphParser:
             self.matrix[idxA, idxB] += 1
 
     def partition(self, count, show_plot=False):
+        print('Running partitioning for', count, 'partitions on', len(self.nodes), 'nodes')
         start_time = time.time()
         A = self.matrix
 
-        n_parts = 10
+        n_parts = count
         A = A - np.diag(np.diag(A))
 
         # partition graph
@@ -81,22 +84,52 @@ class GraphParser:
 
         # plot graphs
         print("Partitioning took {:3f}".format(time.time() - start_time))
-        partitions = [[] for _ in range(n_parts)]
+        node_partitions = [[] for _ in range(n_parts)]
+        edge_partitions = [set() for _ in range(n_parts)]
 
         if show_plot:
             self.cluster_renderer.render(self.nodes, assignments)
 
-        for i in range(len(graph.nodes)):
+        for i in range(len(self.nodes)):
             clustN = int(assignments[i])
-            node = graph.nodes[i]
+            node = self.nodes[i]
             node.cluster = clustN
-            partitions[clustN].append(node)
+            node_partitions[clustN].append(node)
 
-        assert sum([len(x) for x in partitions]) == len(graph.nodes)
-        return partitions
+        assert sum([len(x) for x in node_partitions]) == len(self.nodes)
+        print('Partitions of size: ', [len(x) for x in node_partitions])
+        print('Processing', len(self.edges), 'edges')
+
+        copy_edges = self.edges.copy()
+        for i, partition in enumerate(node_partitions):
+            for edge in tqdm(copy_edges):
+                start = edge.start
+                end = edge.end
+                added = False
+                k = 0
+                while k < len(partition) and not added:
+                    n = partition[k]
+                    if n.id == start:
+                        start = None
+                    elif n.id == end:
+                        end = None
+                    if start is None and end is None:
+                        edge_partitions[i].add(edge)
+                        reversed = copy.deepcopy(edge)
+                        reversed.start = edge.end
+                        reversed.end = edge.start
+                        edge_partitions[i].add(reversed)
+                        added = True
+                    k += 1
+            for item in edge_partitions[i]:
+                if item in copy_edges:
+                    copy_edges.remove(item)
+        edge_partitions = [list(x) for x in edge_partitions]
+        print('Input', len(self.edges), 'assigned', sum([len(x) for x in edge_partitions]))
+        return node_partitions, edge_partitions
 
 
 if __name__ == '__main__':
-    graph = GraphParser('/home/mikroman/dev/ijs/coglo/src/modules/demo/data/slovenia.json')
+    graph = GraphPartitioner('/home/mikroman/dev/ijs/coglo/src/modules/demo/data/slovenia.json')
 
-    partitions = graph.partition(5, True)
+    node_parts, edge_parts = graph.partition(5, True)
