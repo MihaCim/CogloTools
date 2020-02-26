@@ -9,3 +9,5 @@ venv
 *.osm
 *.pbf
 *.csv
+.ipynb_checkpoints/
+.vscode/
