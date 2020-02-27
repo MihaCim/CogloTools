@@ -5,6 +5,9 @@ from math import sin, cos, sqrt, atan2, radians, inf
 
 
 class Node:
+    """
+    Encapsulates Node data from JSON object
+    """
     def __init__(self, node):
         self.id = node['post_id']
         self.name = node['post_id']
@@ -14,12 +17,16 @@ class Node:
 
 
 class Edge:
+    """
+    Edge connecting 2 nodes, with a cost of travel
+    """
     def __init__(self, edge, nodes):
         self.start = nodes[str(edge[0])]['post_id']
         self.end = nodes[str(edge[1])]['post_id']
         self.cost = round(edge[2], 3)
 
 class Path:
+    """A list of nodes make a single path"""
     def __init__(self, path, cost):
         self.start = path[0]
         self.end = path[-1]
@@ -27,11 +34,14 @@ class Path:
         self.cost = cost
 
 class GraphLoader:
+    """Loads graph data from static JSON file"""
     def __init__(self, path='modules/demo/data/posts.json'):
         self. path = path
+        self.nodes, self.edges = self._load_graph()
 
 
     def _load_graph(self):
+        """Loader method that constructs lists of graph nodes and edges"""
         with open(self.path, "r", encoding='UTF-8') as read_file:
             data = json.load(read_file)
             nodes = []
@@ -50,8 +60,10 @@ class GraphLoader:
         return nodes, edges
 
 
-class MockupGraph:
-
+class GraphProcessor:
+    """
+    GraphProcessor handles path management and basic graph operations
+    """
     def __init__(self, nodes, edges):
         self.nodes = nodes
         self.edges = edges
@@ -62,6 +74,7 @@ class MockupGraph:
         print('Loaded graph with', len(nodes), 'nodes,', len(self.edges), 'edges')
 
     def _map_edges(self):
+        """Create dict mapping lists of edges to starting nodes for faster later search"""
         edge_map = {}
         for node in self.nodes:
             edge_map[node.id] = []
@@ -80,16 +93,19 @@ class MockupGraph:
         return nodes
 
     def print_path(self, path):
+        """Prints a backtracked path in readable format"""
         print("{0} nodes: ".format(len(path)), end='')
         print(" -> ".join([str(n.id) for n in path]))
 
     def _get_neighbours(self, node):
+        """Find Node's neighbours from end connection of its edges"""
         nodes = []
         for e in self.edge_map[node.id]:
             nodes.append(next((x for x in self.nodes if x.id == e.end), None))
         return nodes
 
     def get_cost(self, a, b):
+        """Get accurate cost of single edge"""
         for e in self.edge_map[a.id]:
             if e.start == a.id and e.end == b.id:
                 return e.cost
@@ -124,6 +140,7 @@ class MockupGraph:
 
 
     def _calculate_shortest_paths(self):
+        """Compute paths to all nodes from all nodes in graph. Useful for precomputing paths"""
         paths = {}
         print('Computing all paths in partition')
         for i, start in enumerate(self.nodes):
@@ -135,12 +152,15 @@ class MockupGraph:
         return paths
 
     def arbitrary_distance(self, lat1, lon1, lat2, lon2):
+        """Distance between 2 geo points"""
         return self.__distance(lat1, lon1, lat2, lon2 )
 
     def distance(self, a, b):
+        """Distance between Node objects"""
         return self.__distance(a.lat, a.lon, a.lon, b.lon)
 
     def __distance(self, latitude1, longitude1, latitude2, longitude2):
+        """"""
         # approximate radius of earth in km
         R = 6373.0
 
@@ -157,16 +177,20 @@ class MockupGraph:
 
         distance = R * c
         return distance
+
     def node_from_id(self, id):
+        """Finds a node from its name/uuid"""
         for n in self.nodes:
             if n.id == id:
                 return n
 
     def get_path(self,a,b):
+        """finds a path from Node A to Node B"""
         return self._find_shortest(a, b)
 
     def make_matrix(self):
-        incident_matrix = []
+        """Build incidence matrix for graph"""
+        self.incident_matrix = []
 
         for ni, n in enumerate(self.nodes):
             tmp_arr = [0] * len(self.edges)
@@ -177,6 +201,7 @@ class MockupGraph:
 
 
     def map_vehicles(self, vehicles):
+        """Map vehicles to closest node for demo code"""
         map_trucks = []
         for truck in vehicles:
             min = inf

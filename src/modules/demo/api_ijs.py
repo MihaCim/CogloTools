@@ -9,11 +9,15 @@ from flask_jsonpify import jsonify
 from flask_restful import Resource, Api
 from random import randint
 from modules.cvrp.vrp import VRP
-from modules.demo.mockup_graph import MockupGraph
+from modules.demo.graph_processing import GraphProcessor, GraphLoader
 
 MSB_FWD = 'http://116.203.13.198/api/postRecommendation'
 brokenVehicle = None
 parcelData = None
+
+"""
+This is code for Brussels demo. Should not be used for anything else!
+"""
 
 postmap = {
     "SlovenianPostpost26615": "A4",
@@ -56,9 +60,10 @@ def org_by_name(name):
     else:
         return "Croatian Post"
 
-class GraphProcessor:
+class GraphProcessorWrapper:
     def __init__(self, path='modules/demo/data/9node.json'):
-        self.g = MockupGraph(path)
+        loader = GraphLoader(path)
+        self.g = GraphProcessor(loader.nodes, loader.edges)
 
     def has_all(self, nodes):
         graph_nodes = [x.name for x in self.g.nodes]
@@ -233,16 +238,16 @@ class VrpProcessor:
         return self.graphProcessor.node_names()
 
 
-xborderVrpSouthZagreb = VrpProcessor(graphProcessor=GraphProcessor('modules/demo/data/zagreb_south.json'))
-zagrebSVrP = VrpProcessor(graphProcessor=GraphProcessor('modules/demo/data/zagreb_south.json'))
-zagrebNVrp = VrpProcessor(graphProcessor=GraphProcessor('modules/demo/data/zagreb_north.json'))
-xborderVrpNorthZagreb = VrpProcessor(graphProcessor=GraphProcessor('modules/demo/data/zagreb_north.json'))
+xborderVrpSouthZagreb = VrpProcessor(graphProcessor=GraphProcessorWrapper('modules/demo/data/zagreb_south.json'))
+zagrebSVrP = VrpProcessor(graphProcessor=GraphProcessorWrapper('modules/demo/data/zagreb_south.json'))
+zagrebNVrp = VrpProcessor(graphProcessor=GraphProcessorWrapper('modules/demo/data/zagreb_north.json'))
+xborderVrpNorthZagreb = VrpProcessor(graphProcessor=GraphProcessorWrapper('modules/demo/data/zagreb_north.json'))
 
-xborderVrpSouthAthens = VrpProcessor(graphProcessor=GraphProcessor('modules/demo/data/atene_south.json'))
-athensSVrP = VrpProcessor(graphProcessor=GraphProcessor('modules/demo/data/atene_south.json'))
-athensNVrp = VrpProcessor(graphProcessor=GraphProcessor('modules/demo/data/atene_north.json'))
-xborderVrpNorthAthens = VrpProcessor(graphProcessor=GraphProcessor('modules/demo/data/atene_north.json'))
-generalAthens = VrpProcessor(graphProcessor=GraphProcessor('modules/demo/data/atene.json'))
+xborderVrpSouthAthens = VrpProcessor(graphProcessor=GraphProcessorWrapper('modules/demo/data/atene_south.json'))
+athensSVrP = VrpProcessor(graphProcessor=GraphProcessorWrapper('modules/demo/data/atene_south.json'))
+athensNVrp = VrpProcessor(graphProcessor=GraphProcessorWrapper('modules/demo/data/atene_north.json'))
+xborderVrpNorthAthens = VrpProcessor(graphProcessor=GraphProcessorWrapper('modules/demo/data/atene_north.json'))
+generalAthens = VrpProcessor(graphProcessor=GraphProcessorWrapper('modules/demo/data/atene.json'))
 
 
 class Event(Resource):
