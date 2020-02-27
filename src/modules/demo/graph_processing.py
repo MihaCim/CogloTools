@@ -8,6 +8,7 @@ class Node:
     """
     Encapsulates Node data from JSON object
     """
+
     def __init__(self, node):
         self.id = node['post_id']
         self.name = node['post_id']
@@ -20,25 +21,29 @@ class Edge:
     """
     Edge connecting 2 nodes, with a cost of travel
     """
+
     def __init__(self, edge, nodes):
         self.start = nodes[str(edge[0])]['post_id']
         self.end = nodes[str(edge[1])]['post_id']
         self.cost = round(edge[2], 3)
 
+
 class Path:
     """A list of nodes make a single path"""
+
     def __init__(self, path, cost):
         self.start = path[0]
         self.end = path[-1]
         self.path = path
         self.cost = cost
 
+
 class GraphLoader:
     """Loads graph data from static JSON file"""
-    def __init__(self, path='modules/demo/data/posts.json'):
-        self. path = path
-        self.nodes, self.edges = self._load_graph()
 
+    def __init__(self, path='modules/demo/data/posts.json'):
+        self.path = path
+        self.nodes, self.edges = self._load_graph()
 
     def _load_graph(self):
         """Loader method that constructs lists of graph nodes and edges"""
@@ -64,6 +69,7 @@ class GraphProcessor:
     """
     GraphProcessor handles path management and basic graph operations
     """
+
     def __init__(self, nodes, edges):
         self.nodes = nodes
         self.edges = edges
@@ -86,7 +92,7 @@ class GraphProcessor:
     def _backtrack_path(self, came_from, goal, start):
         """Produces a list of nodes from A* output by backtracking over nodes"""
         nodes = [goal]
-        while nodes[-1] != start: #recreate path in backward order, as sequence od nodes
+        while nodes[-1] != start:  # recreate path in backward order, as sequence od nodes
             tmp = came_from[nodes[-1]]
             nodes.append(tmp)
         nodes.reverse()
@@ -123,7 +129,7 @@ class GraphProcessor:
         while not node_queue.empty():
             current = node_queue.get()[1]
 
-            if current == goal: #path finished
+            if current == goal:  # path finished
                 break
 
             for n in self._get_neighbours(current):
@@ -136,8 +142,6 @@ class GraphProcessor:
         nodes = self._backtrack_path(came_from, goal, start)
 
         return Path(nodes, cost_so_far[goal])
-
-
 
     def _calculate_shortest_paths(self):
         """Compute paths to all nodes from all nodes in graph. Useful for precomputing paths"""
@@ -153,16 +157,14 @@ class GraphProcessor:
 
     def arbitrary_distance(self, lat1, lon1, lat2, lon2):
         """Distance between 2 geo points"""
-        return self.__distance(lat1, lon1, lat2, lon2 )
+        return self.__distance(lat1, lon1, lat2, lon2)
 
     def distance(self, a, b):
         """Distance between Node objects"""
         return self.__distance(a.lat, a.lon, a.lon, b.lon)
 
     def __distance(self, latitude1, longitude1, latitude2, longitude2):
-        """"""
-        # approximate radius of earth in km
-        R = 6373.0
+        earth_radius = 6373.0
 
         lat1 = radians(latitude1)
         lon1 = radians(longitude1)
@@ -175,16 +177,16 @@ class GraphProcessor:
         a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
         c = 2 * atan2(sqrt(a), sqrt(1 - a))
 
-        distance = R * c
+        distance = earth_radius * c
         return distance
 
-    def node_from_id(self, id):
+    def node_from_id(self, uuid):
         """Finds a node from its name/uuid"""
         for n in self.nodes:
-            if n.id == id:
+            if n.id == uuid:
                 return n
 
-    def get_path(self,a,b):
+    def get_path(self, a, b):
         """finds a path from Node A to Node B"""
         return self._find_shortest(a, b)
 
@@ -199,17 +201,16 @@ class GraphProcessor:
                     tmp_arr[ne] = 1
             self.incident_matrix.append(tmp_arr)
 
-
     def map_vehicles(self, vehicles):
         """Map vehicles to closest node for demo code"""
         map_trucks = []
         for truck in vehicles:
-            min = inf
+            min_dist = inf
             node = None
             for node in self.nodes:
                 dist = self.__distance(truck['latitude'], truck['longitude'], node.lat, node.lon)
-                if dist < min:
-                    min = dist
+                if dist < min_dist:
+                    min_dist = dist
                     node = node
             map_trucks.append(node)
         return map_trucks

@@ -1,4 +1,3 @@
-import string
 import time
 import requests
 from datetime import datetime
@@ -46,11 +45,13 @@ postmap = {
     "ELTApost4323": "A13"
 }
 
+
 def uuid_by_name(name):
     for key in postmap:
         if postmap[key] == name:
             return key
     return "Unknown"
+
 
 def org_by_name(name):
     if name.startswith('ELTA'):
@@ -59,6 +60,7 @@ def org_by_name(name):
         return "Slovenian Post"
     else:
         return "Croatian Post"
+
 
 class GraphProcessorWrapper:
     def __init__(self, path='modules/demo/data/9node.json'):
@@ -96,9 +98,9 @@ class GraphProcessorWrapper:
 
 
 class VrpProcessor:
-    def __init__(self, graphProcessor):
+    def __init__(self, graph_processor):
         self.vrp = VRP()
-        self.graphProcessor = graphProcessor
+        self.graphProcessor = graph_processor
 
     def process(self, metadata):
         global brokenVehicle
@@ -159,7 +161,6 @@ class VrpProcessor:
         converted_routes = []
 
         for i, vehicle_load in enumerate(loads):
-            route = []
             start_node = start_nodes[i]
             route = [start_node]
             current_node = start_node
@@ -238,16 +239,16 @@ class VrpProcessor:
         return self.graphProcessor.node_names()
 
 
-xborderVrpSouthZagreb = VrpProcessor(graphProcessor=GraphProcessorWrapper('modules/demo/data/zagreb_south.json'))
-zagrebSVrP = VrpProcessor(graphProcessor=GraphProcessorWrapper('modules/demo/data/zagreb_south.json'))
-zagrebNVrp = VrpProcessor(graphProcessor=GraphProcessorWrapper('modules/demo/data/zagreb_north.json'))
-xborderVrpNorthZagreb = VrpProcessor(graphProcessor=GraphProcessorWrapper('modules/demo/data/zagreb_north.json'))
+xborderVrpSouthZagreb = VrpProcessor(graph_processor=GraphProcessorWrapper('modules/demo/data/zagreb_south.json'))
+zagrebSVrP = VrpProcessor(graph_processor=GraphProcessorWrapper('modules/demo/data/zagreb_south.json'))
+zagrebNVrp = VrpProcessor(graph_processor=GraphProcessorWrapper('modules/demo/data/zagreb_north.json'))
+xborderVrpNorthZagreb = VrpProcessor(graph_processor=GraphProcessorWrapper('modules/demo/data/zagreb_north.json'))
 
-xborderVrpSouthAthens = VrpProcessor(graphProcessor=GraphProcessorWrapper('modules/demo/data/atene_south.json'))
-athensSVrP = VrpProcessor(graphProcessor=GraphProcessorWrapper('modules/demo/data/atene_south.json'))
-athensNVrp = VrpProcessor(graphProcessor=GraphProcessorWrapper('modules/demo/data/atene_north.json'))
-xborderVrpNorthAthens = VrpProcessor(graphProcessor=GraphProcessorWrapper('modules/demo/data/atene_north.json'))
-generalAthens = VrpProcessor(graphProcessor=GraphProcessorWrapper('modules/demo/data/atene.json'))
+xborderVrpSouthAthens = VrpProcessor(graph_processor=GraphProcessorWrapper('modules/demo/data/atene_south.json'))
+athensSVrP = VrpProcessor(graph_processor=GraphProcessorWrapper('modules/demo/data/atene_south.json'))
+athensNVrp = VrpProcessor(graph_processor=GraphProcessorWrapper('modules/demo/data/atene_north.json'))
+xborderVrpNorthAthens = VrpProcessor(graph_processor=GraphProcessorWrapper('modules/demo/data/atene_north.json'))
+generalAthens = VrpProcessor(graph_processor=GraphProcessorWrapper('modules/demo/data/atene.json'))
 
 
 class Event(Resource):
@@ -282,7 +283,7 @@ class RecReq(Resource):
     def get(self):
         return jsonify({"success": True, "message": "Please use POST request"})
 
-    def msb_forward(self, payload, key):
+    def msb_forward(self, payload):
 
         timestamp = datetime.strftime(datetime.now(), "%Y-%m-%dT%H:%M:%S.000Z")
         data = {"recommendations": []}
@@ -335,10 +336,8 @@ class RecReq(Resource):
         vehicle_metadata = filtered
 
         routes = []
-        key = "Croatian"
         evt_type = data["event"]["event_type"]
         if "info" in data["event"] and "athens" in data["event"]["info"].lower():
-            key = "Greek"
             routes = self.process_athens(data, evt_type, routes, vehicle_metadata)
         else:
             routes = self.process_zagreb(data, evt_type, routes, vehicle_metadata)
@@ -346,7 +345,7 @@ class RecReq(Resource):
             return jsonify({"msg": "No vehicles"})
 
         try:
-            self.msb_forward(routes, key)
+            self.msb_forward(routes)
         except Exception as e:
             print("Something went wrong at forwarding to MSB", e)
 
@@ -371,17 +370,17 @@ class RecReq(Resource):
                 else:
                     routes = zagrebNVrp.process(vehicle_metadata)
             elif "CrossBorder" in evt_type:
-                xvehiclesSouth = []
-                xvehiclesNorth = []
+                xvehicles_south = []
+                xvehicles_north = []
                 for v in vehicle_metadata:
                     if v["currlocation"]["locationId"] in xborderVrpNorthZagreb.get_node_names():
-                        xvehiclesNorth.append(v)
+                        xvehicles_north.append(v)
                     else:
-                        xvehiclesSouth.append(v)
+                        xvehicles_south.append(v)
                 print("Running VRP 1")
-                routes1 = xborderVrpSouthZagreb.process(xvehiclesSouth)
+                routes1 = xborderVrpSouthZagreb.process(xvehicles_south)
                 print("Running VRP 2")
-                routes2 = xborderVrpNorthZagreb.process(xvehiclesNorth)
+                routes2 = xborderVrpNorthZagreb.process(xvehicles_north)
                 routes = routes1 + routes2
         return routes
 
@@ -398,17 +397,17 @@ class RecReq(Resource):
                 print("Processing VRP data.")
                 routes = generalAthens.process(vehicle_metadata)
             elif "CrossBorder" in evt_type:
-                xvehiclesSouth = []
-                xvehiclesNorth = []
+                xvehicles_south = []
+                xvehicles_north = []
                 for v in vehicle_metadata:
                     if v["currlocation"]["locationId"] in xborderVrpNorthZagreb.get_node_names():
-                        xvehiclesNorth.append(v)
+                        xvehicles_north.append(v)
                     else:
-                        xvehiclesSouth.append(v)
+                        xvehicles_south.append(v)
                 print("Running VRP 1")
-                routes1 = xborderVrpSouthAthens.process(xvehiclesSouth)
+                routes1 = xborderVrpSouthAthens.process(xvehicles_south)
                 print("Running VRP 2")
-                routes2 = xborderVrpNorthAthens.process(xvehiclesNorth)
+                routes2 = xborderVrpNorthAthens.process(xvehicles_north)
                 routes = routes1 + routes2
         return routes
 

@@ -1,8 +1,5 @@
 import time
-import requests
-from datetime import datetime
 from math import inf
-import uuid
 from flask import Flask, request
 from flask_jsonpify import jsonify
 from flask_restful import Resource, Api
@@ -55,6 +52,7 @@ class Vehicle:
     name is usually uuid
     start_node is name/matching UUID
     """
+
     def __init__(self, name, start_node, capacity=200):
         self.capacity = capacity
         self.name = name
@@ -66,6 +64,7 @@ class Parcel:
     Stores parcel information for single delivery
     Target is a destination Node
     """
+
     def __init__(self, target, volume):
         self.volume = volume
         self.target = target
@@ -77,6 +76,7 @@ class Plan:
     vehicles in this partition, all deliveries in this partition and
     the partition object, which is a MockupGraph object
     """
+
     def __init__(self, vehicles, deliveries, partition):
         self.vehicles = vehicles
         self.deliveries = deliveries
@@ -88,6 +88,7 @@ class VrpProcessor:
         Many operations on lists in this code can be replaced with dicts or similar, to remove list iteration with
         dict lookup.
     """
+
     def __init__(self, graphs):
         self.vrp = VRP()
         self.graphs = graphs
@@ -164,7 +165,8 @@ class VrpProcessor:
             costs = [e.cost for e in partition.edges]
 
             computed_routes, dispatch, objc = self.vrp.vrp(partition.incident_matrix, dropoff, capacity, start, costs)
-            # compute routes based on dispatch vectors from VRP. Since VRP output is incomplete/not best, we add A* routing on top
+            # compute routes based on dispatch vectors from VRP. Since VRP output is incomplete/not best,
+            # we add A* routing on top
             plan_routes = self.make_route(computed_routes, dispatch, partition, plan.vehicles)
             routes += plan_routes
         return routes
@@ -241,7 +243,8 @@ class VrpProcessor:
         return converted_routes
 
     def route_to_sumo_format(self, route, loads, nodes):
-        """Transform output route to route according to what we discussed with Salvo. Should be modified for final POC"""
+        """Transform output route to route according to what we discussed with Salvo.
+        Should be modified for final POC"""
         converted_route = []
 
         if len(route) == 1 and loads[nodes.index(route[0])] == 0:
@@ -268,9 +271,11 @@ class VrpProcessor:
         return vehicles
 
 
-# make 25 partitions, so our VRP can do the work in reasonable time, even then small or even-sized partitions are not guaranteed
+# make 25 partitions, so our VRP can do the work in reasonable time,
+# even then small or even-sized partitions are not guaranteed
 K = 25
-# instance partitioner object, partition input graph, create graph processors for all partitions and then create instance of vrp proc
+# instance partitioner object, partition input graph, create graph processors
+# for all partitions and then create instance of vrp proc
 partitioner = GraphPartitioner('/home/mikroman/dev/ijs/coglo/src/modules/demo/data/slovenia.json')
 node_parts, edge_parts = partitioner.partition(K)
 graphProcessors = [GraphProcessor(node_parts[i], edge_parts[i]) for i in range(K)]
@@ -284,8 +289,8 @@ class RecReq(Resource):
 
     def msb_forward(self, payload, key):
         pass
-    #check api_ijs.py for this code
 
+    # check api_ijs.py for this code
 
     def process_pickup_requests(self, clos, requests):
         print("Processing Pickup Delivery Request for ", len(clos), 'vehicles')
@@ -350,19 +355,19 @@ if __name__ == '__main__':
         if len(g.nodes) < len(min_graph.nodes):
             min_graph = g
 
-    vehicles = []
-    start_node = random.choice(min_graph.nodes).id
+    available_vehicles = []
+    dispatch_node = random.choice(min_graph.nodes).id
     for i in range(3):
-        vehicles.append(Vehicle('Vehicle' + str(i), start_node=start_node))
+        available_vehicles.append(Vehicle('Vehicle' + str(i), start_node=dispatch_node))
 
-    deliveries = []
+    requested_deliveries = []
     for i in range(15):
-        deliveries.append(Parcel(random.choice(min_graph.nodes).id, random.randint(1, 30)))
+        requested_deliveries.append(Parcel(random.choice(min_graph.nodes).id, random.randint(1, 30)))
 
-    print(['Vehicle {} at {}'.format(x.name, x.start_node) for x in vehicles])
-    print(['Delivery of {} to {}'.format(x.volume, x.target) for x in deliveries])
+    print(['Vehicle {} at {}'.format(x.name, x.start_node) for x in available_vehicles])
+    print(['Delivery of {} to {}'.format(x.volume, x.target) for x in requested_deliveries])
 
-    vrpProcessor.process(vehicles, deliveries)
+    vrpProcessor.process(available_vehicles, requested_deliveries)
 
     # this starts flask server
     server = CognitiveAdvisorAPI()
