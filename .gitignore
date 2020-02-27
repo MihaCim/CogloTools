@@ -1,5 +1,8 @@
 # Python files
-venv/
+
+include/
+lib/
+bin/
 *.pyc
 .idea
 venv
