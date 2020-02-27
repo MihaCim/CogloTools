@@ -2,10 +2,10 @@ import sys
 
 import xml.sax
 import networkx as nx
-from modules.create_graph.utils import utils
-from modules.create_graph.data_parser.parse_osm import OsmParsers
-from modules.create_graph.data_parser.parse_posts import PostHandler
-from modules.create_graph.pojo.search_node import SearchNode
+from utils import utils
+from data_parser.parse_osm import OsmParsers
+from data_parser.parse_posts import PostHandler
+from pojo.search_node import SearchNode
 
 class DataHandler():
 
@@ -29,12 +29,12 @@ class DataHandler():
                     nodeKey = key
 
             tmpNode = nodesL[nodeKey]
-            if utils.calcDistance(post.latitude, post.longitude, tmpNode.lat, tmpNode.lon) < 0.1:
-                print(nodeKey)
-                print(post.address)
-                print(utils.calcDistance(post.latitude, post.longitude, tmpNode.lat, tmpNode.lon))
+            if utils.calcDistance(post.latitude, post.longitude, tmpNode.lat, tmpNode.lon) < 0.5:
+                #print(nodeKey)
+                #print(post.address)
+                #print(utils.calcDistance(post.latitude, post.longitude, tmpNode.lat, tmpNode.lon))
                 postsNodes.append(nodeKey)
-                tmpNode.add_post(post.address)
+                tmpNode.add_post(post.address, post)
                 nodesL[nodeKey] = tmpNode
         return (nodesL, postsNodes)
 
@@ -63,7 +63,7 @@ class DataHandler():
         self.nodes = handler.nodes
 
         ###
-        print(self.nodes)
+        #print(self.nodes)
         transformed_ids = {}
         cnt = 0
         self.new_nodes = {}
@@ -79,7 +79,7 @@ class DataHandler():
         ###
         self.nodes = self.new_nodes
 
-        print(self.ways)
+        #print(self.ways)
         nodes_filtered = {}
 
         #in this step we remove nodes which are not connected to road
@@ -98,7 +98,7 @@ class DataHandler():
         i = 1
         for key, node in roadNodesAnotated.items():
             if node.post:
-                nodesDict[node.id] = SearchNode(node.id, 'A' + str(i), node.post, node.lat, node.lon, node.address,)
+                nodesDict[node.id] = SearchNode(node.id, 'A' + str(i), node.post, node.lat, node.lon, node.address,node.post)
                 i = i + 1
             else:
                 nodesDict[node.id] = SearchNode(node.id, None, None, node.lat, node.lon, node.address)
@@ -126,21 +126,6 @@ class DataHandler():
         # create_graph an XMLReader
         self.retrieve_road_topology(osm_path, posts_path)
 
-
-    def graph_viz(self):
-        G = nx.Graph()
-        n = set()
-
-        for edge in self.ways:
-            l = edge.get_all_nodes()
-            if l[0] not in n:
-                G.add_node(l[0], pos=(self.nodes[l[0]].lon, self.nodes[l[0]].lat))
-            if l[1] not in n:
-                G.add_node(l[1], pos=(self.nodes[l[1]].lon, self.nodes[l[1]].lat))
-            G.add_edge(l[0], l[1], weight=edge.distance)
-            n.add(l[0])
-            n.add(l[1])
-        return G
 
 
 

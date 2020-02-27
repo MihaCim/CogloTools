@@ -276,7 +276,7 @@ class VrpProcessor:
 K = 25
 # instance partitioner object, partition input graph, create graph processors
 # for all partitions and then create instance of vrp proc
-partitioner = GraphPartitioner('/home/mikroman/dev/ijs/coglo/src/modules/demo/data/slovenia.json')
+partitioner = GraphPartitioner('modules/demo/data/slovenia.json')
 node_parts, edge_parts = partitioner.partition(K)
 graphProcessors = [GraphProcessor(node_parts[i], edge_parts[i]) for i in range(K)]
 vrpProcessor = VrpProcessor(graphProcessors)

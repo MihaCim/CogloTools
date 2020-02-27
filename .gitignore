@@ -11,3 +11,6 @@ venv
 .idea/*
 *.osm
 *.pbf
+*.csv
+.ipynb_checkpoints/
+.vscode/

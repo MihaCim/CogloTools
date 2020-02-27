@@ -1,6 +1,6 @@
 
 import csv
-from modules.create_graph.pojo.post import Post
+from pojo.post import Post
 
 class PostHandler:
 
@@ -15,7 +15,7 @@ class PostHandler:
 
     def posts_si(self, post_path):
         posts = []
-        with open(post_path) as csv_file:
+        with open(post_path, encoding="utf8") as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
 
             for row in csv_reader:
@@ -27,7 +27,7 @@ class PostHandler:
 
     def posts_hr(self, post_path):
         posts = []
-        with open(post_path) as csv_file:
+        with open(post_path, encoding="utf8") as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
             next(csv_reader)
             for row in csv_reader:
@@ -46,6 +46,5 @@ class PostHandler:
                 self.posts.extend(self.posts_si(post_path))
             elif 'hr' in name:
                 self.posts.extend(self.posts_hr(post_path))
-
 
         return self.posts
