@@ -4,10 +4,11 @@ import numpy as np
 from mpl_toolkits.mplot3d import Axes3D  # must be included to support 3D scatter
 import matplotlib.pyplot as plt
 from modules.partitioning.spectral import spectral_part
-from modules.demo.graph_processing import Node, Edge
+from modules.demo.graph_processing import Node, Edge, GraphProcessor
 import json
 import time
 from tqdm import tqdm
+import os
 
 
 class ClusterRender:
@@ -36,7 +37,7 @@ class GraphPartitioner:
         self.path = path
         self.nodes = []
         self.edges = []
-        self.raw_edges = []
+        self.graphProcessors = []
         self._load_graph(path)
         self.matrix = []
         self.cluster_renderer = ClusterRender()
@@ -48,7 +49,6 @@ class GraphPartitioner:
             data = json.load(read_file)
             nodes = []
             edge_map = {}
-            self.raw_edges = data["edge"]
             for n in data['nodes']:
                 node = Node(data['nodes'][n])
                 nodes.append(node)
@@ -95,6 +95,7 @@ class GraphPartitioner:
         # each element of array is a single partition
         node_partitions = [[] for _ in range(n_parts)]
         edge_partitions = [set() for _ in range(n_parts)]
+
 
         if show_plot:
             self.cluster_renderer.render(self.nodes, assignments)
@@ -145,8 +146,10 @@ class GraphPartitioner:
 
         # set to list, so later operations can use list operations
         edge_partitions = [list(x) for x in edge_partitions]
+        self.graphProcessors = [GraphProcessor(node_partitions[i], edge_partitions[i]) for i in range(count)]
         print('Input', len(self.edges), 'assigned', sum([len(x) for x in edge_partitions]))
-        return node_partitions, edge_partitions
+
+        return self.graphProcessors
 
 
 if __name__ == '__main__':

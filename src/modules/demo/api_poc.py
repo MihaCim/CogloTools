@@ -1,3 +1,5 @@
+import pickle
+import os
 import time
 from math import inf
 from flask import Flask, request
@@ -5,8 +7,10 @@ from flask_jsonpify import jsonify
 from flask_restful import Resource, Api
 import random
 from modules.cvrp.vrp import VRP
+import argparse
 from modules.partitioning.post_partitioning import GraphPartitioner
 from modules.demo.graph_processing import GraphProcessor
+JSON_GRAPH_DATA_PATH = 'modules/demo/data/slovenia.json'
 
 MSB_FWD = 'http://116.203.13.198/api/postRecommendation'
 
@@ -46,6 +50,7 @@ Example POST MSG:
 """
 
 
+
 class Vehicle:
     """
     This class stores information about single vehicle
@@ -74,7 +79,7 @@ class Plan:
     """
     Information that are input to produce plan of routing for one partition
     vehicles in this partition, all deliveries in this partition and
-    the partition object, which is a MockupGraph object
+    the partition object, which is a GraphProcessor object
     """
 
     def __init__(self, vehicles, deliveries, partition):
@@ -271,16 +276,6 @@ class VrpProcessor:
         return vehicles
 
 
-# make 25 partitions, so our VRP can do the work in reasonable time,
-# even then small or even-sized partitions are not guaranteed
-K = 25
-# instance partitioner object, partition input graph, create graph processors
-# for all partitions and then create instance of vrp proc
-partitioner = GraphPartitioner('modules/demo/data/slovenia.json')
-node_parts, edge_parts = partitioner.partition(K)
-graphProcessors = [GraphProcessor(node_parts[i], edge_parts[i]) for i in range(K)]
-vrpProcessor = VrpProcessor(graphProcessors)
-
 
 class RecReq(Resource):
 
@@ -346,12 +341,34 @@ class CognitiveAdvisorAPI:
     def serve(self):
         self._app.run(host='0.0.0.0', port=self._port)
 
+##############################
+pickle_path = './' + JSON_GRAPH_DATA_PATH.replace('/', '_') + '.graphs.pickle'
+partitioner = None
+print('Checking if data from', JSON_GRAPH_DATA_PATH, 'exists.')
+if os.path.exists(pickle_path):
+    with open(pickle_path, 'rb') as loadfile:
+        partitioner = pickle.load(loadfile)
+    print('Loaded pickled graph data')
+else:
+    # make 25 partitions, so our VRP can do the work in reasonable time,
+    # even then small or even-sized partitions are not guaranteed
+    K = 25
+    # instance partitioner object, partition input graph, create graph processors
+    # for all partitions and then create instance of vrp proc
+    print('No data found, runing load and partition procedure')
+    partitioner = GraphPartitioner(JSON_GRAPH_DATA_PATH)
+    partitioner.partition(K)
+    with open(pickle_path, 'wb') as dumpfile:
+        pickle.dump(partitioner, dumpfile)
+        print('Stored pickled dump for future use')
+
+vrpProcessor = VrpProcessor(partitioner.graphProcessors)
 
 if __name__ == '__main__':
 
     # this is an example code that demoes input and computation of routing
-    min_graph = graphProcessors[0]
-    for g in graphProcessors:
+    min_graph = partitioner.graphProcessors[0]
+    for g in partitioner.graphProcessors:
         if len(g.nodes) < len(min_graph.nodes):
             min_graph = g
 
@@ -370,6 +387,6 @@ if __name__ == '__main__':
     vrpProcessor.process(available_vehicles, requested_deliveries)
 
     # this starts flask server
-    server = CognitiveAdvisorAPI()
+    server = CognitiveAdvisorAPI(vrpProcessor)
 
     server.serve()
