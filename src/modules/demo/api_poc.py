@@ -68,11 +68,13 @@ class Parcel:
     """
     Stores parcel information for single delivery
     Target is a destination Node
+    Default package volume for poc is 1, for easier UUID unpacking
     """
 
-    def __init__(self, target, volume):
+    def __init__(self, uuid, target, volume):
         self.volume = volume
         self.target = target
+        self.uuid = uuid
 
 
 class Plan:
@@ -121,7 +123,7 @@ class VrpProcessor:
                 for n in nodes:
                     if n.id == d.target:
                         delivery_parts[i].append(d)
-
+        print(sum([len(x) for x in delivery_parts]), len(deliveries))
         assert sum([len(x) for x in delivery_parts]) == len(deliveries)
         return delivery_parts
 
@@ -172,7 +174,7 @@ class VrpProcessor:
             computed_routes, dispatch, objc = self.vrp.vrp(partition.incident_matrix, dropoff, capacity, start, costs)
             # compute routes based on dispatch vectors from VRP. Since VRP output is incomplete/not best,
             # we add A* routing on top
-            plan_routes = self.make_route(computed_routes, dispatch, partition, plan.vehicles)
+            plan_routes = self.make_route(computed_routes, dispatch, partition, plan.vehicles, plan.deliveries)
             routes += plan_routes
         return routes
 
@@ -188,7 +190,7 @@ class VrpProcessor:
                     min_idx = post_idx
         return min_idx
 
-    def make_route(self, graph_routes, loads, graph, vehicles):
+    def make_route(self, graph_routes, loads, graph, vehicles, deliveries):
         nodes = graph.nodes
         edges = graph.edges
         print("Building route from VRP output...")
@@ -242,12 +244,12 @@ class VrpProcessor:
             routes.append(route)
             converted_routes.append({
                 "UUID": vehicles[i].name,
-                "route": self.route_to_sumo_format(route, original_vehicle_load, nodes)})
+                "route": self.route_to_sumo_format(route, original_vehicle_load, nodes, deliveries)})
 
         print("Route build took: {}s".format(time.time() - start_time))
         return converted_routes
 
-    def route_to_sumo_format(self, route, loads, nodes):
+    def route_to_sumo_format(self, route, loads, nodes, deliveries):
         """Transform output route to route according to what we discussed with Salvo.
         Should be modified for final POC"""
         converted_route = []
@@ -258,10 +260,13 @@ class VrpProcessor:
         for idx, node in enumerate(route):
             node_idx = nodes.index(node)
 
+            parcels = [x.uuid for x in deliveries if x.target == node.id]
+
             converted_route.append({
                 "locationId": node.id,
                 "dropoffWeightKg": int(loads[node_idx]),
                 "dropoffVolumeM3": int(loads[node_idx] / 10),
+                "parcels": parcels,
                 "info": "This parcel must be delivered to location " + str(node.id),
                 "position": "{},{}".format(node.lon, node.lat)
             })
@@ -290,20 +295,20 @@ class RecReq(Resource):
     def process_pickup_requests(self, clos, requests):
         print("Processing Pickup Delivery Request for ", len(clos), 'vehicles')
         vehicles = vrpProcessor.parse_vehicles(clos)
-        deliveries = [Parcel(x["destination"], x["weight"]) for x in requests]
+        deliveries = [Parcel(x["UUIDParcel"], x["destination"], x["weight"]) for x in requests]
         for clo in clos:
             for parcel in clo["parcels"]:
-                deliveries.append(Parcel(parcel["destination"], parcel["weight"]))
+                deliveries.append(Parcel(parcel["UUIDParcel"], parcel["destination"], parcel["weight"]))
 
         return vrpProcessor.process(vehicles, deliveries)
 
     def process_broken_clo(self, clos, broken_clo):
         print("Processing Broken CLO for ", len(clos), 'vehicles')
         vehicles = vrpProcessor.parse_vehicles(clos)
-        deliveries = [Parcel(x["destination"], x["weight"]) for x in broken_clo["parcels"]]
+        deliveries = [Parcel(x["UUIDParcel"], x["destination"], x["weight"]) for x in broken_clo["parcels"]]
         for clo in clos:
             for parcel in clo["parcels"]:
-                deliveries.append(Parcel(parcel["destination"], parcel["weight"]))
+                deliveries.append(Parcel(parcel["UUIDParcel"], parcel["destination"], parcel["weight"]))
 
         return vrpProcessor.process(vehicles, deliveries)
 
@@ -379,7 +384,8 @@ if __name__ == '__main__':
 
     requested_deliveries = []
     for i in range(15):
-        requested_deliveries.append(Parcel(random.choice(min_graph.nodes).id, random.randint(1, 30)))
+        requested_deliveries.append(
+            Parcel(random.randint(100, 300), random.choice(min_graph.nodes).id, random.randint(1, 30)))
 
     print(['Vehicle {} at {}'.format(x.name, x.start_node) for x in available_vehicles])
     print(['Delivery of {} to {}'.format(x.volume, x.target) for x in requested_deliveries])
@@ -387,6 +393,6 @@ if __name__ == '__main__':
     vrpProcessor.process(available_vehicles, requested_deliveries)
 
     # this starts flask server
-    server = CognitiveAdvisorAPI(vrpProcessor)
+    server = CognitiveAdvisorAPI()
 
     server.serve()
