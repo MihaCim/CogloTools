@@ -1,3 +1,5 @@
+import pickle
+import os
 import time
 from math import inf
 from flask import Flask, request
@@ -5,8 +7,10 @@ from flask_jsonpify import jsonify
 from flask_restful import Resource, Api
 import random
 from modules.cvrp.vrp import VRP
+import argparse
 from modules.partitioning.post_partitioning import GraphPartitioner
 from modules.demo.graph_processing import GraphProcessor
+JSON_GRAPH_DATA_PATH = 'modules/demo/data/slovenia.json'
 
 MSB_FWD = 'http://116.203.13.198/api/postRecommendation'
 
@@ -46,6 +50,7 @@ Example POST MSG:
 """
 
 
+
 class Vehicle:
     """
     This class stores information about single vehicle
@@ -63,18 +68,20 @@ class Parcel:
     """
     Stores parcel information for single delivery
     Target is a destination Node
+    Default package volume for poc is 1, for easier UUID unpacking
     """
 
-    def __init__(self, target, volume):
+    def __init__(self, uuid, target, volume):
         self.volume = volume
         self.target = target
+        self.uuid = uuid
 
 
 class Plan:
     """
     Information that are input to produce plan of routing for one partition
     vehicles in this partition, all deliveries in this partition and
-    the partition object, which is a MockupGraph object
+    the partition object, which is a GraphProcessor object
     """
 
     def __init__(self, vehicles, deliveries, partition):
@@ -116,7 +123,7 @@ class VrpProcessor:
                 for n in nodes:
                     if n.id == d.target:
                         delivery_parts[i].append(d)
-
+        print(sum([len(x) for x in delivery_parts]), len(deliveries))
         assert sum([len(x) for x in delivery_parts]) == len(deliveries)
         return delivery_parts
 
@@ -167,7 +174,7 @@ class VrpProcessor:
             computed_routes, dispatch, objc = self.vrp.vrp(partition.incident_matrix, dropoff, capacity, start, costs)
             # compute routes based on dispatch vectors from VRP. Since VRP output is incomplete/not best,
             # we add A* routing on top
-            plan_routes = self.make_route(computed_routes, dispatch, partition, plan.vehicles)
+            plan_routes = self.make_route(computed_routes, dispatch, partition, plan.vehicles, plan.deliveries)
             routes += plan_routes
         return routes
 
@@ -183,7 +190,7 @@ class VrpProcessor:
                     min_idx = post_idx
         return min_idx
 
-    def make_route(self, graph_routes, loads, graph, vehicles):
+    def make_route(self, graph_routes, loads, graph, vehicles, deliveries):
         nodes = graph.nodes
         edges = graph.edges
         print("Building route from VRP output...")
@@ -237,12 +244,12 @@ class VrpProcessor:
             routes.append(route)
             converted_routes.append({
                 "UUID": vehicles[i].name,
-                "route": self.route_to_sumo_format(route, original_vehicle_load, nodes)})
+                "route": self.route_to_sumo_format(route, original_vehicle_load, nodes, deliveries)})
 
         print("Route build took: {}s".format(time.time() - start_time))
         return converted_routes
 
-    def route_to_sumo_format(self, route, loads, nodes):
+    def route_to_sumo_format(self, route, loads, nodes, deliveries):
         """Transform output route to route according to what we discussed with Salvo.
         Should be modified for final POC"""
         converted_route = []
@@ -253,10 +260,13 @@ class VrpProcessor:
         for idx, node in enumerate(route):
             node_idx = nodes.index(node)
 
+            parcels = [x.uuid for x in deliveries if x.target == node.id]
+
             converted_route.append({
                 "locationId": node.id,
                 "dropoffWeightKg": int(loads[node_idx]),
                 "dropoffVolumeM3": int(loads[node_idx] / 10),
+                "parcels": parcels,
                 "info": "This parcel must be delivered to location " + str(node.id),
                 "position": "{},{}".format(node.lon, node.lat)
             })
@@ -270,16 +280,6 @@ class VrpProcessor:
             vehicles.append(Vehicle(clo["UUID"], clo["currentLocation"], clo["capacity"]))
         return vehicles
 
-
-# make 25 partitions, so our VRP can do the work in reasonable time,
-# even then small or even-sized partitions are not guaranteed
-K = 25
-# instance partitioner object, partition input graph, create graph processors
-# for all partitions and then create instance of vrp proc
-partitioner = GraphPartitioner('modules/demo/data/slovenia.json')
-node_parts, edge_parts = partitioner.partition(K)
-graphProcessors = [GraphProcessor(node_parts[i], edge_parts[i]) for i in range(K)]
-vrpProcessor = VrpProcessor(graphProcessors)
 
 
 class RecReq(Resource):
@@ -295,20 +295,20 @@ class RecReq(Resource):
     def process_pickup_requests(self, clos, requests):
         print("Processing Pickup Delivery Request for ", len(clos), 'vehicles')
         vehicles = vrpProcessor.parse_vehicles(clos)
-        deliveries = [Parcel(x["destination"], x["weight"]) for x in requests]
+        deliveries = [Parcel(x["UUIDParcel"], x["destination"], x["weight"]) for x in requests]
         for clo in clos:
             for parcel in clo["parcels"]:
-                deliveries.append(Parcel(parcel["destination"], parcel["weight"]))
+                deliveries.append(Parcel(parcel["UUIDParcel"], parcel["destination"], parcel["weight"]))
 
         return vrpProcessor.process(vehicles, deliveries)
 
     def process_broken_clo(self, clos, broken_clo):
         print("Processing Broken CLO for ", len(clos), 'vehicles')
         vehicles = vrpProcessor.parse_vehicles(clos)
-        deliveries = [Parcel(x["destination"], x["weight"]) for x in broken_clo["parcels"]]
+        deliveries = [Parcel(x["UUIDParcel"], x["destination"], x["weight"]) for x in broken_clo["parcels"]]
         for clo in clos:
             for parcel in clo["parcels"]:
-                deliveries.append(Parcel(parcel["destination"], parcel["weight"]))
+                deliveries.append(Parcel(parcel["UUIDParcel"], parcel["destination"], parcel["weight"]))
 
         return vrpProcessor.process(vehicles, deliveries)
 
@@ -346,12 +346,34 @@ class CognitiveAdvisorAPI:
     def serve(self):
         self._app.run(host='0.0.0.0', port=self._port)
 
+##############################
+pickle_path = './' + JSON_GRAPH_DATA_PATH.replace('/', '_') + '.graphs.pickle'
+partitioner = None
+print('Checking if data from', JSON_GRAPH_DATA_PATH, 'exists.')
+if os.path.exists(pickle_path):
+    with open(pickle_path, 'rb') as loadfile:
+        partitioner = pickle.load(loadfile)
+    print('Loaded pickled graph data')
+else:
+    # make 25 partitions, so our VRP can do the work in reasonable time,
+    # even then small or even-sized partitions are not guaranteed
+    K = 25
+    # instance partitioner object, partition input graph, create graph processors
+    # for all partitions and then create instance of vrp proc
+    print('No data found, runing load and partition procedure')
+    partitioner = GraphPartitioner(JSON_GRAPH_DATA_PATH)
+    partitioner.partition(K)
+    with open(pickle_path, 'wb') as dumpfile:
+        pickle.dump(partitioner, dumpfile)
+        print('Stored pickled dump for future use')
+
+vrpProcessor = VrpProcessor(partitioner.graphProcessors)
 
 if __name__ == '__main__':
 
     # this is an example code that demoes input and computation of routing
-    min_graph = graphProcessors[0]
-    for g in graphProcessors:
+    min_graph = partitioner.graphProcessors[0]
+    for g in partitioner.graphProcessors:
         if len(g.nodes) < len(min_graph.nodes):
             min_graph = g
 
@@ -362,7 +384,8 @@ if __name__ == '__main__':
 
     requested_deliveries = []
     for i in range(15):
-        requested_deliveries.append(Parcel(random.choice(min_graph.nodes).id, random.randint(1, 30)))
+        requested_deliveries.append(
+            Parcel(random.randint(100, 300), random.choice(min_graph.nodes).id, random.randint(1, 30)))
 
     print(['Vehicle {} at {}'.format(x.name, x.start_node) for x in available_vehicles])
     print(['Delivery of {} to {}'.format(x.volume, x.target) for x in requested_deliveries])
