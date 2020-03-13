@@ -9,3 +9,6 @@ psycopg2-binary
 pytest
 tqdm
 markupsafe
+flask
+flask-jsonpify
+flask-restful

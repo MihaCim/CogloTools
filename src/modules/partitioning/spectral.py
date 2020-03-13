@@ -1,5 +1,5 @@
 import numpy as np
-from modules.partitioning.k_means_sphere import k_means_sphere
+from src.modules.partitioning.k_means_sphere import k_means_sphere
 
 
 def cut_intensity(Q, part, n_part):

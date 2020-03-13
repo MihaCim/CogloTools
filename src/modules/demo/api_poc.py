@@ -6,11 +6,15 @@ from flask import Flask, request
 from flask_jsonpify import jsonify
 from flask_restful import Resource, Api
 import random
-from modules.cvrp.vrp import VRP
-import argparse
-from modules.partitioning.post_partitioning import GraphPartitioner
-from modules.demo.graph_processing import GraphProcessor
-JSON_GRAPH_DATA_PATH = 'modules/demo/data/slovenia.json'
+
+from src.modules.cvrp.vrp import VRP
+from src.modules.partitioning.post_partitioning import GraphPartitioner
+from src.modules.demo.graph_processing import GraphProcessor
+
+#JSON_GRAPH_DATA_PATH = '.\\modules\\demo\\data\\slovenia.json'
+#JSON_GRAPH_DATA_PATH = 'C:\\Users\\miha\\Desktop\\CogLo Github\\coglo_master\\src\\modules\\demo\\data\\slovenia.json'
+JSON_GRAPH_DATA_PATH = 'demo/data/slovenia.json'
+#JSON_GRAPH_DATA_PATH = 'demo/data/Graph_PoC.json'
 
 MSB_FWD = 'http://116.203.13.198/api/postRecommendation'
 
@@ -48,8 +52,6 @@ Example POST MSG:
 	]
 }
 """
-
-
 
 class Vehicle:
     """
@@ -280,8 +282,6 @@ class VrpProcessor:
             vehicles.append(Vehicle(clo["UUID"], clo["currentLocation"], clo["capacity"]))
         return vehicles
 
-
-
 class RecReq(Resource):
 
     def get(self):
@@ -357,7 +357,7 @@ if os.path.exists(pickle_path):
 else:
     # make 25 partitions, so our VRP can do the work in reasonable time,
     # even then small or even-sized partitions are not guaranteed
-    K = 25
+    K = 2
     # instance partitioner object, partition input graph, create graph processors
     # for all partitions and then create instance of vrp proc
     print('No data found, runing load and partition procedure')
@@ -376,6 +376,7 @@ if __name__ == '__main__':
     for g in partitioner.graphProcessors:
         if len(g.nodes) < len(min_graph.nodes):
             min_graph = g
+
 
     available_vehicles = []
     dispatch_node = random.choice(min_graph.nodes).id
