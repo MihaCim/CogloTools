@@ -6,6 +6,7 @@ from flask import Flask, request
 from flask_jsonpify import jsonify
 from flask_restful import Resource, Api
 import random
+from waitress import serve
 
 from src.modules.cvrp.vrp import VRP
 from src.modules.partitioning.post_partitioning import GraphPartitioner
@@ -343,8 +344,8 @@ class CognitiveAdvisorAPI:
     def _register_endpoint(self, endpoint_name, class_ref):
         self._api.add_resource(class_ref, endpoint_name)
 
-    def serve(self):
-        self._app.run(host='0.0.0.0', port=self._port)
+    def start(self):
+        serve(self._app, host='0.0.0.0', port=self._port)
 
 ##############################
 pickle_path = './' + JSON_GRAPH_DATA_PATH.replace('/', '_') + '.graphs.pickle'
@@ -395,5 +396,4 @@ if __name__ == '__main__':
 
     # this starts flask server
     server = CognitiveAdvisorAPI()
-
-    server.serve()
+    server.start()
