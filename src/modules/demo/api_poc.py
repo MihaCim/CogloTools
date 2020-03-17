@@ -8,15 +8,11 @@ from flask_restful import Resource, Api
 import random
 from waitress import serve
 
-from src.modules.cvrp.vrp import VRP
-from src.modules.partitioning.post_partitioning import GraphPartitioner
-from src.modules.demo.graph_processing import GraphProcessor
+from modules.cvrp.vrp import VRP
+from modules.partitioning.post_partitioning import GraphPartitioner
+from modules.demo.graph_processing import GraphProcessor
 
-#JSON_GRAPH_DATA_PATH = '.\\modules\\demo\\data\\slovenia.json'
-#JSON_GRAPH_DATA_PATH = 'C:\\Users\\miha\\Desktop\\CogLo Github\\coglo_master\\src\\modules\\demo\\data\\slovenia.json'
-JSON_GRAPH_DATA_PATH = 'demo/data/slovenia.json'
-#JSON_GRAPH_DATA_PATH = 'demo/data/Graph_PoC.json'
-
+JSON_GRAPH_DATA_PATH = 'modules/demo/data/Graph_PoC.json'
 MSB_FWD = 'http://116.203.13.198/api/postRecommendation'
 
 """
@@ -348,7 +344,8 @@ class CognitiveAdvisorAPI:
         serve(self._app, host='0.0.0.0', port=self._port)
 
 ##############################
-pickle_path = './' + JSON_GRAPH_DATA_PATH.replace('/', '_') + '.graphs.pickle'
+pickle_path = './modules/demo/data/graphs.pickle'
+#pickle_path = './' + JSON_GRAPH_DATA_PATH.replace('/', '_') + '.graphs.pickle'
 partitioner = None
 print('Checking if data from', JSON_GRAPH_DATA_PATH, 'exists.')
 if os.path.exists(pickle_path):
