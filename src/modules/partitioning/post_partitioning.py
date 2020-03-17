@@ -3,8 +3,8 @@ import copy
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D  # must be included to support 3D scatter
 import matplotlib.pyplot as plt
-from modules.partitioning.spectral import spectral_part
-from modules.demo.graph_processing import Node, Edge, GraphProcessor
+from src.modules.partitioning.spectral import spectral_part
+from src.modules.demo.graph_processing import Node, Edge, GraphProcessor
 import json
 import time
 from tqdm import tqdm
