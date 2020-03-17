@@ -7,10 +7,11 @@ from flask_jsonpify import jsonify
 from flask_restful import Resource, Api
 import random
 from modules.cvrp.vrp import VRP
+from waitress import serve
 import argparse
 from modules.partitioning.post_partitioning import GraphPartitioner
 from modules.demo.graph_processing import GraphProcessor
-JSON_GRAPH_DATA_PATH = 'modules/demo/data/slovenia.json'
+JSON_GRAPH_DATA_PATH = 'modules/demo/data/graph_final.json'
 
 MSB_FWD = 'http://116.203.13.198/api/postRecommendation'
 
@@ -343,8 +344,8 @@ class CognitiveAdvisorAPI:
     def _register_endpoint(self, endpoint_name, class_ref):
         self._api.add_resource(class_ref, endpoint_name)
 
-    def serve(self):
-        self._app.run(host='0.0.0.0', port=self._port)
+    def start(self):
+        serve(self._app, host='0.0.0.0', port=self._port)
 
 ##############################
 pickle_path = './' + JSON_GRAPH_DATA_PATH.replace('/', '_') + '.graphs.pickle'
@@ -357,7 +358,7 @@ if os.path.exists(pickle_path):
 else:
     # make 25 partitions, so our VRP can do the work in reasonable time,
     # even then small or even-sized partitions are not guaranteed
-    K = 25
+    K = 2
     # instance partitioner object, partition input graph, create graph processors
     # for all partitions and then create instance of vrp proc
     print('No data found, runing load and partition procedure')
@@ -394,5 +395,4 @@ if __name__ == '__main__':
 
     # this starts flask server
     server = CognitiveAdvisorAPI()
-
-    server.serve()
+    server.start()

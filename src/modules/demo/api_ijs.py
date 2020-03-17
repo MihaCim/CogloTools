@@ -6,6 +6,7 @@ import uuid
 from flask import Flask, request
 from flask_jsonpify import jsonify
 from flask_restful import Resource, Api
+from waitress import serve
 from random import randint
 from modules.cvrp.vrp import VRP
 from modules.demo.graph_processing import GraphProcessor, GraphLoader
@@ -426,11 +427,10 @@ class CognitiveAdvisorAPI:
     def _register_endpoint(self, endpoint_name, class_ref):
         self._api.add_resource(class_ref, endpoint_name)
 
-    def serve(self):
-        self._app.run(host='0.0.0.0', port=self._port)
+    def start(self):
+        serve(self._app, host='0.0.0.0', port=self._port)
 
 
 if __name__ == '__main__':
     server = CognitiveAdvisorAPI()
-
-    server.serve()
+    server.start()
