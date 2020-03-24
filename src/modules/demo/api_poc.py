@@ -57,11 +57,11 @@ class Vehicle:
     start_node is name/matching UUID
     """
 
-    def __init__(self, name, start_node, capacity=200):
+    def __init__(self, name, start_node, capacity=200, parcels=0):
         self.capacity = capacity
         self.name = name
         self.start_node = start_node
-
+        self.parcels = parcels
 
 class Parcel:
     """
@@ -75,6 +75,13 @@ class Parcel:
         self.target = target
         self.uuid = uuid
 
+class Deliveries:
+
+    #Stores total parcel demand information, before, new, and final_total
+    def __init__(self, deliveries_origin, deliveries_req, deliveries):
+        self.origin = deliveries_origin
+        self.req = deliveries_req
+        self.deliveries = deliveries
 
 class Plan:
     """
@@ -142,11 +149,15 @@ class VrpProcessor:
             for i in range(len(graph.nodes)):
                 if graph.nodes[i].id == v.start_node:
                     indexes.append(i)
-
         return indexes
 
     def process(self, vehicles, deliveries):
         """Process routing request with N vehicles and M deliveries, to produce a list of routing plans"""
+        deliveries = deliveries.deliveries
+        #deliveries_origin = deliveries.origin
+        #deliveries_diff = deliveries.req
+        #print(deliveries_origin)
+        #print(deliveries_diff)
 
         delivery_map = self.map_deliveries(deliveries)
         vehicle_map = self.map_vehicles(vehicles)
@@ -166,6 +177,8 @@ class VrpProcessor:
                                                                                                   len(partition.nodes)))
             # compute input vectors
             dropoff = self.map_dropoff(plan.partition, plan.deliveries)
+            #vehicle_dropoff_origin = [self.map_dropoff(plan.partition, x.parcels) for x in vehicles.name]
+            #dropoff_diff =
             capacity = [v.capacity for v in plan.vehicles]
             start = self.map_start_nodes(partition, plan.vehicles)
             costs = [e.cost for e in partition.edges]
@@ -173,8 +186,11 @@ class VrpProcessor:
             computed_routes, dispatch, objc = self.vrp.vrp(partition.incident_matrix, dropoff, capacity, start, costs)
             # compute routes based on dispatch vectors from VRP. Since VRP output is incomplete/not best,
             # we add A* routing on top
+            print("DISPATCH:", dispatch)
             plan_routes = self.make_route(computed_routes, dispatch, partition, plan.vehicles, plan.deliveries)
             routes += plan_routes
+            #print(vehicle_dropoff_origin)
+
         return routes
 
     def find_closest_post(self, loads, start, graph):
@@ -229,7 +245,7 @@ class VrpProcessor:
                 route += partial_path.path if len(partial_path.path) == 1 else partial_path.path[1:]
 
             # debug info
-            print("Vehicle: {}".format(vehicles[i].name))
+            print("Vehicle: {}".format(vehicles[i].name), "|", "parcels:", str(vehicles[i].parcels))
             print("Edges: VRP: {}, A*:{}".format(sum(graph_routes[i]), len(route)))
 
             # calculate theoretical cost of all visited edges in vrp, to compare to A*
@@ -246,16 +262,16 @@ class VrpProcessor:
                 "route": self.route_to_sumo_format(route, original_vehicle_load, nodes, deliveries)})
 
         print("Route build took: {}s".format(time.time() - start_time))
+
+        print("converted routes:", converted_routes)
         return converted_routes
 
     def route_to_sumo_format(self, route, loads, nodes, deliveries):
         """Transform output route to route according to what we discussed with Salvo.
         Should be modified for final POC"""
         converted_route = []
-
         if len(route) == 1 and loads[nodes.index(route[0])] == 0:
             return []
-
         for idx, node in enumerate(route):
             node_idx = nodes.index(node)
 
@@ -276,8 +292,24 @@ class VrpProcessor:
         """Create a list of Vehicle objects from JSON input"""
         vehicles = []
         for clo in clos:
-            vehicles.append(Vehicle(clo["UUID"], clo["currentLocation"], clo["capacity"]))
+            parcels = []
+            for parcel in clo["parcels"]:
+                parcels.append(parcel["UUIDParcel"])
+            vehicles.append(Vehicle(clo["UUID"], clo["currentLocation"], clo["capacity"], parcels))
         return vehicles
+
+    def parse_deliveries(self, clos,requests):
+        """Create a list of Vehicle objects from JSON input"""
+        deliveries_diff = []
+        # list of parcels on CLOs before request
+        deliveries_origin = [Parcel(x["UUIDParcel"], x["destination"], x["weight"]) for x in requests]
+        # list of additional parcels from request
+        for clo in clos:
+            for parcel in clo["parcels"]:
+                deliveries_diff.append(Parcel(parcel["UUIDParcel"], parcel["destination"], parcel["weight"]))
+        deliveries_all = deliveries_origin + deliveries_diff
+        deliveries = Deliveries(deliveries_origin, deliveries_diff, deliveries_all)
+        return deliveries
 
 class RecReq(Resource):
 
@@ -292,10 +324,25 @@ class RecReq(Resource):
     def process_pickup_requests(self, clos, requests):
         print("Processing Pickup Delivery Request for ", len(clos), 'vehicles')
         vehicles = vrpProcessor.parse_vehicles(clos)
+        deliveries = vrpProcessor.parse_deliveries(clos, requests)
+
+
+        """
+        #all parcel on CLOs before request
         deliveries = [Parcel(x["UUIDParcel"], x["destination"], x["weight"]) for x in requests]
+        deliveries_diff = []
+        deliveries_start = deliveries.deepcopy()
+
+        deliveries_all = []
+        # additional parcels form request
         for clo in clos:
             for parcel in clo["parcels"]:
-                deliveries.append(Parcel(parcel["UUIDParcel"], parcel["destination"], parcel["weight"]))
+                deliveries_start.append(Parcel(parcel["UUIDParcel"], parcel["destination"], parcel["weight"]))
+                deliveries_diff.append(Parcel(parcel["UUIDParcel"], parcel["destination"], parcel["weight"]))
+
+        deliveries_all = deliveries_start
+        deliveries = Deliveries(deliveries_start, deliveries_diff, deliveries)
+        """
 
         return vrpProcessor.process(vehicles, deliveries)
 
@@ -326,7 +373,6 @@ class RecReq(Resource):
         else:
             return jsonify({"message": "Invalid event type: {}".format(evt_type)})
 
-
 class CognitiveAdvisorAPI:
     def __init__(self, port=5000):
         self._port = port
@@ -355,7 +401,7 @@ if os.path.exists(pickle_path):
 else:
     # make 25 partitions, so our VRP can do the work in reasonable time,
     # even then small or even-sized partitions are not guaranteed
-    K = 2
+    K = 1
     # instance partitioner object, partition input graph, create graph processors
     # for all partitions and then create instance of vrp proc
     print('No data found, runing load and partition procedure')
@@ -374,7 +420,6 @@ if __name__ == '__main__':
     for g in partitioner.graphProcessors:
         if len(g.nodes) < len(min_graph.nodes):
             min_graph = g
-
 
     available_vehicles = []
     dispatch_node = random.choice(min_graph.nodes).id
