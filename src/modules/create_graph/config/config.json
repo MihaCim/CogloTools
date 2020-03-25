@@ -1,6 +1,6 @@
 {
   "eps": "3",
   "map_basic": "./data/domaciraji.osm_01.osm",
-  "post_loc":"./data/List of Postal Offices (geographical location)_full.csv",
+  "post_loc":"./data/List of Postal Offices (geographical location).csv",
   "post_loc_type": "si"
 }
