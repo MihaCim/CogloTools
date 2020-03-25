@@ -1,6 +1,7 @@
 import pickle
 import os
 import time
+import numpy as np
 from math import inf
 from flask import Flask, request
 from flask_jsonpify import jsonify
@@ -57,7 +58,7 @@ class Vehicle:
     start_node is name/matching UUID
     """
 
-    def __init__(self, name, start_node, capacity=200, parcels=0):
+    def __init__(self, name, start_node, parcels, capacity=200):
         self.capacity = capacity
         self.name = name
         self.start_node = start_node
@@ -151,17 +152,21 @@ class VrpProcessor:
                     indexes.append(i)
         return indexes
 
-    def process(self, vehicles, deliveries):
+    def process(self, vehicles, deliveries_all):
         """Process routing request with N vehicles and M deliveries, to produce a list of routing plans"""
-        deliveries = deliveries.deliveries
-        #deliveries_origin = deliveries.origin
-        #deliveries_diff = deliveries.req
+        deliveries = deliveries_all.deliveries
+        deliveries_origin = deliveries_all.origin
+        #print("deliveries origin", deliveries.origin)
+        deliveries_diff = deliveries_all.req
         #print(deliveries_origin)
         #print(deliveries_diff)
 
         delivery_map = self.map_deliveries(deliveries)
+        #delivery_map_origin = self.map_deliveries(deliveries_origin)
+        #print(deliveries_origingin)
+        #delivery_map_diff = self.map_deliveries (deliveries_diff)
         vehicle_map = self.map_vehicles(vehicles)
-
+        # mapping all data to partitions
         plans = [Plan(vehicle_map[i], delivery_map[i], self.graphs[i]) for i in range(len(self.graphs))]
         routes = []
 
@@ -177,6 +182,9 @@ class VrpProcessor:
                                                                                                   len(partition.nodes)))
             # compute input vectors
             dropoff = self.map_dropoff(plan.partition, plan.deliveries)
+            vehicles_dropoff = []
+            for x in vehicles:
+                vehicles_dropoff.append(self.map_dropoff(plan.partition, x.parcels))
             #vehicle_dropoff_origin = [self.map_dropoff(plan.partition, x.parcels) for x in vehicles.name]
             #dropoff_diff =
             capacity = [v.capacity for v in plan.vehicles]
@@ -186,10 +194,10 @@ class VrpProcessor:
             computed_routes, dispatch, objc = self.vrp.vrp(partition.incident_matrix, dropoff, capacity, start, costs)
             # compute routes based on dispatch vectors from VRP. Since VRP output is incomplete/not best,
             # we add A* routing on top
+
             print("DISPATCH:", dispatch)
-            plan_routes = self.make_route(computed_routes, dispatch, partition, plan.vehicles, plan.deliveries)
+            plan_routes = self.make_route(computed_routes, dispatch, partition, plan.vehicles, plan.deliveries, deliveries_all, vehicles_dropoff)
             routes += plan_routes
-            #print(vehicle_dropoff_origin)
 
         return routes
 
@@ -205,7 +213,7 @@ class VrpProcessor:
                     min_idx = post_idx
         return min_idx
 
-    def make_route(self, graph_routes, loads, graph, vehicles, deliveries):
+    def make_route(self, graph_routes, loads_vrp, graph, vehicles, deliveries, deliveries_all, vehicles_dropoff):
         nodes = graph.nodes
         edges = graph.edges
         print("Building route from VRP output...")
@@ -214,6 +222,14 @@ class VrpProcessor:
         start_time = time.time()
         routes = []
         converted_routes = []
+        # vector of location of request parcels delivery - loads_diff
+        loads_diff = []
+        loads = []
+        for i, load in enumerate(loads_vrp):
+            loads_diff.append(np.subtract(load, vehicles_dropoff[i]).tolist())
+            #modification needed
+        loads = np.add(loads_diff, vehicles_dropoff).tolist()
+
 
         for i, vehicle_load in enumerate(loads):
             start_node = start_nodes[i]
@@ -259,34 +275,41 @@ class VrpProcessor:
             routes.append(route)
             converted_routes.append({
                 "UUID": vehicles[i].name,
-                "route": self.route_to_sumo_format(route, original_vehicle_load, nodes, deliveries)})
+                "route": self.map_parcels_to_route(route, original_vehicle_load, nodes, deliveries_all, loads_diff,
+                                                   vehicles[i])})
 
         print("Route build took: {}s".format(time.time() - start_time))
-
+        print("calculated routes:", routes)
         print("converted routes:", converted_routes)
+
         return converted_routes
 
-    def route_to_sumo_format(self, route, loads, nodes, deliveries):
-        """Transform output route to route according to what we discussed with Salvo.
-        Should be modified for final POC"""
+    def map_parcels_to_route(self, route, loads, nodes, deliveries_all, loads_diff, vehicle):
+        """Maps parcels UUIDs to the vehicle route: existing parcels on hte vehicles + additional parcels alocated
+        loads_diff: position of addtional parcels to the vehicles routes from adhoc order"""
+
+        #parcels_origin_vehicle = vehicle.parcels
+        #parcels_request = deliveries_all.req
         converted_route = []
+        vehicle_parcels = vehicle.parcels + deliveries_all.req
         if len(route) == 1 and loads[nodes.index(route[0])] == 0:
             return []
         for idx, node in enumerate(route):
             node_idx = nodes.index(node)
 
-            parcels = [x.uuid for x in deliveries if x.target == node.id]
-
+            # existing parcel UUIDs on the vehicle + additional
+            parcels = [x.uuid for x in vehicle_parcels if x.target == node.id]
+            #if (int(loads[node_idx]) > 0 or idx == 0):
             converted_route.append({
                 "locationId": node.id,
                 "dropoffWeightKg": int(loads[node_idx]),
-                "dropoffVolumeM3": int(loads[node_idx] / 10),
+                #"dropoffVolumeM3": int(loads[node_idx] / 10),
                 "parcels": parcels,
                 "info": "This parcel must be delivered to location " + str(node.id),
                 "position": "{},{}".format(node.lon, node.lat)
             })
-
-        return converted_route
+        return\
+            converted_route
 
     def parse_vehicles(self, clos):
         """Create a list of Vehicle objects from JSON input"""
@@ -294,19 +317,20 @@ class VrpProcessor:
         for clo in clos:
             parcels = []
             for parcel in clo["parcels"]:
-                parcels.append(parcel["UUIDParcel"])
-            vehicles.append(Vehicle(clo["UUID"], clo["currentLocation"], clo["capacity"], parcels))
+                parcels.append(Parcel(parcel["UUIDParcel"], parcel["destination"], parcel["weight"]))
+                #parcels.append(parcel["UUIDParcel"])
+            vehicles.append(Vehicle(clo["UUID"], clo["currentLocation"], parcels, clo["capacity"]))
         return vehicles
 
     def parse_deliveries(self, clos,requests):
         """Create a list of Vehicle objects from JSON input"""
-        deliveries_diff = []
-        # list of parcels on CLOs before request
-        deliveries_origin = [Parcel(x["UUIDParcel"], x["destination"], x["weight"]) for x in requests]
+        deliveries_origin = []
         # list of additional parcels from request
+        deliveries_diff = [Parcel(x["UUIDParcel"], x["destination"], x["weight"]) for x in requests]
+        # list of parcels on CLOs before request
         for clo in clos:
             for parcel in clo["parcels"]:
-                deliveries_diff.append(Parcel(parcel["UUIDParcel"], parcel["destination"], parcel["weight"]))
+                deliveries_origin.append(Parcel(parcel["UUIDParcel"], parcel["destination"], parcel["weight"]))
         deliveries_all = deliveries_origin + deliveries_diff
         deliveries = Deliveries(deliveries_origin, deliveries_diff, deliveries_all)
         return deliveries
@@ -325,24 +349,6 @@ class RecReq(Resource):
         print("Processing Pickup Delivery Request for ", len(clos), 'vehicles')
         vehicles = vrpProcessor.parse_vehicles(clos)
         deliveries = vrpProcessor.parse_deliveries(clos, requests)
-
-
-        """
-        #all parcel on CLOs before request
-        deliveries = [Parcel(x["UUIDParcel"], x["destination"], x["weight"]) for x in requests]
-        deliveries_diff = []
-        deliveries_start = deliveries.deepcopy()
-
-        deliveries_all = []
-        # additional parcels form request
-        for clo in clos:
-            for parcel in clo["parcels"]:
-                deliveries_start.append(Parcel(parcel["UUIDParcel"], parcel["destination"], parcel["weight"]))
-                deliveries_diff.append(Parcel(parcel["UUIDParcel"], parcel["destination"], parcel["weight"]))
-
-        deliveries_all = deliveries_start
-        deliveries = Deliveries(deliveries_start, deliveries_diff, deliveries)
-        """
 
         return vrpProcessor.process(vehicles, deliveries)
 
@@ -398,6 +404,7 @@ if os.path.exists(pickle_path):
     with open(pickle_path, 'rb') as loadfile:
         partitioner = pickle.load(loadfile)
     print('Loaded pickled graph data')
+
 else:
     # make 25 partitions, so our VRP can do the work in reasonable time,
     # even then small or even-sized partitions are not guaranteed
