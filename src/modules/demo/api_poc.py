@@ -337,6 +337,39 @@ class VrpProcessor:
 
 class RecReq(Resource):
 
+    def __init__(self):
+        self.vrpProcessor = None
+
+    @staticmethod
+    def init_vrp(use_case):
+        """" Init VRP processor instance based on use-case defined in parameter"""
+
+        pickle_path = './modules/demo/data/graphs.pickle'
+        # pickle_path = './' + JSON_GRAPH_DATA_PATH.replace('/', '_') + '.graphs.pickle'
+        print('Checking if data from', JSON_GRAPH_DATA_PATH, 'exists.')
+
+        # TODO: use parameter useCase when choosing correct graph data instance
+
+        # Load locally stored pickle
+        if os.path.exists(pickle_path):
+            with open(pickle_path, 'rb') as loadfile:
+                partitioner = pickle.load(loadfile)
+            print('Loaded pickled graph data')
+        else:
+            # make 25 partitions, so our VRP can do the work in reasonable time,
+            # even then small or even-sized partitions are not guaranteed
+            K = 1
+            # instance partitioner object, partition input graph, create graph processors
+            # for all partitions and then create instance of vrp proc
+            print('No data found, runing load and partition procedure')
+            partitioner = GraphPartitioner(JSON_GRAPH_DATA_PATH)
+            partitioner.partition(K)
+            with open(pickle_path, 'wb') as dumpfile:
+                pickle.dump(partitioner, dumpfile)
+                print('Stored pickled dump for future use')
+
+        return VrpProcessor(partitioner.graphProcessors)
+
     def get(self):
         return jsonify({"success": True, "message": "Please use POST request"})
 
@@ -347,25 +380,33 @@ class RecReq(Resource):
 
     def process_pickup_requests(self, clos, requests):
         print("Processing Pickup Delivery Request for ", len(clos), 'vehicles')
-        vehicles = vrpProcessor.parse_vehicles(clos)
-        deliveries = vrpProcessor.parse_deliveries(clos, requests)
+        vehicles = self.vrpProcessor.parse_vehicles(clos)
+        deliveries = self.vrpProcessor.parse_deliveries(clos, requests)
 
-        return vrpProcessor.process(vehicles, deliveries)
+        return self.vrpProcessor.process(vehicles, deliveries)
 
     def process_broken_clo(self, clos, broken_clo):
         print("Processing Broken CLO for ", len(clos), 'vehicles')
-        vehicles = vrpProcessor.parse_vehicles(clos)
+        vehicles = self.vrpProcessor.parse_vehicles(clos)
         deliveries = [Parcel(x["UUIDParcel"], x["destination"], x["weight"]) for x in broken_clo["parcels"]]
         for clo in clos:
             for parcel in clo["parcels"]:
                 deliveries.append(Parcel(parcel["UUIDParcel"], parcel["destination"], parcel["weight"]))
 
-        return vrpProcessor.process(vehicles, deliveries)
+        return self.vrpProcessor.process(vehicles, deliveries)
 
     def post(self):
         """Main entry point for HTTP request"""
         data = request.get_json(force=True)
         evt_type = data["eventType"]
+
+        # Initialize vrpProcessor if not yet initialized
+        if self.vrpProcessor is None:
+            if "useCase" not in data:
+                return {"message": "Parameter useCase is missing"}
+            use_case = data["useCase"]
+            self.vrpProcessor = self.init_vrp(use_case)
+
         if evt_type == "brokenVehicle":
             clos = data["CLOS"]
             broken_clo = data["BrokenVehicle"]
@@ -378,6 +419,7 @@ class RecReq(Resource):
             return jsonify(recommendations)
         else:
             return jsonify({"message": "Invalid event type: {}".format(evt_type)})
+
 
 class CognitiveAdvisorAPI:
     def __init__(self, port=5000):
@@ -395,54 +437,7 @@ class CognitiveAdvisorAPI:
     def start(self):
         serve(self._app, host='0.0.0.0', port=self._port)
 
-##############################
-pickle_path = './modules/demo/data/graphs.pickle'
-#pickle_path = './' + JSON_GRAPH_DATA_PATH.replace('/', '_') + '.graphs.pickle'
-partitioner = None
-print('Checking if data from', JSON_GRAPH_DATA_PATH, 'exists.')
-if os.path.exists(pickle_path):
-    with open(pickle_path, 'rb') as loadfile:
-        partitioner = pickle.load(loadfile)
-    print('Loaded pickled graph data')
-
-else:
-    # make 25 partitions, so our VRP can do the work in reasonable time,
-    # even then small or even-sized partitions are not guaranteed
-    K = 1
-    # instance partitioner object, partition input graph, create graph processors
-    # for all partitions and then create instance of vrp proc
-    print('No data found, runing load and partition procedure')
-    partitioner = GraphPartitioner(JSON_GRAPH_DATA_PATH)
-    partitioner.partition(K)
-    with open(pickle_path, 'wb') as dumpfile:
-        pickle.dump(partitioner, dumpfile)
-        print('Stored pickled dump for future use')
-
-vrpProcessor = VrpProcessor(partitioner.graphProcessors)
-
 if __name__ == '__main__':
-
-    # this is an example code that demoes input and computation of routing
-    min_graph = partitioner.graphProcessors[0]
-    for g in partitioner.graphProcessors:
-        if len(g.nodes) < len(min_graph.nodes):
-            min_graph = g
-
-    available_vehicles = []
-    dispatch_node = random.choice(min_graph.nodes).id
-    for i in range(3):
-        available_vehicles.append(Vehicle('Vehicle' + str(i), start_node=dispatch_node))
-
-    requested_deliveries = []
-    for i in range(15):
-        requested_deliveries.append(
-            Parcel(random.randint(100, 300), random.choice(min_graph.nodes).id, random.randint(1, 30)))
-
-    print(['Vehicle {} at {}'.format(x.name, x.start_node) for x in available_vehicles])
-    print(['Delivery of {} to {}'.format(x.volume, x.target) for x in requested_deliveries])
-
-    vrpProcessor.process(available_vehicles, requested_deliveries)
-
     # this starts flask server
     server = CognitiveAdvisorAPI()
     server.start()
