@@ -37,7 +37,7 @@ class VRP:
         # the right side of the equation should be zeros(n_edges*n_cycles + n_vert*n_cycles)
         # b variables = size([capacity_vec])= n_cycles*n_edges + n_cycles*n_nodes
 
-        AddRow = sum(i > -1 for i in start_loc_vec)
+        AddRow = sum(len(mandatory_location_list) for mandatory_location_list in start_loc_vec)
         rows_A1 = 2 * n_nodes * n_cycles + n_nodes * n_cycles + n_edges * n_cycles + AddRow
         cols_A1 = n_nodes * n_cycles + n_edges * n_cycles
 
@@ -67,10 +67,10 @@ class VRP:
 
         insert_line = 0
         for k in range(n_cycles):
-            location_node = start_loc_vec[k]
-            if location_node >= 0:
+            mandatory_location_list = start_loc_vec[k]
+            for mandatory_node_id in mandatory_location_list:
                 for j in range(n_edges):
-                    A1[offset_block4 + insert_line, offset_c + k * n_edges + j] = -E[location_node][j]
+                    A1[offset_block4 + insert_line, offset_c + k * n_edges + j] = -E[mandatory_node_id][j]
                 insert_line = insert_line + 1
 
         # CONSTRAINT II - A2 - the number of packets delivered on the node is equal to all total demand on the node
