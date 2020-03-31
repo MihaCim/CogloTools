@@ -20,10 +20,10 @@ class PostHandler:
 
             for row in csv_reader:
                 #address = [row[13], row[14], row[15]]
-                address = [row[13]]
-                uuid = [row[15]]
-                if (self.is_number(row[22]) != None and self.is_number(row[23]) != None):
-                    post = Post(' '.join(address),' '.join(uuid), self.is_number(row[22]), self.is_number(row[23]))
+                address = [row[0]]
+                uuid = [row[1]]
+                if (self.is_number(row[2]) != None and self.is_number(row[3]) != None):
+                    post = Post(' '.join(address),' '.join(uuid), self.is_number(row[2]), self.is_number(row[3]))
                     posts.append(post)
         return posts
 
