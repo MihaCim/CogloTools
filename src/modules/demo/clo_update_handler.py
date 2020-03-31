@@ -28,8 +28,8 @@ class CloUpdateHandler:
 
                 for row in csv_reader:
                     # Get all important values - UUID, address, latitude and longitude
-                    uuid = row[0]
-                    address = row[1]
+                    address = row[0]
+                    uuid = row[1]
                     lat = row[2]
                     lon = row[3]
 
@@ -96,7 +96,7 @@ class CloUpdateHandler:
                 csv_writer = csv.writer(csv_file)
 
                 for json_obj in clos:
-                    csv_writer.writerow([json_obj["UUID"], json_obj["address"], json_obj["lat"], json_obj["lon"]])
+                    csv_writer.writerow([json_obj["address"], json_obj["UUID"], json_obj["lat"], json_obj["lon"]])
             csv_file.close()
 
         return build_new_graph
@@ -163,7 +163,7 @@ class CloUpdateHandler:
 
                 for key in clos_to_add_dict.keys():
                     obj = clos_to_add_dict[key]
-                    csv_writer.writerow([obj["UUID"], obj["address"], obj["lat"], obj["lon"]])
+                    csv_writer.writerow([obj["address"], obj["UUID"], obj["lat"], obj["lon"]])
             csv_file.close()
 
         return build_new_graph

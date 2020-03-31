@@ -2,13 +2,13 @@
 import sys
 import math
 import json
-import os
 import io
 print(sys.path)
 from data_parser.data_handler import DataHandler
 from neighbours_finder import NeighboursFinder
 import networkx as nx
 import matplotlib.pyplot as plt
+from pojo.pruneG import GraphPrune
 import pojo.search_node as search_node
 
 def graph_viz(nodes, ways):
@@ -57,7 +57,6 @@ def drawGraph(t, postalNodes, postalWays):
 
     for src, dest, weight in postalWays:
         G.add_edge(src, dest, weight=weight)
-
 
         # plt.figure(1)
 
@@ -115,19 +114,15 @@ def drawStaticGraph(nodes, ways, results):
     plt.show()
 
 def run():
-    test = os.system("ls")
-
     with open('./modules/create_graph/config/config.json') as json_data:
         json_config = json.load(json_data)
+
     import time
     start_time = time.time()
-    osmHandler = DataHandler(json_config["map_basic"],
-                            {json_config["post_loc_type"]:json_config["post_loc"]
-                            #"./data/domaciraji.osm_01.osm",
-                             #   "./data/slo.small3.osm_01.osm",
-                             #{'si':'./data/List of Postal Offices (geographical location)_full.csv'
-                              #'hr':'./data/List of Postal Offices (geographical location)_full.csv'
-                               })
+    osmHandler = DataHandler(
+                            json_config["map_basic"],
+                            {json_config["post_loc_type"]:json_config["post_loc"]}
+                            )
     print("Pre-step  {}".format(time.time() - start_time))
 
     #G = osmHandler.graph_viz()
@@ -138,6 +133,7 @@ def run():
     for k, v in roadNodes.items():
         if v.is_post:
             map_posts_to_nodes[v.post_id] = k
+            #map_posts_to_nodes[v.post.uuid] = k
             print("Post_id: " + str(v.post_id) + " node_id" + str(k))
 
     postNode = {}
@@ -149,9 +145,8 @@ def run():
 
 
     for postId, nodeId in map_posts_to_nodes.items():
-        #postId = 'A8'
-        #nodeId = 50
-        res = finder.search_near_posts(roadNodes, roadWays, ways, nodeId, map_posts_to_nodes, 1)
+
+        res = finder.search_near_posts(roadNodes, roadWays, ways, nodeId, map_posts_to_nodes, json_config["eps"])
         print('PostID ' + str(postId) + ' Node: ' + str(nodeId) + ' r: ' + str(res))
 
         tmpRes.append((postId, nodeId, res))
@@ -167,8 +162,9 @@ def run():
                 d = {'address': v.address,
                      'lat': v.lat,
                      'lon': v.lon,
-                     'node_id': v.node_id,
-                     'post_id': v.post_id
+                     'uuid': v.post.uuid,
+                     #'node_id': v.node_id,
+                     #'post_id': v.post_id
                      }
                 postNode[k] = v.__dict__
                 postNodePlain[k] = d
@@ -179,7 +175,6 @@ def run():
 
     # prune graph
     graph = {'nodes': postNodePlain, 'edge': list(postEdge)}
-    from pojo.pruneG import GraphPrune
     graph2 = GraphPrune().PruneG(graph)
     f = open("Graph_final.json", "w")
     f.write(json.dumps(graph2))
@@ -196,4 +191,5 @@ def run():
 if __name__ == "__main__":
 
     run()
+
 

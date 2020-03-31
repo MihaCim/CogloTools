@@ -1,6 +1,8 @@
 import pickle
 import os
 import time
+import json
+
 from math import inf
 from flask import Flask, request
 from flask_jsonpify import jsonify
@@ -11,7 +13,6 @@ from modules.demo.clo_update_handler import CloUpdateHandler
 from modules.cvrp.vrp import VRP
 from modules.partitioning.post_partitioning import GraphPartitioner
 from modules.demo.graph_processing import GraphProcessor
-from modules.demo.id_manager import InternalIdManager
 
 JSON_GRAPH_DATA_PATH = 'modules/demo/data/Graph_PoC.json'
 MSB_FWD = 'http://116.203.13.198/api/postRecommendation'
@@ -324,7 +325,6 @@ class RecReq(Resource):
 
     def __init__(self):
         self.vrpProcessor = None
-        self.internalIdManager = InternalIdManager()
 
     @staticmethod
     def init_vrp(use_case):
@@ -419,7 +419,14 @@ class NewCloReq(Resource):
         """Main entry point for HTTP request"""
         data = request.get_json(force=True)
         clos = data["CLOS"]  # Extract array of CLOs
-        needs_rebuild = CloUpdateHandler.handle_new_clo_request(clos, "./modules/create_graph/data/PostalOffices.csv")
+
+        csv_file = "PostalOffice.csv"
+        with open('./modules/create_graph/config/config.json') as config:
+            json_config = json.load(config)
+            csv_file = json_config["post_loc"]
+        config.close()
+
+        needs_rebuild = CloUpdateHandler.handle_new_clo_request(clos, csv_file)
         if needs_rebuild:
             print("run read_parse_osm run() method now")
             # TODO: Run method for building new graph
@@ -439,7 +446,14 @@ class UpdateCloReq(Resource):
         """Main entry point for HTTP request"""
         data = request.get_json(force=True)
         clos = data["CLOS"]  # Extract array of CLOs
-        needs_rebuild = CloUpdateHandler.handle_update_clo_request(clos, "./modules/create_graph/data/PostalOffices.csv")
+
+        csv_file = "PostalOffice.csv"
+        with open('./modules/create_graph/config/config.json') as config:
+            json_config = json.load(config)
+            csv_file = json_config["post_loc"]
+        config.close()
+
+        needs_rebuild = CloUpdateHandler.handle_update_clo_request(clos, csv_file)
         if needs_rebuild:
             print("run read_parse_osm run() method now")
             # TODO: Run method for building new graph
