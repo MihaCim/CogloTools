@@ -10,8 +10,8 @@ class Node:
     """
 
     def __init__(self, node):
-        self.id = node['post_id']
-        self.name = node['post_id']
+        self.id = node['post_id'] # todo internal id
+        self.name = node['post_id'] # todo UUID
         self.lat = node['lat']
         self.lon = node['lon']
         self.cluster = None

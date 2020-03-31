@@ -1,17 +1,17 @@
 import pickle
 import os
 import time
-import numpy as np
 from math import inf
 from flask import Flask, request
 from flask_jsonpify import jsonify
 from flask_restful import Resource, Api
-import random
 from waitress import serve
 
+from modules.demo.clo_update_handler import CloUpdateHandler
 from modules.cvrp.vrp import VRP
 from modules.partitioning.post_partitioning import GraphPartitioner
 from modules.demo.graph_processing import GraphProcessor
+from modules.demo.id_manager import InternalIdManager
 
 JSON_GRAPH_DATA_PATH = 'modules/demo/data/Graph_PoC.json'
 MSB_FWD = 'http://116.203.13.198/api/postRecommendation'
@@ -51,6 +51,7 @@ Example POST MSG:
 }
 """
 
+
 class Vehicle:
     """
     This class stores information about single vehicle
@@ -64,6 +65,7 @@ class Vehicle:
         self.start_node = start_node
         self.parcels = parcels
 
+
 class Parcel:
     """
     Stores parcel information for single delivery
@@ -76,13 +78,15 @@ class Parcel:
         self.target = target
         self.uuid = uuid
 
+
 class Deliveries:
 
-    #Stores total parcel demand information, before, new, and final_total
+    # Stores total parcel demand information, before, new, and final_total
     def __init__(self, deliveries_origin, deliveries_req, deliveries):
         self.origin = deliveries_origin
         self.req = deliveries_req
         self.deliveries = deliveries
+
 
 class Plan:
     """
@@ -153,7 +157,7 @@ class VrpProcessor:
                     index.append(i)
                 for parcel in v.parcels:
                     if graph.nodes[i].id == parcel.target:
-                       index.append(i)
+                        index.append(i)
             indexes.append(index)
         return indexes
 
@@ -182,7 +186,8 @@ class VrpProcessor:
             start_loc = self.map_start_nodes(partition, plan.vehicles)
             costs = [e.cost for e in partition.edges]
 
-            computed_routes, dispatch, objc = self.vrp.vrp(partition.incident_matrix, dropoff, capacity, start_loc, costs)
+            computed_routes, dispatch, objc = self.vrp.vrp(partition.incident_matrix, dropoff, capacity, start_loc,
+                                                           costs)
             # compute routes based on dispatch vectors from VRP. Since VRP output is incomplete/not best,
             # we add A* routing on top
 
@@ -220,7 +225,7 @@ class VrpProcessor:
             vehicle_load[nodes.index(current_node)] -= vehicle_load[nodes.index(current_node)]
             cost_astar = 0
             original_vehicle_load = vehicle_load.copy()
-            #variableIDS_list = []
+            # variableIDS_list = []
             # always find closest post with parcels to pick/drop off.
             # start at closest node
             # get route and clear up any packages on this route
@@ -280,13 +285,13 @@ class VrpProcessor:
                 converted_route.append({
                     "locationId": node.id,
                     "dropoffWeightKg": int(loads[node_idx]),
-                    #"dropoffVolumeM3": int(loads[node_idx] / 10),
+                    # "dropoffVolumeM3": int(loads[node_idx] / 10),
                     "parcels": parcels,
                     "info": "This parcel must be delivered to location " + str(node.id),
                     "position": "{},{}".format(node.lon, node.lat)
                 })
 
-        return\
+        return \
             converted_route
 
     def parse_vehicles(self, clos):
@@ -296,12 +301,12 @@ class VrpProcessor:
             parcels = []
             for parcel in clo["parcels"]:
                 parcels.append(Parcel(parcel["UUIDParcel"], parcel["destination"], parcel["weight"]))
-                #parcels.append(parcel["UUIDParcel"])
+                # parcels.append(parcel["UUIDParcel"])
             capacity = clo["capacity"] - len(parcels)
             vehicles.append(Vehicle(clo["UUID"], clo["currentLocation"], parcels, capacity))
         return vehicles
 
-    def parse_deliveries(self, clos,requests):
+    def parse_deliveries(self, clos, requests):
         """Create a list of Vehicle objects from JSON input"""
         deliveries_origin = []
         # list of additional parcels from request
@@ -314,10 +319,12 @@ class VrpProcessor:
         deliveries = Deliveries(deliveries_origin, deliveries_diff, deliveries_all)
         return deliveries
 
+
 class RecReq(Resource):
 
     def __init__(self):
         self.vrpProcessor = None
+        self.internalIdManager = InternalIdManager()
 
     @staticmethod
     def init_vrp(use_case):
@@ -400,6 +407,46 @@ class RecReq(Resource):
             return jsonify({"message": "Invalid event type: {}".format(evt_type)})
 
 
+class NewCloReq(Resource):
+    """
+    Class used for handling request for newCLOs.
+    This method checks if graph needs to be rebuilt or updated.
+    """
+    def get(self):
+        return jsonify({"success": True, "message": "Please use POST request"})
+
+    def post(self):
+        """Main entry point for HTTP request"""
+        data = request.get_json(force=True)
+        clos = data["CLOS"]  # Extract array of CLOs
+        needs_rebuild = CloUpdateHandler.handle_new_clo_request(clos, "./modules/create_graph/data/PostalOffices.csv")
+        if needs_rebuild:
+            print("run read_parse_osm run() method now")
+            # TODO: Run method for building new graph
+
+        return {"success": True}
+
+
+class UpdateCloReq(Resource):
+    """
+    Class used for handling request for newCLOs.
+    This method checks if graph needs to be rebuilt or updated.
+    """
+    def get(self):
+        return jsonify({"success": True, "message": "Please use POST request"})
+
+    def post(self):
+        """Main entry point for HTTP request"""
+        data = request.get_json(force=True)
+        clos = data["CLOS"]  # Extract array of CLOs
+        needs_rebuild = CloUpdateHandler.handle_update_clo_request(clos, "./modules/create_graph/data/PostalOffices.csv")
+        if needs_rebuild:
+            print("run read_parse_osm run() method now")
+            # TODO: Run method for building new graph
+
+        return jsonify({"success": True})
+
+
 class CognitiveAdvisorAPI:
     def __init__(self, port=5000):
         self._port = port
@@ -409,12 +456,15 @@ class CognitiveAdvisorAPI:
 
     def _add_endpoints(self):
         self._register_endpoint('/api/adhoc/recommendationRequest', RecReq)
+        self._register_endpoint("/api/clo/newCLOs", NewCloReq)
+        self._register_endpoint("/api/clo/updateCLOs", UpdateCloReq)
 
     def _register_endpoint(self, endpoint_name, class_ref):
         self._api.add_resource(class_ref, endpoint_name)
 
     def start(self):
         serve(self._app, host='0.0.0.0', port=self._port)
+
 
 if __name__ == '__main__':
     # this starts flask server

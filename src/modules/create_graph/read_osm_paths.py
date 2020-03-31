@@ -2,6 +2,7 @@
 import sys
 import math
 import json
+import os
 import io
 print(sys.path)
 from data_parser.data_handler import DataHandler
@@ -114,7 +115,9 @@ def drawStaticGraph(nodes, ways, results):
     plt.show()
 
 def run():
-    with open('./config/config.json') as json_data:
+    test = os.system("ls")
+
+    with open('./modules/create_graph/config/config.json') as json_data:
         json_config = json.load(json_data)
     import time
     start_time = time.time()
