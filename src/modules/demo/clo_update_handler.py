@@ -143,6 +143,8 @@ class CloUpdateHandler:
 
             if received_key not in stored_clos_uuid_map.keys():
                 if action is None or action == "add" or action == "update":
+                    print("received object", received_object)
+
                     clos_to_add_dict[received_key] = received_object
                     build_new_graph = True # At least one CLO needs to be added or updated
             else:
@@ -153,7 +155,10 @@ class CloUpdateHandler:
                 if action == "remove":
                     build_new_graph = True
                     continue
-                else:
+                elif stored_object["lat"] != received_object["lat"] or stored_object["lon"] != \
+                            received_object["lon"] or stored_object["address"] != received_object["address"]:
+                    build_new_graph = True
+
                     # Just add already stored object
                     clos_to_add_dict[received_key] = stored_object
 

@@ -4,9 +4,7 @@ import time
 
 import matplotlib.pyplot as plt
 import networkx as nx
-from pojo.front_data import FrontData
-#from read_osm_paths import graph_viz
-#from read_osm_paths import drawGraph
+from .pojo.front_data import FrontData
 
 class NeighboursFinder():
 

@@ -2,6 +2,7 @@ import pickle
 import os
 import time
 import json
+import requests
 
 from math import inf
 from flask import Flask, request
@@ -9,10 +10,10 @@ from flask_jsonpify import jsonify
 from flask_restful import Resource, Api
 from waitress import serve
 
-from modules.demo.clo_update_handler import CloUpdateHandler
-from modules.cvrp.vrp import VRP
-from modules.partitioning.post_partitioning import GraphPartitioner
-from modules.demo.graph_processing import GraphProcessor
+from ..demo.clo_update_handler import CloUpdateHandler
+from ..cvrp.vrp import VRP
+from ..partitioning.post_partitioning import GraphPartitioner
+from ..create_graph.create_graph import JsonGraphCreator
 
 JSON_GRAPH_DATA_PATH = 'modules/demo/data/Graph_PoC.json'
 MSB_FWD = 'http://116.203.13.198/api/postRecommendation'
@@ -392,6 +393,7 @@ class RecReq(Resource):
                 return {"message": "Parameter useCase is missing"}
             use_case = data["useCase"]
             self.vrpProcessor = self.init_vrp(use_case)
+            print("vrp proces", self.vrpProcessor)
 
         if evt_type == "brokenVehicle":
             clos = data["CLOS"]
@@ -412,6 +414,7 @@ class NewCloReq(Resource):
     Class used for handling request for newCLOs.
     This method checks if graph needs to be rebuilt or updated.
     """
+
     def get(self):
         return jsonify({"success": True, "message": "Please use POST request"})
 
@@ -421,7 +424,8 @@ class NewCloReq(Resource):
         clos = data["CLOS"]  # Extract array of CLOs
 
         csv_file = "PostalOffice.csv"
-        with open('./modules/create_graph/config/config.json') as config:
+        config_path = './modules/create_graph/config/config.json'
+        with open(config_path) as config:
             json_config = json.load(config)
             csv_file = json_config["post_loc"]
         config.close()
@@ -429,7 +433,9 @@ class NewCloReq(Resource):
         needs_rebuild = CloUpdateHandler.handle_new_clo_request(clos, csv_file)
         if needs_rebuild:
             print("run read_parse_osm run() method now")
-            # TODO: Run method for building new graph
+            creator = JsonGraphCreator()
+            creator.create_json_graph(config_path)
+            # TODO: Invalidate VRP instance of RecReq
 
         return {"success": True}
 
@@ -439,6 +445,7 @@ class UpdateCloReq(Resource):
     Class used for handling request for newCLOs.
     This method checks if graph needs to be rebuilt or updated.
     """
+
     def get(self):
         return jsonify({"success": True, "message": "Please use POST request"})
 
@@ -448,20 +455,24 @@ class UpdateCloReq(Resource):
         clos = data["CLOS"]  # Extract array of CLOs
 
         csv_file = "PostalOffice.csv"
-        with open('./modules/create_graph/config/config.json') as config:
+        config_path = './modules/create_graph/config/config.json'
+        with open(config_path) as config:
             json_config = json.load(config)
             csv_file = json_config["post_loc"]
         config.close()
 
         needs_rebuild = CloUpdateHandler.handle_update_clo_request(clos, csv_file)
         if needs_rebuild:
-            print("run read_parse_osm run() method now")
-            # TODO: Run method for building new graph
+            print("will rebuild")
+            creator = JsonGraphCreator()
+            creator.create_json_graph(config_path)
+            # TODO: Invalidate VRP instance of RecReq
 
         return jsonify({"success": True})
 
 
 class CognitiveAdvisorAPI:
+
     def __init__(self, port=5000):
         self._port = port
         self._app = Flask(__name__)
@@ -478,9 +489,3 @@ class CognitiveAdvisorAPI:
 
     def start(self):
         serve(self._app, host='0.0.0.0', port=self._port)
-
-
-if __name__ == '__main__':
-    # this starts flask server
-    server = CognitiveAdvisorAPI()
-    server.start()

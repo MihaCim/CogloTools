@@ -1,11 +1,11 @@
 import sys
 
 import xml.sax
-import networkx as nx
-from utils import utils
-from data_parser.parse_osm import OsmParsers
-from data_parser.parse_posts import PostHandler
-from pojo.search_node import SearchNode
+from .parse_osm import OsmParsers
+from .parse_posts import PostHandler
+from ..pojo.search_node import SearchNode
+from ..utils import utils
+
 
 class DataHandler():
 
