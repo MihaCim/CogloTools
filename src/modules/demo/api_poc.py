@@ -1,22 +1,24 @@
-import pickle
-import os
-import time
 import json
-import requests
-
+import os
+import pickle
+import time
 from math import inf
+
 from flask import Flask, request
 from flask_jsonpify import jsonify
 from flask_restful import Resource, Api
 from waitress import serve
 
-from ..demo.clo_update_handler import CloUpdateHandler
-from ..cvrp.vrp import VRP
-from ..partitioning.post_partitioning import GraphPartitioner
 from ..create_graph.create_graph import JsonGraphCreator
+from ..cvrp.vrp import VRP
+from ..demo.clo_update_handler import CloUpdateHandler
+from ..partitioning.post_partitioning import GraphPartitioner
 
 JSON_GRAPH_DATA_PATH = 'modules/demo/data/Graph_PoC.json'
 MSB_FWD = 'http://116.203.13.198/api/postRecommendation'
+
+app = Flask(__name__)
+vrpProcessorReference = None
 
 """
 Example POST MSG:
@@ -140,7 +142,8 @@ class VrpProcessor:
         assert sum([len(x) for x in delivery_parts]) == len(deliveries)
         return delivery_parts
 
-    def map_dropoff(self, graph, deliveries):
+    @staticmethod
+    def map_dropoff(graph, deliveries):
         """Computer VRP input vector, how much volume will be dropped off on each node"""
         dropoff = [0] * len(graph.nodes)
         for d in deliveries:
@@ -149,7 +152,8 @@ class VrpProcessor:
             dropoff[idx] += d.volume
         return dropoff
 
-    def map_start_nodes(self, graph, vehicles):
+    @staticmethod
+    def map_start_nodes(graph, vehicles):
         """Compute VRP input list of vectors where do the vehicles start"""
         indexes = []
         for v in vehicles:
@@ -198,7 +202,8 @@ class VrpProcessor:
 
         return routes
 
-    def find_closest_post(self, loads, start, graph):
+    @staticmethod
+    def find_closest_post(loads, start, graph):
         nodes = graph.nodes
         min_dist = inf
         min_idx = -1
@@ -272,7 +277,8 @@ class VrpProcessor:
 
         return converted_routes
 
-    def map_parcels_to_route(self, route, loads, nodes, deliveries):
+    @staticmethod
+    def map_parcels_to_route(route, loads, nodes, deliveries):
         """Maps parcels UUIDs to the vehicle route: existing parcels on hte vehicles + additional parcels alocated
         loads_diff: position of addtional parcels to the vehicles routes from adhoc order"""
         converted_route = []
@@ -296,7 +302,8 @@ class VrpProcessor:
         return \
             converted_route
 
-    def parse_vehicles(self, clos):
+    @staticmethod
+    def parse_vehicles(clos):
         """Create a list of Vehicle objects from JSON input"""
         vehicles = []
         for clo in clos:
@@ -308,7 +315,8 @@ class VrpProcessor:
             vehicles.append(Vehicle(clo["UUID"], clo["currentLocation"], parcels, capacity))
         return vehicles
 
-    def parse_deliveries(self, clos, requests):
+    @staticmethod
+    def parse_deliveries(clos, requests):
         """Create a list of Vehicle objects from JSON input"""
         deliveries_origin = []
         # list of additional parcels from request
@@ -365,134 +373,123 @@ class RecReq(Resource):
 
     # check api_ijs.py for this code
 
-    def process_pickup_requests(self, clos, requests):
+    @staticmethod
+    def process_pickup_requests(clos, requests, vrp_processor_ref):
         print("Processing Pickup Delivery Request for ", len(clos), 'vehicles')
-        vehicles = self.vrpProcessor.parse_vehicles(clos)
-        deliveries = self.vrpProcessor.parse_deliveries(clos, requests)
+        vehicles = vrp_processor_ref.parse_vehicles(clos)
+        deliveries = vrp_processor_ref.parse_deliveries(clos, requests)
 
-        return self.vrpProcessor.process(vehicles, deliveries)
+        return vrp_processor_ref.process(vehicles, deliveries)
 
-    def process_broken_clo(self, clos, broken_clo):
+    @staticmethod
+    def process_broken_clo(clos, broken_clo, vrp_processor_ref):
         print("Processing Broken CLO for ", len(clos), 'vehicles')
-        vehicles = self.vrpProcessor.parse_vehicles(clos)
+        vehicles = vrp_processor_ref.parse_vehicles(clos)
         deliveries = [Parcel(x["UUIDParcel"], x["destination"], x["weight"]) for x in broken_clo["parcels"]]
         for clo in clos:
             for parcel in clo["parcels"]:
                 deliveries.append(Parcel(parcel["UUIDParcel"], parcel["destination"], parcel["weight"]))
 
-        return self.vrpProcessor.process(vehicles, deliveries)
-
-    def post(self):
-        """Main entry point for HTTP request"""
-        data = request.get_json(force=True)
-        evt_type = data["eventType"]
-
-        # Initialize vrpProcessor if not yet initialized
-        if self.vrpProcessor is None:
-            if "useCase" not in data:
-                return {"message": "Parameter useCase is missing"}
-            use_case = data["useCase"]
-            self.vrpProcessor = self.init_vrp(use_case)
-            print("vrp proces", self.vrpProcessor)
-
-        if evt_type == "brokenVehicle":
-            clos = data["CLOS"]
-            broken_clo = data["BrokenVehicle"]
-            recommendations = self.process_broken_clo(clos, broken_clo)
-            return jsonify(recommendations)
-        elif evt_type == "pickupRequest":
-            clos = data["CLOS"]
-            requests = data["orders"]
-            recommendations = self.process_pickup_requests(clos, requests)
-            return jsonify(recommendations)
-        else:
-            return jsonify({"message": "Invalid event type: {}".format(evt_type)})
+        return vrp_processor_ref.process(vehicles, deliveries)
 
 
-class NewCloReq(Resource):
-    """
-    Class used for handling request for newCLOs.
-    This method checks if graph needs to be rebuilt or updated.
-    """
+@app.route("/api/adhoc/recommendationRequest", methods=['POST'])
+def handle_recommendation_request():
+    global vrpProcessorReference
 
-    def get(self):
-        return jsonify({"success": True, "message": "Please use POST request"})
+    """Main entry point for HTTP request"""
+    data = request.get_json(force=True)
+    evt_type = data["eventType"]
 
-    def post(self):
-        """Main entry point for HTTP request"""
-        data = request.get_json(force=True)
-        clos = data["CLOS"]  # Extract array of CLOs
+    # Initialize vrpProcessor if not yet initialized
+    if vrpProcessorReference is None:
+        if "useCase" not in data:
+            return {"message": "Parameter useCase is missing"}
+        use_case = data["useCase"]
+        vrpProcessorReference = RecReq.init_vrp(use_case)
 
-        csv_file = "PostalOffice.csv"
-        config_path = './modules/create_graph/config/config.json'
-        with open(config_path) as config:
-            json_config = json.load(config)
-            csv_file = json_config["post_loc"]
-        config.close()
-
-        needs_rebuild = CloUpdateHandler.handle_new_clo_request(clos, csv_file)
-        if needs_rebuild:
-            print("run read_parse_osm run() method now")
-            creator = JsonGraphCreator()
-            creator.create_json_graph(config_path)
-            # TODO: Invalidate VRP instance of RecReq
-
-        return {"success": True}
-
-
-class UpdateCloReq(Resource):
-    """
-    Class used for handling request for newCLOs.
-    This method checks if graph needs to be rebuilt or updated.
-    """
-
-    def get(self):
-        return jsonify({"success": True, "message": "Please use POST request"})
-
-    def post(self):
-        """Main entry point for HTTP request"""
-        data = request.get_json(force=True)
-        clos = data["CLOS"]  # Extract array of CLOs
-
-        csv_file = "PostalOffice.csv"
-        config_path = './modules/create_graph/config/config.json'
-        with open(config_path) as config:
-            json_config = json.load(config)
-            csv_file = json_config["post_loc"]
-        config.close()
-
-        needs_rebuild = CloUpdateHandler.handle_update_clo_request(clos, csv_file)
-        if needs_rebuild:
-            print("will rebuild")
-            creator = JsonGraphCreator()
-            creator.create_json_graph(config_path)
-            # TODO: Invalidate VRP instance of RecReq
-
-        return jsonify({"success": True})
+    vrp_processor_ref = vrpProcessorReference
+    if evt_type == "brokenVehicle":
+        clos = data["CLOS"]
+        broken_clo = data["BrokenVehicle"]
+        recommendations = RecReq.process_broken_clo(clos, broken_clo, vrp_processor_ref)
+        return jsonify(recommendations)
+    elif evt_type == "pickupRequest":
+        clos = data["CLOS"]
+        requests = data["orders"]
+        recommendations = RecReq.process_pickup_requests(clos, requests, vrp_processor_ref)
+        return jsonify(recommendations)
+    else:
+        return jsonify({"message": "Invalid event type: {}".format(evt_type)})
 
 
-class CrossBorderReq(Resource):
+"""
+Class used for handling request for newCLOs.
+This method checks if graph needs to be rebuilt or updated.
+"""
+@app.route("/api/clo/newCLOs", methods=['POST'])
+def new_clos():
+    global vrpProcessorReference
 
-    def post(self):
-        return jsonify({"success": True})
+    """Main entry point for HTTP request"""
+    data = request.get_json(force=True)
+    clos = data["CLOS"]  # Extract array of CLOs
+
+    config_path = './modules/create_graph/config/config.json'
+    with open(config_path) as config:
+        json_config = json.load(config)
+        csv_file = json_config["post_loc"]
+    config.close()
+
+    needs_rebuild = CloUpdateHandler.handle_new_clo_request(clos, csv_file)
+    if needs_rebuild:
+        print("run read_parse_osm run() method now")
+        creator = JsonGraphCreator()
+        creator.create_json_graph(config_path)
+        # Invalidate VRP global variable name
+        vrpProcessorReference = None
+
+    return {"success": True}
+
+
+"""
+Class used for handling request for newCLOs.
+This method checks if graph needs to be rebuilt or updated.
+"""
+@app.route("/api/clo/updateCLOs", methods=['POST'])
+def update_clos():
+    global vrpProcessorReference
+
+    """Main entry point for HTTP request"""
+    data = request.get_json(force=True)
+    clos = data["CLOS"]  # Extract array of CLOs
+
+    config_path = './modules/create_graph/config/config.json'
+    with open(config_path) as config:
+        json_config = json.load(config)
+        csv_file = json_config["post_loc"]
+    config.close()
+
+    needs_rebuild = CloUpdateHandler.handle_update_clo_request(clos, csv_file)
+    if needs_rebuild:
+        creator = JsonGraphCreator()
+        creator.create_json_graph(config_path)
+        # Invalidate VRP global variable name
+        vrpProcessorReference = None
+
+    return jsonify({"success": True})
+
+
+@app.route("/api/crossBorder", methods=['POST'])
+def cross_border_request():
+    print("api call received in cross border API")
 
 
 class CognitiveAdvisorAPI:
-
     def __init__(self, port=5000):
         self._port = port
-        self._app = Flask(__name__)
-        self._api = Api(self._app)
-        self._add_endpoints()
-
-    def _add_endpoints(self):
-        self._register_endpoint('/api/adhoc/recommendationRequest', RecReq)
-        self._register_endpoint("/api/clo/newCLOs", NewCloReq)
-        self._register_endpoint("/api/clo/updateCLOs", UpdateCloReq)
-        self._register_endpoint("/api/crossBorder", CrossBorderReq)
-
-    def _register_endpoint(self, endpoint_name, class_ref):
-        self._api.add_resource(class_ref, endpoint_name)
 
     def start(self):
-        serve(self._app, host='0.0.0.0', port=self._port)
+        serve(app, host='0.0.0.0', port=self._port)
+
+
