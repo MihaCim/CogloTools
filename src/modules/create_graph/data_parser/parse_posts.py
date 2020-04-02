@@ -1,6 +1,7 @@
 
 import csv
-from pojo.post import Post
+
+from ..pojo.post import Post
 
 class PostHandler:
 
