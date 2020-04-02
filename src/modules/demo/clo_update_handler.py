@@ -15,7 +15,7 @@ class CloUpdateHandler:
         # Create map of received CLO UUIDs with content (latitude, longitude, address)
         received_clos_uuid_map = {}
         for json_obj in clos:
-            uuid = json_obj["UUID"]
+            uuid = json_obj["uuid"]
             received_clos_uuid_map[uuid] = json_obj
 
         if not os.path.isfile(csv_file_path):
@@ -35,7 +35,7 @@ class CloUpdateHandler:
 
                     # Map of stored CLOs
                     stored_clos_uuid_map[uuid] = {
-                        "UUID": uuid,
+                        "uuid": uuid,
                         "lat": lat,
                         "lon": lon,
                         "address": address
@@ -57,13 +57,13 @@ class CloUpdateHandler:
         {
             "CLOS": [
                 {
-                    "UUID": "1212",
+                    "uuid": "1212",
                     "lat": "14.12222",
                     "lon": "47.41243124",
                     "address": "Test road"
                 },
                  {
-                    "UUID": "1214",
+                    "uuid": "1214",
                     "lat": "14.5235235",
                     "lon": "46.521424",
                     "address": "Hoolywood road"
@@ -96,7 +96,7 @@ class CloUpdateHandler:
                 csv_writer = csv.writer(csv_file)
 
                 for json_obj in clos:
-                    csv_writer.writerow([json_obj["address"], json_obj["UUID"], json_obj["lat"], json_obj["lon"]])
+                    csv_writer.writerow([json_obj["address"], json_obj["uuid"], json_obj["lat"], json_obj["lon"]])
             csv_file.close()
 
         return build_new_graph
@@ -113,14 +113,14 @@ class CloUpdateHandler:
         {
             "CLOS": [
                 {
-                    "UUID": "1212",
+                    "uuid": "1212",
                     "lat": "14.12224442",
                     "lon": "47.41243121445",
                     "address": "Miami, Florida",
                     "action": "update"
                 },
                  {
-                    "UUID": "1214",
+                    "uuid": "1214",
                     "lat": "14.5235235",
                     "lon": "46.521424",
                     "address": "Hoolywood road",
@@ -168,7 +168,7 @@ class CloUpdateHandler:
 
                 for key in clos_to_add_dict.keys():
                     obj = clos_to_add_dict[key]
-                    csv_writer.writerow([obj["address"], obj["UUID"], obj["lat"], obj["lon"]])
+                    csv_writer.writerow([obj["address"], obj["uuid"], obj["lat"], obj["lon"]])
             csv_file.close()
 
         return build_new_graph

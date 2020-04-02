@@ -471,6 +471,12 @@ class UpdateCloReq(Resource):
         return jsonify({"success": True})
 
 
+class CrossBorderReq(Resource):
+
+    def post(self):
+        return jsonify({"success": True})
+
+
 class CognitiveAdvisorAPI:
 
     def __init__(self, port=5000):
@@ -483,6 +489,7 @@ class CognitiveAdvisorAPI:
         self._register_endpoint('/api/adhoc/recommendationRequest', RecReq)
         self._register_endpoint("/api/clo/newCLOs", NewCloReq)
         self._register_endpoint("/api/clo/updateCLOs", UpdateCloReq)
+        self._register_endpoint("/api/crossBorder", CrossBorderReq)
 
     def _register_endpoint(self, endpoint_name, class_ref):
         self._api.add_resource(class_ref, endpoint_name)

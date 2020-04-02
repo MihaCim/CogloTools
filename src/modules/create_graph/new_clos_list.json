@@ -1,0 +1,34 @@
+{
+  "CLOS": [
+    {
+      "address": "Vir Gub?eva ulica 12",
+      "lat": 46.1507768,
+      "lon": 14.6052041,
+      "uuid": 690
+    },
+    {
+      "address": "Radomlje Cesta borcev 3",
+      "lat": 46.1728265,
+      "lon": 14.6092313,
+      "uuid": 1312
+    },
+    {
+      "address": "Menge\ufffd Trdinov trg 8",
+      "lat": 46.1631656,
+      "lon": 14.5685624,
+      "uuid": 533
+    },
+    {
+      "address": "Kamnik Ljubljanska cesta 14",
+      "lat": 46.2070941,
+      "lon": 14.5976785,
+      "uuid": 153
+    },
+    {
+      "address": "Dob Ulica 7. avgusta 29",
+      "lat": 46.1496257,
+      "lon": 14.6277492,
+      "uuid": 243
+    }
+  ]
+}
