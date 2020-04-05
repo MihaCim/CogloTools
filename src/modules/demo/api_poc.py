@@ -455,12 +455,12 @@ def new_clos():
 """
 Class used for handling request for newCLOs.
 This method checks if graph needs to be rebuilt or updated.
-"""
+
 @app.route("/api/clo/updateCLOs", methods=['POST'])
 def update_clos():
     global vrpProcessorReference
 
-    """Main entry point for HTTP request"""
+    #Main entry point for HTTP request
     data = request.get_json(force=True)
     clos = data["CLOS"]  # Extract array of CLOs
 
@@ -478,7 +478,7 @@ def update_clos():
         vrpProcessorReference = None
 
     return jsonify({"success": True})
-
+"""
 
 @app.route("/api/crossBorder", methods=['POST'])
 def cross_border_request():

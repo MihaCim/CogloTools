@@ -46,50 +46,57 @@ class CloUpdateHandler:
 
     @staticmethod
     def handle_new_clo_request(clos, csv_file_path):
-        """
-        Handle request for new CLOs. If any of received post offices is not stored in our file from which graph is
-        built, we will rewrite the file and rebuild the graph.
-        :param clos:
-        :param csv_file_path:
-        :return:
 
-        Example request (field clos):
-        {
-            "CLOS": [
-                {
-                    "uuid": "1212",
-                    "lat": "14.12222",
-                    "lon": "47.41243124",
-                    "address": "Test road"
-                },
-                 {
-                    "uuid": "1214",
-                    "lat": "14.5235235",
-                    "lon": "46.521424",
-                    "address": "Hoolywood road"
-                 }
-            ]
-        }
         """
-        received_clos_uuid_map, stored_clos_uuid_map = CloUpdateHandler.extract_received_and_stored_dict(clos, csv_file_path)
+               Handle request for new CLOs. If any of received post offices is not stored in our file from which graph is
+               built, we will rewrite the file and rebuild the graph.
+               :param clos:
+               :param csv_file_path:
+               :return:
+
+               Example request (field clos):
+               {
+                   "CLOS": [
+                       {
+                           "uuid": "1212",
+                           "lat": "14.12222",
+                           "lon": "47.41243124",
+                           "address": "Test road"
+                       },
+                        {
+                           "uuid": "1214",
+                           "lat": "14.5235235",
+                           "lon": "46.521424",
+                           "address": "Hoolywood road"
+                        }
+                   ]
+               }
+               """
+        received_clos_uuid_map, stored_clos_uuid_map = CloUpdateHandler.extract_received_and_stored_dict(clos,
+                                                                                                         csv_file_path)
         build_new_graph = False
 
-        # Go through received CLOs and check if we do not have all of them stored
-        for received_key in received_clos_uuid_map.keys():
-            received_object = received_clos_uuid_map[received_key]
+        if len(received_clos_uuid_map) != len(stored_clos_uuid_map):
+            build_new_graph = True
 
-            # Received UUID not stored yet, build new CSV file from scratch
-            if received_key not in stored_clos_uuid_map.keys():
-                build_new_graph = True
-                break
-            else:
-                # We have stored entry for this key, check if any value is different than received one
-                stored_object = stored_clos_uuid_map[received_key]
-                # Something is different, update this entry
-                if stored_object["lat"] != received_object["lat"] or stored_object["lon"] != \
-                        received_object["lon"] or stored_object["address"] != received_object["address"]:
+        else:
+            # Go through received CLOs and check if we do not have all of them stored
+            for received_key in received_clos_uuid_map.keys():
+                received_object = received_clos_uuid_map[received_key]
+
+                # Check if there is difference in uuids
+                if received_key not in stored_clos_uuid_map.keys():
+                    #stored_clos_uuid_map.append()
                     build_new_graph = True
                     break
+                #check is there is difference in other values
+                else:
+                    stored_object = stored_clos_uuid_map[received_key]
+                    # Something is different, update this entry
+                    if stored_object["lat"] != received_object["lat"] or stored_object["lon"] != \
+                            received_object["lon"] or stored_object["address"] != received_object["address"]:
+                        build_new_graph = True
+                        break
 
         if build_new_graph:
             with open(csv_file_path, 'w', newline='') as csv_file:

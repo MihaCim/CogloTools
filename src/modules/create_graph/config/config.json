@@ -1,6 +1,6 @@
 {
-  "eps": 3,
+  "eps": 4,
   "map_basic": "./modules/create_graph/data/PoC_1.osm",
-  "post_loc":"./modules/create_graph/data/PostalOffices_PoC.csv",
+  "post_loc":"./modules/create_graph/data/PostalOffices.csv",
   "post_loc_type": "si"
 }
