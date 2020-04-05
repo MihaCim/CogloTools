@@ -1,3 +1,4 @@
-import modules.create_graph.read_osm_paths as create_graph
+from src.modules.create_graph.create_graph import JsonGraphCreator
 
-create_graph()
+creator = JsonGraphCreator()
+creator.create_json_graph('./modules/create_graph/config/config.json')

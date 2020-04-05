@@ -1,14 +1,16 @@
+
+##GRAPH_TEST_SCENARIO
+
 #!/usr/bin/python3
-import sys
+import os
 import math
 import json
 import networkx as nx
 import matplotlib.pyplot as plt
 
-from .data_parser.data_handler import DataHandler
-from .neighbours_finder import NeighboursFinder
-from .pojo.pruneG import GraphPrune
-
+from src.modules.create_graph.data_parser.data_handler import DataHandler
+from src.modules.create_graph.neighbours_finder import NeighboursFinder
+from src.modules.create_graph.pojo.pruneG import GraphPrune
 
 class JsonGraphCreator():
 
@@ -50,7 +52,7 @@ class JsonGraphCreator():
         for posts in postalNodes:
             li.append(posts)
             G.add_node(posts, pos=(postalNodes[posts]["lat"], postalNodes[posts]["lon"]))
-            labels[posts] = postalNodes[posts]["post"].uuid
+            labels[posts] = postalNodes[posts]["post_id"]
 
         tmpDifColoring = []
         for posts in postalNodes:
@@ -169,9 +171,9 @@ class JsonGraphCreator():
                     postNode[k] = v.__dict__
                     postNodePlain[k] = d
         # print final graph
-        #if len(postEdge) != 0:
-        #    (not_labeled_G, labeled_G, colors) = self.graph_viz(roadNodes, ways)
-        #    self.drawGraph((not_labeled_G, labeled_G, colors), postNode, postEdge)
+        if len(postEdge) != 0:
+            (not_labeled_G, labeled_G, colors) = self.graph_viz(roadNodes, ways)
+            self.drawGraph((not_labeled_G, labeled_G, colors), postNode, postEdge)
 
         # prune graph
         graph = {'nodes': postNodePlain, 'edge': list(postEdge)}
@@ -191,4 +193,5 @@ class JsonGraphCreator():
 
 if __name__ == "__main__":
     creator = JsonGraphCreator()
-    creator.create_json_graph('./config/config.json')
+    #os.system("dir")
+    creator.create_json_graph('./create_graph/config/config1.json')
