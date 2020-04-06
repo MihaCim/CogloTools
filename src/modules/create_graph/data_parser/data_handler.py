@@ -93,7 +93,7 @@ class DataHandler():
         i = 1
         for key, node in roadNodesAnotated.items():
             if node.post:
-                nodesDict[node.id] = SearchNode(node.id, 'A' + str(i), node.post, node.lat, node.lon,
+                nodesDict[node.id] = SearchNode(node.id, node.post.uuid, node.post, node.lat, node.lon,
                                                 node.address,node.post)
                 i = i + 1
             else:

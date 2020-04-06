@@ -10,8 +10,8 @@ class Node:
     """
 
     def __init__(self, node):
-        self.id = node['post_id']
-        self.name = node['post_id']
+        self.id = node['uuid']
+        self.name = node['address']
         self.lat = node['lat']
         self.lon = node['lon']
         self.cluster = None
@@ -23,8 +23,8 @@ class Edge:
     """
 
     def __init__(self, edge, nodes):
-        self.start = nodes[str(edge[0])]['post_id']
-        self.end = nodes[str(edge[1])]['post_id']
+        self.start = nodes[str(edge[0])]['uuid']
+        self.end = nodes[str(edge[1])]['uuid']
         self.cost = round(edge[2], 3)
 
 
@@ -37,7 +37,7 @@ class Path:
         self.path = path
         self.cost = cost
 
-
+@DeprecationWarning
 class GraphLoader:
     """Loads graph data from static JSON file"""
 

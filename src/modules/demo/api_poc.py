@@ -14,7 +14,7 @@ from ..cvrp.vrp import VRP
 from ..demo.clo_update_handler import CloUpdateHandler
 from ..partitioning.post_partitioning import GraphPartitioner
 
-JSON_GRAPH_DATA_PATH = 'modules/demo/data/Graph_PoC.json'
+JSON_GRAPH_DATA_PATH = 'modules/demo/data/Graph_final.json'
 MSB_FWD = 'http://116.203.13.198/api/postRecommendation'
 
 app = Flask(__name__)
