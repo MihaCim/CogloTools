@@ -176,7 +176,7 @@ class JsonGraphCreator():
         # prune graph
         graph = {'nodes': postNodePlain, 'edge': list(postEdge)}
         graph2 = GraphPrune().PruneG(graph)
-        f = open("Graph_final.json", "w")
+        f = open("modules/demo/data/Graph_final.json", "w")
         f.write(json.dumps(graph2))
         f.close()
 
