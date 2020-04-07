@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-import sys
 import math
 import json
 import networkx as nx
@@ -8,6 +7,9 @@ import matplotlib.pyplot as plt
 from .data_parser.data_handler import DataHandler
 from .neighbours_finder import NeighboursFinder
 from .pojo.pruneG import GraphPrune
+from ..demo.config_parser import ConfigParser
+
+config_parser = ConfigParser()
 
 
 class JsonGraphCreator():
@@ -18,8 +20,8 @@ class JsonGraphCreator():
         not_labeled_G = nx.Graph()
         n = set()
 
-        colors = [];
-        colorMap = {};
+        colors = []
+        colorMap = {}
         i = 0
         for edge in ways:
             l = edge.get_all_nodes()
@@ -115,15 +117,12 @@ class JsonGraphCreator():
 
         plt.show()
 
-    def create_json_graph(self, config_path):
-        with open(config_path) as json_data:
-            json_config = json.load(json_data)
-
+    def create_json_graph(self, use_case):
         import time
         start_time = time.time()
         osmHandler = DataHandler(
-            json_config["map_basic"],
-            {json_config["post_loc_type"]: json_config["post_loc"]}
+            config_parser.get_basic_map(),
+            {config_parser.get_post_loc_type(): config_parser.get_post_loc()}
         )
         print("Pre-step  {}".format(time.time() - start_time))
 
@@ -147,7 +146,7 @@ class JsonGraphCreator():
 
         for postId, nodeId in map_posts_to_nodes.items():
 
-            res = finder.search_near_posts(roadNodes, roadWays, ways, nodeId, map_posts_to_nodes, json_config["eps"])
+            res = finder.search_near_posts(roadNodes, roadWays, ways, nodeId, map_posts_to_nodes, config_parser.get_eps())
             print('PostID ' + str(postId) + ' Node: ' + str(nodeId) + ' r: ' + str(res))
 
             tmpRes.append((postId, nodeId, res))
@@ -176,7 +175,7 @@ class JsonGraphCreator():
         # prune graph
         graph = {'nodes': postNodePlain, 'edge': list(postEdge)}
         graph2 = GraphPrune().PruneG(graph)
-        f = open("modules/demo/data/Graph_final.json", "w")
+        f = open(config_parser.get_graph_path(use_case), "w")
         f.write(json.dumps(graph2))
         f.close()
 

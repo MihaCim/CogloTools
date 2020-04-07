@@ -2,5 +2,11 @@
   "eps": 4,
   "map_basic": "./modules/create_graph/data/PoC_1.osm",
   "post_loc":"./modules/create_graph/data/PostalOffices.csv",
-  "post_loc_type": "si"
+  "post_loc_type": "si",
+  "msb_fwd": "http://116.203.13.198/api/postRecommendation",
+  "elta_json_graph_data_path": "./modules/demo/data/elta_graph_final.json",
+  "slo_hr_json_graph_data_path": "./modules/demo/data/slo_hr_graph_final.json",
+  "elta_pickle_path": "./modules/demo/data/elta_graphs.pickle",
+  "slo_hr_pickle_path": "./modules/demo/data/slo_hr_graphs.pickle",
+  "slo_graph_json": "./modules/demo/data/slovenia.json"
 }

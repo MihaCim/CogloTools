@@ -1,7 +1,5 @@
-from collections import Set
 import copy
 import numpy as np
-from mpl_toolkits.mplot3d import Axes3D  # must be included to support 3D scatter
 import matplotlib.pyplot as plt
 from modules.partitioning.spectral import spectral_part
 from modules.demo.graph_processing import Node, Edge, GraphProcessor
@@ -10,6 +8,8 @@ import time
 from tqdm import tqdm
 import os
 
+from ..demo.config_parser import ConfigParser
+config_parser = ConfigParser()
 
 class ClusterRender:
     """Renders partitioned points in chart"""
@@ -33,17 +33,19 @@ class ClusterRender:
 class GraphPartitioner:
     """Handles partitioning of graph from static JSON files using spectral partitioning"""
 
-    def __init__(self, path):
-        self.path = path
+    def __init__(self, use_case):
+        self.use_case = use_case
+        self.path = config_parser.get_graph_path(use_case)
         self.nodes = []
         self.edges = []
         self.graphProcessors = []
-        self._load_graph(path)
+        self._load_graph(self.path)
         self.matrix = []
         self.cluster_renderer = ClusterRender()
         self.adjacency_matrix()
 
     def _load_graph(self, path):
+        os.system("ls")
         """Load graph from file"""
         with open(path, "r", encoding='UTF-8') as read_file:
             data = json.load(read_file)
@@ -157,6 +159,5 @@ class GraphPartitioner:
 
 
 if __name__ == '__main__':
-    graph = GraphPartitioner('/home/mikroman/dev/ijs/coglo/src/modules/demo/data/slovenia.json')
-
+    graph = GraphPartitioner(config_parser.get_slo_graph())
     node_parts, edge_parts = graph.partition(5, True)

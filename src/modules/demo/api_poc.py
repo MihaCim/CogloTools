@@ -13,12 +13,12 @@ from ..create_graph.create_graph import JsonGraphCreator
 from ..cvrp.vrp import VRP
 from ..demo.clo_update_handler import CloUpdateHandler
 from ..partitioning.post_partitioning import GraphPartitioner
-
-JSON_GRAPH_DATA_PATH = 'modules/demo/data/Graph_final.json'
-MSB_FWD = 'http://116.203.13.198/api/postRecommendation'
+from ..demo.config_parser import ConfigParser
 
 app = Flask(__name__)
 vrpProcessorReference = None
+
+config_parser = ConfigParser()
 
 """
 Example POST MSG:
@@ -339,11 +339,8 @@ class RecReq(Resource):
     def init_vrp(use_case):
         """" Init VRP processor instance based on use-case defined in parameter"""
 
-        pickle_path = './modules/demo/data/graphs.pickle'
-        # pickle_path = './' + JSON_GRAPH_DATA_PATH.replace('/', '_') + '.graphs.pickle'
-        print('Checking if data from', JSON_GRAPH_DATA_PATH, 'exists.')
-
-        # TODO: use parameter useCase when choosing correct graph data instance
+        pickle_path = config_parser.get_pickle_path(use_case)
+        graph_path = config_parser.get_graph_path(use_case)
 
         # Load locally stored pickle
         if os.path.exists(pickle_path):
@@ -357,7 +354,7 @@ class RecReq(Resource):
             # instance partitioner object, partition input graph, create graph processors
             # for all partitions and then create instance of vrp proc
             print('No data found, runing load and partition procedure')
-            partitioner = GraphPartitioner(JSON_GRAPH_DATA_PATH)
+            partitioner = GraphPartitioner(use_case)
             partitioner.partition(K)
             with open(pickle_path, 'wb') as dumpfile:
                 pickle.dump(partitioner, dumpfile)
@@ -401,11 +398,12 @@ def handle_recommendation_request():
     data = request.get_json(force=True)
     evt_type = data["eventType"]
 
+    if "useCase" not in data:
+        return {"message": "Parameter useCase is missing"}
+    use_case = data["useCase"]
+
     # Initialize vrpProcessor if not yet initialized
     if vrpProcessorReference is None:
-        if "useCase" not in data:
-            return {"message": "Parameter useCase is missing"}
-        use_case = data["useCase"]
         vrpProcessorReference = RecReq.init_vrp(use_case)
 
     vrp_processor_ref = vrpProcessorReference
@@ -419,6 +417,10 @@ def handle_recommendation_request():
         requests = data["orders"]
         recommendations = RecReq.process_pickup_requests(clos, requests, vrp_processor_ref)
         return jsonify(recommendations)
+
+    elif evt_type == "crossBorder":
+        print("cross border event received")
+
     else:
         return jsonify({"message": "Invalid event type: {}".format(evt_type)})
 
@@ -427,6 +429,8 @@ def handle_recommendation_request():
 Class used for handling request for newCLOs.
 This method checks if graph needs to be rebuilt or updated.
 """
+
+
 @app.route("/api/clo/newCLOs", methods=['POST'])
 def new_clos():
     global vrpProcessorReference
@@ -434,18 +438,14 @@ def new_clos():
     """Main entry point for HTTP request"""
     data = request.get_json(force=True)
     clos = data["CLOS"]  # Extract array of CLOs
-
-    config_path = './modules/create_graph/config/config.json'
-    with open(config_path) as config:
-        json_config = json.load(config)
-        csv_file = json_config["post_loc"]
-    config.close()
+    use_case = data["useCase"]
+    csv_file = config_parser.get_post_loc()
 
     needs_rebuild = CloUpdateHandler.handle_new_clo_request(clos, csv_file)
     if needs_rebuild:
         print("run read_parse_osm run() method now")
         creator = JsonGraphCreator()
-        creator.create_json_graph(config_path)
+        creator.create_json_graph(use_case)
         # Invalidate VRP global variable name
         vrpProcessorReference = None
 
@@ -480,6 +480,7 @@ def update_clos():
     return jsonify({"success": True})
 """
 
+
 @app.route("/api/crossBorder", methods=['POST'])
 def cross_border_request():
     print("api call received in cross border API")
@@ -491,5 +492,3 @@ class CognitiveAdvisorAPI:
 
     def start(self):
         serve(app, host='0.0.0.0', port=self._port)
-
-
