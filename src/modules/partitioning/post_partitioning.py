@@ -79,10 +79,10 @@ class GraphPartitioner:
             idxB = node_map[e.end]
             self.matrix[idxA, idxB] += 1
 
-    def partition(self, count, show_plot=False):
+    def partition(self, count):
         """Prepare matrices, partition graph and assign points and edges to computed partitions"""
         print('Running partitioning for', count, 'partitions on', len(self.nodes), 'nodes')
-        if count == 1:
+        if count == 0:
             self.graphProcessors = [GraphProcessor(self.nodes, self.edges)]
             print('Only one partition made', "nodes:", len(self.nodes), "edges:", len(self.edges))
             return self.graphProcessors
@@ -103,8 +103,8 @@ class GraphPartitioner:
         node_partitions = [[] for _ in range(n_parts)]
         edge_partitions = [set() for _ in range(n_parts)]
 
-        if show_plot:
-            self.cluster_renderer.render(self.nodes, assignments)
+        #plot clusters
+        #self.cluster_renderer.render(self.nodes, assignments)
 
         # assign nodes to partitions
         for i in range(len(self.nodes)):

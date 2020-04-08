@@ -35,19 +35,7 @@
         "uuid": "H6",
         "lat": "45.860454",
         "lon": "15.803261"
-    },
-    {
-        "address": "hrvaska7",
-        "uuid": "H7",
-        "lat": "45.883802",
-        "lon": "15.737766"
-    },
-    {
-        "address": "hrvaska8",
-        "uuid": "H8",
-        "lat": "45.822532",
-        "lon": "15.872464"
-    },
+    }
     {
         "address": "hrvaska9",
         "uuid": "H9",
@@ -92,7 +80,7 @@
     },
     {
         "address": "Kriska vas",
-        "uuid": "s7",
+        "uuid": "S7",
         "lat": "45.89123853",
         "lon": "15.57086928"
     },
