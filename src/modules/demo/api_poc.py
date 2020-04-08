@@ -341,7 +341,6 @@ class RecReq(Resource):
         """" Init VRP processor instance based on use-case defined in parameter"""
 
         pickle_path = config_parser.get_pickle_path(use_case)
-        graph_path = config_parser.get_graph_path(use_case)
 
         # Load locally stored pickle
         if os.path.exists(pickle_path):
@@ -444,6 +443,12 @@ def new_clos():
         print("run read_parse_osm run() method now")
         creator = JsonGraphCreator()
         creator.create_json_graph(use_case)
+
+        # Delete existing pickle file for graph
+        pickle_path = config_parser.get_pickle_path(use_case)
+        if os.path.exists(pickle_path):
+            os.remove(pickle_path)
+
         # Invalidate VRP global variable name
         vrpProcessorReference = None
 
@@ -477,13 +482,6 @@ def update_clos():
 
     return jsonify({"success": True})
 """
-
-
-
-@app.route("/api/crossBorder", methods=['POST'])
-def cross_border_request():
-    print("api call received in cross border API")
-
 
 class CognitiveAdvisorAPI:
     def __init__(self, port=5000):
