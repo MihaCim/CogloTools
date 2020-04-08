@@ -170,6 +170,7 @@ class VrpProcessor:
     def process(self, vehicles, deliveries_all):
         """Process routing request with N vehicles and M deliveries, to produce a list of routing plans"""
         deliveries = deliveries_all.deliveries
+
         delivery_map = self.map_deliveries(deliveries)
         vehicle_map = self.map_vehicles(vehicles)
         # mapping all data to partitions
@@ -350,7 +351,7 @@ class RecReq(Resource):
         else:
             # make 25 partitions, so our VRP can do the work in reasonable time,
             # even then small or even-sized partitions are not guaranteed
-            K = 1
+            K = 2
             # instance partitioner object, partition input graph, create graph processors
             # for all partitions and then create instance of vrp proc
             print('No data found, runing load and partition procedure')
@@ -382,10 +383,7 @@ class RecReq(Resource):
     def process_broken_clo(clos, broken_clo, vrp_processor_ref):
         print("Processing Broken CLO for ", len(clos), 'vehicles')
         vehicles = vrp_processor_ref.parse_vehicles(clos)
-        deliveries = [Parcel(x["UUIDParcel"], x["destination"], x["weight"]) for x in broken_clo["parcels"]]
-        for clo in clos:
-            for parcel in clo["parcels"]:
-                deliveries.append(Parcel(parcel["UUIDParcel"], parcel["destination"], parcel["weight"]))
+        deliveries = vrp_processor_ref.parse_deliveries(clos, broken_clo["parcels"])
 
         return vrp_processor_ref.process(vehicles, deliveries)
 
@@ -479,6 +477,7 @@ def update_clos():
 
     return jsonify({"success": True})
 """
+
 
 
 @app.route("/api/crossBorder", methods=['POST'])
