@@ -1,4 +1,4 @@
-
+import os
 import json
 
 
@@ -6,6 +6,10 @@ class ConfigParser:
 
     def __init__(self):
         config_path = './modules/create_graph/config/config.json'
+        if not os.path.exists(config_path):
+            print("File config.json does not exist. Config parser cannot be initialized!")
+            exit(1)
+
         with open(config_path) as config:
             self.json_config = json.load(config)
         config.close()
@@ -24,13 +28,13 @@ class ConfigParser:
         else:
             print("Error - use_case not defined")
 
-    def get_crossborder_nodes_SLO(self, use_case):
+    def get_cross_border_nodes_slo(self, use_case):
         if use_case == "SLO-HR":
             return self.json_config["S1", "S3", "S5"]
-    def get_crossborder_nodes_CRO(self, use_case):
+
+    def get_cross_border_nodes_cro(self, use_case):
         if use_case == "SLO-HR":
             return self.json_config["H5", "H3", "H1"]
-
 
     def get_msb_few_url(self):
         return self.json_config["msb_fwd"]
