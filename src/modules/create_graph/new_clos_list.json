@@ -98,3 +98,90 @@
     }
   ]
 }
+
+##pickupRequest JSON
+
+{
+"eventType": "brokenVehicle",
+"useCase":"SLO-HR",
+"CLOS": [{
+"UUID": "UUID-1",
+"currentLocation": "S1",
+"capacity": 400,
+"parcels": [{
+"UUIDParcel": "AAAA1",
+"weight": 1,
+"destination": "S4"
+},
+{
+"UUIDParcel": "AAAA2",
+"weight": 1,
+"destination": "S3"
+},
+{
+"UUIDParcel": "AAAA3",
+"weight": 1,
+"destination": "S5"
+}
+]
+},
+{
+"UUID": "UUID-4",
+"currentLocation": "H1",
+"capacity": 200,
+"parcels": [{
+"UUIDParcel": "DDDD",
+"weight": 1,
+"destination": "H3"
+}]
+},
+{
+"UUID": "UUID-3",
+"currentLocation": "H2",
+"capacity": 200,
+"parcels": [{
+"UUIDParcel": "BBBB",
+"weight": 1,
+"destination": "H5"
+}]
+},
+{
+"UUID": "UUID-2",
+"currentLocation": "S6",
+"capacity": 200,
+"parcels": [{
+"UUIDParcel": "CCCC",
+"weight": 1,
+"destination": "H6"
+}]
+}
+
+],
+"BrokenVehicle": {
+"UUID": "UUID-3",
+"currentLocation": "H7",
+"capacity": 200,
+"parcels": [
+{
+"UUIDParcel": "Parcel UUID1",
+"weight": 1,
+"destination": "S8"
+},
+{
+"UUIDParcel": "Parcel UUID3",
+"weight": 1,
+"destination": "H4"
+},
+{
+"UUIDParcel": "Parcel UUID4",
+"weight": 1,
+"destination": "S7"
+},
+{
+"UUIDParcel": "Parcel UUID5",
+"weight": 1,
+"destination": "H6"
+}
+]
+}
+}
