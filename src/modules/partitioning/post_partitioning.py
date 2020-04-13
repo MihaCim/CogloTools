@@ -82,7 +82,7 @@ class GraphPartitioner:
     def partition(self, count):
         """Prepare matrices, partition graph and assign points and edges to computed partitions"""
         print('Running partitioning for', count, 'partitions on', len(self.nodes), 'nodes')
-        if count == 0:
+        if count == 1:
             self.graphProcessors = [GraphProcessor(self.nodes, self.edges)]
             print('Only one partition made', "nodes:", len(self.nodes), "edges:", len(self.edges))
             return self.graphProcessors
