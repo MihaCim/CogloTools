@@ -414,8 +414,9 @@ class RecReq(Resource):
 
 
 class CognitiveAdvisorAPI:
-    def __init__(self, port=5000):
+    def __init__(self, port=5000, host='0.0.0.0'):
         self._port = port
+        self._host = host
         self._app = Flask(__name__)
         self._api = Api(self._app)
         self._add_endpoints()
@@ -428,7 +429,7 @@ class CognitiveAdvisorAPI:
         self._api.add_resource(class_ref, endpoint_name)
 
     def start(self):
-        serve(self._app, host='0.0.0.0', port=self._port)
+        serve(self._app, host=self._host, port=self._port)
 
 
 if __name__ == '__main__':

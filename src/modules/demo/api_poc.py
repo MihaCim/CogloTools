@@ -1,6 +1,5 @@
 import json
 import os
-import pickle
 import time
 from math import inf
 
@@ -176,7 +175,8 @@ class VrpProcessor:
         delivery_map_req = self.map_deliveries(deliveries_req)
         vehicle_map = self.map_vehicles(vehicles)
         # mapping all data to partitions
-        plans = [Plan(vehicle_map[i], delivery_map[i], delivery_map_req[i], self.graphs[i]) for i in range(len(self.graphs))]
+        plans = [Plan(vehicle_map[i], delivery_map[i], delivery_map_req[i], self.graphs[i]) for i in
+                 range(len(self.graphs))]
         routes = []
 
         for i, plan in enumerate(plans):
@@ -199,8 +199,8 @@ class VrpProcessor:
                                                            costs)
             # compute routes based on dispatch vectors from VRP. Since VRP output is incomplete/not best,
             # we add A* routing on top
-
-            plan_routes = self.make_route(computed_routes, dispatch, partition, plan.vehicles, plan.deliveries, plan.deliveries_req)
+            plan_routes = self.make_route(computed_routes, dispatch, partition, plan.vehicles, plan.deliveries,
+                                          plan.deliveries_req)
             routes += plan_routes
 
         return routes
@@ -244,7 +244,6 @@ class VrpProcessor:
                             break
             loads_new.append(self.map_dropoff(graph, vehicle.parcels))
 
-
         for i, vehicle_load in enumerate(loads_new):
             start_node = start_nodes[i]
             route = [start_node]
@@ -285,7 +284,7 @@ class VrpProcessor:
 
             print("Cost VRP: {}, Cost A*:{}".format(cost_vrp, cost_astar))
             graph.print_path(route)
-            #print([item if x > 0 else -1 for item, x in enumerate(original_vehicle_load)])
+            # print([item if x > 0 else -1 for item, x in enumerate(original_vehicle_load)])
 
             route_converted = self.map_parcels_to_route(route, dispatch, graph, vehicles[i])
             routes.append(route)
@@ -305,7 +304,7 @@ class VrpProcessor:
         converted_route = []
         parcel_list = vehicle.parcels
 
-        #map parcel UUIDs to route
+        # map parcel UUIDs to route
         if len(route) == 1 and loads[nodes.index(route[0])] == 0:
             return []
 
@@ -323,7 +322,7 @@ class VrpProcessor:
                     "info": "This parcel must be delivered to location " + str(node.id),
                     "position": "{},{}".format(node.lon, node.lat)
                 })
-                for parcel_remove in parcel_list:       # removes the added parcels from the pending parcel list
+                for parcel_remove in parcel_list:  # removes the added parcels from the pending parcel list
                     if parcel_remove.uuid in parcels:
                         parcel_list.remove(parcel_remove)
 
@@ -359,42 +358,15 @@ class VrpProcessor:
 
 class RecReq(Resource):
 
-    def __init__(self):
-        self.vrpProcessor = None
-
     @staticmethod
     def init_vrp(use_case):
         """" Init VRP processor instance based on use-case defined in parameter"""
-
-        pickle_path = config_parser.get_pickle_path(use_case)
-
-        # Load locally stored pickle
-        if os.path.exists(pickle_path):
-            with open(pickle_path, 'rb') as loadfile:
-                partitioner = pickle.load(loadfile)
-            print('Loaded pickled graph data')
-        else:
-            # make 25 partitions, so our VRP can do the work in reasonable time,
-            # even then small or even-sized partitions are not guaranteed
-            K = 1
-            # instance partitioner object, partition input graph, create graph processors
-            # for all partitions and then create instance of vrp proc
-            print('No data found, runing load and partition procedure')
-            partitioner = GraphPartitioner(use_case)
-            partitioner.partition(K)
-            with open(pickle_path, 'wb') as dumpfile:
-                pickle.dump(partitioner, dumpfile)
-                print('Stored pickled dump for future use')
-
+        partitioner = GraphPartitioner.init_partitioner(use_case)
         return VrpProcessor(partitioner.graphProcessors)
-
-    def get(self):
-        return jsonify({"success": True, "message": "Please use POST request"})
 
     def msb_forward(self, payload, key):
         pass
-
-    # check api_ijs.py for this code
+        # check api_ijs.py for this code
 
     @staticmethod
     def process_pickup_requests(clos, requests, vrp_processor_ref):
@@ -452,8 +424,6 @@ def handle_recommendation_request():
 Class used for handling request for newCLOs.
 This method checks if graph needs to be rebuilt or updated.
 """
-
-
 @app.route("/api/clo/newCLOs", methods=['POST'])
 def new_clos():
     global vrpProcessorReference
@@ -466,7 +436,6 @@ def new_clos():
 
     needs_rebuild = CloUpdateHandler.handle_new_clo_request(clos, csv_file)
     if needs_rebuild:
-        print("run read_parse_osm run() method now")
         creator = JsonGraphCreator()
         creator.create_json_graph(use_case)
 
@@ -481,37 +450,10 @@ def new_clos():
     return {"success": True}
 
 
-"""
-Class used for handling request for newCLOs.
-This method checks if graph needs to be rebuilt or updated.
-
-@app.route("/api/clo/updateCLOs", methods=['POST'])
-def update_clos():
-    global vrpProcessorReference
-
-    #Main entry point for HTTP request
-    data = request.get_json(force=True)
-    clos = data["CLOS"]  # Extract array of CLOs
-
-    config_path = './modules/create_graph/config/config.json'
-    with open(config_path) as config:
-        json_config = json.load(config)
-        csv_file = json_config["post_loc"]
-    config.close()
-
-    needs_rebuild = CloUpdateHandler.handle_update_clo_request(clos, csv_file)
-    if needs_rebuild:
-        creator = JsonGraphCreator()
-        creator.create_json_graph(config_path)
-        # Invalidate VRP global variable name
-        vrpProcessorReference = None
-
-    return jsonify({"success": True})
-"""
-
 class CognitiveAdvisorAPI:
-    def __init__(self, port=5000):
+    def __init__(self, port=5000, host="0.0.0.0"):
         self._port = port
+        self._host = host
 
     def start(self):
-        serve(app, host='0.0.0.0', port=self._port)
+        serve(app, host=self._host, port=self._port)

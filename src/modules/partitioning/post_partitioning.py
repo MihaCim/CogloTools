@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from modules.partitioning.spectral import spectral_part
 from modules.demo.graph_processing import Node, Edge, GraphProcessor
 import json
+import pickle
 import time
 from tqdm import tqdm
 import os
@@ -156,6 +157,33 @@ class GraphPartitioner:
         print('Input', len(self.edges), 'assigned', sum([len(x) for x in edge_partitions]))
 
         return self.graphProcessors
+
+    @staticmethod
+    def init_partitioner(use_case):
+        """
+        Method used for loading Partitioner instance from pickle file or initializing
+        new partitioner and returning it's instance.
+        :param use_case: use_case can be SLO-HR or ELTA for now.
+        :return: instace of GraphPartitioner
+        """
+        pickle_path = config_parser.get_pickle_path(use_case)
+
+        # Load locally stored pickle
+        if os.path.exists(pickle_path):
+            with open(pickle_path, 'rb') as loadfile:
+                partitioner = pickle.load(loadfile)
+            print('Loaded pickled graph partitioner data')
+        else:
+            # Initialize new GraphPartitioner based on use_case given as parameter and execute partition() method,
+            # then store partitioner instance in a pickle file and return it
+            print('No data found, runing init GraphPartitioner and partition procedure')
+            partitioner = GraphPartitioner(use_case)
+            partitioner.partition(config_parser.get_graph_partitions())
+            with open(pickle_path, 'wb') as dumpfile:
+                pickle.dump(partitioner, dumpfile)
+                print('Stored pickled dump for future use')
+
+        return partitioner
 
 
 if __name__ == '__main__':

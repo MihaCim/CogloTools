@@ -20,10 +20,6 @@ class ConfigParser:
         elif use_case == "ELTA":
             return self.json_config["elta_pickle_path"]
 
-    def get_number_of_graph_part(self):
-        number_of_partitions = 1
-        return number_of_partitions
-
     def get_graph_path(self, use_case):
         if use_case == "SLO-HR":
             return self.json_config["slo_hr_json_graph_data_path"]
@@ -57,3 +53,6 @@ class ConfigParser:
 
     def get_slo_graph(self):
         return self.json_config["slo_graph_json"]
+
+    def get_graph_partitions(self):
+        return self.json_config["graph_partitions"]
