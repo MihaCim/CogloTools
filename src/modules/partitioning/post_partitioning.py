@@ -1,16 +1,20 @@
 import copy
 import numpy as np
 import matplotlib.pyplot as plt
-from modules.partitioning.spectral import spectral_part
-from modules.demo.graph_processing import Node, Edge, GraphProcessor
 import json
 import pickle
 import time
-from tqdm import tqdm
 import os
 
-from ..demo.config_parser import ConfigParser
+from tqdm import tqdm
+from ..partitioning.spectral import spectral_part
+from ..demo.graph_processing import GraphProcessor
+from ..create_graph.config.config_parser import ConfigParser
+from ..utils.structures.node import Node
+from ..utils.structures.edge import Edge
+
 config_parser = ConfigParser()
+
 
 class ClusterRender:
     """Renders partitioned points in chart"""
@@ -164,7 +168,7 @@ class GraphPartitioner:
         Method used for loading Partitioner instance from pickle file or initializing
         new partitioner and returning it's instance.
         :param use_case: use_case can be SLO-HR or ELTA for now.
-        :return: instace of GraphPartitioner
+        :return: instance of GraphPartitioner
         """
         pickle_path = config_parser.get_pickle_path(use_case)
 

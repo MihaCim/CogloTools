@@ -4,8 +4,7 @@ import json
 
 class ConfigParser:
 
-    def __init__(self):
-        config_path = './modules/create_graph/config/config.json'
+    def __init__(self, config_path='./modules/create_graph/config/config.json'):
         if not os.path.exists(config_path):
             print("File config.json does not exist. Config parser cannot be initialized!")
             exit(1)

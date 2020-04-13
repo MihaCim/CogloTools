@@ -1,10 +1,12 @@
 import os
 import csv
 
-"""
-Class used for checking whether new 
-"""
+
 class CloUpdateHandler:
+    """
+    Class used for handling new received CLOs and updating or recreating CSV file
+    containing CLO data.
+    """
     @staticmethod
     def extract_received_and_stored_dict(clos, csv_file_path):
         """

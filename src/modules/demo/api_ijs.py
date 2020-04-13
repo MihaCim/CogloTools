@@ -8,8 +8,9 @@ from flask_jsonpify import jsonify
 from flask_restful import Resource, Api
 from waitress import serve
 from random import randint
-from modules.cvrp.vrp import VRP
-from modules.demo.graph_processing import GraphProcessor, GraphLoader
+
+from ..cvrp.vrp import VRP
+from ..demo.graph_processing import GraphProcessor, GraphLoader
 
 MSB_FWD = 'http://116.203.13.198/api/postRecommendation'
 brokenVehicle = None

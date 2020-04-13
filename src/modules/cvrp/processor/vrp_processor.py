@@ -1,8 +1,12 @@
-import json
 import time
 from math import inf
 
-from ..cvrp.vrp import VRP
+from ..vrp import VRP
+from ...utils.structures.parcel import Parcel
+from ...utils.structures.deliveries import Deliveries
+from ...utils.structures.plan import Plan
+from ...utils.structures.vehicle import Vehicle
+
 
 class VrpProcessor:
     """Processes a request for routing

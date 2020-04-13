@@ -1,41 +1,11 @@
 import json
 from queue import PriorityQueue
-
 from math import sin, cos, sqrt, atan2, radians, inf
 
+from ..utils.structures.node import Node
+from ..utils.structures.edge import Edge
+from ..utils.structures.path import Path
 
-class Node:
-    """
-    Encapsulates Node data from JSON object
-    """
-
-    def __init__(self, node):
-        self.id = node['uuid']
-        self.name = node['address']
-        self.lat = node['lat']
-        self.lon = node['lon']
-        self.cluster = None
-
-
-class Edge:
-    """
-    Edge connecting 2 nodes, with a cost of travel
-    """
-
-    def __init__(self, edge, nodes):
-        self.start = nodes[str(edge[0])]['uuid']
-        self.end = nodes[str(edge[1])]['uuid']
-        self.cost = round(edge[2], 3)
-
-
-class Path:
-    """A list of nodes make a single path"""
-
-    def __init__(self, path, cost):
-        self.start = path[0]
-        self.end = path[-1]
-        self.path = path
-        self.cost = cost
 
 @DeprecationWarning
 class GraphLoader:
