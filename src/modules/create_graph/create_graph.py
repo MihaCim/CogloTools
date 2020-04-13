@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from .data_parser.data_handler import DataHandler
 from .neighbours_finder import NeighboursFinder
 from .pojo.pruneG import GraphPrune
-from ..demo.config_parser import ConfigParser
+from ..create_graph.config.config_parser import ConfigParser
 
 config_parser = ConfigParser()
 

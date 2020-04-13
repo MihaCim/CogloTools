@@ -8,5 +8,6 @@
   "slo_hr_json_graph_data_path": "./modules/demo/data/slo_hr_graph_final.json",
   "elta_pickle_path": "./modules/demo/data/elta_graphs.pickle",
   "slo_hr_pickle_path": "./modules/demo/data/slo_hr_graphs.pickle",
-  "slo_graph_json": "./modules/demo/data/slovenia.json"
+  "slo_graph_json": "./modules/demo/data/slovenia.json",
+  "graph_partitions": 1
 }

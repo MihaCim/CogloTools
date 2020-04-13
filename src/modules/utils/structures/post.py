@@ -1,4 +1,3 @@
-
 class Post:
     def __init__(self, address, uuid, latitude, longitude):
         self.address = address

@@ -12,3 +12,4 @@ markupsafe
 flask
 flask-jsonpify
 flask-restful
+waitress
