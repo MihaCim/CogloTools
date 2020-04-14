@@ -93,7 +93,7 @@ class Database:
 
     def query(self, line, parameters=None):
         """
-        Query the table with parameters or without. Examples:
+        Query the table with parameters or without. examples:
         1) "SELECT * FROM concepts"
         2) "SELECT * FROM concepts WHERE id = %s", (9,)
         :param line:
@@ -120,7 +120,7 @@ class Database:
 
     def execute(self, content, parameters=None, fetch=False):
         """
-        Execute insert or update with parameters or without. Examples:
+        Execute insert or update with parameters or without. examples:
         1) "INSERT INTO concepts(id, timestamp, alpha, concepts) VALUES(DEFAULT, 431234124, 0.2, 10)"
         2) "UPDATE concepts set result = %s where id = %s", ("testtest", 6)
         :param fetch:

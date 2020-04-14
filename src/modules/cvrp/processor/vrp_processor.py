@@ -272,9 +272,17 @@ class VrpProcessor:
 
     def map_slo_cro_vehicles(self, vehicles):
         # TODO: implement
+        # if currentLocation starts with "S" - put vehicle to cluster 0
+        # if currentLocation starts with "H" - put vehicle to cluster 1
+
         return []
 
     def map_slo_cro_deliveries(self, deliveries):
         # TODO: implement
+        # if pickup node starts with "S" - put parcel to cluster 0
+            #if destination node start with "H", assign closest "cro_border_nodes"
+        # if destination node starts with "H" - put parcel to cluster 1
+            # if destination node start with "H", assign closest "slo_border_nodes"
+        
         return []
 
