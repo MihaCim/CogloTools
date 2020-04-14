@@ -154,11 +154,17 @@ def new_clos():
         # Remove use case specific
         if use_case == "SLO-CRO":
             slo_path = config_parser.get_slo_graph_path()
+            slo_pickle_path = config_parser.get_slo_pickle_path()
             cro_path = config_parser.get_cro_graph_path()
+            cro_pickle_path = config_parser.get_cro_pickle_path()
             if os.path.exists(slo_path):
                 os.remove(slo_path)
+            if os.path.exists(slo_pickle_path):
+                os.remove(slo_pickle_path)
             if os.path.exists(cro_path):
                 os.remove(cro_path)
+            if os.path.exists(cro_pickle_path):
+                os.remove(cro_pickle_path)
 
         # Invalidate VRP global variable name
         vrpProcessorReference = None
