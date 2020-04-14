@@ -136,7 +136,7 @@ def new_clos():
         return {"message": "Parameter 'CLOS' or 'useCase' is missing"}
     clos = data["CLOS"]  # Extract array of CLOs
     use_case = data["useCase"]
-    csv_file = config_parser.get_post_loc()
+    csv_file = config_parser.get_csv_path(use_case)
 
     if use_case != "SLO-CRO" and use_case != "ELTA":
         return {"message": "Parameter 'useCase' can have value 'SLO-CRO' or 'ELTA'."}
