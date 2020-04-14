@@ -25,7 +25,15 @@ class ConfigParser:
         elif use_case == "ELTA":
             return self.json_config["elta_json_graph_data_path"]
         else:
-            print("Error - use_case not defined")
+            print("Error - use_case not defined.")
+
+    def get_csv_path(self, use_case):
+        if use_case == "SLO_CRO":
+            return self.json_config["post_loc_slo_cro"]
+        elif use_case == "ELTA":
+            return self.json_config["post_loc_elta"]
+        else:
+            print("Error - use not not defined.")
 
     def get_border_nodes_slo(self):
         return self.json_config["slo_border_nodes"]
