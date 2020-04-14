@@ -13,10 +13,10 @@ class VrpProcessor:
         Many operations on lists in this code can be replaced with dicts or similar, to remove list iteration with
         dict lookup.
     """
-
-    def __init__(self, graphs):
+    def __init__(self, graphs, use_case):
         self.vrp = VRP()
         self.graphs = graphs
+        self.use_case = use_case
 
     def map_vehicles(self, vehicles):
         """Assign vehicles to partitions"""
@@ -74,9 +74,17 @@ class VrpProcessor:
         """Process routing request with N vehicles and M deliveries, to produce a list of routing plans"""
         deliveries = deliveries_all.deliveries
         deliveries_req = deliveries_all.req
-        delivery_map = self.map_deliveries(deliveries)
-        delivery_map_req = self.map_deliveries(deliveries_req)
-        vehicle_map = self.map_vehicles(vehicles)
+
+        # Handle SLO-CRO use case for mapping vehicles and deliveries
+        if self.use_case == "SLO-CRO":
+            delivery_map = self.map_slo_cro_deliveries(deliveries)
+            delivery_map_req = self.map_slo_cro_deliveries(deliveries_req)
+            vehicle_map = self.map_slo_cro_vehicles(vehicles)
+        else:
+            delivery_map = self.map_deliveries(deliveries)
+            delivery_map_req = self.map_deliveries(deliveries_req)
+            vehicle_map = self.map_vehicles(vehicles)
+
         # mapping all data to partitions
         plans = [Plan(vehicle_map[i], delivery_map[i], delivery_map_req[i], self.graphs[i]) for i in
                  range(len(self.graphs))]
@@ -257,4 +265,16 @@ class VrpProcessor:
         deliveries_all = deliveries_origin + deliveries_diff
         deliveries = Deliveries(deliveries_origin, deliveries_diff, deliveries_all)
         return deliveries
+
+    ####################################################################################
+    # Helper methods and methods used for specific use case or purpose
+    ####################################################################################
+
+    def map_slo_cro_vehicles(self, vehicles):
+        # TODO: implement
+        return []
+
+    def map_slo_cro_deliveries(self, deliveries):
+        # TODO: implement
+        return []
 

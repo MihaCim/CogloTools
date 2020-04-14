@@ -38,9 +38,8 @@ class ClusterRender:
 class GraphPartitioner:
     """Handles partitioning of graph from static JSON files using spectral partitioning"""
 
-    def __init__(self, use_case):
-        self.use_case = use_case
-        self.path = config_parser.get_graph_path(use_case)
+    def __init__(self, graph_path):
+        self.path = graph_path
         self.nodes = []
         self.edges = []
         self.graphProcessors = []
@@ -162,34 +161,6 @@ class GraphPartitioner:
 
         return self.graphProcessors
 
-    @staticmethod
-    def init_partitioner(use_case):
-        """
-        Method used for loading Partitioner instance from pickle file or initializing
-        new partitioner and returning it's instance.
-        :param use_case: use_case can be SLO-HR or ELTA for now.
-        :return: instance of GraphPartitioner
-        """
-        pickle_path = config_parser.get_pickle_path(use_case)
-
-        # Load locally stored pickle
-        if os.path.exists(pickle_path):
-            with open(pickle_path, 'rb') as loadfile:
-                partitioner = pickle.load(loadfile)
-            print('Loaded pickled graph partitioner data')
-        else:
-            # Initialize new GraphPartitioner based on use_case given as parameter and execute partition() method,
-            # then store partitioner instance in a pickle file and return it
-            print('No data found, runing init GraphPartitioner and partition procedure')
-            partitioner = GraphPartitioner(use_case)
-            partitioner.partition(config_parser.get_graph_partitions())
-            with open(pickle_path, 'wb') as dumpfile:
-                pickle.dump(partitioner, dumpfile)
-                print('Stored pickled dump for future use')
-
-        return partitioner
-
-
 if __name__ == '__main__':
-    graph = GraphPartitioner(config_parser.get_slo_graph())
-    node_parts, edge_parts = graph.partition(5, True)
+    graph = GraphPartitioner(config_parser.get_slo_graph_path())
+    node_parts, edge_parts = graph.partition(5)

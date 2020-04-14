@@ -10,6 +10,7 @@ from ..utils.clo_update_handler import CloUpdateHandler
 from ..partitioning.post_partitioning import GraphPartitioner
 from ..cvrp.processor.vrp_processor import VrpProcessor
 from ..create_graph.config.config_parser import ConfigParser
+from ..partitioning.graph_partitioning_preprocess import GraphPreprocessing
 
 app = Flask(__name__)
 vrpProcessorReference = None
@@ -20,6 +21,7 @@ config_parser = ConfigParser()
 Example POST MSG:
 {
 	"eventType": "pickupRequest",
+	"useCase": "SLO-CRO",
 	"CLOS": [{
 			"UUID": "UUID-1",
 			"currentLocation": "A416",
@@ -56,8 +58,8 @@ class RecReq(Resource):
     @staticmethod
     def init_vrp(use_case):
         """" Init VRP processor instance based on use-case defined in parameter"""
-        partitioner = GraphPartitioner.init_partitioner(use_case)
-        return VrpProcessor(partitioner.graphProcessors)
+        graph_processors = GraphPreprocessing.extract_graph_processors(use_case)
+        return VrpProcessor(graph_processors, use_case)
 
     def msb_forward(self, payload, key):
         pass
@@ -86,10 +88,10 @@ def handle_recommendation_request():
 
     """Main entry point for HTTP request"""
     data = request.get_json(force=True)
-    evt_type = data["eventType"]
 
-    if "useCase" not in data:
-        return {"message": "Parameter useCase is missing"}
+    if "useCase" not in data or "eventType" not in data:
+        return {"message": "Parameter 'eventType' or 'useCase' is missing"}
+    evt_type = data["eventType"]
     use_case = data["useCase"]
 
     # Initialize vrpProcessor if not yet initialized
@@ -98,19 +100,21 @@ def handle_recommendation_request():
 
     vrp_processor_ref = vrpProcessorReference
     if evt_type == "brokenVehicle":
+        if "CLOS" not in data or "BrokenVehicle" not in data:
+            return {"message": "Parameter 'CLOS' or 'BrokenVehicle' is missing"}
         clos = data["CLOS"]
         broken_clo = data["BrokenVehicle"]
         recommendations = RecReq.process_broken_clo(clos, broken_clo, vrp_processor_ref)
         return jsonify(recommendations)
     elif evt_type == "pickupRequest":
+        if "CLOS" not in data or "orders" not in data:
+            return {"message": "Parameter 'CLOS' or 'orders' is missing"}
         clos = data["CLOS"]
         requests = data["orders"]
         recommendations = RecReq.process_pickup_requests(clos, requests, vrp_processor_ref)
         return jsonify(recommendations)
-
     elif evt_type == "crossBorder":
         print("cross border event received")
-
     else:
         return jsonify({"message": "Invalid event type: {}".format(evt_type)})
 
@@ -125,6 +129,9 @@ def new_clos():
 
     """Main entry point for HTTP request"""
     data = request.get_json(force=True)
+
+    if "CLOS" not in data or "useCase" not in data:
+        return {"message": "Parameter 'CLOS' or 'useCase' is missing"}
     clos = data["CLOS"]  # Extract array of CLOs
     use_case = data["useCase"]
     csv_file = config_parser.get_post_loc()
@@ -138,6 +145,15 @@ def new_clos():
         pickle_path = config_parser.get_pickle_path(use_case)
         if os.path.exists(pickle_path):
             os.remove(pickle_path)
+
+        # Remove use case specific
+        if use_case == "SLO-CRO":
+            slo_path = config_parser.get_slo_graph_path()
+            cro_path = config_parser.get_cro_graph_path()
+            if os.path.exists(slo_path):
+                os.remove(slo_path)
+            if os.path.exists(cro_path):
+                os.remove(cro_path)
 
         # Invalidate VRP global variable name
         vrpProcessorReference = None
