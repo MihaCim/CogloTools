@@ -5,12 +5,11 @@ from flask_jsonpify import jsonify
 from flask_restful import Resource
 from waitress import serve
 
-from ..create_graph.create_graph import JsonGraphCreator
-from ..utils.clo_update_handler import CloUpdateHandler
-from ..partitioning.post_partitioning import GraphPartitioner
-from ..cvrp.processor.vrp_processor import VrpProcessor
 from ..create_graph.config.config_parser import ConfigParser
+from ..create_graph.create_graph import JsonGraphCreator
+from ..cvrp.processor.vrp_processor import VrpProcessor
 from ..partitioning.graph_partitioning_preprocess import GraphPreprocessing
+from ..utils.clo_update_handler import CloUpdateHandler
 
 app = Flask(__name__)
 vrpProcessorReference = None
@@ -94,6 +93,9 @@ def handle_recommendation_request():
     evt_type = data["eventType"]
     use_case = data["useCase"]
 
+    if use_case != "SLO-CRO" and use_case != "ELTA":
+        return {"message": "Parameter 'useCase' can have value 'SLO-CRO' or 'ELTA'."}
+
     # Initialize vrpProcessor if not yet initialized
     if vrpProcessorReference is None:
         vrpProcessorReference = RecReq.init_vrp(use_case)
@@ -135,6 +137,9 @@ def new_clos():
     clos = data["CLOS"]  # Extract array of CLOs
     use_case = data["useCase"]
     csv_file = config_parser.get_post_loc()
+
+    if use_case != "SLO-CRO" and use_case != "ELTA":
+        return {"message": "Parameter 'useCase' can have value 'SLO-CRO' or 'ELTA'."}
 
     needs_rebuild = CloUpdateHandler.handle_new_clo_request(clos, csv_file)
     if needs_rebuild:

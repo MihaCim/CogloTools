@@ -65,7 +65,6 @@ class GraphPreprocessing:
                                 slo_nodes_id_array.append(node.id)
                             # All CRO nodes + SLO border nodes
                             if "H" in node.id or node.id in slo_border_nodes:
-                                print("adding node now", node.id)
                                 cro_nodes[node_index] = node_content
                                 cro_nodes_id_array.append(node.id)
 
