@@ -103,7 +103,7 @@
 
 {
 "eventType": "brokenVehicle",
-"useCase":"SLO-HR",
+"useCase":"SLO-CRO",
 "CLOS": [{
 "UUID": "UUID-1",
 "currentLocation": "S1",

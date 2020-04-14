@@ -14,26 +14,24 @@ class ConfigParser:
         config.close()
 
     def get_pickle_path(self, use_case):
-        if use_case == "SLO-HR":
-            return self.json_config["slo_hr_pickle_path"]
+        if use_case == "SLO-CRO":
+            return self.json_config["slo_cro_pickle_path"]
         elif use_case == "ELTA":
             return self.json_config["elta_pickle_path"]
 
     def get_graph_path(self, use_case):
-        if use_case == "SLO-HR":
-            return self.json_config["slo_hr_json_graph_data_path"]
+        if use_case == "SLO-CRO":
+            return self.json_config["slo_cro_json_graph_data_path"]
         elif use_case == "ELTA":
             return self.json_config["elta_json_graph_data_path"]
         else:
             print("Error - use_case not defined")
 
-    def get_cross_border_nodes_slo(self, use_case):
-        if use_case == "SLO-HR":
-            return self.json_config["S1", "S3", "S5"]
+    def get_border_nodes_slo(self):
+        return self.json_config["slo_border_nodes"]
 
-    def get_cross_border_nodes_cro(self, use_case):
-        if use_case == "SLO-HR":
-            return self.json_config["H5", "H3", "H1"]
+    def get_border_nodes_cro(self):
+         return self.json_config["cro_border_nodes"]
 
     def get_msb_few_url(self):
         return self.json_config["msb_fwd"]
@@ -50,8 +48,22 @@ class ConfigParser:
     def get_post_loc_type(self):
         return self.json_config["post_loc_type"]
 
-    def get_slo_graph(self):
-        return self.json_config["slo_graph_json"]
+    def get_slo_graph_path(self):
+        # Get path of SLO graph
+        return self.json_config["slo_graph_json_path"]
+
+    def get_cro_graph_path(self):
+        # Get path of CRO graph
+        return self.json_config["cro_graph_json_path"]
 
     def get_graph_partitions(self):
+        # Get the number of partitions used for graph split by partitioner
         return self.json_config["graph_partitions"]
+
+    def get_slo_pickle_path(self):
+        # Get path of CRO graph pickle
+        return self.json_config["slo_graph_pickle_path"]
+
+    def get_cro_pickle_path(self):
+        # Get path of SLO graph pickle
+        return self.json_config["cro_graph_pickle_path"]

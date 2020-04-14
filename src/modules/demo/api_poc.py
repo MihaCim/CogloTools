@@ -10,6 +10,7 @@ from ..utils.clo_update_handler import CloUpdateHandler
 from ..partitioning.post_partitioning import GraphPartitioner
 from ..cvrp.processor.vrp_processor import VrpProcessor
 from ..create_graph.config.config_parser import ConfigParser
+from ..partitioning.graph_partitioning_preprocess import GraphPreprocessing
 
 app = Flask(__name__)
 vrpProcessorReference = None
@@ -20,6 +21,7 @@ config_parser = ConfigParser()
 Example POST MSG:
 {
 	"eventType": "pickupRequest",
+	"useCase": "SLO-CRO",
 	"CLOS": [{
 			"UUID": "UUID-1",
 			"currentLocation": "A416",
@@ -56,8 +58,8 @@ class RecReq(Resource):
     @staticmethod
     def init_vrp(use_case):
         """" Init VRP processor instance based on use-case defined in parameter"""
-        partitioner = GraphPartitioner.init_partitioner(use_case)
-        return VrpProcessor(partitioner.graphProcessors)
+        graph_processors = GraphPreprocessing.extract_graph_processors(use_case)
+        return VrpProcessor(graph_processors, use_case)
 
     def msb_forward(self, payload, key):
         pass
@@ -143,6 +145,15 @@ def new_clos():
         pickle_path = config_parser.get_pickle_path(use_case)
         if os.path.exists(pickle_path):
             os.remove(pickle_path)
+
+        # Remove use case specific
+        if use_case == "SLO-CRO":
+            slo_path = config_parser.get_slo_graph_path()
+            cro_path = config_parser.get_cro_graph_path()
+            if os.path.exists(slo_path):
+                os.remove(slo_path)
+            if os.path.exists(cro_path):
+                os.remove(cro_path)
 
         # Invalidate VRP global variable name
         vrpProcessorReference = None
