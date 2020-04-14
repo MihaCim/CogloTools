@@ -6,7 +6,9 @@ from ...utils.structures.parcel import Parcel
 from ...utils.structures.deliveries import Deliveries
 from ...utils.structures.plan import Plan
 from ...utils.structures.vehicle import Vehicle
+from ...create_graph.config.config_parser import ConfigParser
 
+config_parser = ConfigParser()
 
 class VrpProcessor:
     """Processes a request for routing
@@ -246,7 +248,8 @@ class VrpProcessor:
         for clo in clos:
             parcels = []
             for parcel in clo["parcels"]:
-                parcels.append(Parcel(parcel["UUIDParcel"], parcel["destination"], parcel["weight"]))
+                parcels.append(Parcel(parcel["UUIDParcel"], parcel["destination"],
+                                      parcel["weight"], clo["currentLocation"]))
                 # parcels.append(parcel["UUIDParcel"])
             capacity = clo["capacity"] - len(parcels)
             vehicles.append(Vehicle(clo["UUID"], clo["currentLocation"], parcels, capacity))
@@ -257,11 +260,13 @@ class VrpProcessor:
         """Create a list of Vehicle objects from JSON input"""
         deliveries_origin = []
         # list of additional parcels from request
-        deliveries_diff = [Parcel(x["UUIDParcel"], x["destination"], x["weight"]) for x in requests]
+        deliveries_diff = [Parcel(x["UUIDParcel"], x["destination"],
+                                  x["weight"], x["pickup"]) for x in requests]
         # list of parcels on CLOs before request
         for clo in clos:
             for parcel in clo["parcels"]:
-                deliveries_origin.append(Parcel(parcel["UUIDParcel"], parcel["destination"], parcel["weight"]))
+                deliveries_origin.append(Parcel(parcel["UUIDParcel"], parcel["destination"],
+                                                parcel["weight"], clo["currentLocation"]))
         deliveries_all = deliveries_origin + deliveries_diff
         deliveries = Deliveries(deliveries_origin, deliveries_diff, deliveries_all)
         return deliveries
@@ -271,18 +276,56 @@ class VrpProcessor:
     ####################################################################################
 
     def map_slo_cro_vehicles(self, vehicles):
-        # TODO: implement
-        # if currentLocation starts with "S" - put vehicle to cluster 0
-        # if currentLocation starts with "H" - put vehicle to cluster 1
+        """
+        Map vehicles to first or second graph. First graph represents SLO nodes and the second
+        graphs represents CRO nodes.
+        :param vehicles:
+        :return:
+        """
+        map_v = [[] for _ in self.graphs]
 
-        return []
+        # First graph is SLO, second graph is CRO
+        for v in vehicles:
+            if "S" in v.start_node:
+                map_v[0].append(v)
+            elif "H" in v.start_node:
+                map_v[1].append(v)
+            else:
+                print("Vehicle start node does not have 'S' or 'H'.")
+                exit(1)
+
+        return map_v
 
     def map_slo_cro_deliveries(self, deliveries):
-        # TODO: implement
-        # if pickup node starts with "S" - put parcel to cluster 0
-            #if destination node start with "H", assign closest "cro_border_nodes"
-        # if destination node starts with "H" - put parcel to cluster 1
-            # if destination node start with "H", assign closest "slo_border_nodes"
-        
-        return []
+        """
+        Map deliveries for SLO-CRO use case. For each parcel, we check current (start) location
+        and destination (target). If parcel needs to be delivered from SLO to CRO, we will
+        assign the closest border node as target, if CRO node assigned that is not the border node.
+        :param deliveries:
+        :return:
+        """
+        delivery_parts = [[] for _ in self.graphs]
+
+        for parcel in deliveries:
+            if "S" in parcel.current_location:
+                if "H" in parcel.target:
+                    # assign closest cro border node
+                    cro_border_nodes = config_parser.get_border_nodes_cro()
+                    if parcel.target not in cro_border_nodes:
+                        # TODO: assign the closest node instead of the first one
+                        parcel.target = cro_border_nodes[0]
+                delivery_parts[0].append(parcel)
+            elif "H" in parcel.current_location:
+                if "S" in parcel.target:
+                    # assign closest slo border node
+                    slo_border_nodes = config_parser.get_border_nodes_slo()
+                    if parcel.target not in slo_border_nodes:
+                        # TODO: assign the closest node instead of the first one
+                        parcel.target = slo_border_nodes[0]
+                delivery_parts[1].append(parcel)
+            else:
+                print("Current parcel location is not 'S' nor 'H'!")
+                exit(1)
+
+        return delivery_parts
 

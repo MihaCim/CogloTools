@@ -1,6 +1,6 @@
 {
-  "eventType": "pickupRequest",
-  "useCase": "SLO-HR",
+  "eventType": "brokenVehicle",
+  "useCase": "SLO-CRO",
   "CLOS": [
     {
       "UUID": "UUID-1",
@@ -26,33 +26,42 @@
     },
     {
       "UUID": "UUID-4",
-      "currentLocation": "H1",
+      "currentLocation": "S3",
       "capacity": 200,
       "parcels": [
         {
           "UUIDParcel": "Vehicleparcel4",
           "weight": 1,
-          "destination": "H3"
+          "destination": "S2"
         }
       ]
     }
   ],
-  "orders": [
-    {
-      "UUIDParcel": "Parcel UUID1",
-      "UUIDRequest": "Request S1",
-      "weight": 1,
-      "destination": "S8",
-      "pickup": "S1",
-      "timestamp": 123456679
-    },
-    {
-      "UUIDParcel": "Parcel UUID2",
-      "UUIDRequest": "Request UUID2",
-      "weight": 1,
-      "destination": "H6",
-      "pickup": "H1",
-      "timestamp": 123456679
-    }
-  ]
-}
+  "BrokenVehicle": {
+    "UUID": "UUID-3",
+    "currentLocation": "S1",
+    "capacity": 200,
+    "parcels": [
+      {
+        "UUIDParcel": "Parcel UUID1",
+        "weight": 1,
+        "destination": "S8"
+      },
+      {
+        "UUIDParcel": "Parcel UUID3",
+        "weight": 1,
+        "destination": "H4"
+      },
+      {
+        "UUIDParcel": "Parcel UUID4",
+        "weight": 1,
+        "destination": "S7"
+      },
+      {
+        "UUIDParcel": "Parcel UUID5",
+        "weight": 1,
+        "destination": "H6"
+      }
+    ]
+  }
+  }
