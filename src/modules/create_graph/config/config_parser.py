@@ -50,11 +50,13 @@ class ConfigParser:
     def get_eps(self):
         return self.json_config["eps"]
 
-    def get_post_loc(self):
-        return self.json_config["post_loc"]
-
-    def get_post_loc_type(self):
-        return self.json_config["post_loc_type"]
+    def get_post_loc_type(self, use_case):
+        if use_case == "SLO_CRO":
+            return self.json_config["post_loc_type_slo_cro"]
+        elif use_case == "ELTA":
+            return self.json_config["post_loc_type_elta"]
+        else:
+            print("Error - use not not defined.")
 
     def get_slo_graph_path(self):
         # Get path of SLO graph
