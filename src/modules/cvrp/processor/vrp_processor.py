@@ -110,6 +110,7 @@ class VrpProcessor:
 
             computed_routes, dispatch, objc = self.vrp.vrp(partition.incident_matrix, dropoff, capacity, start_loc,
                                                            costs)
+
             # compute routes based on dispatch vectors from VRP. Since VRP output is incomplete/not best,
             # we add A* routing on top
             plan_routes = self.make_route(computed_routes, dispatch, partition, plan.vehicles, plan.deliveries,
@@ -177,6 +178,7 @@ class VrpProcessor:
                 vehicle_load[post_idx] -= vehicle_load[post_idx]  # take/drop all parcels
                 partial_path = graph.get_path(current_node,
                                               target)  # get path from current to next dropoff node
+
                 for node in partial_path.path:  # drop off parcels along the way to target
                     for idx, val in enumerate(vehicle_load):
                         if val > 0 and nodes.index(node) == idx:

@@ -62,6 +62,7 @@ class GraphProcessor:
     def _backtrack_path(self, came_from, goal, start):
         """Produces a list of nodes from A* output by backtracking over nodes"""
         nodes = [goal]
+
         while nodes[-1] != start:  # recreate path in backward order, as sequence od nodes
             tmp = came_from[nodes[-1]]
             nodes.append(tmp)

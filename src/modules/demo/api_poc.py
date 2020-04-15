@@ -12,7 +12,8 @@ from ..partitioning.graph_partitioning_preprocess import GraphPreprocessing
 from ..utils.clo_update_handler import CloUpdateHandler
 
 app = Flask(__name__)
-vrpProcessorReference = None
+vrpProcessorReferenceSloCro = None
+vrpProcessorReferenceElta = None
 
 config_parser = ConfigParser()
 
@@ -83,7 +84,8 @@ class RecReq(Resource):
 
 @app.route("/api/adhoc/recommendationRequest", methods=['POST'])
 def handle_recommendation_request():
-    global vrpProcessorReference
+    global vrpProcessorReferenceSloCro
+    global vrpProcessorReferenceElta
 
     """Main entry point for HTTP request"""
     data = request.get_json(force=True)
@@ -97,10 +99,15 @@ def handle_recommendation_request():
         return {"message": "Parameter 'useCase' can have value 'SLO-CRO' or 'ELTA'."}
 
     # Initialize vrpProcessor if not yet initialized
-    if vrpProcessorReference is None:
-        vrpProcessorReference = RecReq.init_vrp(use_case)
+    if use_case == "SLO-CRO" and vrpProcessorReferenceSloCro is None:
+        vrpProcessorReferenceSloCro = RecReq.init_vrp(use_case)
+    elif use_case == "ELTA" and vrpProcessorReferenceElta is None:
+        vrpProcessorReferenceElta = RecReq.init_vrp(use_case)
 
-    vrp_processor_ref = vrpProcessorReference
+    if use_case == "SLO-CRO":
+        vrp_processor_ref = vrpProcessorReferenceSloCro
+    else:
+        vrp_processor_ref = vrpProcessorReferenceElta
     if evt_type == "brokenVehicle":
         if "CLOS" not in data or "BrokenVehicle" not in data:
             return {"message": "Parameter 'CLOS' or 'BrokenVehicle' is missing"}
@@ -127,7 +134,8 @@ def new_clos():
     API route used for handling request for newCLOs.
     This method checks if graph needs to be rebuilt or updated.
     """
-    global vrpProcessorReference
+    global vrpProcessorReferenceElta
+    global vrpProcessorReferenceSloCro
 
     """Main entry point for HTTP request"""
     data = request.get_json(force=True)
@@ -165,9 +173,9 @@ def new_clos():
                 os.remove(cro_path)
             if os.path.exists(cro_pickle_path):
                 os.remove(cro_pickle_path)
-
-        # Invalidate VRP global variable name
-        vrpProcessorReference = None
+            vrpProcessorReferenceSloCro = None
+        else:
+            vrpProcessorReferenceElta = None
 
     return {"success": True}
 
