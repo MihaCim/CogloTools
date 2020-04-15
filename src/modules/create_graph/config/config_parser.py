@@ -28,7 +28,7 @@ class ConfigParser:
             print("Error - use_case not defined.")
 
     def get_csv_path(self, use_case):
-        if use_case == "SLO_CRO":
+        if use_case == "SLO-CRO":
             return self.json_config["post_loc_slo_cro"]
         elif use_case == "ELTA":
             return self.json_config["post_loc_elta"]
@@ -51,7 +51,7 @@ class ConfigParser:
         return self.json_config["eps"]
 
     def get_post_loc_type(self, use_case):
-        if use_case == "SLO_CRO":
+        if use_case == "SLO-CRO":
             return self.json_config["post_loc_type_slo_cro"]
         elif use_case == "ELTA":
             return self.json_config["post_loc_type_elta"]
