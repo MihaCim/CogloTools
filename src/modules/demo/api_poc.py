@@ -150,7 +150,7 @@ def new_clos():
         return {"message": "Parameter 'useCase' can have value 'SLO-CRO' or 'ELTA'."}
 
     needs_rebuild = CloUpdateHandler.handle_new_clo_request(clos, csv_file)
-    if needs_rebuild:
+    if needs_rebuild or not os.path.exists(config_parser.get_graph_path(use_case)):
         creator = JsonGraphCreator()
         creator.create_json_graph(use_case)
 

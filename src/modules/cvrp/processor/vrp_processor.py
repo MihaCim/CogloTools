@@ -113,8 +113,8 @@ class VrpProcessor:
 
             # compute routes based on dispatch vectors from VRP. Since VRP output is incomplete/not best,
             # we add A* routing on top
-            plan_routes = self.make_route(computed_routes, dispatch, partition, plan.vehicles, plan.deliveries,
-                                          plan.deliveries_req)
+            plan_routes = self.make_route(computed_routes, dispatch, partition,
+                                          plan.vehicles, plan.deliveries, plan.deliveries_req)
             routes += plan_routes
 
         return routes
@@ -124,6 +124,7 @@ class VrpProcessor:
         nodes = graph.nodes
         min_dist = inf
         min_idx = -1
+
         for post_idx, load in enumerate(loads):
             if load > 0:
                 cur_dist = graph.distance(start, nodes[post_idx])
@@ -171,13 +172,12 @@ class VrpProcessor:
             # start at closest node
             # get route and clear up any packages on this route
 
-            while sum(vehicle_load) > 1:  # run until all parcels have been delivered
+            while sum(vehicle_load) > 0:  # run until all parcels have been delivered
                 post_idx = self.find_closest_post(vehicle_load, current_node,
                                                   graph)  # idx of closest post with parcel demand
                 target = nodes[post_idx]  # convert idx to node object
                 vehicle_load[post_idx] -= vehicle_load[post_idx]  # take/drop all parcels
-                partial_path = graph.get_path(current_node,
-                                              target)  # get path from current to next dropoff node
+                partial_path = graph.get_path(current_node, target)  # get path from current to next dropoff node
 
                 for node in partial_path.path:  # drop off parcels along the way to target
                     for idx, val in enumerate(vehicle_load):
