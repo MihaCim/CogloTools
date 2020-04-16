@@ -59,7 +59,8 @@ class GraphProcessor:
             edge_map[e.start].append(e)
         return edge_map
 
-    def _backtrack_path(self, came_from, goal, start):
+    @staticmethod
+    def _backtrack_path(came_from, goal, start):
         """Produces a list of nodes from A* output by backtracking over nodes"""
         nodes = [goal]
 
@@ -69,7 +70,8 @@ class GraphProcessor:
         nodes.reverse()
         return nodes
 
-    def print_path(self, path):
+    @staticmethod
+    def print_path(path):
         """Prints a backtracked path in readable format"""
         print("{0} nodes: ".format(len(path)), end='')
         print(" -> ".join([str(n.id) for n in path]))
@@ -132,9 +134,10 @@ class GraphProcessor:
 
     def distance(self, a, b):
         """Distance between Node objects"""
-        return self.__distance(a.lat, a.lon, a.lon, b.lon)
+        return self.__distance(a.lat, a.lon, b.lat, b.lon)
 
-    def __distance(self, latitude1, longitude1, latitude2, longitude2):
+    @staticmethod
+    def __distance(latitude1, longitude1, latitude2, longitude2):
         earth_radius = 6373.0
 
         lat1 = radians(latitude1)
