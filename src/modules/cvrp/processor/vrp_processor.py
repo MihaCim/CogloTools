@@ -143,6 +143,7 @@ class VrpProcessor:
         routes = []
         converted_routes = []
         loads_new = []
+        vehicle_node_sequence = []
 
         # add new parcels to vehicle.parcels list
         for x, vehicle in enumerate(vehicles):
@@ -162,6 +163,8 @@ class VrpProcessor:
         for i, vehicle_load in enumerate(loads_new):
             start_node = start_nodes[i]
             route = [start_node]
+            vehicle_node_sequence.append(start_node.id)
+
             current_node = start_node
             vehicle_load[nodes.index(current_node)] -= vehicle_load[nodes.index(current_node)]
             cost_astar = 0
@@ -177,35 +180,34 @@ class VrpProcessor:
                                                   graph)  # idx of closest post with parcel demand
                 target = nodes[post_idx]  # convert idx to node object
                 vehicle_load[post_idx] -= vehicle_load[post_idx]  # take/drop all parcels
-                partial_path = graph.get_path(current_node, target)  # get path from current to next dropoff node
+                route.append(target)
 
-                for node in partial_path.path:  # drop off parcels along the way to target
-                    for idx, val in enumerate(vehicle_load):
-                        if val > 0 and nodes.index(node) == idx:
-                            vehicle_load[idx] -= vehicle_load[idx]
 
-                current_node = target  # we are now at new node
-                cost_astar += partial_path.cost
+                #partial_path = graph.get_path(current_node, target)  # get path from current to next dropoff node
+                #for node in partial_path.path:  # drop off parcels along the way to target
+                #   for idx, val in enumerate(vehicle_load):
+                #      if val > 0 and nodes.index(node) == idx:
+                #          vehicle_load[idx] -= vehicle_load[idx]
 
+                #current_node = target  # we are now at new node
+                #vehicle_node_sequence.append(current_node.id)
+                #cost_astar += partial_path.cost
                 # merge existing and new route, avoid adding duplicate node on start of route
-                route += partial_path.path if len(partial_path.path) == 1 else partial_path.path[1:]
+                #route += partial_path.path if len(partial_path.path) == 1 else partial_path.path[1:]
 
             # debug info
-            print("Vehicle: {}".format(vehicles[i].name), "|", "parcels:", str(vehicles[i].parcels))
-            print("Edges: VRP: {}, A*:{}".format(sum(graph_routes[i]), len(route)))
-
+            #print("Vehicle: {}".format(vehicles[i].name), "|", "parcels:", str(vehicles[i].parcels))
+            #print("Edges: VRP: {}, A*:{}".format(sum(graph_routes[i]), len(route)))
             # calculate theoretical cost of all visited edges in vrp, to compare to A*
-            cost_vrp = sum([count * edges[j].cost for j, count in enumerate(graph_routes[i])])
-
-            print("Cost VRP: {}, Cost A*:{}".format(cost_vrp, cost_astar))
-            graph.print_path(route)
+            #cost_vrp = sum([count * edges[j].cost for j, count in enumerate(graph_routes[i])])
+            #print("Cost VRP: {}, Cost A*:{}".format(cost_vrp, cost_astar))
             # print([item if x > 0 else -1 for item, x in enumerate(original_vehicle_load)])
-
-            route_converted = self.map_parcels_to_route(route, dispatch, graph, vehicles[i])
+            graph.print_path(route)
             routes.append(route)
-            converted_routes.append({"UUID": vehicles[i].name, "route": route_converted})
+            converted_routes.append({"UUID": vehicles[i].name, "route": self.map_parcels_to_route(route, dispatch, graph, vehicles[i])})
 
-        print("Route build took: {}s".format(time.time() - start_time))
+
+        #print("Route build took: {}s".format(time.time() - start_time))
         print("calculated routes:", routes)
         print("converted routes:", converted_routes)
 
