@@ -1,5 +1,7 @@
 import time
+import requests
 from math import inf
+import json
 
 from ..vrp import VRP
 from ...utils.structures.parcel import Parcel
@@ -7,6 +9,9 @@ from ...utils.structures.deliveries import Deliveries
 from ...utils.structures.plan import Plan
 from ...utils.structures.vehicle import Vehicle
 from ...create_graph.config.config_parser import ConfigParser
+from ...utils.structures.node import Node
+url = "https://graphhopper.com/api/1/vrp?key=e8a55308-9419-4814-81f1-6250efe25b5c"
+
 
 config_parser = ConfigParser()
 
@@ -15,6 +20,7 @@ class VrpProcessor:
         Many operations on lists in this code can be replaced with dicts or similar, to remove list iteration with
         dict lookup.
     """
+
     def __init__(self, graphs, use_case):
         self.vrp = VRP()
         self.graphs = graphs
@@ -133,6 +139,50 @@ class VrpProcessor:
                     min_idx = post_idx
         return min_idx
 
+    @staticmethod
+    def make_route_sequence(route):
+        cluster = route[0].cluster
+        nodes_seq = {"vehicles": [{
+            "vehicle_id": route[0].id,
+            "start_address": {
+                "location_id": route[0].name,
+                "lon": route[0].lon,
+                "lat": route[0].lat
+            }
+        }]
+        }
+        nodes = []
+        for node in route[1:]:
+            e = {
+                "id": node.id,
+                "name": "coglo",
+                "address": {
+                    "location_id": node.name,
+                    "lon": node.lon,
+                    "lat": node.lat
+                }
+            }
+            nodes.append(e)
+        nodes_seq['services'] = nodes
+        import json
+        payload = json.dumps(nodes_seq)
+        headers = {'Content-Type': 'application/json'}
+        response = requests.request("POST", url, headers=headers, data=payload)
+        response_json = response.json()
+        reordered_list = []
+        reordered_list.append(Node({'uuid': route[0].id,
+                       'address': route[0].name,
+                       'lat': route[0].lat,
+                       'lon': route[0].lon,
+                       'cluster': cluster}))
+        for route_point in response_json['solution']['routes'][0]['activities'][1:-1]:
+            reordered_list.append(Node({'uuid': route_point['id'],
+                           'address': route_point['address']['location_id'],
+                           'lat': route_point['address']['lat'],
+                           'lon': route_point['address']['lon'],
+                           'cluster': cluster}))
+        return reordered_list
+
     def make_route(self, graph_routes, loads, graph, vehicles, deliveries, deliveries_req):
         nodes = graph.nodes
         edges = graph.edges
@@ -145,7 +195,7 @@ class VrpProcessor:
         loads_new = []
         vehicle_node_sequence = []
 
-        # add new parcels to vehicle.parcels list
+        # update list of vehicle parcels: add new parcels to vehicle.parcels list
         for x, vehicle in enumerate(vehicles):
             load = loads[x]
             loads_origin = self.map_dropoff(graph, vehicle.parcels)
@@ -183,33 +233,14 @@ class VrpProcessor:
                 route.append(target)
 
 
-                #partial_path = graph.get_path(current_node, target)  # get path from current to next dropoff node
-                #for node in partial_path.path:  # drop off parcels along the way to target
-                #   for idx, val in enumerate(vehicle_load):
-                #      if val > 0 and nodes.index(node) == idx:
-                #          vehicle_load[idx] -= vehicle_load[idx]
+            route_ordered = self.make_route_sequence(route)
 
-                #current_node = target  # we are now at new node
-                #vehicle_node_sequence.append(current_node.id)
-                #cost_astar += partial_path.cost
-                # merge existing and new route, avoid adding duplicate node on start of route
-                #route += partial_path.path if len(partial_path.path) == 1 else partial_path.path[1:]
-
-            # debug info
-            #print("Vehicle: {}".format(vehicles[i].name), "|", "parcels:", str(vehicles[i].parcels))
-            #print("Edges: VRP: {}, A*:{}".format(sum(graph_routes[i]), len(route)))
-            # calculate theoretical cost of all visited edges in vrp, to compare to A*
-            #cost_vrp = sum([count * edges[j].cost for j, count in enumerate(graph_routes[i])])
-            #print("Cost VRP: {}, Cost A*:{}".format(cost_vrp, cost_astar))
-            # print([item if x > 0 else -1 for item, x in enumerate(original_vehicle_load)])
             graph.print_path(route)
             routes.append(route)
-            converted_routes.append({"UUID": vehicles[i].name, "route": self.map_parcels_to_route(route, dispatch, graph, vehicles[i])})
+            converted_routes.append(
+                {"UUID": vehicles[i].name, "route": self.map_parcels_to_route(route_ordered, dispatch, graph, vehicles[i])})
 
-
-        #print("Route build took: {}s".format(time.time() - start_time))
-        print("calculated routes:", routes)
-        print("converted routes:", converted_routes)
+        # converted_routes_reordered = make_route_sequence(converted_routes)
 
         return converted_routes
 
@@ -225,8 +256,12 @@ class VrpProcessor:
         if len(route) == 1 and loads[nodes.index(route[0])] == 0:
             return []
 
-        for idx, node in enumerate(route):
-            node_idx = nodes.index(node)
+        for node in route:
+            node_idx = None
+            for idx, n in enumerate(nodes):
+                if n.id == node.id:
+                    node_idx = idx
+                    break
 
             parcels = [x.uuid for x in parcel_list if x.target == node.id]
 
@@ -242,7 +277,6 @@ class VrpProcessor:
                 for parcel_remove in parcel_list:  # removes the added parcels from the pending parcel list
                     if parcel_remove.uuid in parcels:
                         parcel_list.remove(parcel_remove)
-
         return converted_route
 
     @staticmethod
@@ -260,20 +294,24 @@ class VrpProcessor:
         return vehicles
 
     @staticmethod
-    def parse_deliveries(clos, requests):
-        """Create a list of Vehicle objects from JSON input"""
-        deliveries_origin = []
-        # list of additional parcels from request
-        deliveries_diff = [Parcel(x["UUIDParcel"], x["destination"],
-                                  x["weight"], x["pickup"]) for x in requests]
-        # list of parcels on CLOs before request
-        for clo in clos:
-            for parcel in clo["parcels"]:
-                deliveries_origin.append(Parcel(parcel["UUIDParcel"], parcel["destination"],
-                                                parcel["weight"], clo["currentLocation"]))
-        deliveries_all = deliveries_origin + deliveries_diff
-        deliveries = Deliveries(deliveries_origin, deliveries_diff, deliveries_all)
-        return deliveries
+    def parse_deliveries(evt_type, clos, requests):
+            """Create a list of Vehicle objects from JSON input"""
+            deliveries_origin = []
+            # list of additional parcels from request
+            if evt_type == "brokenVehicle":
+                deliveries_diff = [Parcel(x["UUIDParcel"], x["destination"],
+                                          x["weight"], requests["currentLocation"]) for x in requests["parcels"]]
+            else:
+                deliveries_diff = [Parcel(x["UUIDParcel"], x["destination"],
+                                      x["weight"], x["pickup"]) for x in requests]
+            # list of parcels on CLOs before request
+            for clo in clos:
+                for parcel in clo["parcels"]:
+                    deliveries_origin.append(Parcel(parcel["UUIDParcel"], parcel["destination"],
+                                                    parcel["weight"], clo["currentLocation"]))
+            deliveries_all = deliveries_origin + deliveries_diff
+            deliveries = Deliveries(deliveries_origin, deliveries_diff, deliveries_all)
+            return deliveries
 
     ####################################################################################
     # Helper methods and methods used for specific use case or purpose
@@ -332,4 +370,3 @@ class VrpProcessor:
                 exit(1)
 
         return delivery_parts
-
