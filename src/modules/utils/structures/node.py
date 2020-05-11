@@ -8,4 +8,6 @@ class Node:
         self.lat = node['lat']
         self.lon = node['lon']
         self.cluster = None
+        if node['cluster'] is not None:
+            self.cluster = node['cluster']
 
