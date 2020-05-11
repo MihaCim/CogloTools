@@ -10,12 +10,10 @@ from ...utils.structures.plan import Plan
 from ...utils.structures.vehicle import Vehicle
 from ...create_graph.config.config_parser import ConfigParser
 from ...utils.structures.node import Node
-
 url = "https://graphhopper.com/api/1/vrp?key=e8a55308-9419-4814-81f1-6250efe25b5c"
-headers = {'Content-Type': 'application/json'}
+
 
 config_parser = ConfigParser()
-
 
 class VrpProcessor:
     """Processes a request for routing
@@ -168,22 +166,22 @@ class VrpProcessor:
         nodes_seq['services'] = nodes
         import json
         payload = json.dumps(nodes_seq)
+        headers = {'Content-Type': 'application/json'}
         response = requests.request("POST", url, headers=headers, data=payload)
         response_json = response.json()
-        l = []
-        l.append(Node({'uuid': route[0].id,
+        reordered_list = []
+        reordered_list.append(Node({'uuid': route[0].id,
                        'address': route[0].name,
                        'lat': route[0].lat,
                        'lon': route[0].lon,
                        'cluster': cluster}))
-        for r in response_json['solution']['routes'][0]['activities'][1:-1]:
-            print(r)
-            l.append(Node({'uuid': r['id'],
-                           'address': r['address']['location_id'],
-                           'lat': r['address']['lat'],
-                           'lon': r['address']['lon'],
+        for route_point in response_json['solution']['routes'][0]['activities'][1:-1]:
+            reordered_list.append(Node({'uuid': route_point['id'],
+                           'address': route_point['address']['location_id'],
+                           'lat': route_point['address']['lat'],
+                           'lon': route_point['address']['lon'],
                            'cluster': cluster}))
-        return l
+        return reordered_list
 
     def make_route(self, graph_routes, loads, graph, vehicles, deliveries, deliveries_req):
         nodes = graph.nodes
@@ -296,17 +294,16 @@ class VrpProcessor:
         return vehicles
 
     @staticmethod
-    def parse_deliveries(event, clos, requests):
+    def parse_deliveries(evt_type, clos, requests):
             """Create a list of Vehicle objects from JSON input"""
-
             deliveries_origin = []
             # list of additional parcels from request
-            if event == "pickup":
-                deliveries_diff = [Parcel(x["UUIDParcel"], x["destination"],
-                                      x["weight"], x["pickup"]) for x in requests]
-            elif event == "brokenVehicle":
+            if evt_type == "brokenVehicle":
                 deliveries_diff = [Parcel(x["UUIDParcel"], x["destination"],
                                           x["weight"], requests["currentLocation"]) for x in requests["parcels"]]
+            else:
+                deliveries_diff = [Parcel(x["UUIDParcel"], x["destination"],
+                                      x["weight"], x["pickup"]) for x in requests]
             # list of parcels on CLOs before request
             for clo in clos:
                 for parcel in clo["parcels"]:

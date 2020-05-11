@@ -29,18 +29,18 @@ class RecReq(Resource):
         # check api_ijs.py for this code
 
     @staticmethod
-    def process_pickup_requests(clos, requests, vrp_processor_ref):
+    def process_pickup_requests(evt_type, clos, requests, vrp_processor_ref):
         print("Processing Pickup Delivery Request for ", len(clos), 'vehicles')
         vehicles = vrp_processor_ref.parse_vehicles(clos)
-        deliveries = vrp_processor_ref.parse_deliveries("pickup", clos, requests)
+        deliveries = vrp_processor_ref.parse_deliveries(evt_type, clos, requests)
 
         return vrp_processor_ref.process(vehicles, deliveries)
 
     @staticmethod
-    def process_broken_clo(clos, broken_clo, vrp_processor_ref):
+    def process_broken_clo(evt_type, clos, broken_clo, vrp_processor_ref):
         print("Processing Broken CLO for ", len(clos), 'vehicles')
         vehicles = vrp_processor_ref.parse_vehicles(clos)
-        deliveries = vrp_processor_ref.parse_deliveries("brokenVehicle", clos, broken_clo)
+        deliveries = vrp_processor_ref.parse_deliveries(evt_type, clos, broken_clo)
 
         return vrp_processor_ref.process(vehicles, deliveries)
 
@@ -75,14 +75,14 @@ def handle_recommendation_request():
             return {"message": "Parameter 'CLOS' or 'BrokenVehicle' is missing"}
         clos = data["CLOS"]
         broken_clo = data["BrokenVehicle"]
-        recommendations = RecReq.process_broken_clo(clos, broken_clo, vrp_processor_ref)
+        recommendations = RecReq.process_broken_clo(evt_type, clos, broken_clo, vrp_processor_ref)
         return jsonify(recommendations)
     elif evt_type == "pickupRequest":
         if "CLOS" not in data or "orders" not in data:
             return {"message": "Parameter 'CLOS' or 'orders' is missing"}
         clos = data["CLOS"]
         requests = data["orders"]
-        recommendations = RecReq.process_pickup_requests(clos, requests, vrp_processor_ref)
+        recommendations = RecReq.process_pickup_requests(evt_type, clos, requests, vrp_processor_ref)
         return jsonify(recommendations)
     elif evt_type == "crossBorder":
         print("cross border event received")
