@@ -10,6 +10,7 @@ from ..create_graph.create_graph import JsonGraphCreator
 from ..cvrp.processor.vrp_processor import VrpProcessor
 from ..partitioning.graph_partitioning_preprocess import GraphPreprocessing
 from ..utils.clo_update_handler import CloUpdateHandler
+from ..utils.methods.methods import *
 
 app = Flask(__name__)
 vrpProcessorReferenceSloCro = None
@@ -51,7 +52,7 @@ def handle_recommendation_request():
 
     """Main entry point for HTTP request"""
     data = request.get_json(force=True)
-
+    use_case = data['useCase']
     ##Errors
     if use_case != "SLO-CRO" and use_case != "ELTA":
         return {"message": "Parameter 'useCase' can have value 'SLO-CRO' or 'ELTA'."}
@@ -84,34 +85,24 @@ def handle_recommendation_request():
         else:
             return jsonify({"message": "Invalid event type: {}".format(evt_type)})
 
-    ##Use Case ELTA
-'''
-    elif use_case == "ELTA":
+        ##Use Case ELTA
+    if use_case == "ELTA":
+        if evt_type == "pickupRequest":
+            print(use_case)
+            data_elta = elta_clustering(data)
 
+        '''
+        1. read data (json) - parse v elta_clustering strukturo Virtual nodes, ] virtual packets
+        2. postavit metodo elta_clustering
+        3. Naredimo Vrp response
+        4. dodati parcels na Virtual Node
+        5. poklicati metodo Graphhopper
+        '''
 
+        #vrpProcessorReferenceElta = RecReq.init_vrp(use_case)
 
-    #cluster parcels when event = daily plan
-    if evt_type == None:
-    data_graph, data_elta = data.elta_clustering(evt_type, data)
-
-
-
-    
-    1. read data (json) - parse v elta_clustering strukturo Virtual nodes, ] virtual packets
-    2. postavit metodo elta_clustering
-    3. Naredimo Vrp response
-    4. dodati parcels na Virtual Node
-    5. poklicati metodo Graphhopper
-    
-
-        vrpProcessorReferenceElta = RecReq.init_vrp(use_case)
-
-    #elif evt_type == "reqest" :
-    #map parcels to existing clusters
-    
-        if vrpProcessorReferenceSloCro is None:     #inicialize VRP
-            vrpProcessorReferenceSloCro = RecReq.init_vrp(use_case)
-        vrp_processor_ref = vrpProcessorReferenceSloCro
+        #elif evt_type == "reqest":
+        #map parcels to existing clusters
 
 
         if evt_type == "brokenVehicle":
@@ -130,7 +121,8 @@ def handle_recommendation_request():
             return jsonify(recommendations)
         else:
             return jsonify({"message": "Invalid event type: {}".format(evt_type)})
-'''
+
+
 
 @app.route("/api/clo/newCLOs", methods=['POST'])
 def new_clos():
@@ -178,7 +170,7 @@ def new_clos():
             if os.path.exists(cro_pickle_path):
                 os.remove(cro_pickle_path)
             vrpProcessorReferenceSloCro = None
-        elif use_case == "ELTA":
+        else:
             vrpProcessorReferenceElta = None
 
     return {"success": True}
