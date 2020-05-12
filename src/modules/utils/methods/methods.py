@@ -12,14 +12,14 @@ def elta_clustering(data):
         l.append([el['UUIDParcel'], "pickup"] + el['pickup'])
     df = pd.DataFrame(l)
     # run clustering
-    kmeans = KMeans(n_clusters=3)
+    kmeans = KMeans(n_clusters=5)
     kmeans.fit(df[[2, 3]])  # Compute k-means clustering.
     centers = kmeans.cluster_centers_
     df["labels"] = labels = kmeans.labels_
     for index, row in df.iterrows():
         print(index)
         print(row)
-        data['orders'][index // 2][row[1]] = row['labels']
+        data['orders'][index // 2][row[1]] = str(row['labels'])
     print(df)
 
     clos = {"useCase": "ELTA"}
@@ -27,7 +27,8 @@ def elta_clustering(data):
     i = 0
     for row in centers:
         clos_list.append({
-            "uuid": i,
+            "uuid": str(i),
+            "address": "address",
             "lat": row[0],
             "lon": row[1]
         })
