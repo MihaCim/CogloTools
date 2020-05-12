@@ -52,42 +52,78 @@ def handle_recommendation_request():
     """Main entry point for HTTP request"""
     data = request.get_json(force=True)
 
+    ##Errors
+    if use_case != "SLO-CRO" and use_case != "ELTA":
+        return {"message": "Parameter 'useCase' can have value 'SLO-CRO' or 'ELTA'."}
     if "useCase" not in data or "eventType" not in data:
         return {"message": "Parameter 'eventType' or 'useCase' is missing"}
     evt_type = data["eventType"]
     use_case = data["useCase"]
 
-    if use_case != "SLO-CRO" and use_case != "ELTA":
-        return {"message": "Parameter 'useCase' can have value 'SLO-CRO' or 'ELTA'."}
-
-    # Initialize vrpProcessor if not yet initialized
-    if use_case == "SLO-CRO" and vrpProcessorReferenceSloCro is None:
-        vrpProcessorReferenceSloCro = RecReq.init_vrp(use_case)
-    elif use_case == "ELTA" and vrpProcessorReferenceElta is None:
-        vrpProcessorReferenceElta = RecReq.init_vrp(use_case)
-
+    ##Use Case SLO-CRO
     if use_case == "SLO-CRO":
+        if vrpProcessorReferenceSloCro is None:     #inicialize VRP
+            vrpProcessorReferenceSloCro = RecReq.init_vrp(use_case)
         vrp_processor_ref = vrpProcessorReferenceSloCro
-    else:
-        vrp_processor_ref = vrpProcessorReferenceElta
-    if evt_type == "brokenVehicle":
-        if "CLOS" not in data or "BrokenVehicle" not in data:
-            return {"message": "Parameter 'CLOS' or 'BrokenVehicle' is missing"}
-        clos = data["CLOS"]
-        broken_clo = data["BrokenVehicle"]
-        recommendations = RecReq.process_broken_clo(evt_type, clos, broken_clo, vrp_processor_ref)
-        return jsonify(recommendations)
-    elif evt_type == "pickupRequest":
-        if "CLOS" not in data or "orders" not in data:
-            return {"message": "Parameter 'CLOS' or 'orders' is missing"}
-        clos = data["CLOS"]
-        requests = data["orders"]
-        recommendations = RecReq.process_pickup_requests(evt_type, clos, requests, vrp_processor_ref)
-        return jsonify(recommendations)
-    elif evt_type == "crossBorder":
-        print("cross border event received")
-    else:
-        return jsonify({"message": "Invalid event type: {}".format(evt_type)})
+        if evt_type == "brokenVehicle":
+            if "CLOS" not in data or "BrokenVehicle" not in data:
+                return {"message": "Parameter 'CLOS' or 'BrokenVehicle' is missing"}
+            clos = data["CLOS"]
+            broken_clo = data["BrokenVehicle"]
+            recommendations = RecReq.process_broken_clo(evt_type, clos, broken_clo, vrp_processor_ref)
+            return jsonify(recommendations)
+        elif evt_type == "pickupRequest":
+            if "CLOS" not in data or "orders" not in data:
+                return {"message": "Parameter 'CLOS' or 'orders' is missing"}
+            clos = data["CLOS"]
+            requests = data["orders"]
+            recommendations = RecReq.process_pickup_requests(evt_type, clos, requests, vrp_processor_ref)
+            return jsonify(recommendations)
+        elif evt_type == "crossBorder":
+            print("cross border event received")
+        else:
+            return jsonify({"message": "Invalid event type: {}".format(evt_type)})
+
+    ##Use Case ELTA
+    elif use_case == "ELTA":
+
+
+
+        #cluster parcels when event = daily plan
+        if evt_type == None:
+        data_elta = data.elta_clustering(data)
+
+        '''
+        1. read data (json) - parse v elta_clustering strukturo Virtual nodes, ] virtual packets
+        2. postavit metodo elta_clustering
+        3. Naredimo Vrp response
+        4. dodati parcels na Virtual Node
+        5. poklicati metodo Graphhopper
+        '''
+
+            vrpProcessorReferenceElta = RecReq.init_vrp(use_case)
+
+        elif evt_type == "reqest" :
+        #map parcels to existing clusters
+
+
+        if evt_type == "brokenVehicle":
+            if "CLOS" not in data or "BrokenVehicle" not in data:
+                return {"message": "Parameter 'CLOS' or 'BrokenVehicle' is missing"}
+            clos = data["CLOS"]
+            broken_clo = data["BrokenVehicle"]
+            recommendations = RecReq.process_broken_clo(evt_type, clos, broken_clo, vrpProcessorReferenceElta)
+            return jsonify(recommendations)
+        elif evt_type == "pickupRequest":
+            if "CLOS" not in data or "orders" not in data:
+                return {"message": "Parameter 'CLOS' or 'orders' is missing"}
+            clos = data["CLOS"]
+            requests = data["orders"]
+            recommendations = RecReq.process_pickup_requests(evt_type, clos, requests, vrpProcessorReferenceElta)
+            return jsonify(recommendations)
+        else:
+            return jsonify({"message": "Invalid event type: {}".format(evt_type)})
+
 
 @app.route("/api/clo/newCLOs", methods=['POST'])
 def new_clos():
