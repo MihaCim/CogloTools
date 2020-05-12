@@ -121,7 +121,7 @@ class JsonGraphCreator():
         import time
         start_time = time.time()
         osmHandler = DataHandler(
-            config_parser.get_basic_map(),
+            config_parser.get_basic_map(use_case),
             {config_parser.get_post_loc_type(use_case): config_parser.get_csv_path(use_case)}
         )
         print("Pre-step  {}".format(time.time() - start_time))

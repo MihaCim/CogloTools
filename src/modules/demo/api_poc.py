@@ -85,26 +85,33 @@ def handle_recommendation_request():
             return jsonify({"message": "Invalid event type: {}".format(evt_type)})
 
     ##Use Case ELTA
+'''
     elif use_case == "ELTA":
 
 
 
-        #cluster parcels when event = daily plan
-        if evt_type == None:
-        data_elta = data.elta_clustering(data)
+    #cluster parcels when event = daily plan
+    if evt_type == None:
+    data_graph, data_elta = data.elta_clustering(evt_type, data)
 
-        '''
-        1. read data (json) - parse v elta_clustering strukturo Virtual nodes, ] virtual packets
-        2. postavit metodo elta_clustering
-        3. Naredimo Vrp response
-        4. dodati parcels na Virtual Node
-        5. poklicati metodo Graphhopper
-        '''
 
-            vrpProcessorReferenceElta = RecReq.init_vrp(use_case)
 
-        elif evt_type == "reqest" :
-        #map parcels to existing clusters
+    
+    1. read data (json) - parse v elta_clustering strukturo Virtual nodes, ] virtual packets
+    2. postavit metodo elta_clustering
+    3. Naredimo Vrp response
+    4. dodati parcels na Virtual Node
+    5. poklicati metodo Graphhopper
+    
+
+        vrpProcessorReferenceElta = RecReq.init_vrp(use_case)
+
+    #elif evt_type == "reqest" :
+    #map parcels to existing clusters
+    
+        if vrpProcessorReferenceSloCro is None:     #inicialize VRP
+            vrpProcessorReferenceSloCro = RecReq.init_vrp(use_case)
+        vrp_processor_ref = vrpProcessorReferenceSloCro
 
 
         if evt_type == "brokenVehicle":
@@ -123,7 +130,7 @@ def handle_recommendation_request():
             return jsonify(recommendations)
         else:
             return jsonify({"message": "Invalid event type: {}".format(evt_type)})
-
+'''
 
 @app.route("/api/clo/newCLOs", methods=['POST'])
 def new_clos():
@@ -171,7 +178,7 @@ def new_clos():
             if os.path.exists(cro_pickle_path):
                 os.remove(cro_pickle_path)
             vrpProcessorReferenceSloCro = None
-        else:
+        elif use_case == "ELTA":
             vrpProcessorReferenceElta = None
 
     return {"success": True}
