@@ -1,17 +1,10 @@
 import json
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
-import seaborn as sns; sns.set()
-import csv
 
 
-
-class methods:
-
-    @staticmethod
-    def elta_clustering(data):
+@staticmethod
+def elta_clustering(data):
         #prepare df
         dataDir = ("./")
         df = pd.read_csv(dataDir + r"ELTA_All11.csv")
@@ -32,9 +25,10 @@ class methods:
 
         return(response)
 
-    @staticmethod
-    def elta_map_parcels(data):
-        #map parcels to exisitng virtual nodes
+@staticmethod
+def elta_map_parcels(data):
+        print(data)
+    #map parcels to exisitng virtual nodes
 
 
 
