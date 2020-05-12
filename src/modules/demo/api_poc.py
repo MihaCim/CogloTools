@@ -10,7 +10,7 @@ from ..create_graph.create_graph import JsonGraphCreator
 from ..cvrp.processor.vrp_processor import VrpProcessor
 from ..partitioning.graph_partitioning_preprocess import GraphPreprocessing
 from ..utils.clo_update_handler import CloUpdateHandler
-from ..utils.methods.methods import *
+from src.modules.create_graph.methods.methods import *
 
 app = Flask(__name__)
 vrpProcessorReferenceSloCro = None
@@ -89,7 +89,8 @@ def handle_recommendation_request():
     if use_case == "ELTA":
         if evt_type == "pickupRequest":
             print(use_case)
-            data_elta = elta_clustering(data)
+            #data_elta = elta_clustering(data)
+            data_elta = elta_calculating_closest(data)
 
         '''
         1. read data (json) - parse v elta_clustering strukturo Virtual nodes, ] virtual packets
