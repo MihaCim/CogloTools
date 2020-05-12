@@ -37,7 +37,6 @@ def elta_clustering(data):
 
     return data, clos
 
-
 def elta_map_parcels(data):
     print(data)
 # map parcels to exisitng virtual nodes
