@@ -110,14 +110,14 @@ def handle_recommendation_request():
                 return {"message": "Parameter 'CLOS' or 'BrokenVehicle' is missing"}
             clos = data["CLOS"]
             broken_clo = data["BrokenVehicle"]
-            recommendations = RecReq.process_broken_clo(evt_type, clos, broken_clo, vrpProcessorReferenceElta)
+            recommendations = RecReq.process_broken_clo(evt_type, clos, broken_clo, vrpProcessorReferenceElta, use_case)
             return jsonify(recommendations)
         elif evt_type == "pickupRequest":
             if "CLOS" not in data or "orders" not in data:
                 return {"message": "Parameter 'CLOS' or 'orders' is missing"}
             clos = data["CLOS"]
             requests = data["orders"]
-            recommendations = RecReq.process_pickup_requests(evt_type, clos, requests, vrpProcessorReferenceElta)
+            recommendations = RecReq.process_pickup_requests(evt_type, clos, requests, vrpProcessorReferenceElta, use_case)
             return jsonify(recommendations)
         else:
             return jsonify({"message": "Invalid event type: {}".format(evt_type)})
