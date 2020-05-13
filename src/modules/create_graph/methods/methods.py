@@ -3,17 +3,23 @@ from sklearn.cluster import KMeans
 import pandas as pd
 from ..config.config_parser import ConfigParser
 import copy
+
 config_parser = ConfigParser()
+url = "https://graphhopper.com/api/1/vrp?key=e8a55308-9419-4814-81f1-6250efe25b5c"
+
 
 def proccess_elta_event(proc_event, data):
-    if proc_event==None:
+    if proc_event == None:
         return elta_clustering(data)
-    elif proc_event=='pickup':
+    elif proc_event == 'pickup':
         return elta_map_parcels(data)
+
 
 def elta_clustering(orig_data):
     data = copy.deepcopy(orig_data)
     l = []
+    for el in data['CLOS']:
+        l.append([el['UUID'], 'clos', el['currentLocation'][0], el['currentLocation'][1]])
     for el in data['orders']:
         l.append([el['UUIDParcel'], "destination"] + el['destination'])
         l.append([el['UUIDParcel'], "pickup"] + el['pickup'])
@@ -24,8 +30,11 @@ def elta_clustering(orig_data):
     centers = kmeans.cluster_centers_
     df["labels"] = labels = kmeans.labels_
     for index, row in df.iterrows():
-        data['orders'][index // 2][row[1] + '_location'] = data['orders'][index // 2][row[1]]
-        data['orders'][index // 2][row[1]] = str(row['labels'])
+        if row[1] == 'clos':
+            data['CLOS'][index]['currentLocation'] = str(row['labels'])
+        else:
+            data['orders'][index // 2][row[1] + '_location'] = data['orders'][index // 2][row[1]]
+            data['orders'][index // 2][row[1]] = str(row['labels'])
 
     clos = {"useCase": "ELTA"}
     clos_list = []
@@ -40,6 +49,7 @@ def elta_clustering(orig_data):
         i = i + 1
     clos["CLOS"] = clos_list
     return data, clos
+
 
 def find_min(lat_cord, lon_cord):
     elta = config_parser.get_csv_path("ELTA")
@@ -82,4 +92,5 @@ def elta_map_parcels(orig_data):
         clo['pickup_location'] = clo['pickup']
         clo['pickup'] = m
     return data
+
 # map parcels to exisitng virtual nodes
