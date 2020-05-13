@@ -255,28 +255,52 @@ class VrpProcessor:
         # map parcel UUIDs to route
         if len(route) == 1 and loads[nodes.index(route[0])] == 0:
             return []
-
-        for node in route:
+        new_parcels = []
+        for idx, node in enumerate(route):
             node_idx = None
-            for idx, n in enumerate(nodes):
+            for i, n in enumerate(nodes):
                 if n.id == node.id:
-                    node_idx = idx
+                    node_idx = i
                     break
-
             parcels = [x.uuid for x in parcel_list if x.target == node.id]
-
+            new_parcels += [x for x in parcel_list if x.target == node.id and x.type == "order"] ##save a list of parcels from ad-hoc order for adding puckup locationstop
             if (int(loads[node_idx]) > 0 or idx == 0):
                 converted_route.append({
                     "locationId": node.id,
-                    "dropoffWeightKg": int(loads[node_idx]),
+                    "dropoffWeightKg": int(loads[node_idx]*(-1)),
+                    "pickupWeightKg": 0,
                     # "dropoffVolumeM3": int(loads[node_idx] / 10),
-                    "parcels": parcels,
-                    "info": "This parcel must be delivered to location " + str(node.id),
+                    "pickup parcels": "",
+                    "delivery parcels": parcels,
+                    "info": "This parcels must be delivered to location " + str(node.id),
                     "position": "{},{}".format(node.lon, node.lat)
                 })
-                for parcel_remove in parcel_list:  # removes the added parcels from the pending parcel list
-                    if parcel_remove.uuid in parcels:
-                        parcel_list.remove(parcel_remove)
+                for parcel in parcel_list:  # removes the added parcels from the pending parcel list
+                    if parcel.uuid in parcels:
+                        parcel_list.remove(parcel)
+
+        #add stops for ad-hoc parcels pickup locations
+        for node in nodes:
+            parcels = [x for x in new_parcels if x.current_location == node.id]
+            if len(parcels) > 0:
+                for idx, location in enumerate(converted_route):
+                    if location["locationId"] == node.id:
+                        converted_route[idx]["pickupWeightKg"] = sum([o.volume for o in parcels])
+                        converted_route[idx]["pickup parcels"] = [o.uuid for o in parcels]
+                        break
+
+                    else:
+                        converted_route.append({
+                        "locationId": node.id,
+                        "dropoffWeightKg": 0,
+                        "pickupWeightKg": sum([o.volume for o in parcels]),
+                        "pickup parcels": [o.uuid for o in parcels],
+                        "delivery parcels": "",
+                        "info": "This parcels must be delivered to location " + str(node.id),
+                        "position": "{},{}".format(node.lon, node.lat)
+                        })
+            for parcel in parcels:  # removes the added parcels from the new_parcels list
+                new_parcels.remove(parcel)
         return converted_route
 
     @staticmethod
@@ -300,10 +324,10 @@ class VrpProcessor:
             # list of additional parcels from request
             if evt_type == "brokenVehicle":
                 deliveries_diff = [Parcel(x["UUIDParcel"], x["destination"],
-                                          x["weight"], requests["currentLocation"]) for x in requests["parcels"]]
+                                          x["weight"], requests["currentLocation"], "order") for x in requests["parcels"]]
             else:
                 deliveries_diff = [Parcel(x["UUIDParcel"], x["destination"],
-                                      x["weight"], x["pickup"]) for x in requests]
+                                      x["weight"], x["pickup"], "order") for x in requests]
             # list of parcels on CLOs before request
             for clo in clos:
                 for parcel in clo["parcels"]:
