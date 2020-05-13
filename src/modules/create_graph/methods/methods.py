@@ -1,15 +1,18 @@
-import json
-import numpy as np
 import csv
 from sklearn.cluster import KMeans
 import pandas as pdgit
 from ..config.config_parser import ConfigParser
-
+import copy
 config_parser = ConfigParser()
 
+def proccess_elta_event(proc_event, data):
+    if proc_event==None:
+        elta_clustering(data)
+    elif proc_event=='pickup':
+        elta_map_parcels(data)
 
-def elta_clustering(data):
-    print(data)
+def elta_clustering(orig_data):
+    data = copy.deepcopy(orig_data)
     l = []
     for el in data['orders']:
         l.append([el['UUIDParcel'], "destination"] + el['destination'])
@@ -21,11 +24,8 @@ def elta_clustering(data):
     centers = kmeans.cluster_centers_
     df["labels"] = labels = kmeans.labels_
     for index, row in df.iterrows():
-        print(index)
-        print(row)
         data['orders'][index // 2][row[1] + '_location'] = data['orders'][index // 2][row[1]]
         data['orders'][index // 2][row[1]] = str(row['labels'])
-    print(df)
 
     clos = {"useCase": "ELTA"}
     clos_list = []
@@ -39,7 +39,6 @@ def elta_clustering(data):
         })
         i = i + 1
     clos["CLOS"] = clos_list
-
     return data, clos
 
 def find_min(lat_cord, lon_cord):
@@ -62,7 +61,8 @@ def find_min(lat_cord, lon_cord):
     return label
 
 
-def elta_calculating_closest(data):
+def elta_map_parcels(orig_data):
+    data = copy.deepcopy(orig_data)
     for clo in data['CLOS']:
         m = find_min(clo['currentLocation'][0], clo['currentLocation'][1])
         clo['currentLocation'] = m
@@ -73,6 +73,13 @@ def elta_calculating_closest(data):
             parcel['destination'] = m
             print(m)
 
-def elta_map_parcels(data):
-    print(data)
+    for clo in data['orders']:
+        m = find_min(clo['destination'][0], clo['destination'][1])
+        clo['destination'] = m
+        clo['destination_location'] = clo['destination_location']
+
+        m = find_min(clo['pickup'][0], clo['pickup'][1])
+        clo['pickup'] = m
+        clo['pickup_location'] = clo['pickup_location']
+    return data
 # map parcels to exisitng virtual nodes
