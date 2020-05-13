@@ -2,7 +2,7 @@ import json
 import numpy as np
 import csv
 from sklearn.cluster import KMeans
-import pandas as pd
+import pandas as pdgit
 from ..config.config_parser import ConfigParser
 
 config_parser = ConfigParser()
