@@ -150,30 +150,6 @@ def handle_recommendation_request():
         5. poklicati metodo Graphhopper
         '''
 
-        ### MESSAGE PROCESSING
-        if evt_type is None:
-            if "CLOS" not in data or "orders" not in data:
-                return {"message": "Parameter 'CLOS' or 'orders' is missing"}
-            clos = data_request["CLOS"]
-            requests = data_request["orders"]
-            recommendations = RecReq.process_pickup_requests(evt_type, clos, requests, vrp_processor_ref, use_case)
-            return jsonify(recommendations)
-        elif evt_type == "brokenVehicle":
-            if "CLOS" not in data or "BrokenVehicle" not in data:
-                return {"message": "Parameter 'CLOS' or 'BrokenVehicle' is missing"}
-            clos = data["CLOS"]
-            broken_clo = data["BrokenVehicle"]
-            recommendations = RecReq.process_broken_clo(evt_type, clos, broken_clo, vrp_processor_ref, use_case)
-            return jsonify(recommendations)
-        elif evt_type == "pickupRequest":
-            if "CLOS" not in data or "orders" not in data:
-                return {"message": "Parameter 'CLOS' or 'orders' is missing"}
-            clos = data["CLOS"]
-            requests = data["orders"]
-            recommendations = RecReq.process_pickup_requests(evt_type, clos, requests, vrp_processor_ref, use_case)
-            return jsonify(recommendations)
-        else:
-            return jsonify({"message": "Invalid event type: {}".format(evt_type)})
 
 
 @app.route("/api/clo/newCLOs", methods=['POST'])
