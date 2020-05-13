@@ -18,23 +18,23 @@ def proccess_elta_event(proc_event, data):
 def elta_clustering(orig_data):
     data = copy.deepcopy(orig_data)
     l = []
-    for el in data['CLOS']:
-        l.append([el['UUID'], 'clos', el['currentLocation'][0], el['currentLocation'][1]])
-    for el in data['orders']:
-        l.append([el['UUIDParcel'], "destination"] + el['destination'])
-        l.append([el['UUIDParcel'], "pickup"] + el['pickup'])
+    for i, el in enumerate(data['CLOS']):
+        l.append([i, el['UUID'], 'clos', el['currentLocation'][0], el['currentLocation'][1]])
+    for i, el in enumerate(data['orders']):
+        l.append([i, el['UUIDParcel'], "destination"] + el['destination'])
+        l.append([i, el['UUIDParcel'], "pickup"] + el['pickup'])
     df = pd.DataFrame(l)
     # run clustering
     kmeans = KMeans(n_clusters=5)
-    kmeans.fit(df[[2, 3]])  # Compute k-means clustering.
+    kmeans.fit(df[[3, 4]])  # Compute k-means clustering.
     centers = kmeans.cluster_centers_
     df["labels"] = labels = kmeans.labels_
     for index, row in df.iterrows():
-        if row[1] == 'clos':
-            data['CLOS'][index]['currentLocation'] = str(row['labels'])
+        if row[2] == 'clos':
+            data['CLOS'][row[0]]['currentLocation'] = str(row['labels'])
         else:
-            data['orders'][index // 2][row[1] + '_location'] = data['orders'][index // 2][row[1]]
-            data['orders'][index // 2][row[1]] = str(row['labels'])
+            data['orders'][row[0]][row[2] + '_location'] = data['orders'][row[0]][row[2]]
+            data['orders'][row[0]][row[2]] = str(row['labels'])
 
     clos = {"useCase": "ELTA"}
     clos_list = []
