@@ -2,7 +2,7 @@ import os
 import json
 
 
-class ConfigParser:
+class ConfigParser():
 
     def __init__(self, config_path='./modules/create_graph/config/config.json'):
         if not os.path.exists(config_path):
@@ -35,6 +35,14 @@ class ConfigParser:
         else:
             print("Error - use not not defined.")
 
+    def get_basic_map(self, use_case):
+        if use_case == "SLO-CRO":
+            return self.json_config["map_basic_SLO-CRO"]
+        elif use_case == "ELTA":
+            return self.json_config["map_basic_ELTA"]
+        else:
+            print("Error - use_case not defined.")
+
     def get_border_nodes_slo(self):
         return self.json_config["slo_border_nodes"]
 
@@ -43,9 +51,6 @@ class ConfigParser:
 
     def get_msb_few_url(self):
         return self.json_config["msb_fwd"]
-
-    def get_basic_map(self):
-        return self.json_config["map_basic"]
 
     def get_eps(self):
         return self.json_config["eps"]

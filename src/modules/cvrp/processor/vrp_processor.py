@@ -318,16 +318,37 @@ class VrpProcessor:
         return vehicles
 
     @staticmethod
-    def parse_deliveries(evt_type, clos, requests):
-            """Create a list of Vehicle objects from JSON input"""
+    def parse_deliveries(evt_type, clos, requests, use_case):
+        if use_case == "SLO-CRO":
             deliveries_origin = []
             # list of additional parcels from request
             if evt_type == "brokenVehicle":
                 deliveries_diff = [Parcel(x["UUIDParcel"], x["destination"],
-                                          x["weight"], requests["currentLocation"], "order") for x in requests["parcels"]]
+                                          x["weight"], requests["currentLocation"], "order") for x in
+                                   requests["parcels"]]
             else:
                 deliveries_diff = [Parcel(x["UUIDParcel"], x["destination"],
-                                      x["weight"], x["pickup"], "order") for x in requests]
+                                          x["weight"], x["pickup"],
+                                          "order") for x in requests]
+            # list of parcels on CLOs before request
+            for clo in clos:
+                for parcel in clo["parcels"]:
+                    deliveries_origin.append(Parcel(parcel["UUIDParcel"], parcel["destination"],
+                                                    parcel["weight"], clo["currentLocation"]))
+            deliveries_all = deliveries_origin + deliveries_diff
+            deliveries = Deliveries(deliveries_origin, deliveries_diff, deliveries_all)
+            return deliveries
+
+        if use_case == "ELTA":
+            deliveries_origin = []
+            # list of additional parcels from request
+            if evt_type == "brokenVehicle":
+                deliveries_diff = [Parcel(x["UUIDParcel"], x["destination"],
+                                          x["weight"], requests["currentLocation"], "order") for x in
+                                   requests["parcels"]]
+            else:
+                deliveries_diff = [Parcel(x["UUIDParcel"], x["destination"],
+                                          x["weight"], x["pickup"], "order") for x in requests]
             # list of parcels on CLOs before request
             for clo in clos:
                 for parcel in clo["parcels"]:
