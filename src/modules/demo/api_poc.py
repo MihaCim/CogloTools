@@ -10,13 +10,60 @@ from ..create_graph.create_graph import JsonGraphCreator
 from ..cvrp.processor.vrp_processor import VrpProcessor
 from ..partitioning.graph_partitioning_preprocess import GraphPreprocessing
 from ..utils.clo_update_handler import CloUpdateHandler
-from src.modules.create_graph.methods.methods import *
+from ..utils.methods.methods import *
 
 app = Flask(__name__)
 vrpProcessorReferenceSloCro = None
 vrpProcessorReferenceElta = None
 
 config_parser = ConfigParser()
+
+
+def process_new_CLOs_request(data):
+    global vrpProcessorReferenceElta
+    global vrpProcessorReferenceSloCro
+
+    if "CLOS" not in data or "useCase" not in data:
+        return {"message": "Parameter 'CLOS' or 'useCase' is missing"}
+    clos = data["CLOS"]  # Extract array of CLOs
+    use_case = data["useCase"]
+    csv_file = config_parser.get_csv_path(use_case)
+
+    if use_case != "SLO-CRO" and use_case != "ELTA":
+        return {"message": "Parameter 'useCase' can have value 'SLO-CRO' or 'ELTA'."}
+
+    needs_rebuild = CloUpdateHandler.handle_new_clo_request(clos, csv_file)
+    if needs_rebuild or not os.path.exists(config_parser.get_graph_path(use_case)):
+        creator = JsonGraphCreator()
+        creator.create_json_graph(use_case)
+
+        # Delete existing pickle file for graph
+        pickle_path = config_parser.get_pickle_path(use_case)
+        if os.path.exists(pickle_path):
+            os.remove(pickle_path)
+
+        # Remove use case specific
+        if use_case == "SLO-CRO":
+            slo_path = config_parser.get_slo_graph_path()
+            slo_pickle_path = config_parser.get_slo_pickle_path()
+            cro_path = config_parser.get_cro_graph_path()
+            cro_pickle_path = config_parser.get_cro_pickle_path()
+            if os.path.exists(slo_path):
+                os.remove(slo_path)
+            if os.path.exists(slo_pickle_path):
+                os.remove(slo_pickle_path)
+            if os.path.exists(cro_path):
+                os.remove(cro_path)
+            if os.path.exists(cro_pickle_path):
+                os.remove(cro_pickle_path)
+            vrpProcessorReferenceSloCro = None
+        else:
+            vrpProcessorReferenceElta = None
+
+    return {"success": True}
+
+
+
 
 class RecReq(Resource):
     @staticmethod
@@ -87,11 +134,16 @@ def handle_recommendation_request():
 
         ##Use Case ELTA
     if use_case == "ELTA":
-        if evt_type == "pickupRequest":
-            print(use_case)
-            #data_elta = elta_clustering(data)
-            data_elta = elta_calculating_closest(data)
+        ### VRP INICIALIZATION AND MESSAGE PREPROCESSING
+        if evt_type is None:
+            data_request, data_CLOs = elta_clustering(evt_type, data)
+            #res = process_new_CLOs_request(data_CLOs)  # make graph build
+        else:
+            data_request = elta_clustering(evt_type, data)
 
+        if vrpProcessorReferenceElta is None:     #inicialize VRP
+            vrpProcessorReferenceElta = RecReq.init_vrp(use_case)
+        vrp_processor_ref = vrpProcessorReferenceElta
         '''
         1. read data (json) - parse v elta_clustering strukturo Virtual nodes, ] virtual packets
         2. postavit metodo elta_clustering
@@ -100,81 +152,43 @@ def handle_recommendation_request():
         5. poklicati metodo Graphhopper
         '''
 
-        #vrpProcessorReferenceElta = RecReq.init_vrp(use_case)
-
-        #elif evt_type == "reqest":
-        #map parcels to existing clusters
-
-
-        if evt_type == "brokenVehicle":
+        ### MESSAGE PROCESSING
+        if evt_type is None:
+            if "CLOS" not in data or "orders" not in data:
+                return {"message": "Parameter 'CLOS' or 'orders' is missing"}
+            clos = data_request["CLOS"]
+            requests = data_request["orders"]
+            recommendations = RecReq.process_pickup_requests(evt_type, clos, requests, vrp_processor_ref, use_case)
+            return jsonify(recommendations)
+        elif evt_type == "brokenVehicle":
             if "CLOS" not in data or "BrokenVehicle" not in data:
                 return {"message": "Parameter 'CLOS' or 'BrokenVehicle' is missing"}
             clos = data["CLOS"]
             broken_clo = data["BrokenVehicle"]
-            recommendations = RecReq.process_broken_clo(evt_type, clos, broken_clo, vrpProcessorReferenceElta, use_case)
+            recommendations = RecReq.process_broken_clo(evt_type, clos, broken_clo, vrp_processor_ref, use_case)
             return jsonify(recommendations)
         elif evt_type == "pickupRequest":
             if "CLOS" not in data or "orders" not in data:
                 return {"message": "Parameter 'CLOS' or 'orders' is missing"}
             clos = data["CLOS"]
             requests = data["orders"]
-            recommendations = RecReq.process_pickup_requests(evt_type, clos, requests, vrpProcessorReferenceElta, use_case)
+            recommendations = RecReq.process_pickup_requests(evt_type, clos, requests, vrp_processor_ref, use_case)
             return jsonify(recommendations)
         else:
             return jsonify({"message": "Invalid event type: {}".format(evt_type)})
 
 
-
 @app.route("/api/clo/newCLOs", methods=['POST'])
 def new_clos():
+
     """
     API route used for handling request for newCLOs.
     This method checks if graph needs to be rebuilt or updated.
     """
-    global vrpProcessorReferenceElta
-    global vrpProcessorReferenceSloCro
 
     """Main entry point for HTTP request"""
     data = request.get_json(force=True)
-
-    if "CLOS" not in data or "useCase" not in data:
-        return {"message": "Parameter 'CLOS' or 'useCase' is missing"}
-    clos = data["CLOS"]  # Extract array of CLOs
-    use_case = data["useCase"]
-    csv_file = config_parser.get_csv_path(use_case)
-
-    if use_case != "SLO-CRO" and use_case != "ELTA":
-        return {"message": "Parameter 'useCase' can have value 'SLO-CRO' or 'ELTA'."}
-
-    needs_rebuild = CloUpdateHandler.handle_new_clo_request(clos, csv_file)
-    if needs_rebuild or not os.path.exists(config_parser.get_graph_path(use_case)):
-        creator = JsonGraphCreator()
-        creator.create_json_graph(use_case)
-
-        # Delete existing pickle file for graph
-        pickle_path = config_parser.get_pickle_path(use_case)
-        if os.path.exists(pickle_path):
-            os.remove(pickle_path)
-
-        # Remove use case specific
-        if use_case == "SLO-CRO":
-            slo_path = config_parser.get_slo_graph_path()
-            slo_pickle_path = config_parser.get_slo_pickle_path()
-            cro_path = config_parser.get_cro_graph_path()
-            cro_pickle_path = config_parser.get_cro_pickle_path()
-            if os.path.exists(slo_path):
-                os.remove(slo_path)
-            if os.path.exists(slo_pickle_path):
-                os.remove(slo_pickle_path)
-            if os.path.exists(cro_path):
-                os.remove(cro_path)
-            if os.path.exists(cro_pickle_path):
-                os.remove(cro_pickle_path)
-            vrpProcessorReferenceSloCro = None
-        else:
-            vrpProcessorReferenceElta = None
-
-    return {"success": True}
+    return process_new_CLOs_request(data)
 
 
 class CognitiveAdvisorAPI:
