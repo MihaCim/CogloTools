@@ -5,19 +5,17 @@ from flask_jsonpify import jsonify
 from flask_restful import Resource
 from waitress import serve
 
-from ..create_graph.config.config_parser import ConfigParser
 from ..create_graph.create_graph import JsonGraphCreator
 from ..cvrp.processor.vrp_processor import VrpProcessor
 from ..partitioning.graph_partitioning_preprocess import GraphPreprocessing
 from ..utils.clo_update_handler import CloUpdateHandler
-from ..utils.methods.methods import *
-
+from ..create_graph.methods import methods
+from ..create_graph.config.config_parser import ConfigParser
 app = Flask(__name__)
 vrpProcessorReferenceSloCro = None
 vrpProcessorReferenceElta = None
 
 config_parser = ConfigParser()
-
 
 def process_new_CLOs_request(data):
     global vrpProcessorReferenceElta
@@ -136,10 +134,10 @@ def handle_recommendation_request():
     if use_case == "ELTA":
         ### VRP INICIALIZATION AND MESSAGE PREPROCESSING
         if evt_type is None:
-            data_request, data_CLOs = elta_clustering(evt_type, data)
+            data_request, data_CLOs = methods.proccess_elta_event(evt_type, data)
             #res = process_new_CLOs_request(data_CLOs)  # make graph build
         else:
-            data_request = elta_clustering(evt_type, data)
+            data_request = methods.proccess_elta_event(evt_type, data)
 
         if vrpProcessorReferenceElta is None:     #inicialize VRP
             vrpProcessorReferenceElta = RecReq.init_vrp(use_case)

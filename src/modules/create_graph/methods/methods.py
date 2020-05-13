@@ -1,15 +1,15 @@
 import csv
 from sklearn.cluster import KMeans
-import pandas as pdgit
+import pandas as pd
 from ..config.config_parser import ConfigParser
 import copy
 config_parser = ConfigParser()
 
 def proccess_elta_event(proc_event, data):
     if proc_event==None:
-        elta_clustering(data)
+        return elta_clustering(data)
     elif proc_event=='pickup':
-        elta_map_parcels(data)
+        return elta_map_parcels(data)
 
 def elta_clustering(orig_data):
     data = copy.deepcopy(orig_data)
@@ -48,14 +48,14 @@ def find_min(lat_cord, lon_cord):
         csv_reader = csv.reader(csv_file, delimiter=',')
         for row in csv_reader:
             posts.append([row[1], (row[2], row[3])])
-
-    cur_max = 0
+    import sys
+    cur_max = sys.maxsize
     label = -1
     for post in posts:
         lat = float(lat_cord) - float(post[1][0])
         lon = float(lon_cord) - float(post[1][1])
-        m = lat * lat + lon * lon
-        if m > cur_max:
+        m = (lat * lat) + (lon * lon)
+        if m < cur_max:
             cur_max = m
             label = post[0]
     return label
@@ -75,11 +75,11 @@ def elta_map_parcels(orig_data):
 
     for clo in data['orders']:
         m = find_min(clo['destination'][0], clo['destination'][1])
+        clo['destination_location'] = clo['destination']
         clo['destination'] = m
-        clo['destination_location'] = clo['destination_location']
 
         m = find_min(clo['pickup'][0], clo['pickup'][1])
+        clo['pickup_location'] = clo['pickup']
         clo['pickup'] = m
-        clo['pickup_location'] = clo['pickup_location']
     return data
 # map parcels to exisitng virtual nodes
