@@ -348,7 +348,7 @@ class VrpProcessor:
                                    requests["parcels"]]
             else:
                 deliveries_diff = [Parcel(x["UUIDParcel"], x["destination"],
-                                          x["weight"], x["pickup"],x["pickup_location"],x["destination_location"], "order") for x in requests]
+                                          x["weight"], x["pickup"], "order") for x in requests]
             # list of parcels on CLOs before request
             for clo in clos:
                 for parcel in clo["parcels"]:

@@ -9,6 +9,6 @@ class Parcel:
         self.target = target
         self.uuid = uuid
         self.current_location = current_location
-        self.pickup_location = pickup_location
-        self.destination_location = destination_location
+        #self.pickup_location = pickup_location
+        #self.destination_location = destination_location
         self.type = type

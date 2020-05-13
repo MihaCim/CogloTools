@@ -135,41 +135,34 @@ def handle_recommendation_request():
         ### VRP INICIALIZATION AND MESSAGE PREPROCESSING
         if evt_type is None:
             data_request, data_CLOs = methods.proccess_elta_event(evt_type, data)
-            #res = process_new_CLOs_request(data_CLOs)  # make graph build
+            res = process_new_CLOs_request(data_CLOs)  # make graph build
         else:
             data_request = methods.proccess_elta_event(evt_type, data)
 
         if vrpProcessorReferenceElta is None:     #inicialize VRP
             vrpProcessorReferenceElta = RecReq.init_vrp(use_case)
         vrp_processor_ref = vrpProcessorReferenceElta
-        '''
-        1. read data (json) - parse v elta_clustering strukturo Virtual nodes, ] virtual packets
-        2. postavit metodo elta_clustering
-        3. Naredimo Vrp response
-        4. dodati parcels na Virtual Node
-        5. poklicati metodo Graphhopper
-        '''
 
         ### MESSAGE PROCESSING
         if evt_type is None:
-            if "CLOS" not in data or "orders" not in data:
+            if "CLOS" not in data_request or "orders" not in data_request:
                 return {"message": "Parameter 'CLOS' or 'orders' is missing"}
             clos = data_request["CLOS"]
             requests = data_request["orders"]
             recommendations = RecReq.process_pickup_requests(evt_type, clos, requests, vrp_processor_ref, use_case)
             return jsonify(recommendations)
         elif evt_type == "brokenVehicle":
-            if "CLOS" not in data or "BrokenVehicle" not in data:
+            if "CLOS" not in data_request or "BrokenVehicle" not in data_request:
                 return {"message": "Parameter 'CLOS' or 'BrokenVehicle' is missing"}
-            clos = data["CLOS"]
-            broken_clo = data["BrokenVehicle"]
+            clos = data_request["CLOS"]
+            broken_clo = data_request["BrokenVehicle"]
             recommendations = RecReq.process_broken_clo(evt_type, clos, broken_clo, vrp_processor_ref, use_case)
             return jsonify(recommendations)
         elif evt_type == "pickupRequest":
-            if "CLOS" not in data or "orders" not in data:
+            if "CLOS" not in data_request or "orders" not in data_request:
                 return {"message": "Parameter 'CLOS' or 'orders' is missing"}
-            clos = data["CLOS"]
-            requests = data["orders"]
+            clos = data_request["CLOS"]
+            requests = data_request["orders"]
             recommendations = RecReq.process_pickup_requests(evt_type, clos, requests, vrp_processor_ref, use_case)
             return jsonify(recommendations)
         else:

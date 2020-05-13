@@ -3,6 +3,7 @@ from sklearn.cluster import KMeans
 import pandas as pd
 from ..config.config_parser import ConfigParser
 import copy
+import matplotlib.pyplot as plt
 
 config_parser = ConfigParser()
 url = "https://graphhopper.com/api/1/vrp?key=e8a55308-9419-4814-81f1-6250efe25b5c"
@@ -35,6 +36,10 @@ def elta_clustering(orig_data):
         else:
             data['orders'][row[0]][row[2] + '_location'] = data['orders'][row[0]][row[2]]
             data['orders'][row[0]][row[2]] = str(row['labels'])
+    ## print clusters
+    #df.plot.scatter(x=3, y=4, c=labels, s=10, cmap='viridis')
+    #plt.scatter(centers[:, 0], centers[:, 1], c='black', s=80, alpha=0.5)
+    #plt.show()
 
     clos = {"useCase": "ELTA"}
     clos_list = []
