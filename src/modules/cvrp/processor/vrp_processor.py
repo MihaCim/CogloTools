@@ -78,16 +78,16 @@ class VrpProcessor:
             indexes.append(index)
         return indexes
 
-    def process(self, vehicles, deliveries_all):
+    def process(self, vehicles, deliveries_all, event_type):
         """Process routing request with N vehicles and M deliveries, to produce a list of routing plans"""
         deliveries = deliveries_all.deliveries
         deliveries_req = deliveries_all.req
 
         # Handle SLO-CRO use case for mapping vehicles and deliveries
         if self.use_case == "SLO-CRO":
-            delivery_map = self.map_slo_cro_deliveries(deliveries)
-            delivery_map_req = self.map_slo_cro_deliveries(deliveries_req)
-            vehicle_map = self.map_slo_cro_vehicles(vehicles)
+            delivery_map = self.map_slo_cro_deliveries(deliveries, event_type)
+            delivery_map_req = self.map_slo_cro_deliveries(deliveries_req, event_type)
+            vehicle_map = self.map_slo_cro_vehicles(vehicles, event_type)
         else:
             delivery_map = self.map_deliveries(deliveries)
             delivery_map_req = self.map_deliveries(deliveries_req)
@@ -108,6 +108,9 @@ class VrpProcessor:
             print('Starting planning for {} vehicles to deliver {} packages. Node len: {}'.format(len(plan.vehicles),
                                                                                                   len(plan.deliveries),
                                                                                                   len(partition.nodes)))
+            print("plan deliveries", plan.deliveries)
+            print("plan partition", plan.partition)
+
             # compute input vectors
             dropoff = self.map_dropoff(plan.partition, plan.deliveries)
             capacity = [v.capacity for v in plan.vehicles]
@@ -187,7 +190,7 @@ class VrpProcessor:
         nodes = graph.nodes
         edges = graph.edges
         print("Building route from VRP output...")
-        print(len(edges))
+        print("edges to take into account", edges)
         start_nodes = [graph.node_from_id(x.start_node) for x in vehicles]
         start_time = time.time()
         routes = []
@@ -320,21 +323,26 @@ class VrpProcessor:
     @staticmethod
     def parse_deliveries(evt_type, clos, requests, use_case):
         if use_case == "SLO-CRO":
+            # Event "crossBorder" already has all parcels on the truck so no pickups are necessary. This means
+            # that only deliveries_origin will be used for transportation
             deliveries_origin = []
+            deliveries_diff = []
             # list of additional parcels from request
             if evt_type == "brokenVehicle":
                 deliveries_diff = [Parcel(x["UUIDParcel"], x["destination"],
                                           x["weight"], requests["currentLocation"], "order") for x in
                                    requests["parcels"]]
-            else:
+            elif evt_type == "pickupRequest":
                 deliveries_diff = [Parcel(x["UUIDParcel"], x["destination"],
                                           x["weight"], x["pickup"],
                                           "order") for x in requests]
+
             # list of parcels on CLOs before request
             for clo in clos:
                 for parcel in clo["parcels"]:
                     deliveries_origin.append(Parcel(parcel["UUIDParcel"], parcel["destination"],
                                                     parcel["weight"], clo["currentLocation"]))
+
             deliveries_all = deliveries_origin + deliveries_diff
             deliveries = Deliveries(deliveries_origin, deliveries_diff, deliveries_all)
             return deliveries
@@ -362,7 +370,7 @@ class VrpProcessor:
     # Helper methods and methods used for specific use case or purpose
     ####################################################################################
 
-    def map_slo_cro_vehicles(self, vehicles):
+    def map_slo_cro_vehicles(self, vehicles, event_type):
         """
         Map vehicles to first or second graph. First graph represents SLO nodes and the second
         graphs represents CRO nodes.
@@ -383,7 +391,7 @@ class VrpProcessor:
 
         return map_v
 
-    def map_slo_cro_deliveries(self, deliveries):
+    def map_slo_cro_deliveries(self, deliveries, event_type):
         """
         Map deliveries for SLO-CRO use case. For each parcel, we check current (start) location
         and destination (target). If parcel needs to be delivered from SLO to CRO, we will
@@ -398,6 +406,8 @@ class VrpProcessor:
                 if "H" in parcel.target:
                     # assign closest cro border node
                     cro_border_nodes = config_parser.get_border_nodes_cro()
+                    if event_type == "crossBorder":
+                        cro_border_nodes = config_parser.get_border_nodes_cro_cross_border()
                     if parcel.target not in cro_border_nodes:
                         # TODO: assign the closest node instead of the first one
                         parcel.target = cro_border_nodes[0]
@@ -406,6 +416,8 @@ class VrpProcessor:
                 if "S" in parcel.target:
                     # assign closest slo border node
                     slo_border_nodes = config_parser.get_border_nodes_slo()
+                    if event_type == "crossBorder":
+                        slo_border_nodes = config_parser.get_border_nodes_slo_cross_border()
                     if parcel.target not in slo_border_nodes:
                         # TODO: assign the closest node instead of the first one
                         parcel.target = slo_border_nodes[0]

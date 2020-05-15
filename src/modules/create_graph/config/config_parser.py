@@ -49,6 +49,12 @@ class ConfigParser():
     def get_border_nodes_cro(self):
          return self.json_config["cro_border_nodes"]
 
+    def get_border_nodes_slo_cross_border(self):
+        return self.json_config["slo_border_nodes_cross_border"]
+
+    def get_border_nodes_cro_cross_border(self):
+         return self.json_config["cro_border_nodes_cross_border"]
+
     def get_msb_few_url(self):
         return self.json_config["msb_fwd"]
 

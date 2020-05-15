@@ -17,5 +17,7 @@
   "cro_graph_pickle_path": "./modules/demo/data/cro_graph.pickle",
   "slo_border_nodes": ["S1", "S3", "S5"],
   "cro_border_nodes": ["H5", "H3", "H1"],
+  "slo_border_nodes_cross_border": ["S1", "S3"],
+  "cro_border_nodes_cross_border": ["H3", "H1"],
   "graph_partitions": 1
 }
