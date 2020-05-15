@@ -1,15 +1,16 @@
 import time
-import requests
 from math import inf
-import json
+
+import requests
 
 from ..vrp import VRP
-from ...utils.structures.parcel import Parcel
+from ...create_graph.config.config_parser import ConfigParser
 from ...utils.structures.deliveries import Deliveries
+from ...utils.structures.node import Node
+from ...utils.structures.parcel import Parcel
 from ...utils.structures.plan import Plan
 from ...utils.structures.vehicle import Vehicle
-from ...create_graph.config.config_parser import ConfigParser
-from ...utils.structures.node import Node
+
 url = "https://graphhopper.com/api/1/vrp?key=e8a55308-9419-4814-81f1-6250efe25b5c"
 
 
@@ -78,26 +79,31 @@ class VrpProcessor:
             indexes.append(index)
         return indexes
 
-    def process(self, vehicles, deliveries_all, event_type):
+    def process(self, vehicles, deliveries_object, event_type):
         """Process routing request with N vehicles and M deliveries, to produce a list of routing plans"""
-        deliveries = deliveries_all.deliveries
-        deliveries_req = deliveries_all.req
+        deliveries_all = deliveries_object.origin + deliveries_object.req
+        deliveries_req = deliveries_object.req
 
         # Handle SLO-CRO use case for mapping vehicles and deliveries
         if self.use_case == "SLO-CRO":
-            delivery_map = self.map_slo_cro_deliveries(deliveries, event_type)
+            delivery_map = self.map_slo_cro_deliveries(deliveries_all, event_type)
             delivery_map_req = self.map_slo_cro_deliveries(deliveries_req, event_type)
             vehicle_map = self.map_slo_cro_vehicles(vehicles, event_type)
+
+            # Slightly modified for SLO-CRO use case, because we only have 1 graph, but two Countries which should
+            # be treated as two plans.
+            plans = [Plan(vehicle_map[i], delivery_map[i], delivery_map_req[i], self.graphs[0]) for i in
+                     range(2)]
         else:
-            delivery_map = self.map_deliveries(deliveries)
+            delivery_map = self.map_deliveries(deliveries_all)
             delivery_map_req = self.map_deliveries(deliveries_req)
             vehicle_map = self.map_vehicles(vehicles)
 
-        # mapping all data to partitions
-        plans = [Plan(vehicle_map[i], delivery_map[i], delivery_map_req[i], self.graphs[i]) for i in
-                 range(len(self.graphs))]
-        routes = []
+            # mapping all data to partitions
+            plans = [Plan(vehicle_map[i], delivery_map[i], delivery_map_req[i], self.graphs[i]) for i in
+                     range(len(self.graphs))]
 
+        routes = []
         for i, plan in enumerate(plans):
             partition = plan.partition
             if len(plan.deliveries) == 0 or len(plan.vehicles) == 0:
@@ -108,8 +114,6 @@ class VrpProcessor:
             print('Starting planning for {} vehicles to deliver {} packages. Node len: {}'.format(len(plan.vehicles),
                                                                                                   len(plan.deliveries),
                                                                                                   len(partition.nodes)))
-            print("plan deliveries", plan.deliveries)
-            print("plan partition", plan.partition)
 
             # compute input vectors
             dropoff = self.map_dropoff(plan.partition, plan.deliveries)
@@ -190,7 +194,6 @@ class VrpProcessor:
         nodes = graph.nodes
         edges = graph.edges
         print("Building route from VRP output...")
-        print("edges to take into account", edges)
         start_nodes = [graph.node_from_id(x.start_node) for x in vehicles]
         start_time = time.time()
         routes = []
@@ -202,6 +205,7 @@ class VrpProcessor:
         for x, vehicle in enumerate(vehicles):
             load = loads[x]
             loads_origin = self.map_dropoff(graph, vehicle.parcels)
+
             for i in range(len(nodes)):
                 vehicle_load_diff = load[i] - loads_origin[i]
                 while vehicle_load_diff > 0:
@@ -229,15 +233,13 @@ class VrpProcessor:
             # get route and clear up any packages on this route
 
             while sum(vehicle_load) > 0:  # run until all parcels have been delivered
-                post_idx = self.find_closest_post(vehicle_load, current_node,
-                                                  graph)  # idx of closest post with parcel demand
+                post_idx = self.find_closest_post(vehicle_load, current_node, graph)  # idx of closest post with parcel demand
                 target = nodes[post_idx]  # convert idx to node object
+
                 vehicle_load[post_idx] -= vehicle_load[post_idx]  # take/drop all parcels
                 route.append(target)
 
-
             route_ordered = self.make_route_sequence(route)
-
             graph.print_path(route)
             routes.append(route)
             converted_routes.append(
@@ -342,9 +344,8 @@ class VrpProcessor:
                 for parcel in clo["parcels"]:
                     deliveries_origin.append(Parcel(parcel["UUIDParcel"], parcel["destination"],
                                                     parcel["weight"], clo["currentLocation"]))
+            deliveries = Deliveries(deliveries_origin, deliveries_diff)
 
-            deliveries_all = deliveries_origin + deliveries_diff
-            deliveries = Deliveries(deliveries_origin, deliveries_diff, deliveries_all)
             return deliveries
 
         if use_case == "ELTA":
@@ -362,8 +363,8 @@ class VrpProcessor:
                 for parcel in clo["parcels"]:
                     deliveries_origin.append(Parcel(parcel["UUIDParcel"], parcel["destination"],
                                                     parcel["weight"], clo["currentLocation"]))
-            deliveries_all = deliveries_origin + deliveries_diff
-            deliveries = Deliveries(deliveries_origin, deliveries_diff, deliveries_all)
+            deliveries = Deliveries(deliveries_origin, deliveries_diff)
+
             return deliveries
 
     ####################################################################################
@@ -377,13 +378,17 @@ class VrpProcessor:
         :param vehicles:
         :return:
         """
-        map_v = [[] for _ in self.graphs]
+        map_v = [[], []]
 
         # First graph is SLO, second graph is CRO
         for v in vehicles:
             if "S" in v.start_node:
+                # map SLO parcels to border nodes if necessary
+                v.parcels = self.map_slo_cro_deliveries(v.parcels, event_type)[0]
                 map_v[0].append(v)
             elif "H" in v.start_node:
+                # map CRO parcels to border nodes if necessary
+                v.parcels = self.map_slo_cro_deliveries(v.parcels, event_type)[1]
                 map_v[1].append(v)
             else:
                 print("Vehicle start node does not have 'S' or 'H'.")
@@ -399,8 +404,7 @@ class VrpProcessor:
         :param deliveries:
         :return:
         """
-        delivery_parts = [[] for _ in self.graphs]
-
+        delivery_parts = [[],[]] # First one is for SLO nodes, Second one is for CRO nodes
         for parcel in deliveries:
             if "S" in parcel.current_location:
                 if "H" in parcel.target:

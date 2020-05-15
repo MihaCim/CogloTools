@@ -43,18 +43,6 @@ def process_new_CLOs_request(data):
 
         # Remove use case specific
         if use_case == "SLO-CRO":
-            slo_path = config_parser.get_slo_graph_path()
-            slo_pickle_path = config_parser.get_slo_pickle_path()
-            cro_path = config_parser.get_cro_graph_path()
-            cro_pickle_path = config_parser.get_cro_pickle_path()
-            if os.path.exists(slo_path):
-                os.remove(slo_path)
-            if os.path.exists(slo_pickle_path):
-                os.remove(slo_pickle_path)
-            if os.path.exists(cro_path):
-                os.remove(cro_path)
-            if os.path.exists(cro_pickle_path):
-                os.remove(cro_pickle_path)
             vrpProcessorReferenceSloCro = None
         else:
             vrpProcessorReferenceElta = None
@@ -146,8 +134,6 @@ def handle_recommendation_request():
                 for parcel in parcels:
                     parcel["currentLocation"] = clo["currentLocation"]
                     requests.append(parcel)
-
-            print("requests", requests)
             recommendations = RecReq.process_cross_border_request(evt_type, clos, requests, vrp_processor_ref, use_case)
             return jsonify(recommendations)
         else:

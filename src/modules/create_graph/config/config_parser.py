@@ -69,22 +69,6 @@ class ConfigParser():
         else:
             print("Error - use not not defined.")
 
-    def get_slo_graph_path(self):
-        # Get path of SLO graph
-        return self.json_config["slo_graph_json_path"]
-
-    def get_cro_graph_path(self):
-        # Get path of CRO graph
-        return self.json_config["cro_graph_json_path"]
-
     def get_graph_partitions(self):
         # Get the number of partitions used for graph split by partitioner
         return self.json_config["graph_partitions"]
-
-    def get_slo_pickle_path(self):
-        # Get path of CRO graph pickle
-        return self.json_config["slo_graph_pickle_path"]
-
-    def get_cro_pickle_path(self):
-        # Get path of SLO graph pickle
-        return self.json_config["cro_graph_pickle_path"]

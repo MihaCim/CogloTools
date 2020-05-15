@@ -37,9 +37,9 @@ def elta_clustering(orig_data):
             data['orders'][row[0]][row[2] + '_location'] = data['orders'][row[0]][row[2]]
             data['orders'][row[0]][row[2]] = str(row['labels'])
     ## print clusters
-    df.plot.scatter(x=3, y=4, c=labels, s=10, cmap='viridis')
-    plt.scatter(centers[:, 0], centers[:, 1], c='black', s=80, alpha=0.5)
-    plt.show()
+    # df.plot.scatter(x=3, y=4, c=labels, s=10, cmap='viridis')
+    # plt.scatter(centers[:, 0], centers[:, 1], c='black', s=80, alpha=0.5)
+    # plt.show()
 
     clos = {"useCase": "ELTA"}
     clos_list = []
