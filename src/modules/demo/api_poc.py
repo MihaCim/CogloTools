@@ -17,6 +17,7 @@ vrpProcessorReferenceElta = None
 
 config_parser = ConfigParser()
 
+
 def process_new_CLOs_request(data):
     global vrpProcessorReferenceElta
     global vrpProcessorReferenceSloCro
@@ -42,18 +43,6 @@ def process_new_CLOs_request(data):
 
         # Remove use case specific
         if use_case == "SLO-CRO":
-            slo_path = config_parser.get_slo_graph_path()
-            slo_pickle_path = config_parser.get_slo_pickle_path()
-            cro_path = config_parser.get_cro_graph_path()
-            cro_pickle_path = config_parser.get_cro_pickle_path()
-            if os.path.exists(slo_path):
-                os.remove(slo_path)
-            if os.path.exists(slo_pickle_path):
-                os.remove(slo_pickle_path)
-            if os.path.exists(cro_path):
-                os.remove(cro_path)
-            if os.path.exists(cro_pickle_path):
-                os.remove(cro_pickle_path)
             vrpProcessorReferenceSloCro = None
         else:
             vrpProcessorReferenceElta = None
@@ -61,9 +50,8 @@ def process_new_CLOs_request(data):
     return {"success": True}
 
 
-
-
 class RecReq(Resource):
+
     @staticmethod
     def init_vrp(use_case):
         """" Init VRP processor instance based on use-case defined in parameter"""
@@ -80,7 +68,7 @@ class RecReq(Resource):
         vehicles = vrp_processor_ref.parse_vehicles(clos)
         deliveries = vrp_processor_ref.parse_deliveries(evt_type, clos, requests, use_case)
 
-        return vrp_processor_ref.process(vehicles, deliveries)
+        return vrp_processor_ref.process(vehicles, deliveries, evt_type)
 
     @staticmethod
     def process_broken_clo(evt_type, clos, broken_clo, vrp_processor_ref, use_case):
@@ -88,7 +76,16 @@ class RecReq(Resource):
         vehicles = vrp_processor_ref.parse_vehicles(clos)
         deliveries = vrp_processor_ref.parse_deliveries(evt_type, clos, broken_clo, use_case)
 
-        return vrp_processor_ref.process(vehicles, deliveries)
+        return vrp_processor_ref.process(vehicles, deliveries, evt_type)
+
+    @staticmethod
+    def process_cross_border_request(evt_type, clos, requests, vrp_processor_ref, use_case):
+        print("Processing Cross Border Delivery Request for ", len(clos), 'vehicles')
+        vehicles = vrp_processor_ref.parse_vehicles(clos)
+        deliveries = vrp_processor_ref.parse_deliveries(evt_type, clos, requests, use_case)
+
+        return vrp_processor_ref.process(vehicles, deliveries, evt_type)
+
 
 @app.route("/api/adhoc/getRecommendation", methods=['POST'])
 def handle_recommendation_request():
@@ -108,9 +105,10 @@ def handle_recommendation_request():
 
     ##Use Case SLO-CRO
     if use_case == "SLO-CRO":
-        if vrpProcessorReferenceSloCro is None:     #inicialize VRP
+        if vrpProcessorReferenceSloCro is None:     #initialize VRP
             vrpProcessorReferenceSloCro = RecReq.init_vrp(use_case)
         vrp_processor_ref = vrpProcessorReferenceSloCro
+
         if evt_type == "brokenVehicle":
             if "CLOS" not in data or "BrokenVehicle" not in data:
                 return {"message": "Parameter 'CLOS' or 'BrokenVehicle' is missing"}
@@ -127,11 +125,22 @@ def handle_recommendation_request():
             return jsonify(recommendations)
         elif evt_type == "crossBorder":
             print("cross border event received")
+            if "CLOS" not in data:
+                return {"message": "Parameter 'CLOS' is missing"}
+            clos = data["CLOS"]
+            requests = []
+            for clo in clos:
+                parcels = clo["parcels"]
+                for parcel in parcels:
+                    parcel["currentLocation"] = clo["currentLocation"]
+                    requests.append(parcel)
+            recommendations = RecReq.process_cross_border_request(evt_type, clos, requests, vrp_processor_ref, use_case)
+            return jsonify(recommendations)
         else:
             return jsonify({"message": "Invalid event type: {}".format(evt_type)})
 
         ##Use Case ELTA
-    if use_case == "ELTA":
+    elif use_case == "ELTA":
         ### VRP INICIALIZATION AND MESSAGE PREPROCESSING
         if evt_type is None:
             data_request, data_CLOs = methods.proccess_elta_event(evt_type, data)
@@ -139,7 +148,7 @@ def handle_recommendation_request():
         else:
             data_request = methods.proccess_elta_event(evt_type, data)
 
-        if vrpProcessorReferenceElta is None:     #inicialize VRP
+        if vrpProcessorReferenceElta is None:     #initialize VRP
             vrpProcessorReferenceElta = RecReq.init_vrp(use_case)
         vrp_processor_ref = vrpProcessorReferenceElta
 

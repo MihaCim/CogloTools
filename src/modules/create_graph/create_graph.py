@@ -168,7 +168,7 @@ class JsonGraphCreator():
                     postNode[k] = v.__dict__
                     postNodePlain[k] = d
         # print final graph
-        #if len(postEdge) != 0:
+        # if len(postEdge) != 0:
         #    (not_labeled_G, labeled_G, colors) = self.graph_viz(roadNodes, ways)
         #    self.drawGraph((not_labeled_G, labeled_G, colors), postNode, postEdge)
 
