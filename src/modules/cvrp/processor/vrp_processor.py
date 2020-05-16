@@ -204,9 +204,10 @@ class VrpProcessor:
         # update list of vehicle parcels: add new parcels to vehicle.parcels list
         for x, vehicle in enumerate(vehicles):
             load = loads[x]
+            load = [int(x) for x in load]
             loads_origin = self.map_dropoff(graph, vehicle.parcels)
 
-            for i in range(len(nodes)):
+            for i in range(len(nodes)):     ##add new parcels to the vehicle from the orders
                 vehicle_load_diff = load[i] - loads_origin[i]
                 while vehicle_load_diff > 0:
                     for j in range(len(deliveries_req)):
@@ -240,12 +241,10 @@ class VrpProcessor:
                 route.append(target)
 
             route_ordered = self.make_route_sequence(route)
-            graph.print_path(route)
+            graph.print_path(route_ordered)
             routes.append(route)
             converted_routes.append(
                 {"UUID": vehicles[i].name, "route": self.map_parcels_to_route(route_ordered, dispatch, graph, vehicles[i])})
-
-        # converted_routes_reordered = make_route_sequence(converted_routes)
 
         return converted_routes
 
