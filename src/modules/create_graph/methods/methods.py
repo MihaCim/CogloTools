@@ -9,6 +9,42 @@ config_parser = ConfigParser()
 url = "https://graphhopper.com/api/1/vrp?key=e8a55308-9419-4814-81f1-6250efe25b5c"
 
 
+# map parcels to exisitng virtual nodes
+
+def map_coordinates_to_response(recommendations, transform_map_dict):
+    for recommendation in recommendations:
+        for route in recommendation['route']:
+            pickup_parcels = []
+            if route['pickup parcels'] != '' and len(route['pickup parcels']):
+                print(route)
+                for pickup_parcel in route['pickup parcels']:
+                    pickup_parcels.append({
+                        'id': pickup_parcels,
+                        'lat': transform_map_dict[(pickup_parcel, 'pickup')][0],
+                        'lon': transform_map_dict[(pickup_parcel, 'pickup')][1]
+                    })
+                route['pickup parcels'] = pickup_parcels
+
+            if route['delivery parcels'] != '' and len(route['delivery parcels']):
+                delivery_parcels = []
+                for delivery_parcel in route['delivery parcels']:
+                    delivery_parcels.append({
+                        'id': delivery_parcel,
+                        'lat': transform_map_dict[(delivery_parcel, 'destination')][0],
+                        'lon': transform_map_dict[(delivery_parcel, 'destination')][1]
+                    })
+                route['delivery parcels'] = delivery_parcels
+    return recommendations
+
+
+def get_orders_coordinates(data):
+    transform_map_dict = {}
+    for i, el in enumerate(data['orders']):
+        transform_map_dict[(el['UUIDParcel'], "destination")] = el['destination']
+        transform_map_dict[(el['UUIDParcel'], "pickup")] = el['pickup']
+    return transform_map_dict
+
+
 def proccess_elta_event(proc_event, data):
     if proc_event == None:
         return elta_clustering(data)
@@ -74,7 +110,7 @@ def find_min(lat_cord, lon_cord):
             cur_min = distance
             label = post[0]
     if label == -1:
-        raise Exception( "Error in mapping parcels to nodes")
+        raise Exception("Error in mapping parcels to nodes")
 
     return label
 
@@ -100,5 +136,3 @@ def elta_map_parcels(orig_data):
         clo['pickup_location'] = clo['pickup']
         clo['pickup'] = mapped_location
     return data
-
-# map parcels to exisitng virtual nodes
