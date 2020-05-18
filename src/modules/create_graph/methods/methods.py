@@ -51,6 +51,27 @@ def proccess_elta_event(proc_event, data):
     elif proc_event == 'pickupRequest':
         return elta_map_parcels(data)
 
+def find_min_pickup(coords, posts_nparray):
+    import sys
+    posts = []
+    lat_cord,lon_cord = coords
+    for i, post in enumerate(posts_nparray):
+        print(i)
+        posts.append([i, post])
+    cur_min = sys.maxsize
+    label = -1
+    for post in posts:
+        lat = float(lat_cord) - float(post[1][0])
+        lon = float(lon_cord) - float(post[1][1])
+        distance = (lat * lat) + (lon * lon)
+        if distance < cur_min:
+            cur_min = distance
+            label = post[0]
+    if label == -1:
+        raise Exception("Error in mapping parcels to nodes")
+
+    return label
+
 
 def elta_clustering(orig_data):
     data = copy.deepcopy(orig_data)
@@ -59,7 +80,6 @@ def elta_clustering(orig_data):
         l.append([i, el['UUID'], 'clos', el['currentLocation'][0], el['currentLocation'][1]])
     for i, el in enumerate(data['orders']):
         l.append([i, el['UUIDParcel'], "destination"] + el['destination'])
-        l.append([i, el['UUIDParcel'], "pickup"] + el['pickup'])
     df = pd.DataFrame(l)
     # run clustering
     kmeans = KMeans(n_clusters=5)
@@ -72,6 +92,11 @@ def elta_clustering(orig_data):
         else:
             data['orders'][row[0]][row[2] + '_location'] = data['orders'][row[0]][row[2]]
             data['orders'][row[0]][row[2]] = str(row['labels'])
+
+    for el in data['orders']:
+        mapped_location = find_min_pickup(el['pickup'], centers)
+        el['pickup'] = mapped_location
+
     ## print clusters
     # df.plot.scatter(x=3, y=4, c=labels, s=10, cmap='viridis')
     # plt.scatter(centers[:, 0], centers[:, 1], c='black', s=80, alpha=0.5)
