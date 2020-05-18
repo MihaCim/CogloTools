@@ -189,7 +189,9 @@ class VrpProcessor:
                                'lat': route_point['address']['lat'],
                                'lon': route_point['address']['lon'],
                                'cluster': cluster}))
-        return reordered_list
+
+            return reordered_list
+        return route
 
     def make_route(self, graph_routes, loads, graph, vehicles, deliveries, deliveries_req):
         nodes = graph.nodes
