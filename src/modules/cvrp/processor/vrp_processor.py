@@ -182,13 +182,16 @@ class VrpProcessor:
                        'lat': route[0].lat,
                        'lon': route[0].lon,
                        'cluster': cluster}))
-        for route_point in response_json['solution']['routes'][0]['activities'][1:-1]:
-            reordered_list.append(Node({'uuid': route_point['id'],
-                           'address': route_point['address']['location_id'],
-                           'lat': route_point['address']['lat'],
-                           'lon': route_point['address']['lon'],
-                           'cluster': cluster}))
-        return reordered_list
+        if len(response_json['solution']['routes'][0]['activities']) > 2:
+            for route_point in response_json['solution']['routes'][0]['activities'][1:-1]:
+                reordered_list.append(Node({'uuid': route_point['id'],
+                               'address': route_point['address']['location_id'],
+                               'lat': route_point['address']['lat'],
+                               'lon': route_point['address']['lon'],
+                               'cluster': cluster}))
+            return reordered_list
+        else:
+            return route
 
     def make_route(self, graph_routes, loads, graph, vehicles, deliveries, deliveries_req):
         nodes = graph.nodes

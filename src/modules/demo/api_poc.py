@@ -144,7 +144,9 @@ def handle_recommendation_request():
     elif use_case == "ELTA":
         print("processing ELTA usecase")
         ### VRP INICIALIZATION AND MESSAGE PREPROCESSING
+        transform_map_dict = methods.get_orders_coordinates(data)
         if evt_type is None:
+
             data_request, data_CLOs = methods.proccess_elta_event(evt_type, data)
             res = process_new_CLOs_request(data_CLOs)  # make graph build
         else:
@@ -161,7 +163,7 @@ def handle_recommendation_request():
             clos = data_request["CLOS"]
             requests = data_request["orders"]
             recommendations = RecReq.process_pickup_requests(evt_type, clos, requests, vrp_processor_ref, use_case)
-            return jsonify(recommendations)
+            return jsonify(methods.map_coordinates_to_response(recommendations, transform_map_dict))
         elif evt_type == "brokenVehicle":
             if "CLOS" not in data_request or "BrokenVehicle" not in data_request:
                 return {"message": "Parameter 'CLOS' or 'BrokenVehicle' is missing"}
