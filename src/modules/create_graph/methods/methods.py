@@ -15,7 +15,6 @@ def proccess_elta_event(proc_event, data):
     elif proc_event == 'pickupRequest':
         return elta_map_parcels(data)
 
-
 def elta_clustering(orig_data):
     data = copy.deepcopy(orig_data)
     l = []

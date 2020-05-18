@@ -243,6 +243,7 @@ class VrpProcessor:
             route_ordered = self.make_route_sequence(route)
             graph.print_path(route_ordered)
             routes.append(route)
+
             converted_routes.append(
                 {"UUID": vehicles[i].name, "route": self.map_parcels_to_route(route_ordered, dispatch, graph, vehicles[i])})
 
