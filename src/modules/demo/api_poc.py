@@ -105,6 +105,7 @@ def handle_recommendation_request():
 
     ##Use Case SLO-CRO
     if use_case == "SLO-CRO":
+        print("processing SLO-CRO usease")
         if vrpProcessorReferenceSloCro is None:     #initialize VRP
             vrpProcessorReferenceSloCro = RecReq.init_vrp(use_case)
         vrp_processor_ref = vrpProcessorReferenceSloCro
@@ -141,6 +142,7 @@ def handle_recommendation_request():
 
         ##Use Case ELTA
     elif use_case == "ELTA":
+        print("processing ELTA usecase")
         ### VRP INICIALIZATION AND MESSAGE PREPROCESSING
         if evt_type is None:
             data_request, data_CLOs = methods.proccess_elta_event(evt_type, data)

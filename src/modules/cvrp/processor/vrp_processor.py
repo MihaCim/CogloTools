@@ -274,7 +274,7 @@ class VrpProcessor:
                     "dropoffWeightKg": int(loads[node_idx]*(-1)),
                     "pickupWeightKg": 0,
                     # "dropoffVolumeM3": int(loads[node_idx] / 10),
-                    "pickup parcels": "",
+                    "pickup parcels": [],
                     "delivery parcels": parcels,
                     "info": "This parcels must be delivered to location " + str(node.id),
                     "position": "{},{}".format(node.lon, node.lat)
@@ -299,7 +299,7 @@ class VrpProcessor:
                         "dropoffWeightKg": 0,
                         "pickupWeightKg": sum([o.volume for o in parcels]),
                         "pickup parcels": [o.uuid for o in parcels],
-                        "delivery parcels": "",
+                        "delivery parcels": [],
                         "info": "This parcels must be delivered to location " + str(node.id),
                         "position": "{},{}".format(node.lon, node.lat)
                         })
