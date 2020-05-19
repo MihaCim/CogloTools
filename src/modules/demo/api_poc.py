@@ -165,12 +165,12 @@ def handle_recommendation_request():
             recommendations = RecReq.process_pickup_requests(evt_type, clos, requests, vrp_processor_ref, use_case)
             return jsonify(methods.map_coordinates_to_response(recommendations, transform_map_dict))
         elif evt_type == "brokenVehicle":
-            if "CLOS" not in data_request or "BrokenVehicle" not in data_request:
+            if "CLOS" not in data_request or "brokenVehicle" not in data_request:
                 return {"message": "Parameter 'CLOS' or 'BrokenVehicle' is missing"}
             clos = data_request["CLOS"]
-            broken_clo = data_request["BrokenVehicle"]
+            broken_clo = data_request["brokenVehicle"]
             recommendations = RecReq.process_broken_clo(evt_type, clos, broken_clo, vrp_processor_ref, use_case)
-            return jsonify(recommendations)
+            return jsonify(methods.map_coordinates_to_response(recommendations, transform_map_dict))
         elif evt_type == "pickupRequest":
             if "CLOS" not in data_request or "orders" not in data_request:
                 return {"message": "Parameter 'CLOS' or 'orders' is missing"}
