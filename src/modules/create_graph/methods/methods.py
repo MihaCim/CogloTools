@@ -80,7 +80,7 @@ def elta_clustering(orig_data):
         l.append([i, el['UUIDParcel'], "destination"] + el['destination'])
     df = pd.DataFrame(l)
     # run clustering
-    kmeans = KMeans(n_clusters=5)
+    kmeans = KMeans(n_clusters=8)
     kmeans.fit(df[[3, 4]])  # Compute k-means clustering.
     centers = kmeans.cluster_centers_
     df["labels"] = labels = kmeans.labels_
@@ -136,7 +136,6 @@ def find_min(lat_cord, lon_cord):
         raise Exception("Error in mapping parcels to nodes")
 
     return label
-
 
 def elta_map_parcels(orig_data):
     data = copy.deepcopy(orig_data)
