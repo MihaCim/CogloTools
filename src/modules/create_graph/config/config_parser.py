@@ -58,8 +58,11 @@ class ConfigParser():
     def get_msb_few_url(self):
         return self.json_config["msb_fwd"]
 
-    def get_eps(self):
-        return self.json_config["eps"]
+    def get_eps(self, use_case):
+        if use_case == "SLO-CRO":
+            return self.json_config["eps_slo_cro"]
+        else:
+            return self.json_config["eps_elta"]
 
     def get_post_loc_type(self, use_case):
         if use_case == "SLO-CRO":
