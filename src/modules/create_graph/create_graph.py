@@ -146,7 +146,7 @@ class JsonGraphCreator():
 
         for postId, nodeId in map_posts_to_nodes.items():
 
-            res = finder.search_near_posts(roadNodes, roadWays, ways, nodeId, map_posts_to_nodes, config_parser.get_eps())
+            res = finder.search_near_posts(roadNodes, roadWays, ways, nodeId, map_posts_to_nodes, config_parser.get_eps(use_case))
             print('PostID ' + str(postId) + ' Node: ' + str(nodeId) + ' r: ' + str(res))
 
             tmpRes.append((postId, nodeId, res))
