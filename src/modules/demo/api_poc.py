@@ -28,7 +28,11 @@ def process_new_CLOs_request(data):
         return {"message": "Parameter 'CLOS' or 'useCase' is missing"}
     clos = data["CLOS"]  # Extract array of CLOs
     use_case = data["useCase"]
-    csv_file = config_parser.get_csv_path(use_case)
+    csv_file = None
+    if use_case == "SLO-CRO":
+        csv_file = config_parser.get_csv_path(use_case)
+    elif use_case == "ELTA":
+        csv_file = config_parser.get_elta_path()
 
     if use_case != "SLO-CRO" and use_case != "ELTA":
         return {"message": "Parameter 'useCase' can have value 'SLO-CRO' or 'ELTA'."}
@@ -193,7 +197,6 @@ def handle_recommendation_request():
             return InputOutputTransformer.prepare_output_message(recommendations, use_case, request_id)
         else:
             return jsonify({"message": "Invalid event type: {}".format(evt_type), "status": 0})
-
 
 @app.route("/api/clo/newCLOs", methods=['POST'])
 def new_clos():

@@ -111,6 +111,18 @@ def elta_clustering(orig_data):
             "lon": row[1]
         })
         i = i + 1
+
+    elta = config_parser.get_elta_path()
+    with open(elta) as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        for row in csv_reader:
+            clos_list.append({
+                "uuid": row[1],
+                "address": row[0],
+                "lat": row[2],
+                "lon": row[3]
+            })
+
     clos["CLOS"] = clos_list
     return data, clos
 
