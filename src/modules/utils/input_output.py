@@ -166,7 +166,7 @@ class InputOutputTransformer:
             "useCase": json["organization"],
             "eventType": event["event_type"],
             "UUIDRequest": json["request"],
-            "CLOS": json["CLO_parcels"],
+            "CLOS": json["CLOS"],
             "orders": json["orders"]
         }
 
