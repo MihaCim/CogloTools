@@ -4,7 +4,7 @@ from flask import Flask, request
 from flask_jsonpify import jsonify
 from flask_restful import Resource
 from waitress import serve
-
+import csv
 from ..create_graph.create_graph import JsonGraphCreator
 from ..cvrp.processor.vrp_processor import VrpProcessor
 from ..partitioning.graph_partitioning_preprocess import GraphPreprocessing
@@ -28,11 +28,7 @@ def process_new_CLOs_request(data):
         return {"message": "Parameter 'CLOS' or 'useCase' is missing"}
     clos = data["CLOS"]  # Extract array of CLOs
     use_case = data["useCase"]
-    csv_file = None
-    if use_case == "SLO-CRO":
-        csv_file = config_parser.get_csv_path(use_case)
-    elif use_case == "ELTA":
-        csv_file = config_parser.get_elta_path()
+    csv_file = config_parser.get_csv_path(use_case)
 
     if use_case != "SLO-CRO" and use_case != "ELTA":
         return {"message": "Parameter 'useCase' can have value 'SLO-CRO' or 'ELTA'."}
@@ -209,7 +205,18 @@ def new_clos():
 
     """Main entry point for HTTP request"""
     data = request.get_json(force=True)
-    return process_new_CLOs_request(data)
+    clos = data["CLOS"]  # Extract array of CLOs
+    use_case = data["useCase"]
+    if use_case == "ELTA":
+        csv_file_path = config_parser.get_elta_path()
+        with open(csv_file_path, 'w', newline='') as csv_file:
+            csv_writer = csv.writer(csv_file)
+            for json_obj in clos:
+                csv_writer.writerow([json_obj["address"], json_obj["uuid"], json_obj["lat"], json_obj["lon"]])
+        csv_file.close()
+        return {"success": True}
+    else:
+        return process_new_CLOs_request(data)
 
 
 class CognitiveAdvisorAPI:
