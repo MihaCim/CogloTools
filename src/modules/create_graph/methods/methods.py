@@ -38,16 +38,24 @@ def map_coordinates_to_response(recommendations, transform_map_dict):
 
 def get_orders_coordinates(data):
     transform_map_dict = {}
-    for i, el in enumerate(data['orders']):
-        transform_map_dict[(el['UUIDParcel'], "destination")] = el['destination']
-        transform_map_dict[(el['UUIDParcel'], "pickup")] = el['pickup']
+    if 'orders' in data:
+        for i, el in enumerate(data['orders']):
+            transform_map_dict[(el['UUIDParcel'], "destination")] = el['destination']
+            transform_map_dict[(el['UUIDParcel'], "pickup")] = el['pickup']
+    elif 'brokenVehicle' in data:
+        for clos in data['CLOS']:
+            for parcel in clos['parcels']:
+                    transform_map_dict[(parcel['UUIDParcel'], "destination")] = parcel['destination']
+
+        for parcel in data['brokenVehicle']['parcels']:
+                transform_map_dict[(parcel['UUIDParcel'], "destination")] = parcel['destination']
     return transform_map_dict
 
 
 def proccess_elta_event(proc_event, data):
     if proc_event == None:
         return elta_clustering(data)
-    elif proc_event == 'pickupRequest':
+    elif proc_event == 'pickupRequest' or proc_event == 'brokenVehicle':
         return elta_map_parcels(data)
 
 def find_min_pickup(coords, posts_nparray):
@@ -160,13 +168,18 @@ def elta_map_parcels(orig_data):
             parcel['destination_location'] = parcel['destination']
             parcel['destination'] = mapped_location
             print(mapped_location)
+    if 'orders' in data:
+        for clo in data['orders']:
+            mapped_location = find_min(clo['destination'][0], clo['destination'][1])
+            clo['destination_location'] = clo['destination']
+            clo['destination'] = mapped_location
 
-    for clo in data['orders']:
-        mapped_location = find_min(clo['destination'][0], clo['destination'][1])
-        clo['destination_location'] = clo['destination']
-        clo['destination'] = mapped_location
-
-        mapped_location = find_min(clo['pickup'][0], clo['pickup'][1])
-        clo['pickup_location'] = clo['pickup']
-        clo['pickup'] = mapped_location
+            mapped_location = find_min(clo['pickup'][0], clo['pickup'][1])
+            clo['pickup_location'] = clo['pickup']
+            clo['pickup'] = mapped_location
+    if 'brokenVehicle' in data:
+        for clo in data['brokenVehicle']['parcels']:
+            mapped_location = find_min(clo['destination'][0], clo['destination'][1])
+            clo['destination_location'] = clo['destination']
+            clo['destination'] = mapped_location
     return data
