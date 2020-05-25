@@ -4,13 +4,15 @@ from flask import Flask, request
 from flask_jsonpify import jsonify
 from flask_restful import Resource
 from waitress import serve
-
+import csv
 from ..create_graph.create_graph import JsonGraphCreator
 from ..cvrp.processor.vrp_processor import VrpProcessor
 from ..partitioning.graph_partitioning_preprocess import GraphPreprocessing
 from ..utils.clo_update_handler import CloUpdateHandler
 from ..create_graph.methods import methods
 from ..create_graph.config.config_parser import ConfigParser
+from ..utils.input_output import InputOutputTransformer
+
 app = Flask(__name__)
 vrpProcessorReferenceSloCro = None
 vrpProcessorReferenceElta = None
@@ -87,14 +89,24 @@ class RecReq(Resource):
         return vrp_processor_ref.process(vehicles, deliveries, evt_type)
 
 
+def generate_location(address, postal, city, country):
+    return {}
+
 @app.route("/api/adhoc/getRecommendation", methods=['POST'])
 def handle_recommendation_request():
     global vrpProcessorReferenceSloCro
     global vrpProcessorReferenceElta
 
     """Main entry point for HTTP request"""
-    data = request.get_json(force=True)
+    received_request = request.get_json(force=True)
+
+    # transforms received message for internal structures
+    data = InputOutputTransformer.parse_received_recommendation_message(received_request)
+
+    # needed for response handling
+    request_id = received_request["request"]
     use_case = data['useCase']
+
     ##Errors
     if use_case != "SLO-CRO" and use_case != "ELTA":
         return {"message": "Parameter 'useCase' can have value 'SLO-CRO' or 'ELTA'."}
@@ -111,23 +123,23 @@ def handle_recommendation_request():
         vrp_processor_ref = vrpProcessorReferenceSloCro
 
         if evt_type == "brokenVehicle":
-            if "CLOS" not in data or "BrokenVehicle" not in data:
-                return {"message": "Parameter 'CLOS' or 'BrokenVehicle' is missing"}
+            if "CLOS" not in data or "brokenVehicle" not in data:
+                return {"message": "Parameter 'CLOS' or 'BrokenVehicle' is missing", "status": 0}
             clos = data["CLOS"]
-            broken_clo = data["BrokenVehicle"]
+            broken_clo = data["brokenVehicle"]
             recommendations = RecReq.process_broken_clo(evt_type, clos, broken_clo, vrp_processor_ref, use_case)
-            return jsonify(recommendations)
+            return InputOutputTransformer.prepare_output_message(recommendations, use_case, request_id)
         elif evt_type == "pickupRequest":
             if "CLOS" not in data or "orders" not in data:
-                return {"message": "Parameter 'CLOS' or 'orders' is missing"}
+                return {"message": "Parameter 'CLOS' or 'orders' is missing", "status": 0}
             clos = data["CLOS"]
             requests = data["orders"]
             recommendations = RecReq.process_pickup_requests(evt_type, clos, requests, vrp_processor_ref, use_case)
-            return jsonify(recommendations)
+            return InputOutputTransformer.prepare_output_message(recommendations, use_case, request_id)
         elif evt_type == "crossBorder":
             print("cross border event received")
             if "CLOS" not in data:
-                return {"message": "Parameter 'CLOS' is missing"}
+                return {"message": "Parameter 'CLOS' is missing", "status": 0}
             clos = data["CLOS"]
             requests = []
             for clo in clos:
@@ -136,9 +148,9 @@ def handle_recommendation_request():
                     parcel["currentLocation"] = clo["currentLocation"]
                     requests.append(parcel)
             recommendations = RecReq.process_cross_border_request(evt_type, clos, requests, vrp_processor_ref, use_case)
-            return jsonify(recommendations)
+            return InputOutputTransformer.prepare_output_message(recommendations, use_case, request_id)
         else:
-            return jsonify({"message": "Invalid event type: {}".format(evt_type)})
+            return jsonify({"message": "Invalid event type: {}".format(evt_type), "status": 0})
 
         ##Use Case ELTA
     elif use_case == "ELTA":
@@ -163,24 +175,25 @@ def handle_recommendation_request():
             clos = data_request["CLOS"]
             requests = data_request["orders"]
             recommendations = RecReq.process_pickup_requests(evt_type, clos, requests, vrp_processor_ref, use_case)
-            return jsonify(methods.map_coordinates_to_response(recommendations, transform_map_dict))
+            return InputOutputTransformer.prepare_output_message(
+                methods.map_coordinates_to_response(recommendations, transform_map_dict), use_case, request_id)
         elif evt_type == "brokenVehicle":
             if "CLOS" not in data_request or "brokenVehicle" not in data_request:
-                return {"message": "Parameter 'CLOS' or 'BrokenVehicle' is missing"}
+                return {"message": "Parameter 'CLOS' or 'BrokenVehicle' is missing", "status": 0}
             clos = data_request["CLOS"]
             broken_clo = data_request["brokenVehicle"]
             recommendations = RecReq.process_broken_clo(evt_type, clos, broken_clo, vrp_processor_ref, use_case)
-            return jsonify(methods.map_coordinates_to_response(recommendations, transform_map_dict))
+            recommendations_mapped = jsonify(methods.map_coordinates_to_response(recommendations, transform_map_dict))
+            return InputOutputTransformer.prepare_output_message(recommendations_mapped, use_case, request_id)
         elif evt_type == "pickupRequest":
             if "CLOS" not in data_request or "orders" not in data_request:
-                return {"message": "Parameter 'CLOS' or 'orders' is missing"}
+                return {"message": "Parameter 'CLOS' or 'orders' is missing", "status": 0}
             clos = data_request["CLOS"]
             requests = data_request["orders"]
             recommendations = RecReq.process_pickup_requests(evt_type, clos, requests, vrp_processor_ref, use_case)
-            return jsonify(recommendations)
+            return InputOutputTransformer.prepare_output_message(recommendations, use_case, request_id)
         else:
-            return jsonify({"message": "Invalid event type: {}".format(evt_type)})
-
+            return jsonify({"message": "Invalid event type: {}".format(evt_type), "status": 0})
 
 @app.route("/api/clo/newCLOs", methods=['POST'])
 def new_clos():
@@ -192,7 +205,18 @@ def new_clos():
 
     """Main entry point for HTTP request"""
     data = request.get_json(force=True)
-    return process_new_CLOs_request(data)
+    clos = data["CLOS"]  # Extract array of CLOs
+    use_case = data["useCase"]
+    if use_case == "ELTA":
+        csv_file_path = config_parser.get_elta_path()
+        with open(csv_file_path, 'w', newline='') as csv_file:
+            csv_writer = csv.writer(csv_file)
+            for json_obj in clos:
+                csv_writer.writerow([json_obj["address"], json_obj["uuid"], json_obj["lat"], json_obj["lon"]])
+        csv_file.close()
+        return {"success": True}
+    else:
+        return process_new_CLOs_request(data)
 
 
 class CognitiveAdvisorAPI:

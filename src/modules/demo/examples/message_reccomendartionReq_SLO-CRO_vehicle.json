@@ -37,7 +37,7 @@
       ]
     }
   ],
-  "BrokenVehicle": {
+  "brokenVehicle": {
     "UUID": "UUID-3",
     "currentLocation": "S1",
     "capacity": 200,
