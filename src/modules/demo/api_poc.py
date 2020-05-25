@@ -156,7 +156,7 @@ def handle_recommendation_request():
             vrpProcessorReferenceElta = RecReq.init_vrp(use_case)
         vrp_processor_ref = vrpProcessorReferenceElta
 
-        ### MESSAGE PROCESSING
+        ### MESSAGE PROCESSING ....
         if evt_type is None:
             if "CLOS" not in data_request or "orders" not in data_request:
                 return {"message": "Parameter 'CLOS' or 'orders' is missing"}
