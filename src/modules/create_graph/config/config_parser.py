@@ -28,7 +28,7 @@ class ConfigParser():
             print("Error - use_case not defined.")
 
     def get_elta_path(self):
-        return self.json_config["elta_redboxes_depo_path"]
+        return self.json_config["elta_static_locations"]
 
     def get_csv_path(self, use_case):
         if use_case == "SLO-CRO":

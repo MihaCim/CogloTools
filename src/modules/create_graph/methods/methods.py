@@ -23,6 +23,7 @@ def map_coordinates_to_response(recommendations, transform_map_dict):
                         'lon': transform_map_dict[(pickup_parcel, 'pickup')][1]
                     })
                 route['pickup parcels'] = pickup_parcels
+                route['load'] = route.pop('pickup parcels')
 
             if route['delivery parcels'] != '' and len(route['delivery parcels']):
                 delivery_parcels = []
@@ -33,6 +34,7 @@ def map_coordinates_to_response(recommendations, transform_map_dict):
                         'lon': transform_map_dict[(delivery_parcel, 'destination')][1]
                     })
                 route['delivery parcels'] = delivery_parcels
+                route['unload'] = route.pop('delivery parcels')
     return recommendations
 
 
@@ -124,11 +126,12 @@ def elta_clustering(orig_data):
     with open(elta) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         for row in csv_reader:
-            clos_list.append({
-                "uuid": row[1],
-                "address": row[0],
-                "lat": row[2],
-                "lon": row[3]
+            if len(row) != 0:
+                clos_list.append({
+                    "uuid": row[1],
+                    "address": row[0],
+                    "lat": row[2],
+                    "lon": row[3]
             })
 
     clos["CLOS"] = clos_list

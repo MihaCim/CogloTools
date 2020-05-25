@@ -207,6 +207,7 @@ def new_clos():
     data = request.get_json(force=True)
     clos = data["CLOS"]  # Extract array of CLOs
     use_case = data["useCase"]
+    # for ELTA only update the .csv list of of static locations
     if use_case == "ELTA":
         csv_file_path = config_parser.get_elta_path()
         with open(csv_file_path, 'w', newline='') as csv_file:
@@ -215,6 +216,7 @@ def new_clos():
                 csv_writer.writerow([json_obj["address"], json_obj["uuid"], json_obj["lat"], json_obj["lon"]])
         csv_file.close()
         return {"success": True}
+    # for SLO-CRO create a new graph
     else:
         return process_new_CLOs_request(data)
 
