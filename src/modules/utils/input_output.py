@@ -190,6 +190,7 @@ class InputOutputTransformer:
                     parcel['destination'] = parcel.pop('destination_id')
                 payload["brokenVehicle"] = brokenVehicle
             else:
+
                 ORDERS = json["orders"]
                 for parcel in ORDERS:
                     parcel['UUIDParcel'] = parcel.pop('id')
@@ -200,6 +201,7 @@ class InputOutputTransformer:
 
         elif json["organization"] == "ELTA":
             CLOS = json["CLOS"]
+            payload["eventType"] = event["event_type"]
             for clo in CLOS:
                 clo['currentLocation'] = clo["info"].pop('location')
                 clo['capacity'] = clo["info"].pop('capacity')
@@ -210,7 +212,7 @@ class InputOutputTransformer:
                 payload["CLOS"] = CLOS
             if event["event_type"] == "brokenVehicle":
                 brokenVehicle = json["brokenVehicle"]
-                brokenVehicle['currentLocation'] = brokenVehicle.pop('location')
+                brokenVehicle['currentLocation'] = brokenVehicle["info"].pop('location')
                 for parcel in brokenVehicle["parcels"]:
                     parcel['UUIDParcel'] = parcel.pop('id')
                     parcel['weight'] = parcel.pop('payweight')
@@ -222,7 +224,7 @@ class InputOutputTransformer:
                     parcel['UUIDParcel'] = parcel.pop('id')
                     parcel['weight'] = parcel.pop('payweight')
                     parcel['destination'] = parcel.pop('destination_location')
-                #    parcel['pickup'] = parcel.pop('source_location')
+                    parcel['pickup'] = parcel.pop('source_location')
                 payload["orders"] = ORDERS
 
         return payload
