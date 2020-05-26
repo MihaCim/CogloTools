@@ -4,7 +4,7 @@ from flask import Flask, request
 from flask_jsonpify import jsonify
 from flask_restful import Resource
 from waitress import serve
-
+import csv
 from ..create_graph.create_graph import JsonGraphCreator
 from ..cvrp.processor.vrp_processor import VrpProcessor
 from ..partitioning.graph_partitioning_preprocess import GraphPreprocessing
@@ -168,7 +168,7 @@ def handle_recommendation_request():
             vrpProcessorReferenceElta = RecReq.init_vrp(use_case)
         vrp_processor_ref = vrpProcessorReferenceElta
 
-        ### MESSAGE PROCESSING
+        ### MESSAGE PROCESSING ....
         if evt_type is None:
             if "CLOS" not in data_request or "orders" not in data_request:
                 return {"message": "Parameter 'CLOS' or 'orders' is missing"}
@@ -195,7 +195,6 @@ def handle_recommendation_request():
         else:
             return jsonify({"message": "Invalid event type: {}".format(evt_type), "status": 0})
 
-
 @app.route("/api/clo/newCLOs", methods=['POST'])
 def new_clos():
 
@@ -206,7 +205,20 @@ def new_clos():
 
     """Main entry point for HTTP request"""
     data = request.get_json(force=True)
-    return process_new_CLOs_request(data)
+    clos = data["CLOS"]  # Extract array of CLOs
+    use_case = data["useCase"]
+    # for ELTA only update the .csv list of of static locations
+    if use_case == "ELTA":
+        csv_file_path = config_parser.get_elta_path()
+        with open(csv_file_path, 'w', newline='') as csv_file:
+            csv_writer = csv.writer(csv_file)
+            for json_obj in clos:
+                csv_writer.writerow([json_obj["address"], json_obj["uuid"], json_obj["lat"], json_obj["lon"]])
+        csv_file.close()
+        return {"success": True}
+    # for SLO-CRO create a new graph
+    else:
+        return process_new_CLOs_request(data)
 
 
 class CognitiveAdvisorAPI:

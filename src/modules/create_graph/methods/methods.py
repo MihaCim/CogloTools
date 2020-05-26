@@ -15,24 +15,26 @@ def map_coordinates_to_response(recommendations, transform_map_dict):
     for recommendation in recommendations:
         for route in recommendation['route']:
             pickup_parcels = []
-            if route['pickup parcels'] != '' and len(route['pickup parcels']):
-                for pickup_parcel in route['pickup parcels']:
+            if route['load'] != '' and len(route['load']):
+                for pickup_parcel in route['load']:
                     pickup_parcels.append({
                         'id': pickup_parcels,
                         'lat': transform_map_dict[(pickup_parcel, 'pickup')][0],
                         'lon': transform_map_dict[(pickup_parcel, 'pickup')][1]
                     })
-                route['pickup parcels'] = pickup_parcels
+                route['load'] = pickup_parcels
+                #route['load'] = route.pop('pickup parcels')
 
-            if route['delivery parcels'] != '' and len(route['delivery parcels']):
+            if route['unload'] != '' and len(route['unload']):
                 delivery_parcels = []
-                for delivery_parcel in route['delivery parcels']:
+                for delivery_parcel in route['unload']:
                     delivery_parcels.append({
                         'id': delivery_parcel,
                         'lat': transform_map_dict[(delivery_parcel, 'destination')][0],
                         'lon': transform_map_dict[(delivery_parcel, 'destination')][1]
                     })
-                route['delivery parcels'] = delivery_parcels
+                route['unload'] = delivery_parcels
+                #route['unload'] = route.pop('delivery parcels')
     return recommendations
 
 
@@ -119,6 +121,19 @@ def elta_clustering(orig_data):
             "lon": row[1]
         })
         i = i + 1
+
+    elta = config_parser.get_elta_path()
+    with open(elta) as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        for row in csv_reader:
+            if len(row) != 0:
+                clos_list.append({
+                    "uuid": row[1],
+                    "address": row[0],
+                    "lat": row[2],
+                    "lon": row[3]
+            })
+
     clos["CLOS"] = clos_list
     return data, clos
 
@@ -166,6 +181,8 @@ def elta_map_parcels(orig_data):
             clo['pickup_location'] = clo['pickup']
             clo['pickup'] = mapped_location
     if 'brokenVehicle' in data:
+        brokenVehicle_location = find_min(data["brokenVehicle"]["currentLocation"][0],data ["brokenVehicle"]["currentLocation"][1])
+        data["brokenVehicle"]["currentLocation"] = brokenVehicle_location
         for clo in data['brokenVehicle']['parcels']:
             mapped_location = find_min(clo['destination'][0], clo['destination'][1])
             clo['destination_location'] = clo['destination']

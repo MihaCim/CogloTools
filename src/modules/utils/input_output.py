@@ -161,14 +161,71 @@ class InputOutputTransformer:
     @staticmethod
     def parse_received_recommendation_message(json):
         event = json["event"]
-
-        return {
+        payload = {
             "useCase": json["organization"],
-            "eventType": event["event_type"],
             "UUIDRequest": json["request"],
-            "CLOS": json["CLO_parcels"],
-            "orders": json["orders"]
         }
+
+        if json["organization"] == "SLO-CRO":
+            if event["event_type"] is None:  ##when dailiy plan processing we do same as for pickup request
+                payload["eventType"] = "pickupRequest"
+            else:
+                payload["eventType"] = event["event_type"]
+            CLOS = json["CLOS"]
+            for clo in CLOS:
+
+                clo['currentLocation'] = clo["info"].pop('locationId')
+                clo["capacity"] = clo["info"].pop('capacity')
+                for parcel in clo["parcels"]:
+                    parcel['UUIDParcel'] = parcel.pop('id')
+                    parcel['weight'] = parcel.pop('payweight')
+                    parcel['destination'] = parcel.pop('destination_id')
+                payload["CLOS"] = CLOS
+            if event["event_type"] == "brokenVehicle":
+                brokenVehicle = json["brokenVehicle"]
+                brokenVehicle['currentLocation'] = brokenVehicle["info"].pop('locationId')
+                for parcel in brokenVehicle["parcels"]:
+                    parcel['UUIDParcel'] = parcel.pop('id')
+                    parcel['weight'] = parcel.pop('payweight')
+                    parcel['destination'] = parcel.pop('destination_id')
+                payload["brokenVehicle"] = brokenVehicle
+            else:
+                ORDERS = json["orders"]
+                for parcel in ORDERS:
+                    parcel['UUIDParcel'] = parcel.pop('id')
+                    parcel['weight'] = parcel.pop('payweight')
+                    parcel['destination'] = parcel.pop('destination_id')
+                    parcel['pickup'] = parcel.pop('source_location')
+                payload["orders"] = ORDERS
+
+        elif json["organization"] == "ELTA":
+            CLOS = json["CLOS"]
+            for clo in CLOS:
+                clo['currentLocation'] = clo["info"].pop('location')
+                clo['capacity'] = clo["info"].pop('capacity')
+                for parcel in clo["parcels"]:
+                    parcel['UUIDParcel'] = parcel.pop('id')
+                    parcel['weight'] = parcel.pop('payweight')
+                    parcel['destination'] = parcel.pop('destination_location')
+                payload["CLOS"] = CLOS
+            if event["event_type"] == "brokenVehicle":
+                brokenVehicle = json["brokenVehicle"]
+                brokenVehicle['currentLocation'] = brokenVehicle.pop('location')
+                for parcel in brokenVehicle["parcels"]:
+                    parcel['UUIDParcel'] = parcel.pop('id')
+                    parcel['weight'] = parcel.pop('payweight')
+                    parcel['destination'] = parcel.pop('destination_location')
+                payload["brokenVehicle"] = brokenVehicle
+            else:
+                ORDERS = json["orders"]
+                for parcel in ORDERS:
+                    parcel['UUIDParcel'] = parcel.pop('id')
+                    parcel['weight'] = parcel.pop('payweight')
+                    parcel['destination'] = parcel.pop('destination_location')
+                #    parcel['pickup'] = parcel.pop('source_location')
+                payload["orders"] = ORDERS
+
+        return payload
 
     @staticmethod
     def prepare_output_message(recommendations, use_case, request_id):
@@ -186,8 +243,6 @@ class InputOutputTransformer:
             "status": 1,
             "msg": messages
         }
-
-
 
 
 
