@@ -161,14 +161,18 @@ class InputOutputTransformer:
     @staticmethod
     def parse_received_recommendation_message(json):
         event = json["event"]
-
-        return {
+        payload = {
             "useCase": json["organization"],
             "eventType": event["event_type"],
             "UUIDRequest": json["request"],
-            "CLOS": json["CLOS"],
-            "orders": json["orders"]
+            "CLOS": json["CLOS"]
         }
+        if event["event_type"] == "brokenVehicle":
+                payload["brokenVehicle"]= json["brokenVehicle"]
+        else:
+            payload["orders"]= json["orders"]
+
+        return payload
 
     @staticmethod
     def prepare_output_message(recommendations, use_case, request_id):
@@ -186,8 +190,6 @@ class InputOutputTransformer:
             "status": 1,
             "msg": messages
         }
-
-
 
 
 

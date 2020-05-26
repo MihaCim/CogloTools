@@ -243,12 +243,12 @@ class VrpProcessor:
                 vehicle_load[post_idx] -= vehicle_load[post_idx]  # take/drop all parcels
                 route.append(target)
 
-            route_ordered = self.make_route_sequence(route)
-            graph.print_path(route_ordered)
+            #route_ordered = self.make_route_sequence(route)
+            #graph.print_path(route_ordered)
             routes.append(route)
 
             converted_routes.append(
-                {"UUID": vehicles[i].name, "route": self.map_parcels_to_route(route_ordered, dispatch, graph, vehicles[i])})
+                {"UUID": vehicles[i].name, "route": self.map_parcels_to_route(route, dispatch, graph, vehicles[i])})
 
         return converted_routes
 
@@ -272,14 +272,14 @@ class VrpProcessor:
                     break
             parcels = [x.uuid for x in parcel_list if x.target == node.id]
             new_parcels += [x for x in parcel_list if x.target == node.id and x.type == "order"] ##save a list of parcels from ad-hoc order for adding puckup locationstop
-            if (int(loads[node_idx]) > 0 or idx == 0):
+            if (int(loads[node_idx]) > 0 or idx == 0): ## changed the names of the fileds for the response message
                 converted_route.append({
                     "locationId": node.id,
-                    "dropoffWeightKg": int(loads[node_idx]*(-1)),
-                    "pickupWeightKg": 0,
+                    "unloadWeight": int(loads[node_idx]*(-1)),
+                    "loadWeight": 0,
                     # "dropoffVolumeM3": int(loads[node_idx] / 10),
-                    "pickup parcels": [],
-                    "delivery parcels": parcels,
+                    "load": [],
+                    "unload": parcels,
                     "info": "This parcels must be delivered to location " + str(node.id),
                     "position": "{},{}".format(node.lon, node.lat)
                 })
@@ -297,13 +297,13 @@ class VrpProcessor:
                         converted_route[idx]["pickup parcels"] = [o.uuid for o in parcels]
                         break
 
-                    else:
+                    else:    ## changed names of the fileds for the response message
                         converted_route.append({
                         "locationId": node.id,
-                        "dropoffWeightKg": 0,
-                        "pickupWeightKg": sum([o.volume for o in parcels]),
-                        "pickup parcels": [o.uuid for o in parcels],
-                        "delivery parcels": [],
+                        "unloadWeightKg": 0,
+                        "loadWeightKg": sum([o.volume for o in parcels]),
+                        "load": [o.uuid for o in parcels],
+                        "unload": [],
                         "info": "This parcels must be delivered to location " + str(node.id),
                         "position": "{},{}".format(node.lon, node.lat)
                         })
