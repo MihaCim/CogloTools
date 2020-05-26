@@ -1,0 +1,266 @@
+{
+"request": "Req001",
+"organization":"ELTA",
+"event":{"event_type": "pickupRequest"},
+"CLOS": [
+{
+"UUID": "UUID-4",
+"info":{
+            "location":[38.005177, 23.810454],
+            "capacity":200
+         },
+"parcels": [
+{
+   "id":"UUID-1",
+   "payweight":1,
+   "destination_location":[
+      38.0051774,
+      23.8104539
+   ]
+},
+{
+   "id":"UUID-2",
+   "payweight":1,
+   "destination_location":[
+      38.0090986,
+      23.824298499999998
+   ]
+},
+{
+   "id":"UUID-3",
+   "payweight":1,
+   "destination_location":[
+      38.0098826,
+      23.807868300000003
+   ]
+},
+{
+   "id":"UUID-4",
+   "payweight":1,
+   "destination_location":[
+      38.0110234,
+      23.8285047
+	]
+}
+]}
+],
+
+"orders": [
+{
+   "id":"UUID-10",
+   "payweight":1,
+   "destination_location":[
+      38.0087708,
+      23.814691500000002
+   ],
+   "source_location":[
+      38.005177,
+      23.810454
+   ]
+},
+{
+   "id":"UUID-11",
+   "payweight":1,
+   "destination_location":[
+      38.0057951,
+      23.8296589
+   ],
+   "source_location":[
+      38.005177,
+      23.810454
+   ]
+},
+{
+   "id":"UUID-12",
+   "payweight":1,
+   "destination_location":[
+      38.0096787,
+      23.830970999999998
+   ],
+   "source_location":[
+      38.005177,
+      23.810454
+   ]
+},
+{
+   "id":"UUID-13",
+   "payweight":1,
+   "destination_location":[
+      38.007316499999995,
+      23.8278094
+   ],
+   "source_location":[
+      38.005177,
+      23.810454
+   ]
+},
+{
+   "id":"UUID-14",
+   "payweight":1,
+   "destination_location":[
+      38.0131193,
+      23.8239149
+   ],
+   "source_location":[
+      38.005177,
+      23.810454
+   ]
+},
+{
+   "id":"UUID-15",
+   "payweight":1,
+   "destination_location":[
+      38.0119511,
+      23.8210051
+   ],
+   "source_location":[
+      38.005177,
+      23.810454
+   ]
+},
+{
+   "id":"UUID-16",
+   "payweight":1,
+   "destination_location":[
+      38.0116842,
+      23.834692999999998
+   ],
+   "source_location":[
+      38.005177,
+      23.810454
+   ]
+},
+{
+   "id":"UUID-17",
+   "payweight":1,
+   "destination_location":[
+      38.0090986,
+      23.824298499999998
+   ],
+   "source_location":[
+      38.005177,
+      23.810454
+   ]
+},
+{
+   "id":"UUID-18",
+   "payweight":1,
+   "destination_location":[
+      38.0111051,
+      23.829527300000002
+   ],
+   "source_location":[
+      38.005177,
+      23.810454
+   ]
+},
+{
+   "id":"UUID-19",
+   "payweight":1,
+   "destination_location":[
+      37.9994966,
+      23.8142069
+   ],
+   "source_location":[
+      38.005177,
+      23.810454
+   ]
+},
+{
+   "id":"UUID-20",
+   "payweight":1,
+   "destination_location":[
+      38.0072252,
+      23.822195999999998
+   ],
+   "source_location":[
+      38.005177,
+      23.810454
+   ]
+},
+{
+   "id":"UUID-21",
+   "payweight":1,
+   "destination_location":[
+      38.0027566,
+      23.828629199999998
+   ],
+   "source_location":[
+      38.005177,
+      23.810454
+   ]
+},
+{
+   "id":"UUID-22",
+   "payweight":1,
+   "destination_location":[
+      38.0121346,
+      23.8159333
+   ],
+   "source_location":[
+      38.005177,
+      23.810454
+   ]
+},
+{
+   "id":"UUID-23",
+   "payweight":1,
+   "destination_location":[
+      38.0032217,
+      23.8222195
+   ],
+   "source_location":[
+      38.005177,
+      23.810454
+   ]
+},
+{
+   "id":"UUID-24",
+   "payweight":1,
+   "destination_location":[
+      38.0111188,
+      23.832167600000002
+   ],
+   "source_location":[
+      38.005177,
+      23.810454
+   ]
+},
+{
+   "id":"UUID-25",
+   "payweight":1,
+   "destination_location":[
+      38.006168200000005,
+      23.812593600000003
+   ],
+   "source_location":[
+      38.005177,
+      23.810454
+   ]
+},
+{
+   "id":"UUID-26",
+   "payweight":1,
+   "destination_location":[
+      38.01076679999999,
+      23.8195266
+   ],
+   "source_location":[
+      38.005177,
+      23.810454
+   ]
+},
+{
+   "id":"UUID-27",
+   "payweight":1,
+   "destination_location":[
+      38.003543900000004,
+      23.8150354
+   ],
+   "source_location":[
+      38.005177,
+      23.810454
+   ]
+}
+]
+}
