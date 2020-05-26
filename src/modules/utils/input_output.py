@@ -163,14 +163,66 @@ class InputOutputTransformer:
         event = json["event"]
         payload = {
             "useCase": json["organization"],
-            "eventType": event["event_type"],
             "UUIDRequest": json["request"],
-            "CLOS": json["CLOS"]
         }
-        if event["event_type"] == "brokenVehicle":
-                payload["brokenVehicle"]= json["brokenVehicle"]
+        if event["event_type"] is None:  ##when dailiy plan processing we do same as for pickup request
+            payload["eventType"] = "pickupRequest"
         else:
-            payload["orders"]= json["orders"]
+            payload["eventType"] = event["event_type"]
+
+        if json["organization"] == "SLO-CRO":
+            CLOS = json["CLOS"]
+            for clo in CLOS:
+                clo['currentLocation'] = clo.pop('locationId')
+                for parcel in clo["parcels"]:
+                    parcel['UUIDParcel'] = parcel.pop('id')
+                    parcel['weight'] = parcel.pop('payweight')
+                    parcel['destination'] = parcel.pop('destination_id')
+                payload["CLOS"] = CLOS
+            if event["event_type"] == "brokenVehicle":
+                brokenVehicle = json["brokenVehicle"]
+                brokenVehicle['currentLocation'] = brokenVehicle.pop('locationId')
+                for parcel in brokenVehicle["parcels"]:
+                    parcel['UUIDParcel'] = parcel.pop('id')
+                    parcel['weight'] = parcel.pop('payweight')
+                    parcel['destination'] = parcel.pop('destination_id')
+                payload["brokenVehicle"] = brokenVehicle
+            else:
+                ORDERS = json["orders"]
+                for parcel in ORDERS:
+                    parcel['UUIDParcel'] = parcel.pop('id')
+                    parcel['weight'] = parcel.pop('payweight')
+                    parcel['destination'] = parcel.pop('destination_id')
+                    parcel['pickup'] = parcel.pop('source_location')
+                payload["orders"] = ORDERS
+
+        elif json["organization"] == "ELTA":
+            CLOS = json["CLOS"]
+            for clo in CLOS:
+                clo['currentLocation'] = clo.pop('locationId')
+                for parcel in clo["parcels"]:
+                    parcel['UUIDParcel'] = parcel.pop('id')
+                    parcel['weight'] = parcel.pop('payweight')
+                    parcel['destination'] = parcel.pop('destination_id')
+                payload["CLOS"] = CLOS
+            if event["event_type"] == "brokenVehicle":
+                brokenVehicle = json["brokenVehicle"]
+                brokenVehicle['currentLocation'] = brokenVehicle.pop('locationId')
+                for parcel in brokenVehicle["parcels"]:
+                    parcel['UUIDParcel'] = parcel.pop('id')
+                    parcel['weight'] = parcel.pop('payweight')
+                    parcel['destination'] = parcel.pop('destination_id')
+                payload["brokenVehicle"] = brokenVehicle
+            else:
+                ORDERS = json["orders"]
+                for parcel in ORDERS:
+                    parcel['UUIDParcel'] = parcel.pop('id')
+                    parcel['weight'] = parcel.pop('payweight')
+                    parcel['destination'] = parcel.pop('destination_id')
+                    parcel['pickup'] = parcel.pop('source_location')
+                payload["orders"] = ORDERS
+
+
 
         return payload
 
