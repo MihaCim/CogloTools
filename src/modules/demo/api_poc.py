@@ -1,5 +1,6 @@
 import os
 import requests
+import json
 
 from flask import Flask, request
 from flask_jsonpify import jsonify
@@ -91,17 +92,24 @@ class RecReq(Resource):
 
     @staticmethod
     def post_response_msb(UUID, recommendations):
+        # default=str set because we want to serialize Date objects also
+        json_for_serialization = {
+            "request_id": UUID,
+            "recommendations": recommendations
+        }
+        dumped_str = json.dumps(json_for_serialization, indent=4, sort_keys=True, default=str)
+        headers = {'Content-type': 'application/json'}
         content = {
             "topic": "RECOMMENDATIONS",
             "sender": "CA",
-            "message": {
-                "request_id": UUID,
-                "recommendations": recommendations
-            }
+            "message": dumped_str
         }
-        # TODO: Add certificate to modules/demo/data/ for HTTPS request
-        # requests.post(msb_post_url, data = content)
-        return None
+        try:
+            response = requests.post(msb_post_url, json = content, headers=headers, verify=False)
+            print(response)
+        except Exception as ex:
+            print("Error occurred while posting response to MSB", ex)
+
 
 @app.route("/api/adhoc/getRecommendation", methods=['POST'])
 def handle_recommendation_request():

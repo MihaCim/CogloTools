@@ -79,5 +79,3 @@ class ConfigParser():
         # Get the number of partitions used for graph split by partitioner
         return self.json_config["graph_partitions"]
 
-    def get_cert_path(self):
-        return self.json_config["cert_path"]
