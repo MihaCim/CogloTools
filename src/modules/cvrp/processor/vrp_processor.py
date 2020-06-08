@@ -264,6 +264,8 @@ class VrpProcessor:
         if len(route) == 1 and loads[nodes.index(route[0])] == 0:
             return []
         new_parcels = []
+        step_num = 0   # ittreation index for rank field
+
         for idx, node in enumerate(route):
             node_idx = None
             for i, n in enumerate(nodes):
@@ -272,20 +274,39 @@ class VrpProcessor:
                     break
             parcels = [x.uuid for x in parcel_list if x.target == node.id]
             new_parcels += [x for x in parcel_list if x.target == node.id and x.type == "order"] ##save a list of parcels from ad-hoc order for adding puckup locationstop
-            if (int(loads[node_idx]) > 0 or idx == 0): ## changed the names of the fileds for the response message
+            if (int(loads[node_idx]) > 0 or idx == 0): ## changed the names of the fields for the response message
                 converted_route.append({
-                    "locationId": node.id,
-                    "unloadWeight": int(loads[node_idx]*(-1)),
-                    "loadWeight": 0,
+                    "id": step_num,
+                    "rank": step_num,
+                    "complete": 0,
+                    "due_time": None,
+                    #"message": "parcels from vehicle",
+                    #"unloadWeight": int(loads[node_idx]*(-1)),
+                    #"loadWeight": 0,
                     # "dropoffVolumeM3": int(loads[node_idx] / 10),
                     "load": [],
                     "unload": parcels,
-                    "info": "This parcels must be delivered to location " + str(node.id),
-                    "position": "{},{}".format(node.lon, node.lat)
+                    "location":{
+                        "city": None,
+                        "country": None,
+                        "station": node.name,
+                        "latitude":node.lat,
+                        "longitude":node.lon,
+                        "location_id":node.id,
+                        #""location_id": "{},{}".format(node.lon, node.lat),
+                        "postal_code": None
+                    },
+                    "dependency": {
+                        "plan": None,
+                        "plan_step": None
+                    }
                 })
+                step_num = +1
+
                 for parcel in parcel_list:  # removes the added parcels from the pending parcel list
                     if parcel.uuid in parcels:
                         parcel_list.remove(parcel)
+
 
         #add stops for ad-hoc parcels pickup locations
         for node in nodes:
@@ -299,16 +320,36 @@ class VrpProcessor:
 
                     else:    ## changed names of the fileds for the response message
                         converted_route.append({
-                        "locationId": node.id,
-                        "unloadWeightKg": 0,
-                        "loadWeightKg": sum([o.volume for o in parcels]),
+                        "id": step_num,
+                        "rank": step_num,
+                        "complete": 0,
+                        "due_time": None,
+                        "location": {
+                            "city": None,
+                            "country": None,
+                            "station": node.name,
+                            "latitude": node.lat,
+                            "longitude": node.lon,
+                            "location_id": node.id,
+                            "postal_code": None
+                        },
+                        #"message": "parcels from orders",
+                        #"unloadWeightKg": 0,
+                        #"loadWeightKg": sum([o.volume for o in parcels]),
+                        # "info": "This parcels must be delivered to location " + str(node.id),
+                        #"position": "{},{}".format(node.lon, node.lat)
                         "load": [o.uuid for o in parcels],
                         "unload": [],
-                        "info": "This parcels must be delivered to location " + str(node.id),
-                        "position": "{},{}".format(node.lon, node.lat)
+                        "dependency": {
+                            "plan": None,
+                            "plan_step": None
+                        },
                         })
+                        step_num = +1
+
             for parcel in parcels:  # removes the added parcels from the new_parcels list
                 new_parcels.remove(parcel)
+
         return converted_route
 
     @staticmethod
