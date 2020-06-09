@@ -1,3 +1,11 @@
+'''
+
+
+
+'''
+
+
+
 from datetime import date
 
 class InputOutputTransformer:
@@ -237,7 +245,7 @@ class InputOutputTransformer:
                 "id": request_id,
                 "organization": use_case,
                 "execution_date": date.today(),
-                "steps": clo_plan
+                "cloplans": clo_plan
             }
             messages.append(message)
 
