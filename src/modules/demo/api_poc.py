@@ -209,7 +209,7 @@ def handle_recommendation_request():
             clos = data_request["CLOS"]
             broken_clo = data_request["brokenVehicle"]
             recommendations = RecReq.process_broken_clo(evt_type, clos, broken_clo, vrp_processor_ref, use_case)
-            recommendations_mapped = jsonify(methods.map_coordinates_to_response(recommendations, transform_map_dict))
+            recommendations_mapped = methods.map_coordinates_to_response(recommendations, transform_map_dict)
             response = InputOutputTransformer.prepare_output_message(recommendations_mapped, use_case, request_id)
             RecReq.post_response_msb(request_id, response)  # post response to MSB
             return response
