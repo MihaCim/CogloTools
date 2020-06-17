@@ -174,7 +174,7 @@ class VrpProcessor:
         import json
         payload = json.dumps(nodes_seq)
         headers = {'Content-Type': 'application/json'}
-        response = requests.request#("POST", url, headers=headers, data=payload)
+        response = requests.request("POST", url, headers=headers, data=payload)
         response_json = response.json()
         reordered_list = []
         reordered_list.append(Node({'uuid': route[0].id,
@@ -302,7 +302,7 @@ class VrpProcessor:
                         "plan_step": None
                     }
                 })
-                step_num = +1
+                step_num += 1
 
                 for parcel in parcel_list:  # removes the added parcels from the pending parcel lists for delivery and pickup
                     if parcel.uuid in vehicle_parcels_unload:
