@@ -107,7 +107,7 @@ def elta_clustering(orig_data):
 
     for el in data['orders']:
         mapped_location = find_min_pickup(el['pickup'], centers)
-        el['pickup'] = mapped_location
+        el['pickup'] = str(mapped_location)
 
     ## print clusters
     # df.plot.scatter(x=3, y=4, c=labels, s=10, cmap='viridis')

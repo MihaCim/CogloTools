@@ -219,6 +219,7 @@ def handle_recommendation_request():
             clos = data_request["CLOS"]
             requests = data_request["orders"]
             recommendations = RecReq.process_pickup_requests(evt_type, clos, requests, vrp_processor_ref, use_case)
+            #recommendations_mapped = methods.map_coordinates_to_response(recommendations, transform_map_dict)
             response = InputOutputTransformer.prepare_output_message(recommendations, use_case, request_id)
             RecReq.post_response_msb(request_id, response)  # post response to MSB
             return response
