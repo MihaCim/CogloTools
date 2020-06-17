@@ -1,4 +1,3 @@
-
 {
 "request": "Req001",
 "organization":"ELTA",
@@ -11,7 +10,7 @@
             "capacity":200
          },
 "parcels": []
-	
+
 },
 {
 "UUID": "UUID-V2",
@@ -20,7 +19,7 @@
             "capacity":400
          },
 "parcels": []
-	
+
 }],
 
 "orders": [
