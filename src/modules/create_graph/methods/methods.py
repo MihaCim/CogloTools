@@ -35,7 +35,6 @@ def map_coordinates_to_response(recommendations, transform_map_dict):
                     })
                 route['unload'] = delivery_parcels
                 #route['unload'] = route.pop('delivery parcels')
-    test = 0
     return recommendations
 
 
