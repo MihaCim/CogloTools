@@ -259,21 +259,22 @@ class VrpProcessor:
         nodes = graph.nodes
         converted_route = []
         parcel_list = vehicle.parcels
+        parcel_list_pickup = parcel_list.copy()
+        step_num = 0  # ittreation index for rank field
 
-        # map parcel UUIDs to route
         if len(route) == 1 and loads[nodes.index(route[0])] == 0:
             return []
-        new_parcels = []
-        step_num = 0   # ittreation index for rank field
 
+        # map parcel UUIDs to route
         for idx, node in enumerate(route):
             node_idx = None
             for i, n in enumerate(nodes):
                 if n.id == node.id:
                     node_idx = i
                     break
-            parcels = [x.uuid for x in parcel_list if x.target == node.id]
-            new_parcels += [x for x in parcel_list if x.target == node.id and x.type == "order"] ##save a list of parcels from ad-hoc order for adding puckup locationstop
+            vehicle_parcels_unload = [x.uuid for x in parcel_list if x.target == node.id]
+            vehicle_parcels_load = [x.uuid for x in parcel_list_pickup if x.current_location == node.id]
+
             if (int(loads[node_idx]) > 0 or idx == 0): ## changed the names of the fields for the response message
                 converted_route.append({
                     "id": step_num,
@@ -284,8 +285,8 @@ class VrpProcessor:
                     #"unloadWeight": int(loads[node_idx]*(-1)),
                     #"loadWeight": 0,
                     # "dropoffVolumeM3": int(loads[node_idx] / 10),
-                    "load": [],
-                    "unload": parcels,
+                    "load": vehicle_parcels_load,
+                    "unload": vehicle_parcels_unload,
                     "location":{
                         "city": None,
                         "country": None,
@@ -301,54 +302,14 @@ class VrpProcessor:
                         "plan_step": None
                     }
                 })
-                step_num = +1
+                step_num += 1
 
-                for parcel in parcel_list:  # removes the added parcels from the pending parcel list
-                    if parcel.uuid in parcels:
+                for parcel in parcel_list:  # removes the added parcels from the pending parcel lists for delivery and pickup
+                    if parcel.uuid in vehicle_parcels_unload:
                         parcel_list.remove(parcel)
-
-
-        #add stops for ad-hoc parcels pickup locations
-        for node in nodes:
-            parcels = [x for x in new_parcels if x.current_location == node.id]
-            if len(parcels) > 0:
-                for idx, location in enumerate(converted_route):
-                    if location["locationId"] == node.id:
-                        converted_route[idx]["pickupWeightKg"] = sum([o.volume for o in parcels])
-                        converted_route[idx]["pickup parcels"] = [o.uuid for o in parcels]
-                        break
-
-                    else:    ## changed names of the fileds for the response message
-                        converted_route.append({
-                        "id": step_num,
-                        "rank": step_num,
-                        "complete": 0,
-                        "due_time": None,
-                        "location": {
-                            "city": None,
-                            "country": None,
-                            "station": node.name,
-                            "latitude": node.lat,
-                            "longitude": node.lon,
-                            "location_id": node.id,
-                            "postal_code": None
-                        },
-                        #"message": "parcels from orders",
-                        #"unloadWeightKg": 0,
-                        #"loadWeightKg": sum([o.volume for o in parcels]),
-                        # "info": "This parcels must be delivered to location " + str(node.id),
-                        #"position": "{},{}".format(node.lon, node.lat)
-                        "load": [o.uuid for o in parcels],
-                        "unload": [],
-                        "dependency": {
-                            "plan": None,
-                            "plan_step": None
-                        },
-                        })
-                        step_num = +1
-
-            for parcel in parcels:  # removes the added parcels from the new_parcels list
-                new_parcels.remove(parcel)
+                for parcel in parcel_list_pickup:
+                    if parcel.uuid in vehicle_parcels_load:
+                        parcel_list_pickup.remove(parcel)
 
         return converted_route
 

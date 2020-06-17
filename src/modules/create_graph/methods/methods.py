@@ -35,6 +35,7 @@ def map_coordinates_to_response(recommendations, transform_map_dict):
                     })
                 route['unload'] = delivery_parcels
                 #route['unload'] = route.pop('delivery parcels')
+    test = 0
     return recommendations
 
 
@@ -90,7 +91,7 @@ def elta_clustering(orig_data):
         l.append([i, el['UUIDParcel'], "destination"] + el['destination'])
     df = pd.DataFrame(l)
     # run clustering
-    kmeans = KMeans(n_clusters=8)
+    kmeans = KMeans(n_clusters=6)
     kmeans.fit(df[[3, 4]])  # Compute k-means clustering.
     centers = kmeans.cluster_centers_
     df["labels"] = labels = kmeans.labels_
