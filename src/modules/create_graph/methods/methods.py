@@ -18,7 +18,7 @@ def map_coordinates_to_response(recommendations, transform_map_dict):
             if route['load'] != '' and len(route['load']):
                 for pickup_parcel in route['load']:
                     pickup_parcels.append({
-                        'id': pickup_parcels,
+                        'id': pickup_parcel,
                         'lat': transform_map_dict[(pickup_parcel, 'pickup')][0],
                         'lon': transform_map_dict[(pickup_parcel, 'pickup')][1]
                     })
@@ -47,11 +47,15 @@ def get_orders_coordinates(data):
             transform_map_dict[(el['UUIDParcel'], "pickup")] = el['pickup']
     elif 'brokenVehicle' in data:
         for clos in data['CLOS']:
+            current_location = clos['currentLocation']
             for parcel in clos['parcels']:
-                    transform_map_dict[(parcel['UUIDParcel'], "destination")] = parcel['destination']
+                transform_map_dict[(parcel['UUIDParcel'], "destination")] = parcel['destination']
+                transform_map_dict[(parcel['UUIDParcel'], "pickup")] = current_location
 
+        current_location = data['brokenVehicle']['currentLocation']
         for parcel in data['brokenVehicle']['parcels']:
                 transform_map_dict[(parcel['UUIDParcel'], "destination")] = parcel['destination']
+                transform_map_dict[(parcel['UUIDParcel'], "pickup")] = current_location
     return transform_map_dict
 
 
