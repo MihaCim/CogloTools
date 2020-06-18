@@ -58,7 +58,7 @@ class CloUpdateHandler:
 
                Example request (field clos):
                {
-                   "CLOS": [
+                   "clos": [
                        {
                            "uuid": "1212",
                            "lat": "14.12222",
@@ -120,7 +120,7 @@ class CloUpdateHandler:
 
         Example request (field clos):
         {
-            "CLOS": [
+            "clos": [
                 {
                     "uuid": "1212",
                     "lat": "14.12224442",

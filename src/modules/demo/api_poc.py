@@ -34,7 +34,7 @@ def process_new_CLOs_request(data):
     global vrpProcessorReferenceSloCro
 
     if "clos" not in data or "useCase" not in data:
-        return {"message": "Parameter 'CLOS' or 'useCase' is missing"}
+        return {"message": "Parameter 'clos' or 'useCase' is missing"}
     clos = data["clos"]  # Extract array of CLOs
     use_case = data["useCase"]
     csv_file = config_parser.get_csv_path(use_case)
@@ -162,26 +162,26 @@ def handle_recommendation_request():
             vrpProcessorReferenceSloCro = RecReq.init_vrp(use_case)
         vrp_processor_ref = vrpProcessorReferenceSloCro
 
-        # Extract 'CLOS' which should be a field in each request
-        if "CLOS" not in data:
-            return {"msg": "Parameter 'CLOS' is missing", "status": 0}
-        clos = data["CLOS"]
+        # Extract 'clos' which should be a field in each request
+        if "clos" not in data:
+            return {"msg": "Parameter 'clos' is missing", "status": 0}
+        clos = data["clos"]
 
         if evt_type == "brokenVehicle":
-            if "CLOS" not in data or "brokenVehicle" not in data:
-                return {"msg": "Parameter 'CLOS' or 'BrokenVehicle' is missing", "status": 0}
+            if "clos" not in data or "brokenVehicle" not in data:
+                return {"msg": "Parameter 'clos' or 'BrokenVehicle' is missing", "status": 0}
             broken_clo = data["brokenVehicle"]
             recommendations = RecReq.process_broken_clo(evt_type, clos, broken_clo, vrp_processor_ref, use_case)
         elif evt_type == "pickupRequest":
-            if "CLOS" not in data or "orders" not in data:
-                return {"msg": "Parameter 'CLOS' or 'orders' is missing", "status": 0}
+            if "clos" not in data or "orders" not in data:
+                return {"msg": "Parameter 'clos' or 'orders' is missing", "status": 0}
             requests = data["orders"]
             recommendations = RecReq.process_pickup_requests(evt_type, clos, requests, vrp_processor_ref, use_case)
 
         elif evt_type == "crossBorder":
             print("cross border event received")
-            if "CLOS" not in data:
-                return {"msg": "Parameter 'CLOS' is missing", "status": 0}
+            if "clos" not in data:
+                return {"msg": "Parameter 'clos' is missing", "status": 0}
             requests = []
             for clo in clos:
                 parcels = clo["parcels"]
@@ -216,9 +216,9 @@ def handle_recommendation_request():
             vrpProcessorReferenceElta = RecReq.init_vrp(use_case)
         vrp_processor_ref = vrpProcessorReferenceElta
 
-        if "CLOS" not in data_request:
-            return {"msg": "Parameter 'CLOS' is missing", "status": 0}
-        clos = data_request["CLOS"]
+        if "clos" not in data_request:
+            return {"msg": "Parameter 'clos' is missing", "status": 0}
+        clos = data_request["clos"]
 
         ### MESSAGE PROCESSING ....
         if evt_type is None:
@@ -262,7 +262,7 @@ def new_clos():
 
     """Main entry point for HTTP request"""
     data = request.get_json(force=True)
-    clos = data["CLOS"]  # Extract array of CLOs
+    clos = data["clos"]  # Extract array of CLOs
     use_case = data["useCase"]
     # for ELTA only update the .csv list of of static locations
     if use_case == "ELTA":

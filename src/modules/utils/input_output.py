@@ -171,16 +171,16 @@ class InputOutputTransformer:
                 payload["eventType"] = "pickupRequest"
             else:
                 payload["eventType"] = event["event_type"]
-            CLOS = json["clos"]
+            clos = json["clos"]
 
-            for clo in CLOS:
+            for clo in clos:
                 clo['currentLocation'] = clo["info"].pop('locationId')
                 clo["capacity"] = clo["info"].pop('capacity')
                 for parcel in clo["parcels"]:
                     parcel['UUIDParcel'] = parcel.pop('id')
                     parcel['weight'] = parcel.pop('payweight')
                     parcel['destination'] = parcel.pop('destination_id')
-                payload["CLOS"] = CLOS
+                payload["clos"] = clos
             if payload["eventType"] == "brokenVehicle":
                 brokenVehicle = json["brokenVehicle"]
                 brokenVehicle['currentLocation'] = brokenVehicle["info"].pop('locationId')
@@ -207,15 +207,15 @@ class InputOutputTransformer:
             else:
                 payload["eventType"] = event["event_type"]
 
-            CLOS = json["clos"]
-            for clo in CLOS:
+            clos = json["clos"]
+            for clo in clos:
                 clo['currentLocation'] = clo["info"].pop('location')
                 clo['capacity'] = clo["info"].pop('capacity')
                 for parcel in clo["parcels"]:
                     parcel['UUIDParcel'] = parcel.pop('id')
                     parcel['weight'] = parcel.pop('payweight')
                     parcel['destination'] = parcel.pop('destination_location')
-                payload["CLOS"] = CLOS
+                payload["clos"] = clos
             if payload["eventType"] == "brokenVehicle":
                 brokenVehicle = json["brokenVehicle"]
                 brokenVehicle['currentLocation'] = brokenVehicle["info"].pop('location')

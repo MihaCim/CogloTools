@@ -46,7 +46,7 @@ def get_orders_coordinates(data):
             transform_map_dict[(el['UUIDParcel'], "destination")] = el['destination']
             transform_map_dict[(el['UUIDParcel'], "pickup")] = el['pickup']
     elif 'brokenVehicle' in data:
-        for clos in data['CLOS']:
+        for clos in data['clos']:
             current_location = clos['currentLocation']
             for parcel in clos['parcels']:
                 transform_map_dict[(parcel['UUIDParcel'], "destination")] = parcel['destination']
@@ -89,7 +89,7 @@ def find_min_pickup(coords, posts_nparray):
 def elta_clustering(orig_data):
     data = copy.deepcopy(orig_data)
     l = []
-    for i, el in enumerate(data['CLOS']):
+    for i, el in enumerate(data['clos']):
         l.append([i, el['UUID'], 'clos', el['currentLocation'][0], el['currentLocation'][1]])
     for i, el in enumerate(data['orders']):
         l.append([i, el['UUIDParcel'], "destination"] + el['destination'])
@@ -101,7 +101,7 @@ def elta_clustering(orig_data):
     df["labels"] = labels = kmeans.labels_
     for index, row in df.iterrows():
         if row[2] == 'clos':
-            data['CLOS'][row[0]]['currentLocation'] = str(row['labels'])
+            data['clos'][row[0]]['currentLocation'] = str(row['labels'])
         else:
             data['orders'][row[0]][row[2] + '_location'] = data['orders'][row[0]][row[2]]
             data['orders'][row[0]][row[2]] = str(row['labels'])
@@ -139,7 +139,7 @@ def elta_clustering(orig_data):
                     "lon": row[3]
             })
 
-    clos["CLOS"] = clos_list
+    clos["clos"] = clos_list
     return data, clos
 
 
@@ -167,7 +167,7 @@ def find_min(lat_cord, lon_cord):
 
 def elta_map_parcels(orig_data):
     data = copy.deepcopy(orig_data)
-    for clo in data['CLOS']:
+    for clo in data['clos']:
         mapped_location = find_min(clo['currentLocation'][0], clo['currentLocation'][1])
         clo['currentLocation'] = mapped_location
         clo['currentLocationL'] = clo['currentLocation']
