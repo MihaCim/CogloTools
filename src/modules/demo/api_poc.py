@@ -21,6 +21,7 @@ vrpProcessorReferenceElta = None
 
 config_parser = ConfigParser()
 msb_post_url = "https://msb.cog-lo.eu/api/publish"
+recommendation_post_verification_url = "http://116.203.13.198/api/postRecommendation"
 
 # Generic message expected to be returned after request to CA arrived
 generic_message_received_response = {
@@ -99,7 +100,7 @@ class RecReq(Resource):
 
     @staticmethod
     def post_response_msb(UUID, recommendations):
-        # default=str set because we want to serialize Date objects also
+        # default=str set because we want to serialize Date objects as well
         json_for_serialization = {
             "request_id": UUID,
             "recommendations": recommendations
@@ -107,15 +108,18 @@ class RecReq(Resource):
         dumped_str = json.dumps(json_for_serialization, indent=4, sort_keys=True, default=str)
         headers = {'Content-type': 'application/json'}
         content = {
-            "topic": "RECOMMENDATIONS",
-            "sender": "CA",
+            "topic": "Recommendation",
+            "sender": "COGLOmoduleCA",
             "message": dumped_str
         }
-        try:
-            response = requests.post(msb_post_url, json = content, headers=headers, verify=False)
-            print(response)
-        except Exception as ex:
-            print("Error occurred while posting response to MSB", ex)
+
+        print("recommendations example:", recommendations)
+
+        # try:
+        #     response = requests.post(msb_post_url, json = content, headers=headers, verify=False)
+        #     print(response)
+        # except Exception as ex:
+        #     print("Error occurred while posting response to MSB", ex)
 
 
 @app.route("/api/adhoc/getRecommendation", methods=['POST'])
@@ -131,7 +135,126 @@ def handle_recommendation_request():
         event: null (for the daily plan),
         request: "request UUID"
     }
-    :return:
+
+    Response sent synchronously back after receiving the request is in the following format. Defined on 5.6.2020.
+    {
+        "status": 1,
+        "msg": "The CA has received a new request for optimization"
+    }
+
+    Response given after calculating recommendations should be send to MSB and is in the following format.
+    Defined on 5.6.2020.
+    {
+    topic: "Recommendation",
+    sender: "COGLOmoduleCA",
+    message:
+        {
+            request: "request UUID"
+            recommendation: http://app.cog-lo.eu/getRecommendation?id=EKOLrecommendation1
+        }
+    }
+
+    Example of recommendation message from 5.6.2020:
+    {
+        "status": 1,
+        "msg": "20 plans contained in the recommendation",
+        "recommendation": {
+            "organization": "EKOL",
+            "id": "EKOLrecommendation1",
+            "cloplans": [
+                {
+                    "clo": "EKOLvehicle34DL8536",
+                    "plan": {
+                        "organization": "EKOL",
+                        "execution_date": "2020-01-13 17:25:35.000000",
+                        "recommendation": "EKOLrecommendation1",
+                        "id": "EKOLplan6",
+                        "steps": [
+                            {
+                                "id": 1,
+                                "load": [
+                                    "EKOLcontainer34G80597"
+                                ],
+                                "rank": 1,
+                                "complete": 1,
+                                "due_time": null,
+                                "location": {
+                                "city": null,
+                                "country": null,
+                                "station": "EKOLcontainer34G80597",
+                                "latitude": 47.4481658936,
+                                "longitude": 19.0626106262,
+                                "postal_code": null
+                                },
+                                "dependency": {
+                                    "plan": null,
+                                    "plan_step": null
+                                }
+                            }
+                        ]
+                    }
+                },
+                {
+                    "clo": "EKOLvehicleTruck1",
+                    "plan": {
+                        "organization": "EKOL",
+                        "execution_date": "2020-01-13 17:25:33.000000",
+                        "recommendation": "EKOLrecommendation1",
+                        "id": "EKOLplan4",
+                        "steps": [
+                            {
+                                "id": 1,
+                                "load": [
+                                    "EKOLcontainerTrailer1"
+                                ],
+                                "rank": 1,
+                                "complete": 1,
+                                "due_time": null,
+                                "location": {
+                                "city": null,
+                                "country": null,
+                                "station": "EKOLwarehouse2",
+                                "latitude": 50.25258255,
+                                "longitude": 19.1939735413,
+                                "postal_code": null
+                                },
+                                "dependency": {
+                                    "plan": null,
+                                    "plan_step": null
+                                }
+                            },
+                            {
+                                "id": 2,
+                                "pack": [
+                                    {
+                                        "content": [
+                                            "EKOLorder366929776"
+                                        ],
+                                        "container": "EKOLcontainerTrailer1"
+                                    }
+                                ],
+                                "rank": 2,
+                                "complete": 0,
+                                "due_time": null,
+                                "location": {
+                                "city": null,
+                                "country": null,
+                                "station": "EKOLwarehouse2",
+                                "latitude": 50.25258255,
+                                "longitude": 19.1939735413,
+                                "postal_code": null
+                                },
+                                "dependency": {
+                                    "plan": null,
+                                    "plan_step": null
+                                }
+                            }
+                         ]
+                    }
+                }
+            ]
+        }
+    }
     """
 
     global vrpProcessorReferenceSloCro
