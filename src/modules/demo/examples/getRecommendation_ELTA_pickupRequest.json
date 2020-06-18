@@ -50,7 +50,7 @@
       ]
     }
   ],
-  "orders": [
+  "parcels": [
     {
       "id": "UUID-10",
       "payweight": 1,

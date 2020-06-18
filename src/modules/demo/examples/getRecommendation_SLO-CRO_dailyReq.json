@@ -24,7 +24,7 @@
          ]
       }
    ],
-   "orders":[
+   "parcels":[
       {
          "id":"Parcel UUID1",
          "payweight":1,

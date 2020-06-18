@@ -25,7 +25,7 @@ msb_post_url = "https://msb.cog-lo.eu/api/publish"
 # Generic message expected to be returned after request to CA arrived
 generic_message_received_response = {
     "status": 1,
-    "msg": "The CA has received a new request for optimizatio"
+    "msg": "The CA has received a new request for optimization"
 }
 
 
@@ -111,20 +111,31 @@ class RecReq(Resource):
             "sender": "CA",
             "message": dumped_str
         }
-        # TODO: Uncomment
-        # try:
-        #     response = requests.post(msb_post_url, json = content, headers=headers, verify=False)
-        #     print(response)
-        # except Exception as ex:
-        #     print("Error occurred while posting response to MSB", ex)
+        try:
+            response = requests.post(msb_post_url, json = content, headers=headers, verify=False)
+            print(response)
+        except Exception as ex:
+            print("Error occurred while posting response to MSB", ex)
 
 
 @app.route("/api/adhoc/getRecommendation", methods=['POST'])
 def handle_recommendation_request():
+    # TODO: Make generic_message_received_response synchronous and all other operations asynchronous
+    """
+    Message received will always be in the following format. This info was given by company IntraSoft,
+    integration work-package leader on 5.6.2020.
+    {
+        organization: "ELTA"
+        clos: http://app.cog-lo.eu/getCLOs?org=ELTA,
+        parcels: http://app.cog-lo.eu/getParcels?org=ELTA,
+        event: null (for the daily plan),
+        request: "request UUID"
+    }
+    :return:
+    """
+
     global vrpProcessorReferenceSloCro
     global vrpProcessorReferenceElta
-
-    # TODO: Make generic_message_received_response synchronous and all other operations asynchronous
 
     """Main entry point for HTTP request"""
     received_request = request.get_json(force=True)
