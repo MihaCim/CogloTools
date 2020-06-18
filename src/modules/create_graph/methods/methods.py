@@ -1,9 +1,10 @@
-import csv
-from sklearn.cluster import KMeans
-import pandas as pd
-from ..config.config_parser import ConfigParser
 import copy
-import matplotlib.pyplot as plt
+import csv
+
+import pandas as pd
+from sklearn.cluster import KMeans
+
+from ..config.config_parser import ConfigParser
 
 config_parser = ConfigParser()
 url = "https://graphhopper.com/api/1/vrp?key=e8a55308-9419-4814-81f1-6250efe25b5c"

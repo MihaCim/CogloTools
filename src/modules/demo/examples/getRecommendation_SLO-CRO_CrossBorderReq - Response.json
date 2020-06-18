@@ -2,7 +2,7 @@
 "request": "Req001",
 "event":{"event_type": "crossBorder"},
 "organization":"SLO-CRO",
-   "CLOS":[
+   "clos":[
       {
          "UUID":"UUID-1",
          "locationId":"S1",

@@ -1,11 +1,3 @@
-'''
-
-
-
-'''
-
-
-
 from datetime import date
 
 class InputOutputTransformer:
@@ -168,20 +160,20 @@ class InputOutputTransformer:
 
     @staticmethod
     def parse_received_recommendation_message(json):
-        event = json["event"]
         payload = {
             "useCase": json["organization"],
             "UUIDRequest": json["request"],
         }
 
         if json["organization"] == "SLO-CRO":
-            if event["event_type"] is None:  ##when dailiy plan processing we do same as for pickup request
+            event = json["event"]
+            if event is None:  # Procedure for daily plan is the same as for pickupRequest
                 payload["eventType"] = "pickupRequest"
             else:
                 payload["eventType"] = event["event_type"]
-            CLOS = json["CLOS"]
-            for clo in CLOS:
+            CLOS = json["clos"]
 
+            for clo in CLOS:
                 clo['currentLocation'] = clo["info"].pop('locationId')
                 clo["capacity"] = clo["info"].pop('capacity')
                 for parcel in clo["parcels"]:
@@ -208,8 +200,14 @@ class InputOutputTransformer:
                 payload["orders"] = ORDERS
 
         elif json["organization"] == "ELTA":
-            CLOS = json["CLOS"]
-            payload["eventType"] = event["event_type"]
+            # None is used for dailyPlan
+            event = json["event"]
+            if event is None:
+                payload["eventType"] = None
+            else:
+                payload["eventType"] = event["event_type"]
+
+            CLOS = json["clos"]
             for clo in CLOS:
                 clo['currentLocation'] = clo["info"].pop('location')
                 clo['capacity'] = clo["info"].pop('capacity')
@@ -218,7 +216,7 @@ class InputOutputTransformer:
                     parcel['weight'] = parcel.pop('payweight')
                     parcel['destination'] = parcel.pop('destination_location')
                 payload["CLOS"] = CLOS
-            if event["event_type"] == "brokenVehicle":
+            if payload["eventType"] == "brokenVehicle":
                 brokenVehicle = json["brokenVehicle"]
                 brokenVehicle['currentLocation'] = brokenVehicle["info"].pop('location')
                 for parcel in brokenVehicle["parcels"]:
