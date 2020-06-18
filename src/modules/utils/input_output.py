@@ -165,6 +165,8 @@ class InputOutputTransformer:
             "UUIDRequest": json["request"],
         }
 
+        # SLO-CRO use-case and it's parsing remained the same as it was before... we need example message before
+        # changing the structure
         if json["organization"] == "SLO-CRO":
             event = json["event"]
             if event is None:  # Procedure for daily plan is the same as for pickupRequest
@@ -190,7 +192,6 @@ class InputOutputTransformer:
                     parcel['destination'] = parcel.pop('destination_id')
                 payload["brokenVehicle"] = brokenVehicle
             else:
-
                 ORDERS = json["parcels"]
                 for parcel in ORDERS:
                     parcel['UUIDParcel'] = parcel.pop('id')
@@ -199,6 +200,7 @@ class InputOutputTransformer:
                     parcel['pickup'] = parcel.pop('source_location')
                 payload["orders"] = ORDERS
 
+        # Changed according to examples from 5.6.2020!!!
         elif json["organization"] == "ELTA":
             # None is used for dailyPlan
             event = json["event"]
@@ -207,31 +209,90 @@ class InputOutputTransformer:
             else:
                 payload["eventType"] = event["event_type"]
 
-            clos = json["clos"]
+            clos = json["clos"]["clos"]
             for clo in clos:
-                clo['currentLocation'] = clo["info"].pop('location')
+                location = clo["info"].pop('location')
+                clo['currentLocation'] = [
+                    location["latitude"],
+                    location["longitude"]
+                ]
                 clo['capacity'] = clo["info"].pop('capacity')
-                for parcel in clo["parcels"]:
+
+                # Check for state -> remaining_plan -> steps
+                if "state" not in clo:
+                    clo["parcels"] = []
+                    continue
+                if clo["state"] is None:
+                    clo["parcels"] = []
+                    continue
+                if "remaining_plan" not in clo["state"]:
+                    clo["parcels"] = []
+                    continue
+                if "steps" not in clo["state"]["remaining_plan"]:
+                    clo["parcels"] = []
+                    continue
+
+                parcels = clo["state"]["remaining_plan"]["steps"]
+                clo_parcels = []
+
+                for parcel in parcels:
                     parcel['UUIDParcel'] = parcel.pop('id')
                     parcel['weight'] = parcel.pop('payweight')
-                    parcel['destination'] = parcel.pop('destination_location')
-                payload["clos"] = clos
+
+                    destination = parcel.pop('location')
+                    parcel['destination'] = [
+                        destination["latitude"],
+                        destination["longitude"]
+                    ]
+
+                    clo_parcels.append(parcel)
+
+                clo["parcels"] = clo_parcels
+            payload["clos"] = clos
+
+            # TODO: This needs to be tested furthermore on examples provided by testers!!!
             if payload["eventType"] == "brokenVehicle":
                 brokenVehicle = json["brokenVehicle"]
-                brokenVehicle['currentLocation'] = brokenVehicle["info"].pop('location')
+
+                current_location = brokenVehicle["info"].pop('location')
+                brokenVehicle['currentLocation'] = [
+                    current_location["latitude"],
+                    current_location["longitude"]
+                ]
+
                 for parcel in brokenVehicle["parcels"]:
                     parcel['UUIDParcel'] = parcel.pop('id')
                     parcel['weight'] = parcel.pop('payweight')
-                    parcel['destination'] = parcel.pop('destination_location')
+
+                    destination = parcel.pop('destination')
+                    parcel['destination'] = [
+                        destination["latitude"],
+                        destination["longitude"]
+                    ]
                 payload["brokenVehicle"] = brokenVehicle
             else:
-                ORDERS = json["parcels"]
-                for parcel in ORDERS:
+                orders = []
+                if json["parcels"] is not None and json["parcels"]["parcels"] is not None:
+                    orders = json["parcels"]["parcels"]
+
+                for parcel in orders:
                     parcel['UUIDParcel'] = parcel.pop('id')
                     parcel['weight'] = parcel.pop('payweight')
-                    parcel['destination'] = parcel.pop('destination_location')
-                    parcel['pickup'] = parcel.pop('source_location')
-                payload["orders"] = ORDERS
+
+                    # Destination field is a JSON object
+                    destination = parcel.pop('destination')
+                    parcel['destination'] = [
+                        destination["latitude"],
+                        destination["longitude"]
+                    ]
+
+                    # Pickup field is a JSON object
+                    pickup = parcel.pop("source")
+                    parcel['pickup'] = [
+                        pickup["latitude"],
+                        pickup["longitude"]
+                    ]
+                payload["orders"] = orders
 
         return payload
 
