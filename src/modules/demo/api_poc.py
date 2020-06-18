@@ -113,13 +113,11 @@ class RecReq(Resource):
             "message": dumped_str
         }
 
-        print("recommendations example:", recommendations)
-
-        # try:
-        #     response = requests.post(msb_post_url, json = content, headers=headers, verify=False)
-        #     print(response)
-        # except Exception as ex:
-        #     print("Error occurred while posting response to MSB", ex)
+        try:
+            response = requests.post(msb_post_url, json = content, headers=headers, verify=False)
+            print(response)
+        except Exception as ex:
+            print("Error occurred while posting response to MSB", ex)
 
 
 @app.route("/api/adhoc/getRecommendation", methods=['POST'])

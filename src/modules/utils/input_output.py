@@ -237,19 +237,37 @@ class InputOutputTransformer:
 
     @staticmethod
     def prepare_output_message(recommendations, use_case, request_id):
-        messages = []
+        clo_plans = []
+
+        counter = 0
         for clo_plan in recommendations:
+            counter+=1
+            recommendation_text = "%srecommendation%s" % (use_case, counter)
             message = {
-                "id": request_id,
-                "organization": use_case,
-                "execution_date": date.today(),
-                "cloplans": clo_plan
+                "clo": clo_plan["UUID"], # Vehicle
+                "plan": {
+                    "id": request_id,
+                    "organization": use_case,
+                    "execution_date": date.today(),
+                    "recommendation": recommendation_text,
+                    "steps": clo_plan["route"]
+                }
             }
-            messages.append(message)
+            clo_plans.append(message)
+
+        if len(recommendations) > 1:
+            string_plan = "plans"
+        else:
+            string_plan = "plan"
 
         return {
             "status": 1,
-            "msg": messages
+            "msg": "%s %s contained in the recommendation" % (len(recommendations), string_plan),
+            "recommendation": {
+                "organization": use_case,
+                "id": request_id,
+                "cloplans": clo_plans
+            }
         }
 
 
