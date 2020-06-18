@@ -157,34 +157,31 @@ def handle_recommendation_request():
 
     ##Use Case SLO-CRO
     if use_case == "SLO-CRO":
-        print("processing SLO-CRO usease")
+        print("processing SLO-CRO use-case request")
         if vrpProcessorReferenceSloCro is None:     #initialize VRP
             vrpProcessorReferenceSloCro = RecReq.init_vrp(use_case)
         vrp_processor_ref = vrpProcessorReferenceSloCro
 
+        # Extract 'CLOS' which should be a field in each request
+        if "CLOS" not in data:
+            return {"msg": "Parameter 'CLOS' is missing", "status": 0}
+        clos = data["CLOS"]
+
         if evt_type == "brokenVehicle":
             if "CLOS" not in data or "brokenVehicle" not in data:
-                return {"message": "Parameter 'CLOS' or 'BrokenVehicle' is missing", "status": 0}
-            clos = data["CLOS"]
+                return {"msg": "Parameter 'CLOS' or 'BrokenVehicle' is missing", "status": 0}
             broken_clo = data["brokenVehicle"]
             recommendations = RecReq.process_broken_clo(evt_type, clos, broken_clo, vrp_processor_ref, use_case)
-            response = InputOutputTransformer.prepare_output_message(recommendations, use_case, request_id)
-            RecReq.post_response_msb(request_id, response)
-            return generic_message_received_response
         elif evt_type == "pickupRequest":
             if "CLOS" not in data or "orders" not in data:
-                return {"message": "Parameter 'CLOS' or 'orders' is missing", "status": 0}
-            clos = data["CLOS"]
+                return {"msg": "Parameter 'CLOS' or 'orders' is missing", "status": 0}
             requests = data["orders"]
             recommendations = RecReq.process_pickup_requests(evt_type, clos, requests, vrp_processor_ref, use_case)
-            response = InputOutputTransformer.prepare_output_message(recommendations, use_case, request_id)
-            RecReq.post_response_msb(request_id, response)
-            return generic_message_received_response
+
         elif evt_type == "crossBorder":
             print("cross border event received")
             if "CLOS" not in data:
-                return {"message": "Parameter 'CLOS' is missing", "status": 0}
-            clos = data["CLOS"]
+                return {"msg": "Parameter 'CLOS' is missing", "status": 0}
             requests = []
             for clo in clos:
                 parcels = clo["parcels"]
@@ -192,11 +189,17 @@ def handle_recommendation_request():
                     parcel["currentLocation"] = clo["currentLocation"]
                     requests.append(parcel)
             recommendations = RecReq.process_cross_border_request(evt_type, clos, requests, vrp_processor_ref, use_case)
-            response = InputOutputTransformer.prepare_output_message(recommendations, use_case, request_id)
-            RecReq.post_response_msb(request_id, response) # post response to MSB
-            return generic_message_received_response
         else:
             return jsonify({"message": "Invalid event type: {}".format(evt_type), "status": 0})
+
+        # Prepare output message from calculated recommendations
+        response = InputOutputTransformer.prepare_output_message(recommendations, use_case, request_id)
+
+        # This piece of code posts optimization response to MSB
+        RecReq.post_response_msb(request_id, response)
+
+        # Always return generic message stating that request was received and is due to be processed
+        return generic_message_received_response
 
         ##Use Case ELTA
     elif use_case == "ELTA":
@@ -213,38 +216,41 @@ def handle_recommendation_request():
             vrpProcessorReferenceElta = RecReq.init_vrp(use_case)
         vrp_processor_ref = vrpProcessorReferenceElta
 
+        if "CLOS" not in data_request:
+            return {"msg": "Parameter 'CLOS' is missing", "status": 0}
+        clos = data_request["CLOS"]
+
         ### MESSAGE PROCESSING ....
         if evt_type is None:
-            if "CLOS" not in data_request or "orders" not in data_request:
-                return {"message": "Parameter 'CLOS' or 'orders' is missing"}
-            clos = data_request["CLOS"]
+            if "orders" not in data_request:
+                return {"msg": "Parameter 'orders' is missing", "status": 0}
             requests = data_request["orders"]
             recommendations = RecReq.process_pickup_requests(evt_type, clos, requests, vrp_processor_ref, use_case)
             response = InputOutputTransformer.prepare_output_message(
                 methods.map_coordinates_to_response(recommendations, transform_map_dict), use_case, request_id)
-            RecReq.post_response_msb(request_id, response)  # post response to MSB
-            return generic_message_received_response
+
         elif evt_type == "brokenVehicle":
-            if "CLOS" not in data_request or "brokenVehicle" not in data_request:
-                return {"message": "Parameter 'CLOS' or 'BrokenVehicle' is missing", "status": 0}
-            clos = data_request["CLOS"]
+            if "brokenVehicle" not in data_request:
+                return {"msg": "Parameter 'BrokenVehicle' is missing", "status": 0}
             broken_clo = data_request["brokenVehicle"]
             recommendations = RecReq.process_broken_clo(evt_type, clos, broken_clo, vrp_processor_ref, use_case)
             recommendations_mapped = methods.map_coordinates_to_response(recommendations, transform_map_dict)
             response = InputOutputTransformer.prepare_output_message(recommendations_mapped, use_case, request_id)
-            RecReq.post_response_msb(request_id, response)  # post response to MSB
-            return generic_message_received_response
+
         elif evt_type == "pickupRequest":
-            if "CLOS" not in data_request or "orders" not in data_request:
-                return {"message": "Parameter 'CLOS' or 'orders' is missing", "status": 0}
-            clos = data_request["CLOS"]
+            if "orders" not in data_request:
+                return {"msg": "Parameter 'orders' is missing", "status": 0}
             requests = data_request["orders"]
             recommendations = RecReq.process_pickup_requests(evt_type, clos, requests, vrp_processor_ref, use_case)
             response = InputOutputTransformer.prepare_output_message(recommendations, use_case, request_id)
-            RecReq.post_response_msb(request_id, response)  # post response to MSB
-            return generic_message_received_response
         else:
-            return jsonify({"message": "Invalid event type: {}".format(evt_type), "status": 0})
+            return jsonify({"msg": "Invalid event type: {}".format(evt_type), "status": 0})
+
+        # This piece of code posts optimization response to MSB
+        RecReq.post_response_msb(request_id, response)
+
+        # Response is always a generic one which just states that CA received request and will process it.
+        return generic_message_received_response
 
 @app.route("/api/clo/newCLOs", methods=['POST'])
 def new_clos():
