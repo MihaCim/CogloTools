@@ -1,10 +1,8 @@
 {
    "request":"Req001",
-   "event":{
-      "event_type":null
-   },
+   "event": null,
    "organization":"SLO-CRO",
-   "CLOS":[
+   "clos":[
       {
          "UUID":"UUID-1",
          "info":{
@@ -26,7 +24,7 @@
          ]
       }
    ],
-   "orders":[
+   "parcels":[
       {
          "id":"Parcel UUID1",
          "payweight":1,

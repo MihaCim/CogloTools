@@ -1,0 +1,90 @@
+{
+  "msg": [
+    {
+      "execution_date": "Tue, 26 May 2020 00:00:00 GMT",
+      "id": "Req001",
+      "organization": "SLO-CRO",
+      "steps": {
+        "UUID": "UUID-1",
+        "route": [
+          {
+            "info": "This parcels must be delivered to location S1",
+            "load": [],
+            "loadWeight": 0,
+            "locationId": "S1",
+            "position": "15.6780936,45.9310499",
+            "unload": [
+              "Vehicleparcel3"
+            ],
+            "unloadWeight": 0
+          },
+          {
+            "info": "This parcels must be delivered to location S9",
+            "load": [],
+            "loadWeight": 0,
+            "locationId": "S9",
+            "position": "15.6602321,45.8949345",
+            "unload": [
+              "Vehicleparcel3"
+            ],
+            "unloadWeight": -1
+          },
+          {
+            "info": "This parcels must be delivered to location H5",
+            "load": [],
+            "loadWeight": 0,
+            "locationId": "H5",
+            "position": "15.6962282,45.8936019",
+            "unload": [
+              "Parcel UUID5"
+            ],
+            "unloadWeight": -1
+          },
+          {
+            "info": "This parcels must be delivered to location S4",
+            "load": [],
+            "loadWeight": 0,
+            "locationId": "S4",
+            "position": "15.6214561,45.89337",
+            "unload": [
+              "Vehicleparcel1"
+            ],
+            "unloadWeight": -1
+          },
+          {
+            "info": "This parcels must be delivered to location S3",
+            "load": [],
+            "loadWeight": 0,
+            "locationId": "S3",
+            "position": "15.6897957,45.8595037",
+            "unload": [
+              "Vehicleparcel2"
+            ],
+            "unloadWeight": -1
+          },
+          {
+            "info": "This parcels must be delivered to location H1",
+            "load": [],
+            "loadWeight": 0,
+            "locationId": "H1",
+            "position": "15.6863823,45.839665",
+            "unload": [
+              "Parcel UUID5"
+            ],
+            "unloadWeight": -1
+          },
+          {
+            "info": "This parcels must be delivered to location S5",
+            "load": [],
+            "loadWeight": 0,
+            "locationId": "S5",
+            "position": "15.5231733,45.8844935",
+            "unload": [],
+            "unloadWeight": -1
+          }
+        ]
+      }
+    }
+  ],
+  "status": 1
+}

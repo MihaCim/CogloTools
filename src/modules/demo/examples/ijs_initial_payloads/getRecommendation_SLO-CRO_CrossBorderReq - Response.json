@@ -2,13 +2,11 @@
 "request": "Req001",
 "event":{"event_type": "crossBorder"},
 "organization":"SLO-CRO",
-   "CLOS":[
+   "clos":[
       {
          "UUID":"UUID-1",
-         "info":{
-            "locationId":"S1",
-            "capacity":400
-         },
+         "locationId":"S1",
+         "capacity":400,
          "parcels":[
             {
                "id":"Vehicleparcel1",
@@ -50,11 +48,8 @@
       },
       {
          "UUID":"UUID-4",
-         "info":{
-            "locationId":"H2",
-            "capacity":200
-         },
-         
+         "locationId":"H2",
+         "capacity":200,
          "parcels":[
             {
                "id":"Vehicleparcel4",
@@ -89,4 +84,5 @@
    ]
 }
 
-
+   ]
+}
