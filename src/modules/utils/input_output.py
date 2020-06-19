@@ -285,7 +285,7 @@ class InputOutputTransformer:
                 "plan": {
                     "id": request_id,
                     "organization": use_case,
-                    "execution_date": datetime.utcnow().isoformat(sep=' ', timespec='milliseconds'),
+                    "execution_date": datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
                     "recommendation": recommendation_text,
                     "steps": clo_plan["route"]
                 }

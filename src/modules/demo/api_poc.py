@@ -21,6 +21,7 @@ vrpProcessorReferenceElta = None
 
 config_parser = ConfigParser()
 msb_post_url = "https://msb.cog-lo.eu/api/publish"
+response_validation_url = "http://db.cog-lo.eu/postRecommendation"
 recommendation_post_verification_url = "http://116.203.13.198/api/postRecommendation"
 planner_tsp_api_url = "localhost:1234/api/tsp"
 
@@ -103,7 +104,7 @@ class RecReq(Resource):
     def post_response_msb(UUID, recommendations):
         # default=str set because we want to serialize Date objects as well
         json_for_serialization = {
-            "request_id": UUID,
+            "request": UUID,
             "recommendation": recommendations
         }
         headers = {'Content-type': 'application/json'}
@@ -113,11 +114,15 @@ class RecReq(Resource):
             "message": json_for_serialization
         }
 
-        print("content", content)
+        try:
+            response = requests.post(response_validation_url, json = recommendations, headers=headers, verify=False)
+            print("validation code for recommendations message: ", response)
+        except Exception as ex:
+            print("Error occurred while validating response in validation service", ex)
 
         try:
             response = requests.post(msb_post_url, json = content, headers=headers, verify=False)
-            print(response)
+            print("response from MSB:", response)
         except Exception as ex:
             print("Error occurred while posting response to MSB", ex)
 
