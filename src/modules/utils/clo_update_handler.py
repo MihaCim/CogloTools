@@ -21,8 +21,15 @@ class CloUpdateHandler:
             # Extract 'info' which contains 'name' -> 'address' and 'location' which contains 'latitude' and 'longitude'
             received_info = json_obj["info"]
             received_location = received_info["location"]
+
+            address = ""
+            if "address" in received_info:
+                address = received_info["address"]
+            elif "name" in received_info:
+                address = received_info["name"]
+
             new_json = {
-                "address": received_info["name"],
+                "address": address,
                 "latitude": received_location["latitude"],
                 "longitude": received_location["longitude"]
             }
@@ -111,9 +118,14 @@ class CloUpdateHandler:
                 csv_writer = csv.writer(csv_file)
 
                 for json_obj in clos:
-                    uuid = json_obj["id"]
                     info_obj = json_obj["info"]
-                    address = info_obj["name"] # TODO: Check if this is OK
+
+                    address = ""
+                    if "address" in info_obj:
+                        address = info_obj["address"]
+                    elif "name" in info_obj:
+                        address = info_obj["name"]
+                    uuid = json_obj["id"]
                     location = info_obj["location"]
 
                     csv_writer.writerow([address, uuid, location["latitude"], location["longitude"]])

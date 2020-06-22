@@ -106,7 +106,7 @@ def elta_clustering(orig_data):
 
     for el in data['orders']:
         mapped_location = find_min_pickup(el['pickup'], centers)
-        el['pickup'] = mapped_location
+        el['pickup'] = str(mapped_location)
 
     ## print clusters
     # df.plot.scatter(x=3, y=4, c=labels, s=10, cmap='viridis')
@@ -118,10 +118,14 @@ def elta_clustering(orig_data):
     i = 0
     for row in centers:
         clos_list.append({
-            "uuid": str(i),
-            "address": "address",
-            "lat": row[0],
-            "lon": row[1]
+            "id": str(i),
+            "info": {
+                "address": "address",
+                "location": {
+                    "latitude": row[0],
+                    "longitude": row[1]
+                }
+            }
         })
         i = i + 1
 
@@ -131,10 +135,14 @@ def elta_clustering(orig_data):
         for row in csv_reader:
             if len(row) != 0:
                 clos_list.append({
-                    "uuid": row[1],
-                    "address": row[0],
-                    "lat": row[2],
-                    "lon": row[3]
+                    "id": row[1],
+                    "info": {
+                        "address": row[0],
+                        "location": {
+                            "latitude": row[2],
+                            "longitude": row[3]
+                        }
+                    }
             })
 
     clos["clos"] = clos_list
