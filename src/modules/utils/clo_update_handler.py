@@ -17,8 +17,17 @@ class CloUpdateHandler:
         # Create map of received CLO UUIDs with content (latitude, longitude, address)
         received_clos_uuid_map = {}
         for json_obj in clos:
-            uuid = json_obj["uuid"]
-            received_clos_uuid_map[uuid] = json_obj
+            uuid = json_obj["id"]
+            # Extract 'info' which contains 'name' -> 'address' and 'location' which contains 'latitude' and 'longitude'
+            received_info = json_obj["info"]
+            received_location = received_info["location"]
+            new_json = {
+                "address": received_info["name"],
+                "latitude": received_location["latitude"],
+                "longitude": received_location["longitude"]
+            }
+
+            received_clos_uuid_map[uuid] = new_json
 
         if not os.path.isfile(csv_file_path):
             print("Postal offices csv file does not exist yet.")
@@ -37,9 +46,9 @@ class CloUpdateHandler:
 
                     # Map of stored CLOs
                     stored_clos_uuid_map[uuid] = {
-                        "uuid": uuid,
-                        "lat": lat,
-                        "lon": lon,
+                        "id": uuid,
+                        "latitude": lat,
+                        "longitude": lon,
                         "address": address
                     }
             csv_file.close()
@@ -48,7 +57,6 @@ class CloUpdateHandler:
 
     @staticmethod
     def handle_new_clo_request(clos, csv_file_path):
-
         """
                Handle request for new CLOs. If any of received post offices is not stored in our file from which graph is
                built, we will rewrite the file and rebuild the graph.
@@ -59,17 +67,15 @@ class CloUpdateHandler:
                Example request (field clos):
                {
                    "clos": [
-                       {
-                           "uuid": "1212",
-                           "lat": "14.12222",
-                           "lon": "47.41243124",
-                           "address": "Test road"
-                       },
                         {
-                           "uuid": "1214",
-                           "lat": "14.5235235",
-                           "lon": "46.521424",
-                           "address": "Hoolywood road"
+                            "id": "xxxx",
+                            "info": {
+                                "name": "asdasd",
+                                "location": {
+                                    "latitude": 43.23123,
+                                    "longitude": 14.23232
+                                }
+                            }
                         }
                    ]
                }
@@ -95,8 +101,8 @@ class CloUpdateHandler:
                 else:
                     stored_object = stored_clos_uuid_map[received_key]
                     # Something is different, update this entry
-                    if stored_object["lat"] != received_object["lat"] or stored_object["lon"] != \
-                            received_object["lon"] or stored_object["address"] != received_object["address"]:
+                    if stored_object["latitude"] != received_object["latitude"] or stored_object["longitude"] != \
+                            received_object["longitude"] or stored_object["address"] != received_object["address"]:
                         build_new_graph = True
                         break
 
@@ -105,7 +111,12 @@ class CloUpdateHandler:
                 csv_writer = csv.writer(csv_file)
 
                 for json_obj in clos:
-                    csv_writer.writerow([json_obj["address"], json_obj["uuid"], json_obj["lat"], json_obj["lon"]])
+                    uuid = json_obj["id"]
+                    info_obj = json_obj["info"]
+                    address = info_obj["name"] # TODO: Check if this is OK
+                    location = info_obj["location"]
+
+                    csv_writer.writerow([address, uuid, location["latitude"], location["longitude"]])
             csv_file.close()
 
         return build_new_graph
@@ -121,20 +132,16 @@ class CloUpdateHandler:
         Example request (field clos):
         {
             "clos": [
-                {
-                    "uuid": "1212",
-                    "lat": "14.12224442",
-                    "lon": "47.41243121445",
-                    "address": "Miami, Florida",
-                    "action": "update"
-                },
                  {
-                    "uuid": "1214",
-                    "lat": "14.5235235",
-                    "lon": "46.521424",
-                    "address": "Hoolywood road",
-                    "action": "remove"
-                 }
+                    "id": "xxxx",
+                    "info": {
+                        "name": "asdasd",
+                        "location": {
+                            "latitude": 43.23123,
+                            "longitude": 14.23232
+                        }
+                    }
+                }
             ]
         }
         """
@@ -164,8 +171,8 @@ class CloUpdateHandler:
                 if action == "remove":
                     build_new_graph = True
                     continue
-                elif stored_object["lat"] != received_object["lat"] or stored_object["lon"] != \
-                            received_object["lon"] or stored_object["address"] != received_object["address"]:
+                elif stored_object["latitude"] != received_object["latitude"] or stored_object["longitude"] != \
+                            received_object["longitude"] or stored_object["address"] != received_object["address"]:
                     build_new_graph = True
 
                     # Just add already stored object
@@ -177,7 +184,7 @@ class CloUpdateHandler:
 
                 for key in clos_to_add_dict.keys():
                     obj = clos_to_add_dict[key]
-                    csv_writer.writerow([obj["address"], obj["uuid"], obj["lat"], obj["lon"]])
+                    csv_writer.writerow([obj["address"], obj["uuid"], obj["latitude"], obj["longitude"]])
             csv_file.close()
 
         return build_new_graph

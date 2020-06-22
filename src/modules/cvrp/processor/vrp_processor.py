@@ -387,11 +387,11 @@ class VrpProcessor:
 
         # First graph is SLO, second graph is CRO
         for v in vehicles:
-            if "S" in v.start_node:
+            if "S" in v.start_node or "PS" in v.start_node:
                 # map SLO parcels to border nodes if necessary
                 v.parcels = self.map_slo_cro_deliveries(v.parcels, event_type)[0]
                 map_v[0].append(v)
-            elif "H" in v.start_node:
+            elif "H" in v.start_node or "HP" in v.start_node:
                 # map CRO parcels to border nodes if necessary
                 v.parcels = self.map_slo_cro_deliveries(v.parcels, event_type)[1]
                 map_v[1].append(v)
@@ -411,8 +411,8 @@ class VrpProcessor:
         """
         delivery_parts = [[],[]] # First one is for SLO nodes, Second one is for CRO nodes
         for parcel in deliveries:
-            if "S" in parcel.current_location:
-                if "H" in parcel.target:
+            if "S" in parcel.current_location or "PS" in parcel.current_location:
+                if "H" in parcel.target or "HP" in parcel.target:
                     # assign closest cro border node
                     cro_border_nodes = config_parser.get_border_nodes_cro()
                     if event_type == "crossBorder":
@@ -421,8 +421,8 @@ class VrpProcessor:
                         # TODO: assign the closest node instead of the first one
                         parcel.target = cro_border_nodes[0]
                 delivery_parts[0].append(parcel)
-            elif "H" in parcel.current_location:
-                if "S" in parcel.target:
+            elif "H" in parcel.current_location or "HP" in parcel.current_location:
+                if "S" in parcel.target or "PS" in parcel.target:
                     # assign closest slo border node
                     slo_border_nodes = config_parser.get_border_nodes_slo()
                     if event_type == "crossBorder":
