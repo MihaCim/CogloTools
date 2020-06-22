@@ -196,7 +196,26 @@ class CloUpdateHandler:
 
                 for key in clos_to_add_dict.keys():
                     obj = clos_to_add_dict[key]
-                    csv_writer.writerow([obj["address"], obj["uuid"], obj["latitude"], obj["longitude"]])
+                    csv_writer.writerow([obj["address"], obj["id"], obj["latitude"], obj["longitude"]])
             csv_file.close()
 
         return build_new_graph
+
+    @staticmethod
+    def extract_location_station_dict(csv_file_path):
+        location_station_dict = {}
+
+        # Open file and read line by line
+        stored_clos_uuid_map = {}
+        with open(csv_file_path, encoding="utf8") as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=',')
+
+            for row in csv_reader:
+                id = row[1]
+                lat = row[2]
+                lon = row[3]
+
+                location_station_dict[(str(lat), str(lon))] = id
+        csv_file.close()
+
+        return location_station_dict
