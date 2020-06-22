@@ -21,6 +21,7 @@ vrpProcessorReferenceElta = None
 
 config_parser = ConfigParser()
 msb_post_url = "https://msb.cog-lo.eu/api/publish"
+response_validation_url = "http://db.cog-lo.eu/postRecommendation"
 recommendation_post_verification_url = "http://116.203.13.198/api/postRecommendation"
 planner_tsp_api_url = "localhost:1234/api/tsp"
 
@@ -103,20 +104,25 @@ class RecReq(Resource):
     def post_response_msb(UUID, recommendations):
         # default=str set because we want to serialize Date objects as well
         json_for_serialization = {
-            "request_id": UUID,
-            "recommendations": recommendations
+            "request": UUID,
+            "recommendation": recommendations
         }
-        dumped_str = json.dumps(json_for_serialization, indent=4, sort_keys=True, default=str)
         headers = {'Content-type': 'application/json'}
         content = {
-            "topic": "Recommendation",
+            "topic": "recommendations",
             "sender": "COGLOmoduleCA",
-            "message": dumped_str
+            "message": json_for_serialization
         }
 
         try:
+            response = requests.post(response_validation_url, json = recommendations, headers=headers, verify=False)
+            print("validation code for recommendations message: ", response)
+        except Exception as ex:
+            print("Error occurred while validating response in validation service", ex)
+
+        try:
             response = requests.post(msb_post_url, json = content, headers=headers, verify=False)
-            print(response)
+            print("response from MSB:", response)
         except Exception as ex:
             print("Error occurred while posting response to MSB", ex)
 
@@ -697,6 +703,8 @@ def handle_recommendation_request():
     """Main entry point for HTTP request"""
     received_request = request.get_json(force=True)
 
+    print("received request", received_request)
+
     # transforms received message for internal structures
     data = InputOutputTransformer.parse_received_recommendation_message(received_request)
 
@@ -811,23 +819,40 @@ def handle_recommendation_request():
 
 @app.route("/api/clo/newCLOs", methods=['POST'])
 def new_clos():
-
     """
     API route used for handling request for newCLOs.
     This method checks if graph needs to be rebuilt or updated.
     """
 
+    print("request just arrived")
+
     """Main entry point for HTTP request"""
     data = request.get_json(force=True)
     clos = data["clos"]  # Extract array of CLOs
-    use_case = data["useCase"]
+
+    # Check for non empty array
+    if len(clos) < 1:
+        return {
+            "status": -1,
+            "msg": "List of 'clos' should have at least one field."
+        }
+    first_clo = clos[0]["info"]
+    use_case = first_clo["organization"]
+
     # for ELTA only update the .csv list of of static locations
     if use_case == "ELTA":
         csv_file_path = config_parser.get_elta_path()
         with open(csv_file_path, 'w', newline='') as csv_file:
             csv_writer = csv.writer(csv_file)
             for json_obj in clos:
-                csv_writer.writerow([json_obj["address"], json_obj["uuid"], json_obj["lat"], json_obj["lon"]])
+                # Extract CLO ID and it's location object. Location object should have fields 'address',
+                # 'latitude' and 'longitude'
+                id = json_obj["id"]
+                info_obj = json_obj["info"]
+                location = info_obj["location"]
+
+                # Write rows
+                csv_writer.writerow([location["address"], id, location["latitude"], location["longitude"]])
         csv_file.close()
         return {"success": True}
     # for SLO-CRO create a new graph

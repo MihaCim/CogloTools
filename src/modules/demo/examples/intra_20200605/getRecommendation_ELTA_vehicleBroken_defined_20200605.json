@@ -4,58 +4,56 @@
     "event_type": "brokenVehicle"
   },
   "organization": "ELTA",
-  "clos": {
-    "clos": [
-      {
-        "UUID": "UUID-V1",
-        "info": {
-          "location": {
-            "latitude": 38.005177,
-            "longitude": 23.810454
-          },
-          "capacity": 200
+  "clos": [
+    {
+      "id": "UUID-V1",
+      "info": {
+        "location": {
+          "latitude": 38.005177,
+          "longitude": 23.810454
         },
-        "state": {
-          "remaining_plan": {
-            "steps": [
-              {
-                "id": "UUID-1",
-                "payweight": 1,
-                "location": {
-                  "latitude": 38.0051774,
-                  "longitude": 23.8104539
-                }
-              },
-              {
-                "id": "UUID-2",
-                "payweight": 1,
-                "location": {
-                  "latitude": 38.0090986,
-                  "longitude": 23.824298499999998
-                }
-              },
-              {
-                "id": "UUID-3",
-                "payweight": 1,
-                "location": {
-                  "latitude": 38.0098826,
-                  "longitude": 23.807868300000003
-                }
-              },
-              {
-                "id": "UUID-4",
-                "payweight": 1,
-                "location": {
-                  "latitude": 38.0110234,
-                  "longitude": 23.8285047
-                }
+        "capacity": 200
+      },
+      "state": {
+        "remaining_plan": {
+          "steps": [
+            {
+              "id": "UUID-1",
+              "payweight": 1,
+              "location": {
+                "latitude": 38.0051774,
+                "longitude": 23.8104539
               }
-            ]
-          }
+            },
+            {
+              "id": "UUID-2",
+              "payweight": 1,
+              "location": {
+                "latitude": 38.0090986,
+                "longitude": 23.824298499999998
+              }
+            },
+            {
+              "id": "UUID-3",
+              "payweight": 1,
+              "location": {
+                "latitude": 38.0098826,
+                "longitude": 23.807868300000003
+              }
+            },
+            {
+              "id": "UUID-4",
+              "payweight": 1,
+              "location": {
+                "latitude": 38.0110234,
+                "longitude": 23.8285047
+              }
+            }
+          ]
         }
       }
-    ]
-  },
+    }
+  ],
   "brokenVehicle": {
     "UUID": "UUID-V2",
     "info": {

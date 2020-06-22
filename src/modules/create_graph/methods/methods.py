@@ -20,22 +20,20 @@ def map_coordinates_to_response(recommendations, transform_map_dict):
                 for pickup_parcel in route['load']:
                     pickup_parcels.append({
                         'id': pickup_parcel,
-                        'lat': transform_map_dict[(pickup_parcel, 'pickup')][0],
-                        'lon': transform_map_dict[(pickup_parcel, 'pickup')][1]
+                        'latitude': transform_map_dict[(pickup_parcel, 'pickup')][0],
+                        'longitude': transform_map_dict[(pickup_parcel, 'pickup')][1]
                     })
                 route['load'] = pickup_parcels
-                #route['load'] = route.pop('pickup parcels')
 
             if route['unload'] != '' and len(route['unload']):
                 delivery_parcels = []
                 for delivery_parcel in route['unload']:
                     delivery_parcels.append({
                         'id': delivery_parcel,
-                        'lat': transform_map_dict[(delivery_parcel, 'destination')][0],
-                        'lon': transform_map_dict[(delivery_parcel, 'destination')][1]
+                        'latitude': transform_map_dict[(delivery_parcel, 'destination')][0],
+                        'longitude': transform_map_dict[(delivery_parcel, 'destination')][1]
                     })
                 route['unload'] = delivery_parcels
-                #route['unload'] = route.pop('delivery parcels')
     return recommendations
 
 
