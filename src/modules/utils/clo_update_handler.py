@@ -17,7 +17,7 @@ class CloUpdateHandler:
         # Create map of received CLO UUIDs with content (latitude, longitude, address)
         received_clos_uuid_map = {}
         for json_obj in clos:
-            uuid = json_obj["uuid"]
+            uuid = json_obj["id"]
             received_clos_uuid_map[uuid] = json_obj
 
         if not os.path.isfile(csv_file_path):
@@ -48,7 +48,6 @@ class CloUpdateHandler:
 
     @staticmethod
     def handle_new_clo_request(clos, csv_file_path):
-
         """
                Handle request for new CLOs. If any of received post offices is not stored in our file from which graph is
                built, we will rewrite the file and rebuild the graph.
@@ -105,7 +104,12 @@ class CloUpdateHandler:
                 csv_writer = csv.writer(csv_file)
 
                 for json_obj in clos:
-                    csv_writer.writerow([json_obj["address"], json_obj["uuid"], json_obj["lat"], json_obj["lon"]])
+                    uuid = json_obj["id"]
+                    info_obj = json_obj["info"]
+                    address = info_obj["name"] # TODO: Check if this is OK
+                    location = info_obj["location"]
+
+                    csv_writer.writerow([address, uuid, location["latitude"], location["longitude"]])
             csv_file.close()
 
         return build_new_graph
