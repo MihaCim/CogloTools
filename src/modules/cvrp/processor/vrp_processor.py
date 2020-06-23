@@ -13,6 +13,10 @@ from ...utils.structures.vehicle import Vehicle
 
 url = "https://graphhopper.com/api/1/vrp?key=e8a55308-9419-4814-81f1-6250efe25b5c"
 
+ELTA_USE_CASE = "ELTA"
+SLO_CRO_USE_CASE = "SLO-CRO"
+CROATIA = "CRO"
+SLOVENIA = "SLO"
 
 config_parser = ConfigParser()
 
@@ -85,7 +89,7 @@ class VrpProcessor:
         deliveries_req = deliveries_object.req
 
         # Handle SLO-CRO use case for mapping vehicles and deliveries
-        if self.use_case == "SLO-CRO":
+        if self.use_case == SLO_CRO_USE_CASE:
             delivery_map = self.map_slo_cro_deliveries(deliveries_all, event_type)
             delivery_map_req = self.map_slo_cro_deliveries(deliveries_req, event_type)
             vehicle_map = self.map_slo_cro_vehicles(vehicles, event_type)
@@ -198,7 +202,7 @@ class VrpProcessor:
         edges = graph.edges
         print("Building route from VRP output...")
         start_nodes = [graph.node_from_id(x.start_node) for x in vehicles]
-        start_time = time.time()
+
         routes = []
         converted_routes = []
         loads_new = []
@@ -210,14 +214,20 @@ class VrpProcessor:
             load = [int(x) for x in load]
             loads_origin = self.map_dropoff(graph, vehicle.parcels)
 
-            for i in range(len(nodes)):     ##add new parcels to the vehicle from the orders
+            for i in range(len(nodes)):     # add new parcels to the vehicle from the orders
                 vehicle_load_diff = load[i] - loads_origin[i]
+
                 while vehicle_load_diff > 0:
                     for j in range(len(deliveries_req)):
                         if deliveries_req[j].target == nodes[i].id:
+
+                            # Payweight needs to be decreased from vehicle_load_diff, because it
+                            # drops all packets for one location at once
+                            pay_weight = deliveries_req[j].volume
+
                             vehicle.parcels.append(deliveries_req[j])
                             deliveries_req.remove(deliveries_req[j])
-                            vehicle_load_diff -= 1
+                            vehicle_load_diff -= pay_weight
                             break
             loads_new.append(self.map_dropoff(graph, vehicle.parcels))
 
@@ -320,16 +330,23 @@ class VrpProcessor:
         for clo in clos:
             parcels = []
             for parcel in clo["parcels"]:
+                country = None
+                if "country" in parcel:
+                    country = parcel["country"]
+
                 parcels.append(Parcel(parcel["UUIDParcel"], parcel["destination"],
-                                      parcel["weight"], clo["currentLocation"]))
-                # parcels.append(parcel["UUIDParcel"])
+                                      parcel["weight"], clo["currentLocation"], country=country))
             capacity = clo["capacity"] - len(parcels)
-            vehicles.append(Vehicle(clo["UUID"], clo["currentLocation"], parcels, capacity))
+
+            clo_country = None
+            if "country" in clo:
+                clo_country = clo["country"]
+            vehicles.append(Vehicle(clo["UUID"], clo["currentLocation"], parcels, capacity, country=clo_country))
         return vehicles
 
     @staticmethod
     def parse_deliveries(evt_type, clos, requests, use_case):
-        if use_case == "SLO-CRO":
+        if use_case == SLO_CRO_USE_CASE:
             # Event "crossBorder" already has all parcels on the truck so no pickups are necessary. This means
             # that only deliveries_origin will be used for transportation
             deliveries_origin = []
@@ -337,23 +354,23 @@ class VrpProcessor:
             # list of additional parcels from request
             if evt_type == "brokenVehicle":
                 deliveries_diff = [Parcel(x["UUIDParcel"], x["destination"],
-                                          x["weight"], requests["currentLocation"], "order") for x in
+                                          x["weight"], requests["currentLocation"], "order", country=x["country"]) for x in
                                    requests["parcels"]]
             elif evt_type == "pickupRequest":
                 deliveries_diff = [Parcel(x["UUIDParcel"], x["destination"],
                                           x["weight"], x["pickup"],
-                                          "order") for x in requests]
+                                          "order", country=x["country"]) for x in requests]
 
             # list of parcels on CLOs before request
             for clo in clos:
                 for parcel in clo["parcels"]:
                     deliveries_origin.append(Parcel(parcel["UUIDParcel"], parcel["destination"],
-                                                    parcel["weight"], clo["currentLocation"]))
+                                                    parcel["weight"], clo["currentLocation"], country=clo["country"]))
             deliveries = Deliveries(deliveries_origin, deliveries_diff)
 
             return deliveries
 
-        if use_case == "ELTA":
+        if use_case == ELTA_USE_CASE:
             deliveries_origin = []
             # list of additional parcels from request
             if evt_type == "brokenVehicle":
@@ -366,8 +383,12 @@ class VrpProcessor:
             # list of parcels on CLOs before request
             for clo in clos:
                 for parcel in clo["parcels"]:
+                    country = None
+                    if "country" in parcel:
+                        country = parcel["country"]
+
                     deliveries_origin.append(Parcel(parcel["UUIDParcel"], parcel["destination"],
-                                                    parcel["weight"], clo["currentLocation"]))
+                                                    parcel["weight"], clo["currentLocation"], country=country))
             deliveries = Deliveries(deliveries_origin, deliveries_diff)
 
             return deliveries
@@ -387,11 +408,11 @@ class VrpProcessor:
 
         # First graph is SLO, second graph is CRO
         for v in vehicles:
-            if "S" in v.start_node or "PS" in v.start_node:
+            if SLOVENIA == v.country:
                 # map SLO parcels to border nodes if necessary
                 v.parcels = self.map_slo_cro_deliveries(v.parcels, event_type)[0]
                 map_v[0].append(v)
-            elif "H" in v.start_node or "HP" in v.start_node:
+            elif CROATIA == v.country:
                 # map CRO parcels to border nodes if necessary
                 v.parcels = self.map_slo_cro_deliveries(v.parcels, event_type)[1]
                 map_v[1].append(v)
@@ -411,8 +432,8 @@ class VrpProcessor:
         """
         delivery_parts = [[],[]] # First one is for SLO nodes, Second one is for CRO nodes
         for parcel in deliveries:
-            if "S" in parcel.current_location or "PS" in parcel.current_location:
-                if "H" in parcel.target or "HP" in parcel.target:
+            if SLOVENIA == parcel.country:
+                if CROATIA == parcel.country:
                     # assign closest cro border node
                     cro_border_nodes = config_parser.get_border_nodes_cro()
                     if event_type == "crossBorder":
@@ -421,8 +442,8 @@ class VrpProcessor:
                         # TODO: assign the closest node instead of the first one
                         parcel.target = cro_border_nodes[0]
                 delivery_parts[0].append(parcel)
-            elif "H" in parcel.current_location or "HP" in parcel.current_location:
-                if "S" in parcel.target or "PS" in parcel.target:
+            elif CROATIA == parcel.country:
+                if SLOVENIA == parcel.country:
                     # assign closest slo border node
                     slo_border_nodes = config_parser.get_border_nodes_slo()
                     if event_type == "crossBorder":

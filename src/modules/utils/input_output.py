@@ -1,4 +1,12 @@
 from datetime import datetime
+from ..create_graph.config.config_parser import ConfigParser
+from ..utils.clo_update_handler import CloUpdateHandler
+
+config_parser = ConfigParser()
+
+ELTA_USE_CASE = "ELTA"
+SLO_CRO_USE_CASE = "SLO-CRO"
+
 
 class InputOutputTransformer:
     @staticmethod
@@ -167,13 +175,15 @@ class InputOutputTransformer:
 
         # SLO-CRO use-case and it's parsing remained the same as it was before... we need example message before
         # changing the structure
-        if json["organization"] == "SLO-CRO":
+        if json["organization"] == SLO_CRO_USE_CASE or json["organization"] == "PS" or json["organization"] == "HP":
+            payload["useCase"] = SLO_CRO_USE_CASE
             event = json["event"]
             if event is None:  # Procedure for daily plan is the same as for pickupRequest
                 payload["eventType"] = "pickupRequest"
             else:
                 payload["eventType"] = event["event_type"]
-        elif json["organization"] == "ELTA":
+        elif json["organization"] == ELTA_USE_CASE:
+            payload["useCase"] = ELTA_USE_CASE
             # None is used for dailyPlan
             if "event" not in json:
                 payload["eventType"] = None
@@ -185,13 +195,25 @@ class InputOutputTransformer:
                     payload["eventType"] = event["event_type"]
 
         clos = json["clos"]
+
         for clo in clos:
             clo["UUID"] = clo["id"]
             location = clo["info"].pop('location')
-            clo['currentLocation'] = [
-                location["latitude"],
-                location["longitude"]
-            ]
+
+            if payload["useCase"] == SLO_CRO_USE_CASE:
+                # Extract station ID from given 'latitude' and 'longitude'.
+                csv_file = config_parser.get_csv_path(SLO_CRO_USE_CASE)
+                location_station_dict = CloUpdateHandler.extract_location_station_dict(csv_file)
+                station_id = location_station_dict[(str(location["latitude"]), str(location["longitude"]))]
+
+                clo['currentLocation'] = station_id
+            else:
+                clo['currentLocation'] = [
+                    location["latitude"],
+                    location["longitude"]
+                ]
+            if "country" in location:
+                clo['country'] = location["country"]
             clo['capacity'] = clo["info"].pop('capacity')
 
             # Check for state -> remaining_plan -> steps
@@ -216,10 +238,16 @@ class InputOutputTransformer:
                 parcel['weight'] = parcel.pop('payweight')
 
                 destination = parcel.pop('location')
-                parcel['destination'] = [
-                    destination["latitude"],
-                    destination["longitude"]
-                ]
+
+                if payload["useCase"] == SLO_CRO_USE_CASE:
+                    parcel['destination'] = destination["station"]
+                else:
+                    parcel['destination'] = [
+                        destination["latitude"],
+                        destination["longitude"]
+                    ]
+                if "country" in destination:
+                    parcel['country'] = destination["country"]
 
                 clo_parcels.append(parcel)
 
@@ -231,20 +259,32 @@ class InputOutputTransformer:
             brokenVehicle = json["brokenVehicle"]
 
             current_location = brokenVehicle["info"].pop('location')
-            brokenVehicle['currentLocation'] = [
-                current_location["latitude"],
-                current_location["longitude"]
-            ]
+
+            if payload["useCase"] == SLO_CRO_USE_CASE:
+                brokenVehicle["currentLocation"] = current_location["station"]
+            else:
+                brokenVehicle['currentLocation'] = [
+                    current_location["latitude"],
+                    current_location["longitude"]
+                ]
+            if "country" in current_location:
+                brokenVehicle['country'] = current_location["country"]
 
             for parcel in brokenVehicle["parcels"]:
                 parcel['UUIDParcel'] = parcel.pop('id')
                 parcel['weight'] = parcel.pop('payweight')
 
                 destination = parcel.pop('destination')
-                parcel['destination'] = [
-                    destination["latitude"],
-                    destination["longitude"]
-                ]
+                if payload["useCase"] == SLO_CRO_USE_CASE:
+                    parcel['destination'] = destination["station"]
+                else:
+                    parcel['destination'] = [
+                        destination["latitude"],
+                        destination["longitude"]
+                    ]
+                if "country" in destination:
+                    parcel['country'] = destination["country"]
+
             payload["brokenVehicle"] = brokenVehicle
         else:
             orders = []
@@ -257,17 +297,27 @@ class InputOutputTransformer:
 
                 # Destination field is a JSON object
                 destination = parcel.pop('destination')
-                parcel['destination'] = [
-                    destination["latitude"],
-                    destination["longitude"]
-                ]
+                if payload["useCase"] == SLO_CRO_USE_CASE:
+                    parcel['destination'] = destination["station"]
+                else:
+                    parcel['destination'] = [
+                        destination["latitude"],
+                        destination["longitude"]
+                    ]
+                if "country" in destination:
+                    parcel['country'] = destination["country"]
 
                 # Pickup field is a JSON object
                 pickup = parcel.pop("source")
-                parcel['pickup'] = [
-                    pickup["latitude"],
-                    pickup["longitude"]
-                ]
+                if payload["useCase"] == SLO_CRO_USE_CASE:
+                    parcel['pickup'] = pickup["station"]
+                else:
+                    parcel['pickup'] = [
+                      pickup["latitude"],
+                      pickup["longitude"]
+                    ]
+                if "country" in pickup:
+                    parcel['country'] = pickup["country"]
             payload["orders"] = orders
 
         return payload
