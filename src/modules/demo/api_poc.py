@@ -703,7 +703,7 @@ def handle_recommendation_request():
     """Main entry point for HTTP request"""
     received_request = request.get_json(force=True)
 
-    print("received getRecommendation request")
+    print("received getRecommendation request", received_request)
 
     # transforms received message for internal structures
     data = InputOutputTransformer.parse_received_recommendation_message(received_request)
