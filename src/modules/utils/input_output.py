@@ -177,11 +177,14 @@ class InputOutputTransformer:
         # changing the structure
         if json["organization"] == SLO_CRO_USE_CASE or json["organization"] == "PS" or json["organization"] == "HP":
             payload["useCase"] = SLO_CRO_USE_CASE
-            event = json["event"]
-            if event is None:  # Procedure for daily plan is the same as for pickupRequest
+            if "event" not in json:
                 payload["eventType"] = "pickupRequest"
             else:
-                payload["eventType"] = event["event_type"]
+                event = json["event"]
+                if event is None:  # Procedure for daily plan is the same as for pickupRequest
+                    payload["eventType"] = "pickupRequest"
+                else:
+                    payload["eventType"] = event["event_type"]
         elif json["organization"] == ELTA_USE_CASE:
             payload["useCase"] = ELTA_USE_CASE
             # None is used for dailyPlan
@@ -324,6 +327,8 @@ class InputOutputTransformer:
 
     @staticmethod
     def prepare_output_message(recommendations, use_case, request_id):
+        # TODO: Replace location_id in messages to be in form of:
+        # "location": { "latitude" : "xxx", "longitude": "xxx", "station": location_id}
         clo_plans = []
 
         counter = 0
