@@ -201,7 +201,15 @@ class InputOutputTransformer:
 
         for clo in clos:
             clo["UUID"] = clo["id"]
-            location = clo["info"].pop('location')
+
+            location = None
+            if "info" in clo:
+                if "location" in clo["info"]:
+                    location = clo["info"].pop('location')
+
+            if location is None and "state" in clo:
+                if "location" in clo["state"]:
+                    location = clo["state"].pop('location')
 
             if payload["useCase"] == SLO_CRO_USE_CASE:
                 # Extract station ID from given 'latitude' and 'longitude'.
