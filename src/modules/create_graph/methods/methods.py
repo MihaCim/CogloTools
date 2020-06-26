@@ -43,6 +43,11 @@ def get_orders_coordinates(data):
         for i, el in enumerate(data['orders']):
             transform_map_dict[(el['UUIDParcel'], "destination")] = el['destination']
             transform_map_dict[(el['UUIDParcel'], "pickup")] = el['pickup']
+        if 'clos' in data:
+            for clos in data['clos']:
+                for parcel in clos['parcels']:
+                    transform_map_dict[(parcel['UUIDParcel'], "destination")] = parcel['destination']
+                    transform_map_dict[(parcel['UUIDParcel'], "pickup")] = parcel['destination']
     elif 'brokenVehicle' in data:
         for clos in data['clos']:
             current_location = clos['currentLocation']

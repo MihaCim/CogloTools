@@ -807,13 +807,14 @@ def handle_recommendation_request():
                 return {"msg": "Parameter 'orders' is missing", "status": 0}
             requests = data_request["orders"]
             recommendations = RecReq.process_pickup_requests(evt_type, clos, requests, vrp_processor_ref, use_case)
-            response = InputOutputTransformer.prepare_output_message(recommendations, use_case, request_id)
+            recommendations_mapped = methods.map_coordinates_to_response(recommendations, transform_map_dict)
+            response = InputOutputTransformer.prepare_output_message(recommendations_mapped, use_case, request_id)
         else:
             return jsonify({"msg": "Invalid event type: {}".format(evt_type), "status": 0})
 
         # This piece of code posts optimization response to MSB
-        RecReq.post_response_msb(request_id, response)
-
+        #RecReq.post_response_msb(request_id, response)
+        return response
         # Response is always a generic one which just states that CA received request and will process it.
         return generic_message_received_response
 
