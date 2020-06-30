@@ -12,8 +12,14 @@ class Tsp:
     def order_recommendations(recommendations):
         dictionary, vehicle_array = Tsp.build_location_id_route_dict(recommendations)
         built_request = Tsp.build_input_request(recommendations)
-        tsp_response = Tsp.send_request(built_request)
-        return Tsp.parse_response(tsp_response, dictionary, vehicle_array)
+        tsp_response, tsp_success = Tsp.send_request(built_request)
+
+        if tsp_success:
+            return Tsp.parse_response(tsp_response, dictionary, vehicle_array)
+        else:
+            print("TSP algorithm execution failed. Returning default 'recommendations' calculated without applying TSP")
+            # Just return default recommendations
+            return recommendations
 
     @staticmethod
     def build_input_request(recommendations):
@@ -190,6 +196,7 @@ class Tsp:
         :return:
         """
 
+        transform_success = False
         response = []
         for index in range(len(request_array)):
             print("sending TSP request for plan", index)
@@ -199,8 +206,10 @@ class Tsp:
             try:
                 tsp_solution = requests.post(TSP_URL, json=request, headers=headers).text
                 response.append(tsp_solution)
+                transform_success = True
                 print("received TSP response for plan", index)
             except Exception as ex:
                 print("Error occurred sending request to TSP service", ex)
+                transform_success = False
 
-        return response
+        return response, transform_success
