@@ -51,11 +51,11 @@ class Tsp:
                 location = route["location"]
 
                 services_array.append({
-                    "id": location["location_id"],
+                    "id": location["station"],
                     "address": {
                         "lat": location["latitude"],
                         "lon": location["longitude"],
-                        "location_id": location["location_id"]
+                        "location_id": location["station"]
                     }
                 })
 
@@ -87,7 +87,7 @@ class Tsp:
                 if "location" not in route:
                     continue
                 location = route["location"]
-                dictionary[index][location["location_id"]] = route
+                dictionary[index][location["station"]] = route
 
         return dictionary, recommendations_array
 
