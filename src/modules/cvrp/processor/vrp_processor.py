@@ -313,10 +313,10 @@ class VrpProcessor:
                     "location":{
                         "city": None,
                         "country": None,
-                        "station": node.name,
+                        "address": node.name,
                         "latitude":node.lat,
                         "longitude":node.lon,
-                        "location_id":node.id,
+                        "station":node.id,
                         #""location_id": "{},{}".format(node.lon, node.lat),
                         "postal_code": None
                     },
@@ -333,7 +333,6 @@ class VrpProcessor:
                 for parcel in parcel_list_pickup:
                     if parcel.uuid in vehicle_parcels_load:
                         parcel_list_pickup.remove(parcel)
-
         return converted_route
 
     @staticmethod
