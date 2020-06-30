@@ -1,18 +1,18 @@
+import csv
 import os
-import requests
-import json
 
+import requests
 from flask import Flask, request
 from flask_jsonpify import jsonify
 from flask_restful import Resource
 from waitress import serve
-import csv
+
+from ..create_graph.config.config_parser import ConfigParser
 from ..create_graph.create_graph import JsonGraphCreator
+from ..create_graph.methods import methods
 from ..cvrp.processor.vrp_processor import VrpProcessor
 from ..partitioning.graph_partitioning_preprocess import GraphPreprocessing
 from ..utils.clo_update_handler import CloUpdateHandler
-from ..create_graph.methods import methods
-from ..create_graph.config.config_parser import ConfigParser
 from ..utils.input_output import InputOutputTransformer
 from ..utils.tsp import Tsp
 
