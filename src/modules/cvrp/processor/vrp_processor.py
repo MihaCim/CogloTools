@@ -1,4 +1,3 @@
-import time
 from math import inf
 
 import requests
@@ -10,6 +9,8 @@ from ...utils.structures.node import Node
 from ...utils.structures.parcel import Parcel
 from ...utils.structures.plan import Plan
 from ...utils.structures.vehicle import Vehicle
+from ...utils.clo_update_handler import CloUpdateHandler
+
 
 url = "https://graphhopper.com/api/1/vrp?key=e8a55308-9419-4814-81f1-6250efe25b5c"
 
@@ -83,7 +84,7 @@ class VrpProcessor:
             indexes.append(index)
         return indexes
 
-    def process(self, vehicles, deliveries_object, event_type):
+    def process(self, vehicles, deliveries_object, event_type, use_case):
         """Process routing request with N vehicles and M deliveries, to produce a list of routing plans"""
         deliveries_all = deliveries_object.origin + deliveries_object.req
         deliveries_req = deliveries_object.req
@@ -130,8 +131,7 @@ class VrpProcessor:
 
             # compute routes based on dispatch vectors from VRP. Since VRP output is incomplete/not best,
             # we add A* routing on top
-            plan_routes = self.make_route(computed_routes, dispatch, partition,
-                                          plan.vehicles, plan.deliveries, plan.deliveries_req)
+            plan_routes = self.make_route(dispatch, partition, plan.vehicles, plan.deliveries_req, use_case)
             routes += plan_routes
 
         return routes
@@ -197,7 +197,7 @@ class VrpProcessor:
         else:
             return route
 
-    def make_route(self, graph_routes, loads, graph, vehicles, deliveries, deliveries_req):
+    def make_route(self, loads, graph, vehicles, deliveries_req, use_case):
         nodes = graph.nodes
         edges = graph.edges
         print("Building route from VRP output...")
@@ -257,8 +257,21 @@ class VrpProcessor:
             #graph.print_path(route_ordered)
             routes.append(route)
 
+            # Extract 'latitude' and 'longitude' from station ID
+            csv_file = config_parser.get_csv_path(use_case)
+            location_station_dict = CloUpdateHandler.extract_location_station_dict(csv_file)
+            station_id = vehicles[i].start_node
+            lat, lon = list(location_station_dict.keys())[list(location_station_dict.values()).index(station_id)]
+
+            # Append route to the list. Also, "start_address" is necessary for each vehicle which we later use for TSP.
             converted_routes.append(
-                {"UUID": vehicles[i].name, "route": self.map_parcels_to_route(route, dispatch, graph, vehicles[i])})
+                {"UUID": vehicles[i].name,
+                 "start_address": {
+                     "lat": lat,
+                     "lon": lon,
+                     "location_id": station_id
+                 },
+                 "route": self.map_parcels_to_route(route, dispatch, graph, vehicles[i])})
 
         return converted_routes
 

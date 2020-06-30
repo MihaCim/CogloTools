@@ -1,19 +1,20 @@
+import csv
 import os
-import requests
-import json
 
+import requests
 from flask import Flask, request
 from flask_jsonpify import jsonify
 from flask_restful import Resource
 from waitress import serve
-import csv
+
+from ..create_graph.config.config_parser import ConfigParser
 from ..create_graph.create_graph import JsonGraphCreator
+from ..create_graph.methods import methods
 from ..cvrp.processor.vrp_processor import VrpProcessor
 from ..partitioning.graph_partitioning_preprocess import GraphPreprocessing
 from ..utils.clo_update_handler import CloUpdateHandler
-from ..create_graph.methods import methods
-from ..create_graph.config.config_parser import ConfigParser
 from ..utils.input_output import InputOutputTransformer
+from ..utils.tsp import Tsp
 
 app = Flask(__name__)
 vrpProcessorReferenceSloCro = None
@@ -82,7 +83,7 @@ class RecReq(Resource):
         vehicles = vrp_processor_ref.parse_vehicles(clos)
         deliveries = vrp_processor_ref.parse_deliveries(evt_type, clos, requests, use_case)
 
-        return vrp_processor_ref.process(vehicles, deliveries, evt_type)
+        return vrp_processor_ref.process(vehicles, deliveries, evt_type, use_case)
 
     @staticmethod
     def process_broken_clo(evt_type, clos, broken_clo, vrp_processor_ref, use_case):
@@ -90,7 +91,7 @@ class RecReq(Resource):
         vehicles = vrp_processor_ref.parse_vehicles(clos)
         deliveries = vrp_processor_ref.parse_deliveries(evt_type, clos, broken_clo, use_case)
 
-        return vrp_processor_ref.process(vehicles, deliveries, evt_type)
+        return vrp_processor_ref.process(vehicles, deliveries, evt_type, use_case)
 
     @staticmethod
     def process_cross_border_request(evt_type, clos, requests, vrp_processor_ref, use_case):
@@ -98,7 +99,7 @@ class RecReq(Resource):
         vehicles = vrp_processor_ref.parse_vehicles(clos)
         deliveries = vrp_processor_ref.parse_deliveries(evt_type, clos, requests, use_case)
 
-        return vrp_processor_ref.process(vehicles, deliveries, evt_type)
+        return vrp_processor_ref.process(vehicles, deliveries, evt_type, use_case)
 
     @staticmethod
     def post_response_msb(UUID, recommendations):
@@ -742,7 +743,6 @@ def handle_recommendation_request():
                 return {"msg": "Parameter 'clos' or 'orders' is missing", "status": 0}
             requests = data["orders"]
             recommendations = RecReq.process_pickup_requests(evt_type, clos, requests, vrp_processor_ref, use_case)
-
         elif evt_type == "crossBorder":
             print("cross border event received")
             if "clos" not in data:
@@ -757,6 +757,9 @@ def handle_recommendation_request():
         else:
             return jsonify({"message": "Invalid event type: {}".format(evt_type), "status": 0})
 
+        # Executes TSP algorithm upon calculated recommendations by our VRP
+        recommendations = Tsp.order_recommendations(recommendations)
+
         # Prepare output message from calculated recommendations
         response = InputOutputTransformer.prepare_output_message(recommendations, use_case, request_id)
 
@@ -766,7 +769,7 @@ def handle_recommendation_request():
         # Always return generic message stating that request was received and is due to be processed
         return generic_message_received_response
 
-        ##Use Case ELTA
+    ##Use Case ELTA
     elif use_case == "ELTA":
         print("processing ELTA usecase")
         ### VRP INICIALIZATION AND MESSAGE PREPROCESSING
@@ -789,32 +792,34 @@ def handle_recommendation_request():
         if evt_type is None:
             if "orders" not in data_request:
                 return {"msg": "Parameter 'orders' is missing", "status": 0}
-            requests = data_request["orders"]
-            recommendations = RecReq.process_pickup_requests(evt_type, clos, requests, vrp_processor_ref, use_case)
-            response = InputOutputTransformer.prepare_output_message(
-                methods.map_coordinates_to_response(recommendations, transform_map_dict), use_case, request_id)
-
+            data_requests = data_request["orders"]
+            recommendations = RecReq.process_pickup_requests(evt_type, clos, data_requests, vrp_processor_ref, use_case)
         elif evt_type == "brokenVehicle":
             if "brokenVehicle" not in data_request:
                 return {"msg": "Parameter 'BrokenVehicle' is missing", "status": 0}
             broken_clo = data_request["brokenVehicle"]
             recommendations = RecReq.process_broken_clo(evt_type, clos, broken_clo, vrp_processor_ref, use_case)
-            recommendations_mapped = methods.map_coordinates_to_response(recommendations, transform_map_dict)
-            response = InputOutputTransformer.prepare_output_message(recommendations_mapped, use_case, request_id)
 
         elif evt_type == "pickupRequest":
             if "orders" not in data_request:
                 return {"msg": "Parameter 'orders' is missing", "status": 0}
-            requests = data_request["orders"]
-            recommendations = RecReq.process_pickup_requests(evt_type, clos, requests, vrp_processor_ref, use_case)
-            recommendations_mapped = methods.map_coordinates_to_response(recommendations, transform_map_dict)
-            response = InputOutputTransformer.prepare_output_message(recommendations_mapped, use_case, request_id)
+            data_requests = data_request["orders"]
+            recommendations = RecReq.process_pickup_requests(evt_type, clos, data_requests, vrp_processor_ref, use_case)
         else:
             return jsonify({"msg": "Invalid event type: {}".format(evt_type), "status": 0})
 
+        # Executes TSP on given recommendations to order route plan correctly
+        recommendations = Tsp.order_recommendations(recommendations)
+
+        # Maps recommendations based on transform_map_dict
+        recommendations_mapped = methods.map_coordinates_to_response(recommendations, transform_map_dict)
+
+        # Transforms response in 'JSI' format to the one used for MSB
+        response = InputOutputTransformer.prepare_output_message(recommendations_mapped, use_case, request_id)
+
         # This piece of code posts optimization response to MSB
-        #RecReq.post_response_msb(request_id, response)
-        return response
+        RecReq.post_response_msb(request_id, response)
+
         # Response is always a generic one which just states that CA received request and will process it.
         return generic_message_received_response
 
