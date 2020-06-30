@@ -333,7 +333,6 @@ class VrpProcessor:
                 for parcel in parcel_list_pickup:
                     if parcel.uuid in vehicle_parcels_load:
                         parcel_list_pickup.remove(parcel)
-
         return converted_route
 
     @staticmethod
