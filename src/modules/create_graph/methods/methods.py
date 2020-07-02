@@ -61,6 +61,30 @@ def get_orders_coordinates(data):
                 transform_map_dict[(parcel['UUIDParcel'], "pickup")] = current_location
     return transform_map_dict
 
+def order_parcels_on_route(response):
+    for idx, clo in enumerate(response["cloplans"]):
+        new_steps = []
+        for step in clo['plan']["steps"]:
+            if len(step['load']) != []:
+                for parcel in step['load']:
+                    new_step = copy.deepcopy(step)
+                    print(new_step)
+                    new_step["load"] = parcel["id"]
+                    new_step["location"]["latitude"] = parcel["latitude"]
+                    new_step["location"]["longitude"] = parcel ["longitude"]
+                    new_step["unload"] = []
+                    new_steps.append(new_step)
+
+            if len(step['unload']) != []:
+                for parcel in step['unload']:
+                    new_step = copy.deepcopy(step)
+                    new_step["unload"] = parcel["id"]
+                    new_step["location"]["latitude"] = parcel["latitude"]
+                    new_step["location"]["longitude"] = parcel["longitude"]
+                    new_step["load"] = []
+                    new_steps.append(new_step)
+        response["cloplans"][idx]["plan"]["steps"]=new_steps
+    return response
 
 def proccess_elta_event(proc_event, data):
     if proc_event == None:
@@ -98,7 +122,7 @@ def elta_clustering(orig_data):
         l.append([i, el['UUIDParcel'], "destination"] + el['destination'])
     df = pd.DataFrame(l)
     # run clustering
-    kmeans = KMeans(n_clusters=6)
+    kmeans = KMeans(n_clusters=8)
     kmeans.fit(df[[3, 4]])  # Compute k-means clustering.
     centers = kmeans.cluster_centers_
     df["labels"] = labels = kmeans.labels_
