@@ -118,7 +118,6 @@ class RecReq(Resource):
 
         with open('response.txt', 'w') as outfile:
             json.dump(recommendations, outfile)
-        '''
 
         try:
             response = requests.post(response_validation_url, json = recommendations, headers=headers, verify=False)
@@ -131,7 +130,6 @@ class RecReq(Resource):
             print("response from MSB:", response)
         except Exception as ex:
             print("Error occurred while posting response to MSB", ex)
-        '''
 
 @app.route("/api/adhoc/getRecommendation", methods=['POST'])
 def handle_recommendation_request():
