@@ -283,7 +283,7 @@ class VrpProcessor:
         converted_route = []
         parcel_list = vehicle.parcels
         parcel_list_pickup = parcel_list.copy()
-        step_num = 0  # ittreation index for rank field
+        step_num = 1  # ittreation index for rank field
 
         if len(route) == 1 and loads[nodes.index(route[0])] == 0:
             return []

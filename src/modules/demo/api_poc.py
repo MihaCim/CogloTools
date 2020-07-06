@@ -1,5 +1,6 @@
 import csv
 import os
+import json
 
 import requests
 from flask import Flask, request
@@ -115,6 +116,9 @@ class RecReq(Resource):
             "message": json_for_serialization
         }
 
+        with open('response.txt', 'w') as outfile:
+            json.dump(recommendations, outfile)
+
         try:
             response = requests.post(response_validation_url, json = recommendations, headers=headers, verify=False)
             print("validation code for recommendations message: ", response)
@@ -126,7 +130,6 @@ class RecReq(Resource):
             print("response from MSB:", response)
         except Exception as ex:
             print("Error occurred while posting response to MSB", ex)
-
 
 @app.route("/api/adhoc/getRecommendation", methods=['POST'])
 def handle_recommendation_request():
@@ -809,13 +812,16 @@ def handle_recommendation_request():
             return jsonify({"msg": "Invalid event type: {}".format(evt_type), "status": 0})
 
         # Executes TSP on given recommendations to order route plan correctly
-        recommendations = Tsp.order_recommendations(recommendations)
+        #recommendations = Tsp.order_recommendations(recommendations)
 
         # Maps recommendations based on transform_map_dict
         recommendations_mapped = methods.map_coordinates_to_response(recommendations, transform_map_dict)
 
         # Transforms response in 'JSI' format to the one used for MSB
-        response = InputOutputTransformer.prepare_output_message(recommendations_mapped, use_case, request_id)
+        response1 = InputOutputTransformer.prepare_output_message(recommendations_mapped, use_case, request_id)
+
+        # restructures steps plan and and lists all the parcels from clusters as a list of locations
+        response = methods.order_parcels_on_route(response1)
 
         # This piece of code posts optimization response to MSB
         RecReq.post_response_msb(request_id, response)
