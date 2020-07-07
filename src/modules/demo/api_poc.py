@@ -823,7 +823,7 @@ def handle_recommendation_request():
             return jsonify({"msg": "Invalid event type: {}".format(evt_type), "status": 0})
 
         # Executes TSP on given recommendations to order route plan correctly
-        #recommendations = Tsp.order_recommendations(recommendations)
+        recommendations = Tsp.order_recommendations(recommendations)
 
         # Maps recommendations based on transform_map_dict
         recommendations_mapped = methods.map_coordinates_to_response(recommendations, transform_map_dict)
