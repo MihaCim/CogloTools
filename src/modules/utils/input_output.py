@@ -420,13 +420,15 @@ class InputOutputTransformer:
         for clo_plan in recommendations:
             counter+=1
             recommendation_text = "%srecommendation%s" % (use_case, counter)
+            plan_id = "%splan%s" % (use_case, counter)
             message = {
                 "clo": clo_plan["UUID"], # Vehicle
+                "id": recommendation_text,
                 "plan": {
-                    "id": request_id,
+                    "id": plan_id,
                     "organization": use_case,
                     "execution_date": datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
-                    "recommendation": recommendation_text,
+                    "recommendation": request_id,
                     "steps": clo_plan["route"]
                 }
             }
