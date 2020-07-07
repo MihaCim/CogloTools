@@ -106,21 +106,21 @@ class RecReq(Resource):
     def post_response_msb(UUID, recommendations):
         # default=str set because we want to serialize Date objects as well
         json_for_serialization = {
-            "request": UUID,
             "recommendation": recommendations
         }
         headers = {'Content-type': 'application/json'}
         content = {
+            "request": UUID,
             "topic": "recommendations",
             "sender": "COGLOmoduleCA",
             "message": json_for_serialization
         }
 
-        with open('response.txt', 'w') as outfile:
-            json.dump(recommendations, outfile)
+        with open('response.json', 'w') as outfile:
+            json.dump(content, outfile)
 
         try:
-            response = requests.post(response_validation_url, json = recommendations, headers=headers, verify=False)
+            response = requests.post(response_validation_url, json = recommendations, headers=headers, verify=False).json()
             print("validation code for recommendations message: ", response)
         except Exception as ex:
             print("Error occurred while validating response in validation service", ex)
