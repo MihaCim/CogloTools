@@ -186,7 +186,12 @@ class InputOutputTransformer:
                 if event is None:  # Procedure for daily plan is the same as for pickupRequest
                     payload["eventType"] = "pickupRequest"
                 else:
-                    payload["eventType"] = event["event_type"]
+                    type = event["event_type"]
+                    if type == "order":
+                        type = "pickupRequest"
+                    elif type == "vehicle":
+                        type = "brokenVehicle"
+                    payload["eventType"] = type
         elif json["organization"] == ELTA_USE_CASE:
             payload["useCase"] = ELTA_USE_CASE
             # None is used for dailyPlan
@@ -197,7 +202,12 @@ class InputOutputTransformer:
                 if event is None:
                     payload["eventType"] = None
                 else:
-                    payload["eventType"] = event["event_type"]
+                    type = event["event_type"]
+                    if type == "order":
+                        type = "pickupRequest"
+                    elif type == "vehicle":
+                        type = "brokenVehicle"
+                    payload["eventType"] = type
 
         InputOutputTransformer.validateMessageForValue(json, ["clos"])
         clos = json["clos"]
@@ -210,6 +220,9 @@ class InputOutputTransformer:
             if "info" in clo:
                 if "location" in clo["info"]:
                     location = clo["info"].pop('location')
+
+                    if location["latitude"] is None or location["longitude"] is None:
+                        location = None
 
             if location is None and "state" in clo:
                 if "location" in clo["state"]:
@@ -280,14 +293,23 @@ class InputOutputTransformer:
         payload["clos"] = clos
 
         # TODO: This needs to be tested furthermore on examples provided by testers!!!
-        if payload["eventType"] == "vehicle":
+        if payload["eventType"] == "brokenVehicle":
+            InputOutputTransformer.validateMessageForValue(json["event"], ["info"])
             InputOutputTransformer.validateMessageForValue(json["event"], ["info"])
             InputOutputTransformer.validateMessageForValue(json["event"]["info"], ["clo"])
             broken_vehicle = json["event"]["info"]["clo"]
 
-            InputOutputTransformer.validateMessageForValue(broken_vehicle, ["info"])
-            InputOutputTransformer.validateMessageForValue(broken_vehicle["info"], ["location"])
-            current_location = broken_vehicle["info"].pop('location')
+            current_location = None
+            if "info" in broken_vehicle:
+                if "location" in broken_vehicle["info"]:
+                    current_location = broken_vehicle["info"].pop('location')
+
+                    if current_location["latitude"] is None or current_location["longitude"] is None:
+                        current_location = None
+
+            if current_location is None and "state" in broken_vehicle:
+                if "location" in broken_vehicle["state"]:
+                    current_location = broken_vehicle["state"].pop('location')
 
             if payload["useCase"] == SLO_CRO_USE_CASE:
                 InputOutputTransformer.validateMessageForValue(current_location, ["station"])
@@ -305,6 +327,7 @@ class InputOutputTransformer:
             state = broken_vehicle["state"]
 
             InputOutputTransformer.validateMessageForValue(state, ["parcels"])
+            parcels = []
             for parcel in state["parcels"]:
                 parcel['UUIDParcel'] = parcel.pop('id')
                 parcel['weight'] = parcel.pop('payweight')
@@ -324,6 +347,10 @@ class InputOutputTransformer:
                 if "country" in destination:
                     parcel['country'] = destination["country"]
 
+                # Append as last element
+                parcels.append(parcel)
+
+            broken_vehicle["parcels"] = parcels
             payload["brokenVehicle"] = broken_vehicle
         else:
             orders = []
