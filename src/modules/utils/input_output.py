@@ -168,6 +168,8 @@ class InputOutputTransformer:
 
     @staticmethod
     def parse_received_recommendation_message(json):
+        InputOutputTransformer.validateMessageForValue(json, ["organization"])
+        InputOutputTransformer.validateMessageForValue(json, ["request"])
         payload = {
             "useCase": json["organization"],
             "UUIDRequest": json["request"],
@@ -197,9 +199,11 @@ class InputOutputTransformer:
                 else:
                     payload["eventType"] = event["event_type"]
 
+        InputOutputTransformer.validateMessageForValue(json, ["clos"])
         clos = json["clos"]
 
         for clo in clos:
+            InputOutputTransformer.validateMessageForValue(clo, ["id"])
             clo["UUID"] = clo["id"]
 
             location = None
@@ -211,6 +215,7 @@ class InputOutputTransformer:
                 if "location" in clo["state"]:
                     location = clo["state"].pop('location')
 
+            InputOutputTransformer.validateMessageForValue(location, ["latitude", "longitude"])
             if payload["useCase"] == SLO_CRO_USE_CASE:
                 # Extract station ID from given 'latitude' and 'longitude'.
                 csv_file = config_parser.get_csv_path(SLO_CRO_USE_CASE)
@@ -225,6 +230,9 @@ class InputOutputTransformer:
                 ]
             if "country" in location:
                 clo['country'] = location["country"]
+
+            InputOutputTransformer.validateMessageForValue(clo, ["info"])
+            InputOutputTransformer.validateMessageForValue(clo["info"], ["capacity"])
             clo['capacity'] = clo["info"].pop('capacity')
 
             # Check for state -> remaining_plan -> steps
@@ -245,14 +253,20 @@ class InputOutputTransformer:
             clo_parcels = []
 
             for parcel in parcels:
+                InputOutputTransformer.validateMessageForValue(parcel, ["id"])
+                InputOutputTransformer.validateMessageForValue(parcel, ["payweight"])
+
                 parcel['UUIDParcel'] = parcel.pop('id')
                 parcel['weight'] = parcel.pop('payweight')
 
+                InputOutputTransformer.validateMessageForValue(parcel, ["location"])
                 destination = parcel.pop('location')
 
                 if payload["useCase"] == SLO_CRO_USE_CASE:
+                    InputOutputTransformer.validateMessageForValue(destination, ["station"])
                     parcel['destination'] = destination["station"]
                 else:
+                    InputOutputTransformer.validateMessageForValue(destination, ["latitude", "longitude"])
                     parcel['destination'] = [
                         destination["latitude"],
                         destination["longitude"]
@@ -266,29 +280,43 @@ class InputOutputTransformer:
         payload["clos"] = clos
 
         # TODO: This needs to be tested furthermore on examples provided by testers!!!
-        if payload["eventType"] == "brokenVehicle":
-            brokenVehicle = json["brokenVehicle"]
+        if payload["eventType"] == "vehicle":
+            InputOutputTransformer.validateMessageForValue(json["event"], ["info"])
+            InputOutputTransformer.validateMessageForValue(json["event"]["info"], ["clo"])
+            broken_vehicle = json["event"]["info"]["clo"]
 
-            current_location = brokenVehicle["info"].pop('location')
+            InputOutputTransformer.validateMessageForValue(broken_vehicle, ["info"])
+            InputOutputTransformer.validateMessageForValue(broken_vehicle["info"], ["location"])
+            current_location = broken_vehicle["info"].pop('location')
 
             if payload["useCase"] == SLO_CRO_USE_CASE:
-                brokenVehicle["currentLocation"] = current_location["station"]
+                InputOutputTransformer.validateMessageForValue(current_location, ["station"])
+                broken_vehicle["currentLocation"] = current_location["station"]
             else:
-                brokenVehicle['currentLocation'] = [
+                InputOutputTransformer.validateMessageForValue(current_location, ["latitude", "longitude"])
+                broken_vehicle['currentLocation'] = [
                     current_location["latitude"],
                     current_location["longitude"]
                 ]
             if "country" in current_location:
-                brokenVehicle['country'] = current_location["country"]
+                broken_vehicle['country'] = current_location["country"]
 
-            for parcel in brokenVehicle["parcels"]:
+            InputOutputTransformer.validateMessageForValue(broken_vehicle, ["state"])
+            state = broken_vehicle["state"]
+
+            InputOutputTransformer.validateMessageForValue(state, ["parcels"])
+            for parcel in state["parcels"]:
                 parcel['UUIDParcel'] = parcel.pop('id')
                 parcel['weight'] = parcel.pop('payweight')
 
+                InputOutputTransformer.validateMessageForValue(parcel, ["destination"])
                 destination = parcel.pop('destination')
+
                 if payload["useCase"] == SLO_CRO_USE_CASE:
+                    InputOutputTransformer.validateMessageForValue(destination, ["station"])
                     parcel['destination'] = destination["station"]
                 else:
+                    InputOutputTransformer.validateMessageForValue(destination, ["latitude", "longitude"])
                     parcel['destination'] = [
                         destination["latitude"],
                         destination["longitude"]
@@ -296,7 +324,7 @@ class InputOutputTransformer:
                 if "country" in destination:
                     parcel['country'] = destination["country"]
 
-            payload["brokenVehicle"] = brokenVehicle
+            payload["brokenVehicle"] = broken_vehicle
         else:
             orders = []
             if json["parcels"] is not None:
@@ -306,11 +334,15 @@ class InputOutputTransformer:
                 parcel['UUIDParcel'] = parcel.pop('id')
                 parcel['weight'] = parcel.pop('payweight')
 
+                InputOutputTransformer.validateMessageForValue(parcel, ["destination"])
                 # Destination field is a JSON object
                 destination = parcel.pop('destination')
+
                 if payload["useCase"] == SLO_CRO_USE_CASE:
+                    InputOutputTransformer.validateMessageForValue(destination, ["station"])
                     parcel['destination'] = destination["station"]
                 else:
+                    InputOutputTransformer.validateMessageForValue(destination, ["latitude", "longitude"])
                     parcel['destination'] = [
                         destination["latitude"],
                         destination["longitude"]
@@ -318,11 +350,15 @@ class InputOutputTransformer:
                 if "country" in destination:
                     parcel['country'] = destination["country"]
 
+                InputOutputTransformer.validateMessageForValue(parcel, ["source"])
                 # Pickup field is a JSON object
                 pickup = parcel.pop("source")
+
                 if payload["useCase"] == SLO_CRO_USE_CASE:
+                    InputOutputTransformer.validateMessageForValue(pickup, ["station"])
                     parcel['pickup'] = pickup["station"]
                 else:
+                    InputOutputTransformer.validateMessageForValue(pickup, ["latitude", "longitude"])
                     parcel['pickup'] = [
                       pickup["latitude"],
                       pickup["longitude"]
@@ -332,6 +368,20 @@ class InputOutputTransformer:
             payload["orders"] = orders
 
         return payload
+
+    @staticmethod
+    def incorrectFormatMessage(message):
+        return {
+            "message": message, "status": 0
+        }
+
+    @staticmethod
+    def validateMessageForValue(field, keys):
+        for key in keys:
+            if key not in field or field[key] is None:
+                raise ValueError(InputOutputTransformer.incorrectFormatMessage(
+                    str(field) + " should have a non NULL field " + key))
+        return None
 
     @staticmethod
     def prepare_output_message(recommendations, use_case, request_id):
@@ -360,17 +410,3 @@ class InputOutputTransformer:
             "id": request_id,
             "cloplans": clo_plans
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
