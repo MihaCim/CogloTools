@@ -1,7 +1,6 @@
 {
   "status": 1,
   "msg": "Event process flow - CA:getRecommendation example input built",
-  "CAgetRecommendationParameters": {
     "organization": "ELTA",
     "clos": [
       {
@@ -171,4 +170,3 @@
     },
     "request": "COGLOrequestXXXXXXX"
   }
-}

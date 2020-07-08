@@ -118,7 +118,7 @@ class RecReq(Resource):
 
         with open('response.json', 'w') as outfile:
             json.dump(content, outfile)
-
+        '''
         try:
             response = requests.post(response_validation_url, json = recommendations, headers=headers, verify=False).json()
             print("validation code for recommendations message: ", response)
@@ -130,7 +130,7 @@ class RecReq(Resource):
             print("response from MSB:", response)
         except Exception as ex:
             print("Error occurred while posting response to MSB", ex)
-
+        '''
 @app.route("/api/adhoc/getRecommendation", methods=['POST'])
 def handle_recommendation_request():
     # TODO: Make generic_message_received_response synchronous and all other operations asynchronous
@@ -709,22 +709,14 @@ def handle_recommendation_request():
 
     print("received getRecommendation request", received_request)
 
-    if "CAgetRecommendationParameters" not in received_request or received_request["CAgetRecommendationParameters"] is None:
-        return {
-            "message": "Request should contain non NULL object 'CAgetRecommendationParameters'!",
-            "status": 0
-        }
-
-    request_parameters = received_request["CAgetRecommendationParameters"]
-
     # transforms received message for internal structures
     try:
-        data = InputOutputTransformer.parse_received_recommendation_message(request_parameters)
+        data = InputOutputTransformer.parse_received_recommendation_message(received_request)
     except ValueError as error:
         return str(error)
 
     # needed for response handling
-    request_id = request_parameters["request"]
+    request_id = received_request["request"]
     use_case = data['useCase']
 
     ##Errors
@@ -823,7 +815,7 @@ def handle_recommendation_request():
             return jsonify({"msg": "Invalid event type: {}".format(evt_type), "status": 0})
 
         # Executes TSP on given recommendations to order route plan correctly
-        recommendations = Tsp.order_recommendations(recommendations)
+        #recommendations = Tsp.order_recommendations(recommendations)
 
         # Maps recommendations based on transform_map_dict
         recommendations_mapped = methods.map_coordinates_to_response(recommendations, transform_map_dict)

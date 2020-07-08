@@ -1,7 +1,6 @@
 {
   "status": 1,
   "msg": "Event process flow - CA:getRecommendation example input built",
-  "CAgetRecommendationParameters": {
     "organization": "ELTA",
     "clos": [
       {
@@ -15,8 +14,8 @@
             "city": null,
             "country": null,
             "station": null,
-            "latitude": null,
-            "longitude": null,
+            "latitude": 37.9894900012,
+            "longitude": 23.7942801234,
             "postal_code": null
           },
           "description": "truck",
@@ -66,8 +65,8 @@
             "city": null,
             "country": null,
             "station": null,
-            "latitude": null,
-            "longitude": null,
+            "latitude": 37.9894900012,
+            "longitude": 23.7942801234,
             "postal_code": null
           },
           "description": "truck",
@@ -156,4 +155,3 @@
     },
     "request": "COGLOrequestXXXXXXX"
   }
-}
