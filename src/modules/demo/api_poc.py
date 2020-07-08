@@ -709,22 +709,14 @@ def handle_recommendation_request():
 
     print("received getRecommendation request", received_request)
 
-    if "CAgetRecommendationParameters" not in received_request or received_request["CAgetRecommendationParameters"] is None:
-        return {
-            "message": "Request should contain non NULL object 'CAgetRecommendationParameters'!",
-            "status": 0
-        }
-
-    request_parameters = received_request["CAgetRecommendationParameters"]
-
     # transforms received message for internal structures
     try:
-        data = InputOutputTransformer.parse_received_recommendation_message(request_parameters)
+        data = InputOutputTransformer.parse_received_recommendation_message(received_request)
     except ValueError as error:
         return str(error)
 
     # needed for response handling
-    request_id = request_parameters["request"]
+    request_id = received_request["request"]
     use_case = data['useCase']
 
     ##Errors

@@ -1,7 +1,6 @@
 {
   "status": 1,
   "msg": "Daily plan process flow - CA:getRecommendation example input built",
-  "CAgetRecommendationParameters": {
     "organization": "ELTA",
     "clos": [
       {
@@ -5832,4 +5831,3 @@
     "event": null,
     "request": "COGLOrequestXXXXXXX"
   }
-}

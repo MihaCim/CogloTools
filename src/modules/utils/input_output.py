@@ -414,6 +414,9 @@ class InputOutputTransformer:
     def prepare_output_message(recommendations, use_case, request_id):
         # TODO: Replace location_id in messages to be in form of:
         # "location": { "latitude" : "xxx", "longitude": "xxx", "station": location_id}
+
+        # recommendation_id ids a unique string for matching to response to the event for Angela
+        recommendation_id = use_case + datetime.utcnow().strftime('%Y%m%d%H%M%S')
         clo_plans = []
 
         counter = 0
@@ -428,7 +431,7 @@ class InputOutputTransformer:
                     "id": plan_id,
                     "organization": use_case,
                     "execution_date": datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
-                    "recommendation": request_id,
+                    "recommendation": recommendation_id,
                     "steps": clo_plan["route"]
                 }
             }
@@ -436,6 +439,6 @@ class InputOutputTransformer:
 
         return {
             "organization": use_case,
-            "id": request_id,
+            "id": recommendation_id,
             "cloplans": clo_plans
         }
