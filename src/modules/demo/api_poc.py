@@ -118,7 +118,7 @@ class RecReq(Resource):
 
         with open('response.json', 'w') as outfile:
             json.dump(content, outfile)
-        '''
+
         try:
             response = requests.post(response_validation_url, json = recommendations, headers=headers, verify=False).json()
             print("validation code for recommendations message: ", response)
@@ -130,7 +130,7 @@ class RecReq(Resource):
             print("response from MSB:", response)
         except Exception as ex:
             print("Error occurred while posting response to MSB", ex)
-        '''
+        
 @app.route("/api/adhoc/getRecommendation", methods=['POST'])
 def handle_recommendation_request():
     # TODO: Make generic_message_received_response synchronous and all other operations asynchronous
