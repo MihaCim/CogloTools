@@ -128,7 +128,7 @@ def elta_clustering(orig_data):
         l.append([i, el['UUIDParcel'], "destination"] + el['destination'])
     df = pd.DataFrame(l)
     # run clustering
-    kmeans = KMeans(n_clusters=20)
+    kmeans = KMeans(n_clusters=12)
     kmeans.fit(df[[3, 4]])  # Compute k-means clustering.
     centers = kmeans.cluster_centers_
     df["labels"] = labels = kmeans.labels_
