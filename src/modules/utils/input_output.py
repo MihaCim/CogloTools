@@ -439,6 +439,6 @@ class InputOutputTransformer:
 
         return {
             "organization": use_case,
-            "id": recommendation_id,
+            "id": request_id, # TODO: Previously it was recommendation_id which might be correct!
             "cloplans": clo_plans
         }
