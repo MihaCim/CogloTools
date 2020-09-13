@@ -1,6 +1,7 @@
 from datetime import datetime
 from ..create_graph.config.config_parser import ConfigParser
 from ..utils.clo_update_handler import CloUpdateHandler
+import copy
 
 config_parser = ConfigParser()
 
@@ -210,7 +211,14 @@ class InputOutputTransformer:
                     payload["eventType"] = type
 
         InputOutputTransformer.validateMessageForValue(json, ["clos"])
-        clos = json["clos"]
+        clos = json["clos"][:]
+
+        # Array of parcels from the message. This array will help us extracting fields if for example,
+        # some CLO only has parcel ID instead of all the information about this parcel!
+        parcels_dict = None
+        json_parcels = list(json["parcels"])
+        if "parcels" in json:
+            parcels_dict = {element["id"]: element for element in json_parcels[:]}
 
         for clo in clos:
             InputOutputTransformer.validateMessageForValue(clo, ["id"])
@@ -233,14 +241,17 @@ class InputOutputTransformer:
                 # Extract station ID from given 'latitude' and 'longitude'.
                 csv_file = config_parser.get_csv_path(SLO_CRO_USE_CASE)
                 location_station_dict = CloUpdateHandler.extract_location_station_dict(csv_file)
-                station_id = location_station_dict[(str(location["latitude"]), str(location["longitude"]))]
+
+                if (str(location["latitude"]), str(location["longitude"])) in location_station_dict:
+                    station_id = location_station_dict[(str(location["latitude"]), str(location["longitude"]))]
+                else:
+                    # TODO: Check if service still works if current location of CLO is given with lat/lon instead of
+                    # station, because CLO can be outside the station when the request comes and this should work as well!
+                    station_id = clo['currentLocation'] = [location["latitude"], location["longitude"]]
 
                 clo['currentLocation'] = station_id
             else:
-                clo['currentLocation'] = [
-                    location["latitude"],
-                    location["longitude"]
-                ]
+                clo['currentLocation'] = [location["latitude"], location["longitude"]]
             if "country" in location:
                 clo['country'] = location["country"]
 
@@ -262,139 +273,236 @@ class InputOutputTransformer:
                 clo["parcels"] = []
                 continue
 
-            parcels = clo["state"]["remaining_plan"]["steps"]
+            parcels = []
+            if "parcels" in clo["state"]:
+                parcels = clo["state"]["parcels"][:]
+
+            ########################################################################
+            # PARCELS ON THE VEHICLE (CLO)
+            ########################################################################
+
             clo_parcels = []
-
-            for parcel in parcels:
+            # Has parcels on the vehicle, go through them
+            parcel_dict_cpy = copy.deepcopy(parcels_dict)
+            for parcel_id in parcels:
+                parcel = parcel_dict_cpy[parcel_id]
                 InputOutputTransformer.validateMessageForValue(parcel, ["id"])
-                InputOutputTransformer.validateMessageForValue(parcel, ["payweight"])
 
-                parcel['UUIDParcel'] = parcel.pop('id')
-                parcel['weight'] = parcel.pop('payweight')
+                parcel['UUIDParcel'] = parcel['id']
+                parcel['weight'] = parcel['payweight']
 
-                InputOutputTransformer.validateMessageForValue(parcel, ["location"])
-                destination = parcel.pop('location')
+                InputOutputTransformer.validateMessageForValue(parcel, ["destination"])
+                destination = parcel['destination']
 
                 if payload["useCase"] == SLO_CRO_USE_CASE:
-                    InputOutputTransformer.validateMessageForValue(destination, ["station"])
-                    parcel['destination'] = destination["station"]
+                    parcel['destination'] = InputOutputTransformer.getStationIdOrCoordinates(destination)
                 else:
                     InputOutputTransformer.validateMessageForValue(destination, ["latitude", "longitude"])
-                    parcel['destination'] = [
-                        destination["latitude"],
-                        destination["longitude"]
-                    ]
+                    parcel['destination'] = [ destination["latitude"], destination["longitude"]]
                 if "country" in destination:
                     parcel['country'] = destination["country"]
-
                 clo_parcels.append(parcel)
 
             clo["parcels"] = clo_parcels
         payload["clos"] = clos
+
+        ########################################################################
+        # REMOVE BROKEN VEHICLE FROM CANDIDATES FOR DELIVERIES AND CREATE
+        # NEW ORDERS PLAN TO DELIVER REMAINING PARCELS FROM THE BROKEN VEHICLE
+        ########################################################################
 
         # TODO: This needs to be tested furthermore on examples provided by testers!!!
         if payload["eventType"] == "brokenVehicle":
             InputOutputTransformer.validateMessageForValue(json["event"], ["info"])
             InputOutputTransformer.validateMessageForValue(json["event"], ["info"])
             InputOutputTransformer.validateMessageForValue(json["event"]["info"], ["clo"])
-            broken_vehicle = json["event"]["info"]["clo"]
+            broken_clo = json["event"]["info"]["clo"]
+
+            # First thing we need to do is remove broken vehicle from the list of "clos" available for deliveries!
+            new_clos = []
+            for clo in json["clos"]:
+                # This vehicle is no longer useful, because it is broken!
+                if clo["id"] == broken_clo["id"]:
+                    continue
+                new_clos.append(clo)
+            payload["clos"] = new_clos
 
             current_location = None
-            if "info" in broken_vehicle:
-                if "location" in broken_vehicle["info"]:
-                    current_location = broken_vehicle["info"].pop('location')
+            if "info" in broken_clo:
+                if "location" in broken_clo["info"]:
+                    current_location = broken_clo["info"]['location']
 
                     if current_location["latitude"] is None or current_location["longitude"] is None:
                         current_location = None
 
-            if current_location is None and "state" in broken_vehicle:
-                if "location" in broken_vehicle["state"]:
-                    current_location = broken_vehicle["state"].pop('location')
+            if current_location is None and "state" in broken_clo:
+                if "location" in broken_clo["state"]:
+                    current_location = broken_clo["state"]['location']
 
             if payload["useCase"] == SLO_CRO_USE_CASE:
-                InputOutputTransformer.validateMessageForValue(current_location, ["station"])
-                broken_vehicle["currentLocation"] = current_location["station"]
+                broken_clo["currentLocation"] = InputOutputTransformer.getStationIdOrCoordinates(current_location)
             else:
                 InputOutputTransformer.validateMessageForValue(current_location, ["latitude", "longitude"])
-                broken_vehicle['currentLocation'] = [
-                    current_location["latitude"],
-                    current_location["longitude"]
-                ]
+                broken_clo['currentLocation'] = [current_location["latitude"], current_location["longitude"]]
+
+            # Assign location from 'country' field if exists or from name
+            broken_vehicle_country = None
             if "country" in current_location:
-                broken_vehicle['country'] = current_location["country"]
+                broken_vehicle_country = current_location["country"]
+            if broken_vehicle_country is None:
+                if broken_clo["id"].find("PS") != -1:
+                    broken_vehicle_country = "SLO"
+                elif broken_clo["id"].find("HP") != -1:
+                    broken_vehicle_country = "CRO"
+                elif broken_clo["id"].find("ELTA") != -1:
+                    broken_vehicle_country = "GREECE"
+            broken_clo['country'] = broken_vehicle_country
 
-            InputOutputTransformer.validateMessageForValue(broken_vehicle, ["state"])
-            state = broken_vehicle["state"]
+            InputOutputTransformer.validateMessageForValue(broken_clo, ["state"])
 
-            InputOutputTransformer.validateMessageForValue(state, ["parcels"])
-            parcels = []
-            for parcel in state["parcels"]:
+            orders = [] # Zero orders
+
+            # Current vehicle state at breakdown
+            vehicle_state = broken_clo["state"]
+            InputOutputTransformer.validateMessageForValue(vehicle_state, ["parcels"])
+            parcel_ids = vehicle_state["parcels"]
+
+            # Currently loaded parcels on the vehicle need to be delivered as well!
+            for parcel_id in parcel_ids:
+                parcel_dict_cpy = copy.deepcopy(parcels_dict)
+                if parcel_id not in parcel_dict_cpy:
+                    raise ValueError("Parcel with ID " + str(parcel_id) +
+                                     " not on the list of 'parcels'!")
+
+                # Package source is the location of the vehicle!
+                InputOutputTransformer.validateMessageForValue(vehicle_state, ["location"])
+
+                # Get parcel object.
+                vehicle_location = vehicle_state["location"]
+                parcel = parcel_dict_cpy[parcel_id]
                 parcel['UUIDParcel'] = parcel.pop('id')
                 parcel['weight'] = parcel.pop('payweight')
+                parcel["country"] = vehicle_location["country"]
 
+                # Pickup of these parcels is the vehicle's location!
+                if payload["useCase"] == SLO_CRO_USE_CASE:
+                    parcel['pickup'] = InputOutputTransformer.getStationIdOrCoordinates(vehicle_location)
+                else:
+                    InputOutputTransformer.validateMessageForValue(vehicle_location, ["latitude", "longitude"])
+                    parcel['pickup'] = [vehicle_location["latitude"], vehicle_location["longitude"]]
+
+                # Parse package destination
                 InputOutputTransformer.validateMessageForValue(parcel, ["destination"])
                 destination = parcel.pop('destination')
-
                 if payload["useCase"] == SLO_CRO_USE_CASE:
-                    InputOutputTransformer.validateMessageForValue(destination, ["station"])
-                    parcel['destination'] = destination["station"]
+                    parcel['destination'] = InputOutputTransformer.getStationIdOrCoordinates(destination)
                 else:
                     InputOutputTransformer.validateMessageForValue(destination, ["latitude", "longitude"])
-                    parcel['destination'] = [
-                        destination["latitude"],
-                        destination["longitude"]
-                    ]
-                if "country" in destination:
-                    parcel['country'] = destination["country"]
+                    parcel['destination'] = [destination["latitude"], destination["longitude"]]
 
-                # Append as last element
-                parcels.append(parcel)
+                orders.append(parcel)
 
-            broken_vehicle["parcels"] = parcels
-            payload["brokenVehicle"] = broken_vehicle
+            ########################################################################################
+            # REMAINING PLAN FOR BROKEN CLO (PICKUP PARCELS THAT BROKEN CLO SHOULD, BUT CANNOT)
+            ########################################################################################
+
+            if "remaining_plan" in vehicle_state and "steps" in vehicle_state["remaining_plan"]:
+                for step in vehicle_state["remaining_plan"]["steps"]:
+                    InputOutputTransformer.validateMessageForValue(step, ["id"])
+
+                    # Each step has 'load' or 'unload' array of parcel IDs to be delivered.
+                    # We are only interesed in the field 'load', since we will only "take"
+                    # parcels from broken CLO. Each of these parcels contain 'source' and
+                    # 'destination'.
+                    if 'load' in step:
+                        load = step["load"]
+                        if load is None or len(load) == 0:
+                            continue # Skip, no parcels to pickup
+
+                        parcels = []
+                        for parcel_id in load:
+                            parcel_dict_cpy = copy.deepcopy(parcels_dict)
+                            if parcel_id not in parcel_dict_cpy:
+                                raise ValueError("Parcel with ID " + str(parcel_id) +
+                                                 " not on the list of 'parcels'!")
+                            # Get parcel object
+                            parcels.append(parcel_dict_cpy[parcel_id])
+
+                        new_orders = InputOutputTransformer.buildOrdersFromParcels(parcels, payload["useCase"])
+                        orders.extend(new_orders)
+
+            # broken_clo["parcels"] = orders
+            payload["orders"] = orders # Orders that need to be processed by the remaining CLOs
         else:
-            orders = []
+            parcels = []
             if json["parcels"] is not None:
-                orders = json["parcels"]
-
-            for parcel in orders:
-                parcel['UUIDParcel'] = parcel.pop('id')
-                parcel['weight'] = parcel.pop('payweight')
-
-                InputOutputTransformer.validateMessageForValue(parcel, ["destination"])
-                # Destination field is a JSON object
-                destination = parcel.pop('destination')
-
-                if payload["useCase"] == SLO_CRO_USE_CASE:
-                    InputOutputTransformer.validateMessageForValue(destination, ["station"])
-                    parcel['destination'] = destination["station"]
-                else:
-                    InputOutputTransformer.validateMessageForValue(destination, ["latitude", "longitude"])
-                    parcel['destination'] = [
-                        destination["latitude"],
-                        destination["longitude"]
-                    ]
-                if "country" in destination:
-                    parcel['country'] = destination["country"]
-
-                InputOutputTransformer.validateMessageForValue(parcel, ["source"])
-                # Pickup field is a JSON object
-                pickup = parcel.pop("source")
-
-                if payload["useCase"] == SLO_CRO_USE_CASE:
-                    InputOutputTransformer.validateMessageForValue(pickup, ["station"])
-                    parcel['pickup'] = pickup["station"]
-                else:
-                    InputOutputTransformer.validateMessageForValue(pickup, ["latitude", "longitude"])
-                    parcel['pickup'] = [
-                      pickup["latitude"],
-                      pickup["longitude"]
-                    ]
-                if "country" in pickup:
-                    parcel['country'] = pickup["country"]
+                parcels = json["parcels"]
+            orders = InputOutputTransformer.buildOrdersFromParcels(parcels, payload["useCase"])
             payload["orders"] = orders
 
         return payload
+
+    @staticmethod
+    def getStationIdOrCoordinates(location_dict):
+        station = None
+        if "station" in location_dict:
+            station = location_dict["station"]
+
+        current_lat = None
+        current_lon = None
+        if station is None and ("latitude" in location_dict and "longitude" in location_dict):
+            current_lat = location_dict["latitude"]
+            current_lon = location_dict["longitude"]
+            station = [current_lat, current_lon]
+
+        if station is None and (current_lat is None or current_lon is None):
+            raise ValueError("location info should have a non-NULL fields 'station' "
+                             "or 'latitude' and 'longitude'!")
+        return station
+
+    @staticmethod
+    def buildOrdersFromParcels(parcels, use_case):
+        # Goes through parcels and builds an array of orders to be delivered
+        orders = []
+
+        for parcel in parcels:
+            parcel['UUIDParcel'] = parcel.pop('id')
+            parcel['weight'] = parcel.pop('payweight')
+
+            InputOutputTransformer.validateMessageForValue(parcel, ["destination"])
+            # Destination field is a JSON object
+            destination = parcel.pop('destination')
+
+            if use_case == SLO_CRO_USE_CASE:
+                parcel['destination'] = InputOutputTransformer.getStationIdOrCoordinates(destination)
+            else:
+                InputOutputTransformer.validateMessageForValue(destination, ["latitude", "longitude"])
+                parcel['destination'] = [
+                    destination["latitude"],
+                    destination["longitude"]
+                ]
+            if "country" in destination:
+                parcel['country'] = destination["country"]
+
+            InputOutputTransformer.validateMessageForValue(parcel, ["source"])
+
+            # Pickup field is a JSON object
+            pickup = parcel.pop("source")
+
+            if use_case == SLO_CRO_USE_CASE:
+                parcel['pickup'] = InputOutputTransformer.getStationIdOrCoordinates(pickup)
+            else:
+                InputOutputTransformer.validateMessageForValue(pickup, ["latitude", "longitude"])
+                parcel['pickup'] = [
+                    pickup["latitude"],
+                    pickup["longitude"]
+                ]
+            if "country" in pickup:
+                parcel['country'] = pickup["country"]
+
+            orders.append(parcel)
+
+        return orders
 
     @staticmethod
     def incorrectFormatMessage(message):

@@ -345,7 +345,6 @@ class VrpProcessor:
                 country = None
                 if "country" in parcel:
                     country = parcel["country"]
-
                 parcels.append(Parcel(parcel["UUIDParcel"], parcel["destination"],
                                       parcel["weight"], clo["currentLocation"], country=country))
             capacity = clo["capacity"] - len(parcels)
@@ -366,8 +365,8 @@ class VrpProcessor:
             # list of additional parcels from request
             if evt_type == "brokenVehicle":
                 deliveries_diff = [Parcel(x["UUIDParcel"], x["destination"],
-                                          x["weight"], requests["currentLocation"], "order", country=x["country"]) for x in
-                                   requests["parcels"]]
+                                          x["weight"], x["pickup"],
+                                          "order", country=x["country"]) for x in requests]
             elif evt_type == "pickupRequest":
                 deliveries_diff = [Parcel(x["UUIDParcel"], x["destination"],
                                           x["weight"], x["pickup"],
@@ -465,7 +464,7 @@ class VrpProcessor:
                         parcel.target = slo_border_nodes[0]
                 delivery_parts[1].append(parcel)
             else:
-                print("Current parcel location is not 'S' nor 'H'!")
+                print("Current parcel country is not 'SLO' nor 'CRO'!")
                 exit(1)
 
         return delivery_parts

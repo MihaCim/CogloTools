@@ -119,17 +119,20 @@ class RecReq(Resource):
         with open('response.json', 'w') as outfile:
             json.dump(content, outfile)
 
-        try:
-            response = requests.post(response_validation_url, json = recommendations, headers=headers, verify=False).json()
-            print("validation code for recommendations message: ", response)
-        except Exception as ex:
-            print("Error occurred while validating response in validation service", ex)
+        # TODO: Remove
+        print("response", recommendations)
 
-        try:
-            response = requests.post(msb_post_url, json = content, headers=headers, verify=False)
-            print("response from MSB:", response)
-        except Exception as ex:
-            print("Error occurred while posting response to MSB", ex)
+        # try:
+            # response = requests.post(response_validation_url, json = recommendations, headers=headers, verify=False).json()
+            # print("validation code for recommendations message: ", response)
+        # except Exception as ex:
+        #     print("Error occurred while validating response in validation service", ex)
+
+        # try:
+            # response = requests.post(msb_post_url, json = content, headers=headers, verify=False)
+            # print("response from MSB:", response)
+        # except Exception as ex:
+        #     print("Error occurred while posting response to MSB", ex)
 
 @app.route("/api/adhoc/getRecommendation", methods=['POST'])
 def handle_recommendation_request():
@@ -740,10 +743,10 @@ def handle_recommendation_request():
         clos = data["clos"]
 
         if evt_type == "brokenVehicle":
-            if "clos" not in data or "brokenVehicle" not in data:
-                return {"msg": "Parameter 'clos' or 'BrokenVehicle' is missing", "status": 0}
-            broken_clo = data["brokenVehicle"]
-            recommendations = RecReq.process_broken_clo(evt_type, clos, broken_clo, vrp_processor_ref, use_case)
+            if "clos" not in data or "orders" not in data:
+                return {"msg": "Parameter 'clos' or 'orders' is missing", "status": 0}
+            broken_clo_orders = data["orders"]
+            recommendations = RecReq.process_broken_clo(evt_type, clos, broken_clo_orders, vrp_processor_ref, use_case)
         elif evt_type == "pickupRequest":
             if "clos" not in data or "orders" not in data:
                 return {"msg": "Parameter 'clos' or 'orders' is missing", "status": 0}
