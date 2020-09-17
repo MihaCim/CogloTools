@@ -229,6 +229,8 @@ class VrpProcessor:
                             deliveries_req.remove(deliveries_req[j])
                             vehicle_load_diff -= pay_weight
                             break
+
+
             loads_new.append(self.map_dropoff(graph, vehicle.parcels))
 
         for i, vehicle_load in enumerate(loads_new):
@@ -342,18 +344,10 @@ class VrpProcessor:
         for clo in clos:
             parcels = []
             for parcel in clo["parcels"]:
-                country = None
-                if "country" in parcel:
-                    country = parcel["country"]
-
                 parcels.append(Parcel(parcel["UUIDParcel"], parcel["destination"],
-                                      parcel["weight"], clo["currentLocation"], country=country))
+                                      parcel["weight"], clo["currentLocation"], country=parcel["country"]))
             capacity = clo["capacity"] - len(parcels)
-
-            clo_country = None
-            if "country" in clo:
-                clo_country = clo["country"]
-            vehicles.append(Vehicle(clo["UUID"], clo["currentLocation"], parcels, capacity, country=clo_country))
+            vehicles.append(Vehicle(clo["UUID"], clo["currentLocation"], parcels, capacity, country=clo["country"]))
         return vehicles
 
     @staticmethod
@@ -366,8 +360,8 @@ class VrpProcessor:
             # list of additional parcels from request
             if evt_type == "brokenVehicle":
                 deliveries_diff = [Parcel(x["UUIDParcel"], x["destination"],
-                                          x["weight"], requests["currentLocation"], "order", country=x["country"]) for x in
-                                   requests["parcels"]]
+                                          x["weight"], x["pickup"],
+                                          "order", country=x["country"]) for x in requests]
             elif evt_type == "pickupRequest":
                 deliveries_diff = [Parcel(x["UUIDParcel"], x["destination"],
                                           x["weight"], x["pickup"],
@@ -395,12 +389,8 @@ class VrpProcessor:
             # list of parcels on CLOs before request
             for clo in clos:
                 for parcel in clo["parcels"]:
-                    country = None
-                    if "country" in parcel:
-                        country = parcel["country"]
-
                     deliveries_origin.append(Parcel(parcel["UUIDParcel"], parcel["destination"],
-                                                    parcel["weight"], clo["currentLocation"], country=country))
+                                                    parcel["weight"], clo["currentLocation"], country=parcel["country"]))
             deliveries = Deliveries(deliveries_origin, deliveries_diff)
 
             return deliveries
@@ -444,8 +434,8 @@ class VrpProcessor:
         """
         delivery_parts = [[],[]] # First one is for SLO nodes, Second one is for CRO nodes
         for parcel in deliveries:
-            if SLOVENIA == parcel.country:
-                if CROATIA == parcel.country:
+            if SLOVENIA == parcel.country: # Source country
+                if parcel.target.startswith("CRO") or parcel.target.startswith("HP"):
                     # assign closest cro border node
                     cro_border_nodes = config_parser.get_border_nodes_cro()
                     if event_type == "crossBorder":
@@ -454,8 +444,8 @@ class VrpProcessor:
                         # TODO: assign the closest node instead of the first one
                         parcel.target = cro_border_nodes[0]
                 delivery_parts[0].append(parcel)
-            elif CROATIA == parcel.country:
-                if SLOVENIA == parcel.country:
+            elif CROATIA == parcel.country: # Source country
+                if parcel.target.startswith("SLO") or parcel.target.startswith("PS"):
                     # assign closest slo border node
                     slo_border_nodes = config_parser.get_border_nodes_slo()
                     if event_type == "crossBorder":
@@ -465,7 +455,9 @@ class VrpProcessor:
                         parcel.target = slo_border_nodes[0]
                 delivery_parts[1].append(parcel)
             else:
-                print("Current parcel location is not 'S' nor 'H'!")
+                print("Current parcel country is not 'SLO' nor 'CRO'! Data: ",
+                      parcel.uuid, ", target: ", parcel.target, ", location now:", parcel.current_location,
+                      ", type: ", parcel.type, ", country: ", parcel.country)
                 exit(1)
 
         return delivery_parts
