@@ -7,7 +7,7 @@
         "name": "PS truck 001",
         "type": "transportation means",
         "subtype": "vehicle",
-        "capacity": 400,
+        "capacity": 1000,
         "location": {
           "city": null,
           "country": null,
@@ -482,7 +482,7 @@
         "name": "PS truck 002",
         "type": "transportation means",
         "subtype": "vehicle",
-        "capacity": 200,
+        "capacity": 1000,
         "location": {
           "city": null,
           "country": null,
@@ -12017,12 +12017,12 @@
     "id": "09bdac42-b30a-4bf9-b668-6ba7656c70d0",
     "info": {
       "clo": {
-        "id": "PSvehicle10",
+        "id": "PSvehicle11",
         "info": {
           "name": "PS truck 001",
           "type": "transportation means",
           "subtype": "vehicle",
-          "capacity": 400,
+          "capacity": 1000,
           "location": {
             "city": null,
             "country": null,

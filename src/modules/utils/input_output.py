@@ -1,13 +1,15 @@
-from datetime import datetime
-from ..create_graph.config.config_parser import ConfigParser
-from ..utils.clo_update_handler import CloUpdateHandler
 import copy
+import csv
+from datetime import datetime
+
+import numpy as np
+
+from ..create_graph.config.config_parser import ConfigParser
 
 config_parser = ConfigParser()
 
 ELTA_USE_CASE = "ELTA"
 SLO_CRO_USE_CASE = "SLO-CRO"
-
 
 class InputOutputTransformer:
     @staticmethod
@@ -168,7 +170,7 @@ class InputOutputTransformer:
         }
 
     @staticmethod
-    def parse_received_recommendation_message(json):
+    def parse_received_recommendation_message(json, transformation_map):
         InputOutputTransformer.validateMessageForValue(json, ["organization"])
         InputOutputTransformer.validateMessageForValue(json, ["request"])
         payload = {
@@ -239,21 +241,24 @@ class InputOutputTransformer:
             InputOutputTransformer.validateMessageForValue(location, ["latitude", "longitude"])
             if payload["useCase"] == SLO_CRO_USE_CASE:
                 # Extract station ID from given 'latitude' and 'longitude'.
-                csv_file = config_parser.get_csv_path(SLO_CRO_USE_CASE)
-                location_station_dict = CloUpdateHandler.extract_location_station_dict(csv_file)
+                # location_station_dict = CloUpdateHandler.extract_location_station_dict(csv_file)
 
-                if (str(location["latitude"]), str(location["longitude"])) in location_station_dict:
-                    station_id = location_station_dict[(str(location["latitude"]), str(location["longitude"]))]
-                else:
-                    # TODO: Check if service still works if current location of CLO is given with lat/lon instead of
-                    # station, because CLO can be outside the station when the request comes and this should work as well!
-                    station_id = clo['currentLocation'] = [location["latitude"], location["longitude"]]
+                station_id = InputOutputTransformer.getStationIdOrClosest(
+                    location, config_parser.get_csv_path(SLO_CRO_USE_CASE), transformation_map)
+                #
+                # if (str(location["latitude"]), str(location["longitude"])) in location_station_dict:
+                #     station_id = location_station_dict[(str(location["latitude"]), str(location["longitude"]))]
+                # else:
+                #     station_id = CloUpdateHandler.map_to_closest_node(csv_file, location["latitude"], location["longitude"])
 
                 clo['currentLocation'] = station_id
             else:
                 clo['currentLocation'] = [location["latitude"], location["longitude"]]
             if "country" in location:
                 clo['country'] = location["country"]
+
+            if clo['country'] is None and payload["useCase"] == SLO_CRO_USE_CASE:
+                clo["country"] = "SLO" if clo["id"].startswith("PS") else "CRO"
 
             InputOutputTransformer.validateMessageForValue(clo, ["info"])
             InputOutputTransformer.validateMessageForValue(clo["info"], ["capacity"])
@@ -282,6 +287,7 @@ class InputOutputTransformer:
             ########################################################################
 
             clo_parcels = []
+
             # Has parcels on the vehicle, go through them
             parcel_dict_cpy = copy.deepcopy(parcels_dict)
             for parcel_id in parcels:
@@ -293,14 +299,15 @@ class InputOutputTransformer:
 
                 InputOutputTransformer.validateMessageForValue(parcel, ["destination"])
                 destination = parcel['destination']
+                parcel["country"] = clo["country"]
 
                 if payload["useCase"] == SLO_CRO_USE_CASE:
-                    parcel['destination'] = InputOutputTransformer.getStationIdOrCoordinates(destination)
+                    csv_file = config_parser.get_csv_path(SLO_CRO_USE_CASE)
+                    station_id = InputOutputTransformer.getStationIdOrClosest(destination, csv_file, transformation_map, parcel['id'])
+                    parcel['destination'] = station_id
                 else:
                     InputOutputTransformer.validateMessageForValue(destination, ["latitude", "longitude"])
-                    parcel['destination'] = [ destination["latitude"], destination["longitude"]]
-                if "country" in destination:
-                    parcel['country'] = destination["country"]
+                    parcel['destination'] = [destination["latitude"], destination["longitude"]]
                 clo_parcels.append(parcel)
 
             clo["parcels"] = clo_parcels
@@ -320,7 +327,7 @@ class InputOutputTransformer:
 
             # First thing we need to do is remove broken vehicle from the list of "clos" available for deliveries!
             new_clos = []
-            for clo in json["clos"]:
+            for clo in payload["clos"]:
                 # This vehicle is no longer useful, because it is broken!
                 if clo["id"] == broken_clo["id"]:
                     continue
@@ -340,7 +347,9 @@ class InputOutputTransformer:
                     current_location = broken_clo["state"]['location']
 
             if payload["useCase"] == SLO_CRO_USE_CASE:
-                broken_clo["currentLocation"] = InputOutputTransformer.getStationIdOrCoordinates(current_location)
+                station_id = InputOutputTransformer.getStationIdOrClosest(
+                    current_location, config_parser.get_csv_path(SLO_CRO_USE_CASE), transformation_map)
+                broken_clo["currentLocation"] = station_id
             else:
                 InputOutputTransformer.validateMessageForValue(current_location, ["latitude", "longitude"])
                 broken_clo['currentLocation'] = [current_location["latitude"], current_location["longitude"]]
@@ -384,9 +393,14 @@ class InputOutputTransformer:
                 parcel['weight'] = parcel.pop('payweight')
                 parcel["country"] = vehicle_location["country"]
 
+                if parcel["country"] is None and payload["useCase"] == SLO_CRO_USE_CASE:
+                    parcel["country"] = "SLO" if parcel["UUIDParcel"].startswith("PS") else "CRO"
+
                 # Pickup of these parcels is the vehicle's location!
                 if payload["useCase"] == SLO_CRO_USE_CASE:
-                    parcel['pickup'] = InputOutputTransformer.getStationIdOrCoordinates(vehicle_location)
+                    station_id = InputOutputTransformer.getStationIdOrClosest(
+                        vehicle_location, config_parser.get_csv_path(SLO_CRO_USE_CASE), transformation_map)
+                    parcel['pickup'] = station_id
                 else:
                     InputOutputTransformer.validateMessageForValue(vehicle_location, ["latitude", "longitude"])
                     parcel['pickup'] = [vehicle_location["latitude"], vehicle_location["longitude"]]
@@ -395,7 +409,9 @@ class InputOutputTransformer:
                 InputOutputTransformer.validateMessageForValue(parcel, ["destination"])
                 destination = parcel.pop('destination')
                 if payload["useCase"] == SLO_CRO_USE_CASE:
-                    parcel['destination'] = InputOutputTransformer.getStationIdOrCoordinates(destination)
+                    station_id = InputOutputTransformer.getStationIdOrClosest(destination,
+                                                        config_parser.get_csv_path(SLO_CRO_USE_CASE), transformation_map, parcel_id)
+                    parcel['destination'] = station_id
                 else:
                     InputOutputTransformer.validateMessageForValue(destination, ["latitude", "longitude"])
                     parcel['destination'] = [destination["latitude"], destination["longitude"]]
@@ -428,7 +444,7 @@ class InputOutputTransformer:
                             # Get parcel object
                             parcels.append(parcel_dict_cpy[parcel_id])
 
-                        new_orders = InputOutputTransformer.buildOrdersFromParcels(parcels, payload["useCase"])
+                        new_orders = InputOutputTransformer.buildOrdersFromParcels(parcels, payload["useCase"], transformation_map)
                         orders.extend(new_orders)
 
             # broken_clo["parcels"] = orders
@@ -437,13 +453,13 @@ class InputOutputTransformer:
             parcels = []
             if json["parcels"] is not None:
                 parcels = json["parcels"]
-            orders = InputOutputTransformer.buildOrdersFromParcels(parcels, payload["useCase"])
+            orders = InputOutputTransformer.buildOrdersFromParcels(parcels, payload["useCase"], transformation_map)
             payload["orders"] = orders
 
         return payload
 
     @staticmethod
-    def getStationIdOrCoordinates(location_dict):
+    def getStationIdOrClosest(location_dict, csv_file_path, transformation_map, parcel_id = None):
         station = None
         if "station" in location_dict:
             station = location_dict["station"]
@@ -453,7 +469,28 @@ class InputOutputTransformer:
         if station is None and ("latitude" in location_dict and "longitude" in location_dict):
             current_lat = location_dict["latitude"]
             current_lon = location_dict["longitude"]
-            station = [current_lat, current_lon]
+
+            distances = {} # Dict of distances between initial location and all the nodes in CSV file
+            # Open file and read line by line
+            with open(csv_file_path, encoding="utf8") as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter=',')
+
+                for row in csv_reader:
+                    id = row[1]
+                    lat = row[2]
+                    lon = row[3]
+
+                    a = np.array((float(lat), float(lon)))
+                    b = np.array((float(current_lat), float(current_lon)))
+
+                    distances[id] = np.linalg.norm(a - b)
+
+                csv_file.close()
+
+                if parcel_id is not None:
+                    transformation_map.map(parcel_id, [current_lat, current_lon])
+
+                station = min(distances, key=distances.get)
 
         if station is None and (current_lat is None or current_lon is None):
             raise ValueError("location info should have a non-NULL fields 'station' "
@@ -461,7 +498,7 @@ class InputOutputTransformer:
         return station
 
     @staticmethod
-    def buildOrdersFromParcels(parcels, use_case):
+    def buildOrdersFromParcels(parcels, use_case, transformation_map):
         # Goes through parcels and builds an array of orders to be delivered
         orders = []
 
@@ -474,7 +511,9 @@ class InputOutputTransformer:
             destination = parcel.pop('destination')
 
             if use_case == SLO_CRO_USE_CASE:
-                parcel['destination'] = InputOutputTransformer.getStationIdOrCoordinates(destination)
+                station_id = InputOutputTransformer.getStationIdOrClosest(
+                    destination, config_parser.get_csv_path(SLO_CRO_USE_CASE), transformation_map)
+                parcel['destination'] = station_id
             else:
                 InputOutputTransformer.validateMessageForValue(destination, ["latitude", "longitude"])
                 parcel['destination'] = [
@@ -490,15 +529,15 @@ class InputOutputTransformer:
             pickup = parcel.pop("source")
 
             if use_case == SLO_CRO_USE_CASE:
-                parcel['pickup'] = InputOutputTransformer.getStationIdOrCoordinates(pickup)
+                station_id = InputOutputTransformer.getStationIdOrClosest(
+                    pickup, config_parser.get_csv_path(SLO_CRO_USE_CASE), transformation_map, parcel["UUIDParcel"])
+                parcel['pickup'] = station_id
             else:
                 InputOutputTransformer.validateMessageForValue(pickup, ["latitude", "longitude"])
                 parcel['pickup'] = [
                     pickup["latitude"],
                     pickup["longitude"]
                 ]
-            if "country" in pickup:
-                parcel['country'] = pickup["country"]
 
             orders.append(parcel)
 
@@ -519,7 +558,7 @@ class InputOutputTransformer:
         return None
 
     @staticmethod
-    def prepare_output_message(recommendations, use_case, request_id):
+    def prepare_output_message(recommendations, use_case, request_id, organization):
         # TODO: Replace location_id in messages to be in form of:
         # "location": { "latitude" : "xxx", "longitude": "xxx", "station": location_id}
 
@@ -530,6 +569,11 @@ class InputOutputTransformer:
         counter = 0
         for clo_plan in recommendations:
             counter+=1
+
+            plan_organization = "ELTA"
+            if use_case == SLO_CRO_USE_CASE:
+                plan_organization = "PS" if clo_plan["UUID"].startswith("PS") else "HP"
+
             recommendation_text = "%srecommendation%s" % (use_case, counter)
             plan_id = "%splan%s" % (use_case, counter)
             message = {
@@ -537,16 +581,79 @@ class InputOutputTransformer:
                 "id": recommendation_text,
                 "plan": {
                     "id": plan_id,
-                    "organization": use_case,
+                    "organization": plan_organization,
                     "execution_date": datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
-                    "recommendation": recommendation_id,
+                    "recommendation": request_id,
                     "steps": clo_plan["route"]
                 }
             }
             clo_plans.append(message)
 
         return {
-            "organization": use_case,
-            "id": request_id, # TODO: Previously it was recommendation_id which might be correct!
+            "organization": organization,
+            "id": request_id,
             "cloplans": clo_plans
         }
+
+    @staticmethod
+    def revert_coordinates(recommendations, transformation_map):
+        new_route_locations = []
+        for recommendation in recommendations:
+            last_id = 0
+            if "route" in recommendation:
+                routes = recommendation["route"]
+
+                for route in routes:
+                    last_id = int(route["id"])
+                    load = route["load"]
+
+                    for parcel_id in load:
+                        if parcel_id in transformation_map.keys():
+                            # Remove parcel from the 'load' and add it's ID with new locations in the dictionary
+                            load.remove(parcel_id)
+                            parcel_location_lat_lon = transformation_map.get(parcel_id)
+
+                            added_to_array = False
+                            for parcel_object in new_route_locations:
+                                location = parcel_object.location
+
+                                if location[0] == parcel_location_lat_lon[0] and location[1] == parcel_location_lat_lon[1]:
+                                    parcel_object.addParcel(parcel_id)
+                                    added_to_array = True
+                                    continue
+                            # Wasn't added to array, add new key and value
+                            if not added_to_array:
+                                parcel_loc = ParcelLocation(parcel_location_lat_lon, parcel_id)
+                                new_route_locations.append(parcel_loc)
+
+                for parcel_object in new_route_locations:
+                    location = parcel_object.location
+
+                    last_id = last_id + 1
+                    routes.append({
+                        "id": str(last_id),
+                        "rank": str(last_id),
+                        "complete": 0,
+                        "due_time": None,
+                        "load": parcel_object.parcels, # Array of parcels
+                        "unload": [],
+                        "location": {'city': None, 'country': None, 'address': None,
+                                     'latitude': location[0], 'longitude': location[1],
+                                     'station': "station " + str(last_id), 'postal_code': None
+                                     }
+                    })
+
+                recommendation["route"] = routes
+
+        return recommendations
+
+class ParcelLocation:
+    """
+    Used for adding parcels to array which are meant for the same location.
+    """
+    def __init__(self, location, parcel):
+        self.location = location
+        self.parcels = [parcel]
+
+    def addParcel(self, parcel):
+        self.parcels.append(parcel)
