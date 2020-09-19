@@ -813,11 +813,10 @@ def handle_recommendation_request():
             data_requests = data_request["orders"]
             recommendations = RecReq.process_pickup_requests(evt_type, clos, data_requests, vrp_processor_ref, use_case)
         elif evt_type == "brokenVehicle":
-            if "brokenVehicle" not in data_request:
-                return {"msg": "Parameter 'BrokenVehicle' is missing", "status": 0}
-            broken_clo = data_request["brokenVehicle"]
-            recommendations = RecReq.process_broken_clo(evt_type, clos, broken_clo, vrp_processor_ref, use_case)
-
+            if "clos" not in data or "orders" not in data:
+                return {"msg": "Parameter 'clos' or 'orders' is missing", "status": 0}
+            broken_clo_orders = data["orders"]
+            recommendations = RecReq.process_broken_clo(evt_type, clos, broken_clo_orders, vrp_processor_ref, use_case)
         elif evt_type == "pickupRequest":
             if "orders" not in data_request:
                 return {"msg": "Parameter 'orders' is missing", "status": 0}
