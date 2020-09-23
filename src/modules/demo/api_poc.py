@@ -116,7 +116,12 @@ class RecReq(Resource):
             "message": json_for_serialization
         }
 
-        with open('response.json', 'w') as outfile:
+        print("Storing message for validation service...")
+        with open('validation_service_message_posted.json', 'w') as outfile:
+            json.dump(recommendations, outfile)
+
+        print("Storing message content posted...")
+        with open('content_message_posted.json', 'w') as outfile:
             json.dump(content, outfile)
 
         print("posting response to validation URL: " + response_validation_url)

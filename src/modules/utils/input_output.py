@@ -520,13 +520,13 @@ class InputOutputTransformer:
                     destination["latitude"],
                     destination["longitude"]
                 ]
-            if "country" in destination:
-                parcel['country'] = destination["country"]
 
             InputOutputTransformer.validateMessageForValue(parcel, ["source"])
 
             # Pickup field is a JSON object
             pickup = parcel.pop("source")
+            if "country" in pickup:
+                parcel['country'] = pickup["country"]
 
             if use_case == SLO_CRO_USE_CASE:
                 station_id = InputOutputTransformer.getStationIdOrClosest(
