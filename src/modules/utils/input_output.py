@@ -419,35 +419,16 @@ class InputOutputTransformer:
                 orders.append(parcel)
 
             ########################################################################################
+            # GO THROUGH AVAILABLE VEHICLES AND PUT CURRENT LOAD ORDERS IN ARRAY OF PARCELS
+            ########################################################################################
+            for remaining_clo in new_clos:
+                orders.extend(InputOutputTransformer.updateOrdersList(remaining_clo, payload, parcels_dict, transformation_map))
+
+            ########################################################################################
             # REMAINING PLAN FOR BROKEN CLO (PICKUP PARCELS THAT BROKEN CLO SHOULD, BUT CANNOT)
             ########################################################################################
+            orders.extend(InputOutputTransformer.updateOrdersList(broken_clo, payload, parcels_dict, transformation_map))
 
-            if "remaining_plan" in vehicle_state and "steps" in vehicle_state["remaining_plan"]:
-                for step in vehicle_state["remaining_plan"]["steps"]:
-                    InputOutputTransformer.validateMessageForValue(step, ["id"])
-
-                    # Each step has 'load' or 'unload' array of parcel IDs to be delivered.
-                    # We are only interesed in the field 'load', since we will only "take"
-                    # parcels from broken CLO. Each of these parcels contain 'source' and
-                    # 'destination'.
-                    if 'load' in step:
-                        load = step["load"]
-                        if load is None or len(load) == 0:
-                            continue # Skip, no parcels to pickup
-
-                        parcels = []
-                        for parcel_id in load:
-                            parcel_dict_cpy = copy.deepcopy(parcels_dict)
-                            if parcel_id not in parcel_dict_cpy:
-                                raise ValueError("Parcel with ID " + str(parcel_id) +
-                                                 " not on the list of 'parcels'!")
-                            # Get parcel object
-                            parcels.append(parcel_dict_cpy[parcel_id])
-
-                        new_orders = InputOutputTransformer.buildOrdersFromParcels(parcels, payload["useCase"], transformation_map)
-                        orders.extend(new_orders)
-
-            # broken_clo["parcels"] = orders
             payload["orders"] = orders # Orders that need to be processed by the remaining CLOs
         else:
             parcels = []
@@ -457,6 +438,33 @@ class InputOutputTransformer:
             payload["orders"] = orders
 
         return payload
+
+    @staticmethod
+    def updateOrdersList(clo, payload, parcels_dict, transformation_map):
+        new_orders = []
+        clo_state = clo["state"]
+
+        if "remaining_plan" in clo_state and "steps" in clo_state["remaining_plan"]:
+            for step in clo_state["remaining_plan"]["steps"]:
+                InputOutputTransformer.validateMessageForValue(step, ["id"])
+                if 'load' in step:
+                    load = step["load"]
+                    if load is None or len(load) == 0:
+                        continue  # Skip, no parcels in vehicle plan
+
+                    parcels = []
+                    for parcel_id in load:
+                        parcel_dict_cpy = copy.deepcopy(parcels_dict)
+                        if parcel_id not in parcel_dict_cpy:
+                            raise ValueError("Parcel with ID " + str(parcel_id) +
+                                             " not on the list of 'parcels'!")
+                        # Get parcel object
+                        parcels.append(parcel_dict_cpy[parcel_id])
+
+                    new_orders = InputOutputTransformer.buildOrdersFromParcels(
+                        parcels, payload["useCase"], transformation_map)
+
+        return new_orders
 
     @staticmethod
     def getStationIdOrClosest(location_dict, csv_file_path, transformation_map, parcel_id = None):
