@@ -227,38 +227,28 @@ class InputOutputTransformer:
             clo["UUID"] = clo["id"]
 
             location = None
-            if "info" in clo:
-                if "location" in clo["info"]:
-                    location = clo["info"].pop('location')
+            if "state" in clo and "location" in clo["state"]:
+                location = clo["state"].pop('location')
 
-                    if location["latitude"] is None or location["longitude"] is None:
-                        location = None
-
-            if location is None and "state" in clo:
-                if "location" in clo["state"]:
-                    location = clo["state"].pop('location')
+                if location["latitude"] is None or location["longitude"] is None:
+                    location = None
 
             InputOutputTransformer.validateMessageForValue(location, ["latitude", "longitude"])
             if payload["useCase"] == SLO_CRO_USE_CASE:
                 # Extract station ID from given 'latitude' and 'longitude'.
                 # location_station_dict = CloUpdateHandler.extract_location_station_dict(csv_file)
-
                 station_id = InputOutputTransformer.getStationIdOrClosest(
                     location, config_parser.get_csv_path(SLO_CRO_USE_CASE), transformation_map)
-                #
-                # if (str(location["latitude"]), str(location["longitude"])) in location_station_dict:
-                #     station_id = location_station_dict[(str(location["latitude"]), str(location["longitude"]))]
-                # else:
-                #     station_id = CloUpdateHandler.map_to_closest_node(csv_file, location["latitude"], location["longitude"])
-
                 clo['currentLocation'] = station_id
             else:
                 clo['currentLocation'] = [location["latitude"], location["longitude"]]
-            if "country" in location:
-                clo['country'] = location["country"]
 
-            if clo['country'] is None and payload["useCase"] == SLO_CRO_USE_CASE:
+            if "country" in location and location["country"] is not None:
+                clo['country'] = location["country"]
+            elif payload["useCase"] == SLO_CRO_USE_CASE:
                 clo["country"] = "SLO" if clo["id"].startswith("PS") else "CRO"
+            else:
+                clo["country"] = "GREECE"
 
             InputOutputTransformer.validateMessageForValue(clo, ["info"])
             InputOutputTransformer.validateMessageForValue(clo["info"], ["capacity"])
@@ -310,7 +300,7 @@ class InputOutputTransformer:
                     parcel['destination'] = [destination["latitude"], destination["longitude"]]
                 clo_parcels.append(parcel)
 
-            clo["parcels"] = clo_parcels
+            clo["parcels"] = clo_parcels # Parcels already on the vehicle!
         payload["clos"] = clos
 
         ########################################################################
@@ -320,7 +310,6 @@ class InputOutputTransformer:
 
         # TODO: This needs to be tested furthermore on examples provided by testers!!!
         if payload["eventType"] == "brokenVehicle":
-            InputOutputTransformer.validateMessageForValue(json["event"], ["info"])
             InputOutputTransformer.validateMessageForValue(json["event"], ["info"])
             InputOutputTransformer.validateMessageForValue(json["event"]["info"], ["clo"])
             broken_clo = json["event"]["info"]["clo"]
@@ -335,16 +324,17 @@ class InputOutputTransformer:
             payload["clos"] = new_clos
 
             current_location = None
-            if "info" in broken_clo:
-                if "location" in broken_clo["info"]:
-                    current_location = broken_clo["info"]['location']
+            InputOutputTransformer.validateMessageForValue(broken_clo, ["info"])
+            InputOutputTransformer.validateMessageForValue(broken_clo, ["state"])
+            InputOutputTransformer.validateMessageForValue(broken_clo["state"], ["location"])
+            InputOutputTransformer.validateMessageForValue(broken_clo["state"]["location"], ["latitude"])
+            InputOutputTransformer.validateMessageForValue(broken_clo["state"]["location"], ["longitude"])
 
-                    if current_location["latitude"] is None or current_location["longitude"] is None:
-                        current_location = None
+            if "state" in broken_clo and "location" in broken_clo["state"]:
+                current_location = broken_clo["state"]['location']
 
-            if current_location is None and "state" in broken_clo:
-                if "location" in broken_clo["state"]:
-                    current_location = broken_clo["state"]['location']
+                if current_location["latitude"] is None or current_location["longitude"] is None:
+                    current_location = None
 
             if payload["useCase"] == SLO_CRO_USE_CASE:
                 station_id = InputOutputTransformer.getStationIdOrClosest(
@@ -408,6 +398,7 @@ class InputOutputTransformer:
                 # Parse package destination
                 InputOutputTransformer.validateMessageForValue(parcel, ["destination"])
                 destination = parcel.pop('destination')
+
                 if payload["useCase"] == SLO_CRO_USE_CASE:
                     station_id = InputOutputTransformer.getStationIdOrClosest(destination,
                                                         config_parser.get_csv_path(SLO_CRO_USE_CASE), transformation_map, parcel_id)
@@ -419,7 +410,7 @@ class InputOutputTransformer:
                 orders.append(parcel)
 
             ########################################################################################
-            # GO THROUGH AVAILABLE VEHICLES AND PUT CURRENT LOAD ORDERS IN ARRAY OF PARCELS
+            # GO THROUGH AVAILABLE VEHICLES AND PUT REMAINING PLAN LOAD ORDERS IN ARRAY OF PARCELS
             ########################################################################################
             for remaining_clo in new_clos:
                 orders.extend(InputOutputTransformer.updateOrdersList(remaining_clo, payload, parcels_dict, transformation_map))
@@ -474,7 +465,7 @@ class InputOutputTransformer:
 
         current_lat = None
         current_lon = None
-        if station is None and ("latitude" in location_dict and "longitude" in location_dict):
+        if station is None or station == "null" and ("latitude" in location_dict and "longitude" in location_dict):
             current_lat = location_dict["latitude"]
             current_lon = location_dict["longitude"]
 
@@ -503,6 +494,7 @@ class InputOutputTransformer:
         if station is None and (current_lat is None or current_lon is None):
             raise ValueError("location info should have a non-NULL fields 'station' "
                              "or 'latitude' and 'longitude'!")
+
         return station
 
     @staticmethod
