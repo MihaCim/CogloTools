@@ -346,6 +346,8 @@ class VrpProcessor:
         vehicles = []
         for clo in clos:
             parcels = []
+            # Go through parcels that are already on the vehicle
+            # and only need to be delivered and not picked up as well.
             for parcel in clo["parcels"]:
                 parcels.append(Parcel(parcel["UUIDParcel"], parcel["destination"],
                                       parcel["weight"], clo["currentLocation"], country=parcel["country"]))
