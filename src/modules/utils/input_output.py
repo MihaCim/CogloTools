@@ -261,12 +261,13 @@ class InputOutputTransformer:
             if clo["state"] is None:
                 clo["parcels"] = []
                 continue
-            if "remaining_plan" not in clo["state"]:
-                clo["parcels"] = []
-                continue
-            if "steps" not in clo["state"]["remaining_plan"]:
-                clo["parcels"] = []
-                continue
+
+            #if "remaining_plan" not in clo["state"]:
+            #    clo["parcels"] = []
+            #    continue
+            #if "steps" not in clo["state"]["remaining_plan"]:
+            #    clo["parcels"] = []
+            #    continue
 
             parcels = []
             if "parcels" in clo["state"]:
@@ -290,6 +291,7 @@ class InputOutputTransformer:
                 InputOutputTransformer.validateMessageForValue(parcel, ["destination"])
                 destination = parcel['destination']
                 parcel["country"] = clo["country"]
+                #parcel["source"] = clo['currentLocation']
 
                 if payload["useCase"] == SLO_CRO_USE_CASE:
                     csv_file = config_parser.get_csv_path(SLO_CRO_USE_CASE)
