@@ -27,7 +27,14 @@
           "plan": "PSplanc70e479e-d302-4d0e-a6bc-4cfaa6f7a4fd",
           "driver": null,
           "status": null,
-          "parcels": [],
+          "parcels": [
+            "PSparcelCE233350194HR",
+            "PSparcelCE233350203HR",
+            "PSparcelCE233248325HR",
+            "PSparcelCE233286434HR",
+            "PSparcelCE233350282HR",
+            "PSparcelCE233389836HR"
+          ],
           "location": {
             "city": null,
             "country": null,
@@ -41,32 +48,6 @@
           "delay_minutes": null,
           "remaining_plan": {
             "steps": [
-              {
-                "id": 1,
-                "load": [
-                  "PSparcelCE233350194HR",
-                  "PSparcelCE233350203HR",
-                  "PSparcelCE233248325HR",
-                  "PSparcelCE233286434HR",
-                  "PSparcelCE233350282HR",
-                  "PSparcelCE233389836HR"
-                ],
-                "rank": 1,
-                "complete": 0,
-                "due_time": null,
-                "location": {
-                  "city": null,
-                  "country": null,
-                  "station": null,
-                  "latitude": 45.93105,
-                  "longitude": 15.678094,
-                  "postal_code": null
-                },
-                "dependency": {
-                  "plan": null,
-                  "plan_step": null
-                }
-              },
               {
                 "id": 2,
                 "rank": 2,
@@ -232,6 +213,16 @@
         "status": 1,
         "load_volume": 0,
         "available_space": 0,
+        "parcels": [
+          "PSparcelCE232810549HR",
+          "PSparcelCE233248348HR",
+          "PSparcelCE233286522HR",
+          "PSparcelCE233286540HR",
+          "PSparcelCE233335515HR",
+          "PSparcelCE233350163HR",
+          "PSparcelCE233350217HR",
+          "PSparcelCE233389840HR"
+        ],
         "remaining_plan": {
           "id": "PSplane3ce3b9a-86f0-4744-80b9-f5ea62c94f41",
           "recommendation": "DAILY-6ec88b9b-0a42-4c48-817b-96ca6fd33ead",
@@ -248,15 +239,7 @@
                 "station": "PSpostofficeS1"
               },
               "load": [
-                "PSparcelCE232746718HR",
-                "PSparcelCE232810549HR",
-                "PSparcelCE233248348HR",
-                "PSparcelCE233286522HR",
-                "PSparcelCE233286540HR",
-                "PSparcelCE233335515HR",
-                "PSparcelCE233350163HR",
-                "PSparcelCE233350217HR",
-                "PSparcelCE233389840HR"
+                "PSparcelCE232746718HR"
               ],
               "unload": [],
               "complete": 0,
