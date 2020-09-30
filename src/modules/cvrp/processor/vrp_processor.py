@@ -295,14 +295,11 @@ class VrpProcessor:
 
         # map parcel UUIDs to route
         for idx, node in enumerate(route):
-            print("nodeId:", node.id)
-
             node_idx = None
             for i, n in enumerate(nodes):
                 if n.id == node.id:
                     node_idx = i
                     break
-                print("node_idx:", node_idx)
             vehicle_parcels_unload = [x.uuid for x in parcel_list if x.target == node.id]
             vehicle_parcels_load = [x.uuid for x in parcel_list_pickup if x.current_location == node.id]
 
