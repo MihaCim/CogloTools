@@ -336,7 +336,6 @@ class VrpProcessor:
 
         ##Adding the residual loading location for parcels pickup locations: vehicle_parcel_load == residual loading locaitons to be added
         for node in graph.nodes:
-            print ("node.id:",node.id)
             vehicle_parcels_load = [x.uuid for x in parcel_list_pickup if x.current_location == node.id]
             if vehicle_parcels_load:
                 converted_route.append({
