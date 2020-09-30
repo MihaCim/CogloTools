@@ -299,8 +299,6 @@ class VrpProcessor:
 
             node_idx = None
             for i, n in enumerate(nodes):
-                #print("i:",i)
-                #print("n.id:",n.id)
                 if n.id == node.id:
                     node_idx = i
                     break
@@ -314,10 +312,6 @@ class VrpProcessor:
                     "rank": step_num,
                     "complete": 0,
                     "due_time": None,
-                    #"message": "parcels from vehicle",
-                    #"unloadWeight": int(loads[node_idx]*(-1)),
-                    #"loadWeight": 0,
-                    # "dropoffVolumeM3": int(loads[node_idx] / 10),
                     "load": vehicle_parcels_load,
                     "unload": vehicle_parcels_unload,
                     "location":{
@@ -327,7 +321,6 @@ class VrpProcessor:
                         "latitude":node.lat,
                         "longitude":node.lon,
                         "station":node.id,
-                        #""location_id": "{},{}".format(node.lon, node.lat),
                         "postal_code": None
                     },
                     "dependency": {
@@ -363,7 +356,6 @@ class VrpProcessor:
                         "latitude": node.lat,
                         "longitude": node.lon,
                         "station": node.id,
-                        # ""location_id": "{},{}".format(node.lon, node.lat),
                         "postal_code": None
                     },
                     "dependency": {
