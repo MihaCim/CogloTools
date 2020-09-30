@@ -261,12 +261,6 @@ class InputOutputTransformer:
             if clo["state"] is None:
                 clo["parcels"] = []
                 continue
-            if "remaining_plan" not in clo["state"]:
-                clo["parcels"] = []
-                continue
-            if "steps" not in clo["state"]["remaining_plan"]:
-                clo["parcels"] = []
-                continue
 
             parcels = []
             if "parcels" in clo["state"]:

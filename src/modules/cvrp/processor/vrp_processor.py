@@ -295,11 +295,14 @@ class VrpProcessor:
 
         # map parcel UUIDs to route
         for idx, node in enumerate(route):
+            print("nodeId:", node.id)
+
             node_idx = None
             for i, n in enumerate(nodes):
                 if n.id == node.id:
                     node_idx = i
                     break
+                print("node_idx:", node_idx)
             vehicle_parcels_unload = [x.uuid for x in parcel_list if x.target == node.id]
             vehicle_parcels_load = [x.uuid for x in parcel_list_pickup if x.current_location == node.id]
 
@@ -309,10 +312,6 @@ class VrpProcessor:
                     "rank": step_num,
                     "complete": 0,
                     "due_time": None,
-                    #"message": "parcels from vehicle",
-                    #"unloadWeight": int(loads[node_idx]*(-1)),
-                    #"loadWeight": 0,
-                    # "dropoffVolumeM3": int(loads[node_idx] / 10),
                     "load": vehicle_parcels_load,
                     "unload": vehicle_parcels_unload,
                     "location":{
@@ -322,7 +321,6 @@ class VrpProcessor:
                         "latitude":node.lat,
                         "longitude":node.lon,
                         "station":node.id,
-                        #""location_id": "{},{}".format(node.lon, node.lat),
                         "postal_code": None
                     },
                     "dependency": {
@@ -338,6 +336,35 @@ class VrpProcessor:
                 for parcel in parcel_list_pickup:
                     if parcel.uuid in vehicle_parcels_load:
                         parcel_list_pickup.remove(parcel)
+
+        ##Adding the residual loading location for parcels pickup locations: vehicle_parcel_load == residual loading locaitons to be added
+        for node in graph.nodes:
+            print ("node.id:",node.id)
+            vehicle_parcels_load = [x.uuid for x in parcel_list_pickup if x.current_location == node.id]
+            if vehicle_parcels_load:
+                converted_route.append({
+                    "id": step_num,
+                    "rank": step_num,
+                    "complete": 0,
+                    "due_time": None,
+                    "load": vehicle_parcels_load,
+                    "unload":[],
+                    "location": {
+                        "city": None,
+                        "country": None,
+                        "address": node.name,
+                        "latitude": node.lat,
+                        "longitude": node.lon,
+                        "station": node.id,
+                        "postal_code": None
+                    },
+                    "dependency": {
+                        "plan": None,
+                        "plan_step": None
+                    }
+                })
+                step_num += 1
+
         return converted_route
 
     @staticmethod
