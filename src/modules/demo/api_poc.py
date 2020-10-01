@@ -719,6 +719,7 @@ def handle_recommendation_request():
     """Main entry point for HTTP request"""
     received_request = request.get_json(force=True)
 
+
     print("received getRecommendation request", received_request)
 
     # transforms received message for internal structures
@@ -780,17 +781,32 @@ def handle_recommendation_request():
         # Transform parcel locations back to the original ones
         recommendations = InputOutputTransformer.revert_coordinates(recommendations, transformation_map)
 
+        #reporder the final route on TSP
+        #if evt_type == "brokenVehicle" or evt_type == "pickupRequest":
+        #    recommendations = InputOutputTransformer.PickupNodeReorder(recommendations_raw, data)
+
+        #else:
+        #    recommendations = Tsp.order_recommendations(recommendations_raw)
+        # 1. delete the node with broken vehicle from rout.
+        # 2. run TSP
+        # 3. check which node on route is the first one that has broken vehicle parcels
+        # 4. cut the route before that and in the first part the broken vehicle node
+        # 5. run TSP over first part of the rout
+        # 6. append the second part of the route
+
         # Executes TSP algorithm upon calculated recommendations by our VRP
+
         recommendations = Tsp.order_recommendations(recommendations)
 
         # Prepare output message from calculated recommendations
         response = InputOutputTransformer.prepare_output_message(recommendations, use_case, request_id, organization)
 
         # This piece of code posts optimization response to MSB
-        RecReq.post_response_msb(request_id, response)
+        #RecReq.post_response_msb(request_id, response)
 
         # Always return generic message stating that request was received and is due to be processed
-        return generic_message_received_response
+        return response
+        #return generic_message_received_response
 
     ##Use Case ELTA
     elif use_case == "ELTA":
