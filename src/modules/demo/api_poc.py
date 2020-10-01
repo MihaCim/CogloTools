@@ -719,6 +719,7 @@ def handle_recommendation_request():
     """Main entry point for HTTP request"""
     received_request = request.get_json(force=True)
 
+
     print("received getRecommendation request", received_request)
 
     # transforms received message for internal structures
@@ -778,6 +779,7 @@ def handle_recommendation_request():
             return jsonify({"message": "Invalid event type: {}".format(evt_type), "status": 0})
 
         # Transform parcel locations back to the original ones
+
         recommendations_raw = InputOutputTransformer.revert_coordinates(recommendations, transformation_map)
 
         # reporder the final route on TSP
@@ -793,12 +795,12 @@ def handle_recommendation_request():
 
         # Prepare output message from calculated recommendations
         response = InputOutputTransformer.prepare_output_message(recommendations, use_case, request_id, organization)
-
         # This piece of code posts optimization response to MSB
         RecReq.post_response_msb(request_id, response)
 
         # Always return generic message stating that request was received and is due to be processed
-        return generic_message_received_response
+        return response
+        #return generic_message_received_response
 
     ##Use Case ELTA
     elif use_case == "ELTA":
