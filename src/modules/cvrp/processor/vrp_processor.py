@@ -304,7 +304,6 @@ class VrpProcessor:
             vehicle_parcels_load = [x.uuid for x in parcel_list_pickup if x.current_location == node.id]
 
             if (int(loads[node_idx]) > 0 or idx == 0):
-                print("node", loads[node_idx])
                 converted_route.append({
                     "id": step_num,
                     "rank": step_num,
