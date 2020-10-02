@@ -695,9 +695,31 @@ class InputOutputTransformer:
             else:
                 route.append(el)
 
+        size = len(route)
+        # kreiras novo lokacijo - kopija node[0]
+        # route_part1:  pobrises parcels from broken vehicle na  node[0]["unload"]
+        # route_part2 dodas lokacijo  z  parcels from broken vehicle: node[0]["unload"] + pobrisses node[0]["load"] = []
+
         route.append(broken_vehicle)
         recommendations_without_broken_vehicle[0]['route'] = route
         recommendations_without_start_half = Tsp.order_recommendations(recommendations_without_broken_vehicle)
+
+        if size == 1:
+            new_location = copy.deepcopy(broken_vehicle)
+            unload = []
+            for loc in broken_vehicle['unload'][:]:
+                if loc not in vehicle_parcels_list:
+                    unload.append(loc)
+            new_location['load'] = []
+            new_location['unload'] = unload
+
+            route_second_half = recommendations_without_broken_vehicle[0]['route'][1:]
+            route_second_half.append(new_location)
+            recommendations_without_broken_vehicle[0]['route'] = route_second_half
+            recommendations_second_reorder = Tsp.order_recommendations(recommendations_without_broken_vehicle)
+            route_second_half = recommendations_second_reorder[0]['route']
+
+
 
         recommendations_without_start_half[0]['route'] = recommendations_without_start_half[0][
                                                              'route'] + route_second_half
