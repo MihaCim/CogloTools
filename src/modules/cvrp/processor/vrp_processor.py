@@ -1,7 +1,7 @@
 from math import inf
 
 import requests
-
+import copy
 from ..vrp import VRP
 from ...create_graph.config.config_parser import ConfigParser
 from ...utils.structures.deliveries import Deliveries
@@ -286,7 +286,7 @@ class VrpProcessor:
         loads_diff: position of addtional parcels to the vehicles routes from adhoc order"""
         nodes = graph.nodes
         converted_route = []
-        parcel_list = vehicle.parcels
+        parcel_list= vehicle.parcels
         parcel_list_pickup = parcel_list.copy()
         step_num = 1  # ittreation index for rank field
 
@@ -303,7 +303,7 @@ class VrpProcessor:
             vehicle_parcels_unload = [x.uuid for x in parcel_list if x.target == node.id]
             vehicle_parcels_load = [x.uuid for x in parcel_list_pickup if x.current_location == node.id]
 
-            if (int(loads[node_idx]) > 0 or idx == 0): ## changed the names of the fields for the response message
+            if (int(loads[node_idx]) > 0 or idx == 0):
                 converted_route.append({
                     "id": step_num,
                     "rank": step_num,
@@ -327,14 +327,14 @@ class VrpProcessor:
                 })
                 step_num += 1
 
-                for parcel in parcel_list:  # removes the added parcels from the pending parcel lists for delivery and pickup
+                for parcel in parcel_list[:]:  # removes the added parcels from the pending parcel lists for delivery and pickup
                     if parcel.uuid in vehicle_parcels_unload:
                         parcel_list.remove(parcel)
-                for parcel in parcel_list_pickup:
+                for parcel in parcel_list_pickup[:]:
                     if parcel.uuid in vehicle_parcels_load:
                         parcel_list_pickup.remove(parcel)
 
-        ##Adding the residual loading location for parcels pickup locations: vehicle_parcel_load == residual loading locaitons to be added
+            ##Adding the residual loading location for parcels pickup locations: vehicle_parcel_load == residual loading locaitons to be added
         for node in graph.nodes:
             vehicle_parcels_load = [x.uuid for x in parcel_list_pickup if x.current_location == node.id]
             if vehicle_parcels_load:
@@ -344,7 +344,7 @@ class VrpProcessor:
                     "complete": 0,
                     "due_time": None,
                     "load": vehicle_parcels_load,
-                    "unload":[],
+                    "unload": [],
                     "location": {
                         "city": None,
                         "country": None,
@@ -360,6 +360,10 @@ class VrpProcessor:
                     }
                 })
                 step_num += 1
+
+            #check if all parcels mapped sucessfuly
+        if len(vehicle_parcels_unload) > 0 or len(vehicle_parcels_load) > 0:
+            print("Parcels not mapped correctly on route")
 
         return converted_route
 
