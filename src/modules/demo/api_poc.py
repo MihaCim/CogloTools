@@ -799,8 +799,7 @@ def handle_recommendation_request():
         RecReq.post_response_msb(request_id, response)
 
         # Always return generic message stating that request was received and is due to be processed
-        return response
-        #return generic_message_received_response
+        return generic_message_received_response
 
     ##Use Case ELTA
     elif use_case == "ELTA":
