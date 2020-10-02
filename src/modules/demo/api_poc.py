@@ -779,9 +779,20 @@ def handle_recommendation_request():
             return jsonify({"message": "Invalid event type: {}".format(evt_type), "status": 0})
 
         # Transform parcel locations back to the original ones
-        recommendations = InputOutputTransformer.revert_coordinates(recommendations, transformation_map)
+
+        recommendations_raw = InputOutputTransformer.revert_coordinates(recommendations, transformation_map)
+
+        # reporder the final route on TSP
+        if evt_type == "brokenVehicle" or evt_type == "pickupRequest":
+            recommendations = InputOutputTransformer.PickupNodeReorder(recommendations_raw, data)
+
+        else:
+            recommendations = Tsp.order_recommendations(recommendations_raw)
+
+
         # Executes TSP algorithm upon calculated recommendations by our VRP
-        recommendations = Tsp.order_recommendations(recommendations)
+        #recommendations = Tsp.order_recommendations(recommendations)
+
         # Prepare output message from calculated recommendations
         response = InputOutputTransformer.prepare_output_message(recommendations, use_case, request_id, organization)
         # This piece of code posts optimization response to MSB
