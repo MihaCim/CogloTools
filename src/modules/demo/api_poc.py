@@ -718,7 +718,8 @@ def handle_recommendation_request():
 
     """Main entry point for HTTP request"""
     received_request = request.get_json(force=True)
-
+    with open('received_request.json', 'w') as outfile:
+        json.dump(received_request, outfile)
 
     print("received getRecommendation request", received_request)
 
