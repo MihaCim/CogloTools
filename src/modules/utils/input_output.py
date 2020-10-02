@@ -663,6 +663,8 @@ class InputOutputTransformer:
         # 4. cut the route before that and in the first part the broken vehicle node
         # 5. run TSP over first part of the rout
         # 6. append the second part of the route
+        import copy
+        recommendations_raw_tmp = copy.deepcopy(recommendations_raw)
         broken_vehicle_station = data['orders'][0]['pickup']
         broken_vehicle = {}
         route = []
