@@ -662,6 +662,7 @@ class InputOutputTransformer:
         # 6. append the second part of the route
         import copy
         recommendations_raw_tmp = copy.deepcopy(recommendations_raw)
+        broken_vehicle_start_address = recommendations_raw_tmp[0]['start_address']
         broken_vehicle_station = data['orders'][0]['pickup']
         broken_vehicle = {}
         route = []
@@ -693,16 +694,37 @@ class InputOutputTransformer:
                 break
             else:
                 route.append(el)
-        #create first part of the route with briken vehicle
+
+        size = len(route)
+        # kreiras novo lokacijo - kopija node[0]
+        # route_part1:  pobrises parcels from broken vehicle na  node[0]["unload"]
+        # route_part2 dodas lokacijo  z  parcels from broken vehicle: node[0]["unload"] + pobrisses node[0]["load"] = []
+
         route.append(broken_vehicle)
         recommendations_without_broken_vehicle[0]['route'] = route
-        recommendations_final = Tsp.order_recommendations(recommendations_without_broken_vehicle)
+        recommendations_without_start_half = Tsp.order_recommendations(recommendations_without_broken_vehicle)
 
-        #append second part of the route
-        recommendations_final[0]['route'] = recommendations_final[0][
+        if size == 1:
+            new_location = copy.deepcopy(broken_vehicle)
+            unload = []
+            for loc in broken_vehicle['unload'][:]:
+                if loc not in vehicle_parcels_list:
+                    unload.append(loc)
+            new_location['load'] = []
+            new_location['unload'] = unload
+
+            route_second_half = recommendations_without_broken_vehicle[0]['route'][1:]
+            route_second_half.append(new_location)
+            recommendations_without_broken_vehicle[0]['route'] = route_second_half
+            recommendations_second_reorder = Tsp.order_recommendations(recommendations_without_broken_vehicle)
+            route_second_half = recommendations_second_reorder[0]['route']
+
+
+
+        recommendations_without_start_half[0]['route'] = recommendations_without_start_half[0][
                                                              'route'] + route_second_half
-
-        return recommendations_final
+        recommendations_without_start_half[0]['start_address'] = broken_vehicle_start_address
+        return recommendations_without_start_half
 
 
 class ParcelLocation:
