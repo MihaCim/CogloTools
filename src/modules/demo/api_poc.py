@@ -124,13 +124,13 @@ class RecReq(Resource):
         with open('content_message_posted.json', 'w') as outfile:
             json.dump(content, outfile)
 
-        print("posting response to validation URL: " + response_validation_url)
-        print(recommendations)
-        try:
-            response = requests.post(response_validation_url, json = recommendations, headers=headers, verify=False).json()
-            print("validation code for recommendations message: ", response)
-        except Exception as ex:
-            print("Error occurred while validating response in validation service", ex)
+        #print("posting response to validation URL: " + response_validation_url)
+        #print(recommendations)
+        #try:
+        #    response = requests.post(response_validation_url, json = recommendations, headers=headers, verify=False).json()
+        #    print("validation code for recommendations message: ", response)
+        #except Exception as ex:
+        #    print("Error occurred while validating response in validation service", ex)
 
         print("posting to MSB post URL: " + msb_post_url)
         print(content)
@@ -718,7 +718,8 @@ def handle_recommendation_request():
 
     """Main entry point for HTTP request"""
     received_request = request.get_json(force=True)
-
+    with open('received_request.json', 'w') as outfile:
+        json.dump(received_request, outfile)
 
     print("received getRecommendation request", received_request)
 
@@ -782,7 +783,7 @@ def handle_recommendation_request():
 
         recommendations_raw = InputOutputTransformer.revert_coordinates(recommendations, transformation_map)
 
-        # reporder the final route on TSP
+        # reorder the final route on TSP
         if evt_type == "brokenVehicle" or evt_type == "pickupRequest":
             recommendations = InputOutputTransformer.PickupNodeReorder(recommendations_raw, data)
 
