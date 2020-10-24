@@ -654,9 +654,6 @@ class InputOutputTransformer:
 
     @staticmethod
     def PickupNodeReorder(recommendations_raw, data):
-        print(recommendations_raw)
-        import copy
-        recommendations_raw_tmp = copy.deepcopy(recommendations_raw)
         # 1. delete the node with broken vehicle from rout.
         # 2. run TSP
         # 3. check which node on route is the first one that has broken vehicle parcels
@@ -665,6 +662,7 @@ class InputOutputTransformer:
         # 6. append the second part of the route
         import copy
         recommendations_raw_tmp = copy.deepcopy(recommendations_raw)
+        broken_vehicle_start_address = recommendations_raw_tmp[0]['start_address']
         broken_vehicle_station = data['orders'][0]['pickup']
         broken_vehicle = {}
         route = []
@@ -725,7 +723,7 @@ class InputOutputTransformer:
 
         recommendations_without_start_half[0]['route'] = recommendations_without_start_half[0][
                                                              'route'] + route_second_half
-
+        recommendations_without_start_half[0]['start_address'] = broken_vehicle_start_address
         return recommendations_without_start_half
 
 
