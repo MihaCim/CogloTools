@@ -654,7 +654,7 @@ class InputOutputTransformer:
 
     @staticmethod
     def PickupNodeReorder(recommendations_raw, data):
-        # 1. delete the node with broken vehicle from rout.
+        # 1. delete the node with broken vehicle from route.
         # 2. run TSP
         # 3. check which node on route is the first one that has broken vehicle parcels
         # 4. cut the route before that and in the first part the broken vehicle node
@@ -704,6 +704,30 @@ class InputOutputTransformer:
 
         return recommendations_final
 
+    @staticmethod
+    def PrintRoutes(recommendations):
+        # Print route sequence for each CLO in recommendations plan.
+        print("*******Route plan for delivery********")
+        for plan in recommendations:
+            print("Plan for VEHICLE:", plan["UUID"])
+            string = ""
+            for step in plan["route"]:
+                location_name = (step["location"]["station"])
+                loadparcels = ""
+                for load in step["load"]:
+                    loadparcels = loadparcels + " " + load
+                unloadparcels = ""
+                for unload in step["unload"]:
+                    unloadparcels = unloadparcels + " " + unload
+
+                step_string = "nodeName:" + " " + location_name + "Load:" + loadparcels
+                print("STEP:", location_name)
+                if loadparcels:
+                    print("parcels loading:", loadparcels)
+                if unloadparcels:
+                    print("parcels unloading:", unloadparcels)
+        print("****end of plan****")
+        return(True)
 
 class ParcelLocation:
     """

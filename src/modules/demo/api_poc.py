@@ -780,19 +780,21 @@ def handle_recommendation_request():
             return jsonify({"message": "Invalid event type: {}".format(evt_type), "status": 0})
 
         # Transform parcel locations back to the original ones
-
         recommendations_raw = InputOutputTransformer.revert_coordinates(recommendations, transformation_map)
 
+        print("starting final repordering & TSP")
         # reorder the final route on TSP
-        if evt_type == "brokenVehicle" or evt_type == "pickupRequest":
+        if evt_type == "brokenVehicle": #or evt_type == "pickupRequest":
             recommendations = InputOutputTransformer.PickupNodeReorder(recommendations_raw, data)
 
         else:
             recommendations = Tsp.order_recommendations(recommendations_raw)
 
-
         # Executes TSP algorithm upon calculated recommendations by our VRP
-        #recommendations = Tsp.order_recommendations(recommendations)
+        #recommendations = Tsp.order_recommendations(recommendations_raw)
+
+        # print route for all vehicles
+        P=InputOutputTransformer.PrintRoutes(recommendations)
 
         # Prepare output message from calculated recommendations
         response = InputOutputTransformer.prepare_output_message(recommendations, use_case, request_id, organization)
@@ -800,7 +802,8 @@ def handle_recommendation_request():
         RecReq.post_response_msb(request_id, response)
 
         # Always return generic message stating that request was received and is due to be processed
-        return generic_message_received_response
+        #return generic_message_received_response
+        return response
 
     ##Use Case ELTA
     elif use_case == "ELTA":

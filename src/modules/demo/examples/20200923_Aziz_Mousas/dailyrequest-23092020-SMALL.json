@@ -16,8 +16,8 @@
         "status": 1,
         "location": {
           "country": "SLO",
-          "latitude": 45.93107932,
-          "longitude": 15.67793203
+          "latitude": 45.942039,
+          "longitude": 15.478103
         }
       }
     },
@@ -37,8 +37,8 @@
         "status": 1,
         "location": {
           "country": "SLO",
-          "latitude": 45.93107932,
-          "longitude": 15.67793203
+          "latitude": 45.942039,
+          "longitude": 15.478103
         }
       }
     }
@@ -46,11 +46,11 @@
   "parcels": [
     {
       "organization": "PS",
-      "id": "PSparcelCE232746718HR",
+      "id": "PSparcel_01HR",
       "source": {
-        "latitude": 45.93107932,
-        "longitude": 15.67793203,
-        "station": "PSpostofficeS1",
+        "latitude": 45.942039,
+        "longitude": 15.478103,
+        "station": "PSpostofficeS5",
         "country": "SLO"
       },
       "destination": {
@@ -66,16 +66,16 @@
     },
     {
       "organization": "PS",
-      "id": "PSparcelCE232810549HR",
+      "id": "PSparcel_02HR",
       "source": {
-        "latitude": 45.93107932,
-        "longitude": 15.67793203,
-        "station": "PSpostofficeS1",
+        "latitude": 45.942039,
+        "longitude": 15.478103,
+        "station": "PSpostofficeS5",
         "country": "SLO"
       },
       "destination": {
-        "latitude": 45.839828,
-        "longitude": 15.68643,
+        "latitude": 45.831867,
+        "longitude": 15.690455,
         "station": "HPpostofficeH2",
         "country": "CRO"
       },
@@ -86,10 +86,10 @@
     },
     {
       "organization": "PS",
-      "id": "PSparcelCE233248325HR",
+      "id": "PSparcel_03HR",
       "source": {
-        "latitude": 45.93107932,
-        "longitude": 15.67793203,
+        "latitude": 45.942039,
+        "longitude": 15.478103,
         "station": "PSpostofficeS1",
         "country": "SLO"
       },
@@ -108,14 +108,14 @@
       "organization": "PS",
       "id": "PSparcelCE233248348HR",
       "source": {
-        "latitude": 45.93107932,
-        "longitude": 15.67793203,
+        "latitude": 45.942039,
+        "longitude": 15.478103,
         "station": "PSpostofficeS1",
         "country": "SLO"
       },
       "destination": {
-        "latitude": 45.917165,
-        "longitude": 15.730056,
+        "latitude": 15.710135,
+        "longitude": 15.710135,
         "station": "HPpostofficeH4",
         "country": "CRO"
       },
@@ -128,8 +128,8 @@
       "organization": "PS",
       "id": "PSparcelCE233286434HR",
       "source": {
-        "latitude": 45.93107932,
-        "longitude": 15.67793203,
+        "latitude": 45.942039,
+        "longitude": 15.478103,
         "station": "PSpostofficeS1",
         "country": "SLO"
       },
@@ -148,8 +148,8 @@
       "organization": "PS",
       "id": "PSparcelCE233286522HR",
       "source": {
-        "latitude": 45.93107932,
-        "longitude": 15.67793203,
+        "latitude": 45.942039,
+        "longitude": 15.478103,
         "station": "PSpostofficeS1",
         "country": "SLO"
       },
@@ -168,8 +168,8 @@
       "organization": "PS",
       "id": "PSparcelCE233286540HR",
       "source": {
-        "latitude": 45.93107932,
-        "longitude": 15.67793203,
+        "latitude": 45.942039,
+        "longitude": 15.478103,
         "station": "PSpostofficeS1",
         "country": "SLO"
       },
@@ -188,9 +188,9 @@
       "organization": "PS",
       "id": "PSparcelCE233335515HR",
       "source": {
-        "latitude": 45.93107932,
-        "longitude": 15.67793203,
-        "station": "PSpostofficeS1",
+        "latitude": 45.942039,
+        "longitude": 15.478103,
+       "station": "PSpostofficeS1",
         "country": "SLO"
       },
       "destination": {
@@ -208,8 +208,8 @@
       "organization": "PS",
       "id": "PSparcelCE233350163HR",
       "source": {
-        "latitude": 45.93107932,
-        "longitude": 15.67793203,
+        "latitude": 45.942039,
+        "longitude": 15.478103,
         "station": "PSpostofficeS1",
         "country": "SLO"
       },
@@ -228,8 +228,8 @@
       "organization": "PS",
       "id": "PSparcelCE233350194HR",
       "source": {
-        "latitude": 45.93107932,
-        "longitude": 15.67793203,
+        "latitude": 45.942039,
+        "longitude": 15.478103,
         "station": "PSpostofficeS1",
         "country": "SLO"
       },
@@ -248,8 +248,8 @@
       "organization": "PS",
       "id": "PSparcelCE233350203HR",
       "source": {
-        "latitude": 45.93107932,
-        "longitude": 15.67793203,
+        "latitude": 45.942039,
+        "longitude": 15.478103,
         "station": "PSpostofficeS1",
         "country": "SLO"
       },
@@ -268,8 +268,8 @@
       "organization": "PS",
       "id": "PSparcelCE233350217HR",
       "source": {
-        "latitude": 45.93107932,
-        "longitude": 15.67793203,
+        "latitude": 45.942039,
+        "longitude": 15.478103,
         "station": "PSpostofficeS1",
         "country": "SLO"
       },
@@ -288,8 +288,8 @@
       "organization": "PS",
       "id": "PSparcelCE233350282HR",
       "source": {
-        "latitude": 45.93107932,
-        "longitude": 15.67793203,
+        "latitude": 45.942039,
+        "longitude": 15.478103,
         "station": "PSpostofficeS1",
         "country": "SLO"
       },
@@ -308,8 +308,8 @@
       "organization": "PS",
       "id": "PSparcelCE233389836HR",
       "source": {
-        "latitude": 45.93107932,
-        "longitude": 15.67793203,
+        "latitude": 45.942039,
+        "longitude": 15.478103,
         "station": "PSpostofficeS1",
         "country": "SLO"
       },
@@ -328,8 +328,8 @@
       "organization": "PS",
       "id": "PSparcelCE233389840HR",
       "source": {
-        "latitude": 45.93107932,
-        "longitude": 15.67793203,
+        "latitude": 45.942039,
+        "longitude": 15.478103,
         "station": "PSpostofficeS1",
         "country": "SLO"
       },
