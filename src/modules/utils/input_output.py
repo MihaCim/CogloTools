@@ -662,7 +662,7 @@ class InputOutputTransformer:
         # 6. append the second part of the route
         import copy
         recommendations_raw_tmp = copy.deepcopy(recommendations_raw)
-        broken_vehicle_start_address = recommendations_raw_tmp[0]['start_address']
+        start_address = recommendations_raw_tmp[0]['start_address']
         broken_vehicle_station = data['orders'][0]['pickup']
         broken_vehicle = {}
         route = []
@@ -702,6 +702,7 @@ class InputOutputTransformer:
 
         route.append(broken_vehicle)
         recommendations_without_broken_vehicle[0]['route'] = route
+        recommendations_without_broken_vehicle[0]['start_address'] = start_address
         recommendations_without_start_half = Tsp.order_recommendations(recommendations_without_broken_vehicle)
 
         if size == 1:
@@ -723,7 +724,7 @@ class InputOutputTransformer:
 
         recommendations_without_start_half[0]['route'] = recommendations_without_start_half[0][
                                                              'route'] + route_second_half
-        recommendations_without_start_half[0]['start_address'] = broken_vehicle_start_address
+        recommendations_without_start_half[0]['start_address'] = start_address
         return recommendations_without_start_half
 
     @staticmethod

@@ -361,8 +361,12 @@ class VrpProcessor:
                 })
                 step_num += 1
 
+                for parcel in parcel_list_pickup[:]:
+                    if parcel.uuid in vehicle_parcels_load:
+                        parcel_list_pickup.remove(parcel)
+
             #check if all parcels mapped sucessfuly
-        if len(vehicle_parcels_unload) > 0 or len(vehicle_parcels_load) > 0:
+        if len(parcel_list) > 0 or len(parcel_list_pickup) > 0:
             print("Parcels not mapped correctly on route")
 
         return converted_route
