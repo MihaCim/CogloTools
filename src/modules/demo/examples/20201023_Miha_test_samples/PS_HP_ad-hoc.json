@@ -1,0 +1,259 @@
+{
+  "event": {
+    "time": "2020-10-27T05:54:57Z",
+    "event_type": "order",
+    "event": "system",
+    "initiator": "COGLOmoduleWebIF",
+    "info": {
+      "item": {
+        "organization": "HP",
+        "id": "HPparcelAdhoc1",
+        "source": {
+          "country": "CRO",
+          "station": "HPpostofficeH1",
+          "latitude": 45.840296,
+          "longitude": 15.686514
+        },
+        "destination": {
+          "country": "CRO",
+          "station": "HPpostofficeH2",
+          "latitude": 45.831867,
+          "longitude": 15.690455
+        },
+        "service_type": "normal",
+        "payweight": 1,
+        "issued": "2020-10-27T05:54:57Z",
+        "state": "unserved"
+      },
+      "location": {
+        "country": "CRO",
+        "station": "HPpostofficeH1",
+        "latitude": 45.840296,
+        "longitude": 15.686514
+      }
+    }
+  },
+  "clos": [
+    {
+      "id": "HPvehicle1",
+      "info": {
+        "organization": "HP",
+        "physical_id": "8",
+        "type": "transportation means",
+        "subtype": "vehicle",
+        "description": "truck",
+        "capacity": 1000,
+        "capacity_unit": "kg"
+      },
+      "state": {
+        "location": {
+          "country": "SLO",
+          "latitude": 45.893208,
+          "longitude": 15.6213,
+          "station": "PSpostofficeS3"
+        },
+        "status": 0,
+        "availability_prediction": {
+          "location": {
+            "latitude": 0,
+            "longitude": 0
+          },
+          "time": 0
+        },
+        "load_volume": 0,
+        "available_space": 0,
+        "plan": "HPplan20041408489340040",
+        "completed_plan": {},
+        "remaining_plan": {
+          "id": "HPplan20041408489340040",
+          "recommendation": "DAILY-730bd753-0ec4-4972-8cbb-9234eedd1e8c",
+          "organization": "HP",
+          "execution_date": "2020-10-06 10:49:46",
+          "steps": [
+            {
+              "id": 1,
+              "rank": 1,
+              "location": {
+                "address": "Jesenice",
+                "latitude": 45.840225,
+                "longitude": 15.686388,
+                "station": "HPpostofficeH1"
+              },
+              "load": [
+                "HPparcelCE232746718HR",
+                "HPparcelCE233286540HR",
+                "CE262608176HR"
+              ],
+              "unload": [],
+              "complete": 0,
+              "dependency": {
+                "plan_step": 0
+              }
+            },
+            {
+              "id": 2,
+              "rank": 2,
+              "location": {
+                "address": "Ul. Dure Basariceka 9",
+                "latitude": 45.83137,
+                "longitude": 15.689681,
+                "station": "HPpostofficeH2"
+              },
+              "load": [],
+              "unload": [
+                "HPparcelCE232746718HR"
+              ],
+              "complete": 0,
+              "dependency": {
+                "plan_step": 0
+              }
+            },
+            {
+              "id": 3,
+              "rank": 3,
+              "location": {
+                "address": "Zagrebacka ul. 45",
+                "latitude": 45.887268,
+                "longitude": 15.696898,
+                "station": "HPpostofficeH6"
+              },
+              "load": [],
+              "unload": [
+                "CE262608176HR"
+              ],
+              "complete": 0,
+              "dependency": {
+                "plan_step": 0
+              }
+            },
+            {
+              "id": 4,
+              "rank": 4,
+              "location": {
+                "address": "Zagrebacka ul. 29",
+                "latitude": 45.87787,
+                "longitude": 15.739141,
+                "station": "HPpostofficeH8"
+              },
+              "load": [],
+              "unload": [
+                "HPparcelCE233286540HR"
+              ],
+              "complete": 0,
+              "dependency": {
+                "plan_step": 0
+              }
+            }
+          ]
+        },
+        "load_size": 0,
+        "parcels": [
+          "HPparcelCE233286540HR"
+        ],
+        "delay_minutes": 0
+      }
+    },
+     {
+      "id": "HPvehicle2",
+      "info": {
+        "organization": "HP",
+        "physical_id": "1",
+        "type": "transportation means",
+        "subtype": "vehicle",
+        "description": "truck",
+        "capacity": 1000,
+        "capacity_unit": "kg"
+      },
+      "state": {
+        "location": {
+          "country": "SLO",
+          "latitude": 45.893208,
+          "longitude": 15.6213,
+          "station": "PSpostofficeS3"
+        },
+        "status": 0,
+        "availability_prediction": {
+          "location": {
+            "latitude": 0,
+            "longitude": 0
+          },
+          "time": 0
+        },
+        "load_volume": 0,
+        "available_space": 0,
+        "plan": "HPplan20041408489340040",
+        "completed_plan": {},
+        "remaining_plan": {
+          "id": "HPplan20041408489340040",
+          "recommendation": "DAILY-730bd753-0ec4-4972-8cbb-9234eedd1e8c",
+          "organization": "HP",
+          "execution_date": "2020-10-06 10:49:46",
+          "steps": [],
+          "delay_minutes": 0
+      }
+    }
+  ],
+  "parcels": [
+    {
+      "id": "HPparcelCE232746718HR",
+      "state": "unserved",
+      "issued": "2020-10-04T09:17:51Z",
+      "source": {
+        "country": "CRO",
+        "station": "HPpostofficeH1",
+        "latitude": 45.840296,
+        "longitude": 15.686514
+      },
+      "deadline": "2020-10-05T14:17:51Z",
+      "payweight": 1,
+      "destination": {
+        "country": "CRO",
+        "station": "HPpostofficeH2",
+        "latitude": 45.831867,
+        "longitude": 15.690455
+      },
+      "organization": "HP"
+    },
+    {
+      "id": "HPparcelCE233286540HR",
+      "state": "unserved",
+      "issued": "2020-10-04T12:41:46Z",
+      "source": {
+        "country": "CRO",
+        "station": "HPpostofficeH1",
+        "latitude": 45.840296,
+        "longitude": 15.686514
+      },
+      "deadline": "2020-10-05T17:41:46Z",
+      "payweight": 1,
+      "destination": {
+        "country": "CRO",
+        "station": "HPpostofficeH8",
+        "latitude": 45.878072,
+        "longitude": 15.739208
+      },
+      "organization": "HP"
+    },
+    {
+      "id": "CE262608176HR",
+      "state": "unserved",
+      "issued": "2020-10-06T10:10:30Z",
+      "source": {
+        "country": "CRO",
+        "station": "HPpostofficeH1",
+        "latitude": 45.840296,
+        "longitude": 15.686514
+      },
+      "payweight": 6,
+      "destination": {
+        "country": "CRO",
+        "station": "HPpostofficeH6",
+        "latitude": 45.887335,
+        "longitude": 15.697116
+      },
+      "organization": "HP"
+    }
+  ],
+  "request": "859eb9cd-65d1-4836-bd82-ddc3cad9a914",
+  "organization": "HP"
+}

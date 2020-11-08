@@ -799,7 +799,7 @@ def handle_recommendation_request():
         response = InputOutputTransformer.prepare_output_message(recommendations, use_case, request_id, organization)
 
         # Post response to MSB
-        RecReq.post_response_msb(request_id, response)
+        #RecReq.post_response_msb(request_id, response)
         # Return generic message stating that request was received and is due to be processed
         return generic_message_received_response
 
