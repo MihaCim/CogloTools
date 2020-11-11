@@ -765,7 +765,7 @@ def handle_recommendation_request():
                 return {"msg": "Parameter 'clos' or 'orders' is missing", "status": 0}
             requests = data["orders"]
             recommendations = RecReq.process_pickup_requests(evt_type, clos, requests, vrp_processor_ref, use_case)
-        elif evt_type == "crossBorder":
+        elif evt_type == "crossBorder" or "border":
             print("cross border event received")
             if "clos" not in data:
                 return {"msg": "Parameter 'clos' is missing", "status": 0}
@@ -783,7 +783,6 @@ def handle_recommendation_request():
         #recommendations_raw = InputOutputTransformer.revert_coordinates(recommendations, transformation_map)
 
         print("starting final reordering & TSP")
-
         # reorder the final route on TSP
         if evt_type == "brokenVehicle":
             recommendations = InputOutputTransformer.PickupNodeReorder(recommendations, data)

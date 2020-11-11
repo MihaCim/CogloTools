@@ -199,6 +199,8 @@ class InputOutputTransformer:
                         type = "pickupRequest"
                     elif type == "vehicle":
                         type = "brokenVehicle"
+                    elif type == "border":
+                        type = "crossBorder"
                     payload["eventType"] = type
         elif json["organization"] == ELTA_USE_CASE:
             payload["useCase"] = ELTA_USE_CASE

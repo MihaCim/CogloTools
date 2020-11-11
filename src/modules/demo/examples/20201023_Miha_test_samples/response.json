@@ -1,0 +1,31 @@
+
+brez TSP:
+*******Route plan for delivery********
+Plan for VEHICLE: PSvehicle10
+STEP: PSpostofficeS7
+parcels loading:  PSparcel_01HR PSparcel_02HR PSparcel_03HR PSparcel_05HR PSparcel07HR PSparcel_08HR PSparcel_10HR PSparcel_04HR PSparcel_09HR PSparcel_11HR PSparcel_14HR PSparcel_15HR
+parcels unloading:  PSparcel_14HR
+STEP: PSpostofficeS3
+parcels unloading:  PSparcel_10HR
+STEP: PSpostofficeS8
+parcels unloading:  PSparcel_15HR
+STEP: PSpostofficeS4
+parcels unloading:  PSparcel_11HR
+STEP: PSpostofficeS2
+parcels unloading:  PSparcel_09HR
+STEP: HPpostofficeH1
+parcels unloading:  PSparcel_01HR PSparcel_02HR PSparcel_03HR PSparcel_05HR PSparcel07HR PSparcel_08HR
+STEP: HPpostofficeH4
+parcels unloading:  PSparcel_04HR
+Plan for VEHICLE: PSvehicle11
+STEP: PSpostofficeS7
+parcels loading:  PSparcel_06HR PSparcel_12HR PSparcel_13HR
+STEP: PSpostofficeS6
+parcels unloading:  PSparcel_13HR
+STEP: HPpostofficeH6
+parcels unloading:  PSparcel_06HR
+STEP: PSpostofficeS5
+parcels unloading:  PSparcel_12HR
+****end of plan****
+
+z TSP:

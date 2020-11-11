@@ -29,12 +29,12 @@
           "driver": null,
           "status": null,
           "parcels": [
-            "PSparcelCE233389836HR"
+            "PSparcel_01HR"
           ],
           "location": {
             "city": null,
             "country": null,
-            "station": null,
+            "station": "PSpostofficeS4",
             "latitude": 45.88461153,
             "longitude": 15.5231045,
             "postal_code": null
@@ -73,14 +73,14 @@
                 "id": 1,
                 "rank": 6,
                 "unload": [
-                  "PSparcelCE233389836HR"
+                  "PSparcel_01HR"
                 ],
                 "complete": 0,
                 "due_time": null,
                 "location": {
                   "city": null,
                   "country": null,
-                  "station": null,
+                  "station": "PSpostofficeS6",
                   "latitude": 45.89123853,
                   "longitude": 15.57086927,
                   "postal_code": null
@@ -138,7 +138,7 @@
                 "longitude": 15.66006978
               },
               "unload": [
-                "PSparcelCE233389840HR"
+                "PSparcel_02HR"
               ],
               "complete": 0,
               "dependency": {
@@ -149,7 +149,7 @@
         },
         "load_size": 1,
         "parcels": [
-          "PSparcelCE233389840HR"
+          "PSparcel_02HR"
         ],
         "delay_minutes": 0
       }
@@ -157,7 +157,7 @@
   ],
   "parcels": [
     {
-      "id": "PSparcelCE233389836HR",
+      "id": "PSparcel_01HR",
       "state": "unserved",
       "issued": "2020-09-22T10:41:34Z",
       "source": {
@@ -183,7 +183,7 @@
       "customs_checkpoint": null
     },
     {
-      "id": "PSparcelCE233389840HR",
+      "id": "PSparcel_02HR",
       "state": "unserved",
       "issued": "2020-09-22T16:21:23Z",
       "source": {

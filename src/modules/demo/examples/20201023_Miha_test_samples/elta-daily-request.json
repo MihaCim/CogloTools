@@ -1,9 +1,9 @@
 {
   "clos": [
     {
-      "id": "ELTAvehicle6",
+      "id": "Vehicle1",
       "info": {
-        "name": "ELTA truck 001",
+        "name": "truck 001",
         "type": "transportation means",
         "subtype": "vehicle",
         "capacity": 200,
@@ -17,7 +17,7 @@
         },
         "description": "truck",
         "physical_id": "6",
-        "organization": "ELTA",
+        "organization": "PS",
         "capacity_unit": "kg",
         "working_hours": null
       },
@@ -60,9 +60,9 @@
         "location": {
           "city": null,
           "country": null,
-          "station": null,
-          "latitude": 38.012288,
-          "longitude": 23.813838,
+          "station": "PSpostofficeS3",
+          "latitude": 45.89320611,
+          "longitude": 15.6212996,
           "postal_code": null
         },
         "load_volume": null,
@@ -86,9 +86,9 @@
       }
     },
     {
-      "id": "ELTAvehicle7",
+      "id": "Vehicle2",
       "info": {
-        "name": "ELTA truck 002",
+        "name": "truck 002",
         "type": "transportation means",
         "subtype": "vehicle",
         "capacity": 200,
@@ -102,7 +102,7 @@
         },
         "description": "truck",
         "physical_id": "7",
-        "organization": "ELTA",
+        "organization": "PS",
         "capacity_unit": "kg",
         "working_hours": null
       },
@@ -193,9 +193,9 @@
         "location": {
           "city": null,
           "country": null,
-          "station": null,
-          "latitude": 38.012288,
-          "longitude": 23.813838,
+          "station": "PSpostofficeS1",
+          "latitude": 45.93107932,
+          "longitude": 15.67793203,
           "postal_code": null
         },
         "load_volume": null,

@@ -28,9 +28,9 @@
       "state": {
         "location": {
           "country": "SLO",
-          "latitude": 45.840296,
-          "longitude": 15.686514,
-          "station": "PSpostofficeH1"
+          "latitude": 45.803142,
+          "longitude": 15.710135,
+          "station": "PSpostofficeH3"
         },
         "status": 0,
         "availability_prediction": {
@@ -55,25 +55,15 @@
               "rank": 1,
               "location": {
                 "address": "Jesenice",
-                "latitude": 45.840296,
-                "longitude": 15.686514,
-                "station": "HPpostofficeH1"
+                "latitude": 45.803142,
+                "longitude": 15.710135,
+                "station": "PSpostofficeH3"
               },
               "load": [
-                "HPparcelCE233248348HR",
-                "HPparcelCE233350194HR",
-                "HPparcelCE233248325HR",
-                "HPparcelCE233286540HR",
-                "HPparcelCE233335515HR",
-                "HPparcelCE233350163HR",
-                "HPparcelCE233350203HR",
-                "HPparcelCE233350282HR",
-                "HPparcelCE233389836HR",
-                "HPparcelCE233389840HR",
-                "HPparcelCE233350217HR",
-                "CE233271960HR",
-                "HP123456789PS",
-                "HPparcelCE233286522HR"
+                "HP_01",
+                "HP_02",
+                "HP_03",
+                "HP_04"
               ],
               "unload": [],
               "complete": 0,
@@ -90,11 +80,10 @@
                 "longitude": 15.689681,
                 "station": "HPpostofficeH2"
               },
-              "load": [
-                "CE232969180HR",
-                "CE233759854HR"
+              "load": [],
+              "unload": [
+                "HP_01"
               ],
-              "unload": [],
               "complete": 0,
               "dependency": {
                 "plan_step": 0
@@ -105,15 +94,14 @@
               "rank": 2,
               "location": {
                 "address": "Ul. Ljudevita Gaja 4",
-                "latitude": 45.803165,
-                "longitude": 15.71014,
-                "station": "HPpostofficeH3"
+                "latitude": 45.840296,
+                "longitude": 15.686514,
+                "station": "HPpostofficeH1"
               },
               "load": [
-                "HP123456790PS"
               ],
               "unload": [
-                "CE232969180HR"
+                "HP_02"
               ],
               "complete": 0,
               "dependency": {
@@ -131,7 +119,7 @@
               },
               "load": [],
               "unload": [
-                "HPparcelCE233248348HR"
+                "HP_03"
               ],
               "complete": 0,
               "dependency": {
@@ -143,112 +131,13 @@
               "rank": 6,
               "location": {
                 "address": "Ul. Drage Svajcara 5",
-                "latitude": 45.858887,
-                "longitude": 15.803373,
-                "station": "HPpostofficeH7"
+                "latitude": 45.942039,
+                "longitude": 15.478103,
+                "station": "HPpostofficeS5"
               },
               "load": [],
               "unload": [
-                "CE233271960HR",
-                "HP123456789PS",
-                "HPparcelCE233286522HR"
-              ],
-              "complete": 0,
-              "dependency": {
-                "plan_step": 0
-              }
-            },
-            {
-              "id": 3,
-              "rank": 3,
-              "location": {
-                "address": "Zagrebacka ul. 29",
-                "latitude": 45.87787,
-                "longitude": 15.739141,
-                "station": "HPpostofficeH8"
-              },
-              "load": [],
-              "unload": [
-                "HPparcelCE233286540HR"
-              ],
-              "complete": 0,
-              "dependency": {
-                "plan_step": 0
-              }
-            },
-            {
-              "id": 5,
-              "rank": 5,
-              "location": {
-                "address": "Goricka 1",
-                "latitude": 45.91716,
-                "longitude": 15.728002,
-                "station": "HPpostofficeH4"
-              },
-              "load": [],
-              "unload": [
-                "CE233759854HR",
-                "HP123456790PS",
-                "HPparcelCE233248325HR"
-              ],
-              "complete": 0,
-              "dependency": {
-                "plan_step": 0
-              }
-            },
-            {
-              "id": 7,
-              "rank": 7,
-              "location": {
-                "address": "Kapele",
-                "latitude": 45.93105,
-                "longitude": 15.678094,
-                "station": "PSpostofficeS1"
-              },
-              "load": [],
-              "unload": [
-                "HPparcelCE233335515HR",
-                "HPparcelCE233350163HR",
-                "HPparcelCE233350203HR",
-                "HPparcelCE233350282HR",
-                "HPparcelCE233389836HR",
-                "HPparcelCE233389840HR"
-              ],
-              "complete": 0,
-              "dependency": {
-                "plan_step": 0
-              }
-            },
-            {
-              "id": 4,
-              "rank": 4,
-              "location": {
-                "address": "Topliska cesta",
-                "latitude": 45.89337,
-                "longitude": 15.621456,
-                "station": "PSpostofficeS3"
-              },
-              "load": [],
-              "unload": [
-                "HPparcelCE233350194HR"
-              ],
-              "complete": 0,
-              "dependency": {
-                "plan_step": 0
-              }
-            },
-            {
-              "id": 9,
-              "rank": 9,
-              "location": {
-                "address": "Ulica 11. novembra",
-                "latitude": 45.94199,
-                "longitude": 15.478111,
-                "station": "PSpostofficeS5"
-              },
-              "load": [],
-              "unload": [
-                "HPparcelCE233350217HR"
+                "HP_04"
               ],
               "complete": 0,
               "dependency": {
@@ -256,20 +145,7 @@
               }
             }
           ]
-        },
-        "load_size": 0,
-        "parcels": [
-          "HP123456789PS",
-          "HPparcelCE233248348HR",
-          "HPparcelCE233286522HR",
-          "HPparcelCE233335515HR",
-          "HPparcelCE233350163HR",
-          "HPparcelCE233350203HR",
-          "HPparcelCE233350282HR",
-          "HPparcelCE233389836HR",
-          "HPparcelCE233389840HR"
-        ],
-        "delay_minutes": 0
+        }
       }
     },
     {
@@ -294,9 +170,9 @@
           "location": {
             "city": null,
             "country": "CRO",
-            "station": "HPpostofficeH1",
-            "latitude": 45.840296,
-            "longitude": 15.686514,
+            "latitude": 45.803142,
+            "longitude": 15.710135,
+            "station": "PSpostofficeH3",
             "postal_code": null
           },
           "load_volume": null,
@@ -307,9 +183,10 @@
               {
                 "id": 1,
                 "load": [
-                  "HPparcelAdhoc1",
-                  "HPparcelCE232746718HR",
-                  "CE262608176HR"
+                  "HP_06",
+                  "HP_07",
+                  "HP_08",
+                  "HP_09"
                 ],
                 "rank": 1,
                 "complete": 0,
@@ -317,9 +194,9 @@
                 "location": {
                   "city": null,
                   "country": null,
-                  "station": "HPpostofficeH1",
-                  "latitude": 45.840296,
-                  "longitude": 15.686514,
+                  "latitude": 45.803142,
+                  "longitude": 15.710135,
+                  "station": "PSpostofficeH3",
                   "postal_code": null
                 },
                 "dependency": {
@@ -330,18 +207,16 @@
               {
                 "id": 2,
                 "rank": 2,
-                "unload": [
-                  "HPparcelAdhoc1",
-                  "HPparcelCE232746718HR"
+                "unload": ["HP_06"
                 ],
                 "complete": 0,
                 "due_time": null,
                 "location": {
                   "city": null,
                   "country": null,
-                  "station": "HPpostofficeH2",
-                  "latitude": 45.831867,
-                  "longitude": 15.690455,
+                  "station": "HPpostofficeH8",
+                  "latitude": 45.878072,
+                  "longitude": 15.739208,
                   "postal_code": null
                 },
                 "dependency": {
@@ -353,7 +228,7 @@
                 "id": 3,
                 "rank": 3,
                 "unload": [
-                  "CE262608176HR"
+                  "HP_07"
                 ],
                 "complete": 0,
                 "due_time": null,
@@ -363,6 +238,48 @@
                   "station": "HPpostofficeH6",
                   "latitude": 45.8872686,
                   "longitude": 15.6968985,
+                  "postal_code": null
+                },
+                "dependency": {
+                  "plan": null,
+                  "plan_step": 0
+                }
+              },
+              {
+                "id": 3,
+                "rank": 3,
+                "unload": [
+                  "HP_08"
+                ],
+                "complete": 0,
+                "due_time": null,
+                "location": {
+                  "city": null,
+                  "country": null,
+                  "station": "HPpostofficeS8",
+                  "latitude": 45.89504865,
+                  "longitude": 15.66006978,
+                  "postal_code": null
+                },
+                "dependency": {
+                  "plan": null,
+                  "plan_step": 0
+                }
+              },
+              {
+                "id": 2,
+                "rank": 2,
+                "unload": [
+                  "HP_09"
+                ],
+                "complete": 0,
+                "due_time": null,
+                "location": {
+                  "city": null,
+                  "country": null,
+                  "station": "HPpostofficeS1",
+                  "latitude": 45.93107932,
+                  "longitude": 15.67793203,
                   "postal_code": null
                 },
                 "dependency": {
@@ -389,7 +306,7 @@
   ],
   "parcels": [
     {
-      "id": "HPparcelAdhoc1",
+      "id": "HP_01",
       "state": "unserved",
       "issued": "2020-10-27T05:54:57Z",
       "source": {
@@ -415,7 +332,7 @@
       "customs_checkpoint": null
     },
     {
-      "id": "HPparcelCE232746718HR",
+      "id": "HP_02",
       "state": "unserved",
       "issued": "2020-10-04T09:17:51Z",
       "source": {
@@ -431,9 +348,9 @@
       "destination": {
         "city": null,
         "country": "CRO",
-        "station": "HPpostofficeH2",
-        "latitude": 45.831867,
-        "longitude": 15.690455,
+        "station": "HPpostofficeH1",
+        "latitude": 45.840296,
+        "longitude": 15.686514,
         "postal_code": null
       },
       "organization": "HP",
@@ -441,7 +358,7 @@
       "customs_checkpoint": null
     },
     {
-      "id": "CE262608176HR",
+      "id": "HP_03",
       "state": "unserved",
       "issued": "2020-10-06T10:10:30Z",
       "source": {
@@ -457,9 +374,9 @@
       "destination": {
         "city": null,
         "country": "CRO",
-        "station": "HPpostofficeH6",
-        "latitude": 45.887335,
-        "longitude": 15.697116,
+        "station": "HPpostofficeH5",
+        "latitude": 45.808406,
+        "longitude": 15.816847,
         "postal_code": null
       },
       "organization": "HP",
@@ -467,7 +384,7 @@
       "customs_checkpoint": null
     },
     {
-      "id": "HPparcelCE233248348HR",
+      "id": "HP_04",
       "state": "unserved",
       "issued": "2020-10-04T15:39:34Z",
       "source": {
@@ -483,33 +400,7 @@
       "destination": {
         "city": null,
         "country": "CRO",
-        "station": "HPpostofficeH5",
-        "latitude": 45.808406,
-        "longitude": 15.816847,
-        "postal_code": null
-      },
-      "organization": "HP",
-      "service_type": null,
-      "customs_checkpoint": null
-    },
-    {
-      "id": "HPparcelCE233350194HR",
-      "state": "unserved",
-      "issued": "2020-10-04T18:10:20Z",
-      "source": {
-        "city": null,
-        "country": "CRO",
-        "station": "HPpostofficeH1",
-        "latitude": 45.840296,
-        "longitude": 15.686514,
-        "postal_code": null
-      },
-      "deadline": "2020-10-05T23:10:20Z",
-      "payweight": 1,
-      "destination": {
-        "city": null,
-        "country": "SLO",
-        "station": "PSpostofficeS3",
+        "station": "HPpostofficeS3",
         "latitude": 45.89320611,
         "longitude": 15.6212996,
         "postal_code": null
@@ -519,7 +410,7 @@
       "customs_checkpoint": null
     },
     {
-      "id": "HPparcelCE233248325HR",
+      "id": "HP_06",
       "state": "unserved",
       "issued": "2020-10-04T13:07:43Z",
       "source": {
@@ -535,9 +426,9 @@
       "destination": {
         "city": null,
         "country": "CRO",
-        "station": "HPpostofficeH4",
-        "latitude": 45.917165,
-        "longitude": 15.730056,
+        "station": "HPpostofficeH8",
+        "latitude": 45.878072,
+        "longitude": 15.739208,
         "postal_code": null
       },
       "organization": "HP",
@@ -545,7 +436,7 @@
       "customs_checkpoint": null
     },
     {
-      "id": "HPparcelCE233286540HR",
+      "id": "HP_07",
       "state": "unserved",
       "issued": "2020-10-04T12:41:46Z",
       "source": {
@@ -561,9 +452,9 @@
       "destination": {
         "city": null,
         "country": "CRO",
-        "station": "HPpostofficeH8",
-        "latitude": 45.878072,
-        "longitude": 15.739208,
+        "station": "HPpostofficeH6",
+        "latitude": 45.887335,
+        "longitude": 15.697116,
         "postal_code": null
       },
       "organization": "HP",
@@ -571,7 +462,7 @@
       "customs_checkpoint": null
     },
     {
-      "id": "HPparcelCE233335515HR",
+      "id": "HP_08",
       "state": "unserved",
       "issued": "2020-10-04T17:44:43Z",
       "source": {
@@ -587,9 +478,9 @@
       "destination": {
         "city": null,
         "country": "SLO",
-        "station": "PSpostofficeS1",
-        "latitude": 45.93107932,
-        "longitude": 15.67793203,
+        "station": "HPpostofficeS8",
+        "latitude": 45.89504865,
+        "longitude": 15.66006978,
         "postal_code": null
       },
       "organization": "HP",
@@ -597,7 +488,7 @@
       "customs_checkpoint": null
     },
     {
-      "id": "HPparcelCE233350163HR",
+      "id": "HP_09",
       "state": "unserved",
       "issued": "2020-10-04T10:51:53Z",
       "source": {
@@ -613,299 +504,13 @@
       "destination": {
         "city": null,
         "country": "SLO",
-        "station": "PSpostofficeS2",
-        "latitude": 45.95503619,
-        "longitude": 15.63656969,
+        "station": "PSpostofficeS1",
+        "latitude": 45.93107932,
+        "longitude": 15.67793203,
         "postal_code": null
       },
       "organization": "HP",
       "service_type": null,
-      "customs_checkpoint": null
-    },
-    {
-      "id": "HPparcelCE233350203HR",
-      "state": "unserved",
-      "issued": "2020-10-04T14:50:02Z",
-      "source": {
-        "city": null,
-        "country": "CRO",
-        "station": "HPpostofficeH1",
-        "latitude": 45.840296,
-        "longitude": 15.686514,
-        "postal_code": null
-      },
-      "deadline": "2020-10-05T19:50:02Z",
-      "payweight": 1,
-      "destination": {
-        "city": null,
-        "country": "SLO",
-        "station": "PSpostofficeS4",
-        "latitude": 45.88461153,
-        "longitude": 15.5231045,
-        "postal_code": null
-      },
-      "organization": "HP",
-      "service_type": null,
-      "customs_checkpoint": null
-    },
-    {
-      "id": "HPparcelCE233350282HR",
-      "state": "unserved",
-      "issued": "2020-10-04T17:42:13Z",
-      "source": {
-        "city": null,
-        "country": "CRO",
-        "station": "HPpostofficeH1",
-        "latitude": 45.840296,
-        "longitude": 15.686514,
-        "postal_code": null
-      },
-      "deadline": "2020-10-05T22:42:13Z",
-      "payweight": 1,
-      "destination": {
-        "city": null,
-        "country": "SLO",
-        "station": "PSpostofficeS6",
-        "latitude": 45.89123853,
-        "longitude": 15.57086927,
-        "postal_code": null
-      },
-      "organization": "HP",
-      "service_type": null,
-      "customs_checkpoint": null
-    },
-    {
-      "id": "HPparcelCE233389836HR",
-      "state": "unserved",
-      "issued": "2020-10-04T10:41:34Z",
-      "source": {
-        "city": null,
-        "country": "CRO",
-        "station": "HPpostofficeH1",
-        "latitude": 45.840296,
-        "longitude": 15.686514,
-        "postal_code": null
-      },
-      "deadline": "2020-10-05T15:41:34Z",
-      "payweight": 1,
-      "destination": {
-        "city": null,
-        "country": "SLO",
-        "station": "PSpostofficeS7",
-        "latitude": 45.90488128,
-        "longitude": 15.59338439,
-        "postal_code": null
-      },
-      "organization": "HP",
-      "service_type": null,
-      "customs_checkpoint": null
-    },
-    {
-      "id": "HPparcelCE233389840HR",
-      "state": "unserved",
-      "issued": "2020-10-04T16:21:23Z",
-      "source": {
-        "city": null,
-        "country": "CRO",
-        "station": "HPpostofficeH1",
-        "latitude": 45.840296,
-        "longitude": 15.686514,
-        "postal_code": null
-      },
-      "deadline": "2020-10-05T21:21:23Z",
-      "payweight": 1,
-      "destination": {
-        "city": null,
-        "country": "SLO",
-        "station": "PSpostofficeS8",
-        "latitude": 45.89504865,
-        "longitude": 15.66006978,
-        "postal_code": null
-      },
-      "organization": "HP",
-      "service_type": null,
-      "customs_checkpoint": null
-    },
-    {
-      "id": "HPparcelCE233350217HR",
-      "state": "unserved",
-      "issued": "2020-10-04T17:47:04Z",
-      "source": {
-        "city": null,
-        "country": "CRO",
-        "station": "HPpostofficeH1",
-        "latitude": 45.840296,
-        "longitude": 15.686514,
-        "postal_code": null
-      },
-      "deadline": "2020-10-05T22:47:04Z",
-      "payweight": 1,
-      "destination": {
-        "city": null,
-        "country": "SLO",
-        "station": "PSpostofficeS5",
-        "latitude": 45.942039,
-        "longitude": 15.478103,
-        "postal_code": null
-      },
-      "organization": "HP",
-      "service_type": null,
-      "customs_checkpoint": null
-    },
-    {
-      "id": "CE233271960HR",
-      "state": "unserved",
-      "issued": "2020-10-06T10:30:13Z",
-      "source": {
-        "city": null,
-        "country": "CRO",
-        "station": "HPpostofficeH1",
-        "latitude": 45.840296,
-        "longitude": 15.686514,
-        "postal_code": null
-      },
-      "deadline": null,
-      "payweight": 1,
-      "destination": {
-        "city": null,
-        "country": "CRO",
-        "station": "HPpostofficeH7",
-        "latitude": 45.859075,
-        "longitude": 15.80341,
-        "postal_code": null
-      },
-      "organization": "HP",
-      "service_type": null,
-      "customs_checkpoint": null
-    },
-    {
-      "id": "HP123456789PS",
-      "state": "unserved",
-      "issued": "2020-10-06T10:05:02Z",
-      "source": {
-        "city": null,
-        "country": "CRO",
-        "station": "HPpostofficeH1",
-        "latitude": 45.840296,
-        "longitude": 15.686514,
-        "postal_code": null
-      },
-      "deadline": null,
-      "payweight": 9,
-      "destination": {
-        "city": null,
-        "country": "CRO",
-        "station": "HPpostofficeH7",
-        "latitude": 45.859075,
-        "longitude": 15.80341,
-        "postal_code": null
-      },
-      "organization": "HP",
-      "service_type": "normal",
-      "customs_checkpoint": null
-    },
-    {
-      "id": "HPparcelCE233286522HR",
-      "state": "unserved",
-      "issued": "2020-10-04T15:34:24Z",
-      "source": {
-        "city": null,
-        "country": "CRO",
-        "station": "HPpostofficeH1",
-        "latitude": 45.840296,
-        "longitude": 15.686514,
-        "postal_code": null
-      },
-      "deadline": "2020-10-05T20:34:24Z",
-      "payweight": 1,
-      "destination": {
-        "city": null,
-        "country": "CRO",
-        "station": "HPpostofficeH7",
-        "latitude": 45.859075,
-        "longitude": 15.80341,
-        "postal_code": null
-      },
-      "organization": "HP",
-      "service_type": null,
-      "customs_checkpoint": null
-    },
-    {
-      "id": "CE232969180HR",
-      "state": "unserved",
-      "issued": "2020-10-06T10:29:57Z",
-      "source": {
-        "city": null,
-        "country": "CRO",
-        "station": "HPpostofficeH2",
-        "latitude": 45.831867,
-        "longitude": 15.690455,
-        "postal_code": null
-      },
-      "deadline": null,
-      "payweight": 6,
-      "destination": {
-        "city": null,
-        "country": "CRO",
-        "station": "HPpostofficeH3",
-        "latitude": 45.803142,
-        "longitude": 15.710135,
-        "postal_code": null
-      },
-      "organization": "HP",
-      "service_type": null,
-      "customs_checkpoint": null
-    },
-    {
-      "id": "CE233759854HR",
-      "state": "unserved",
-      "issued": "2020-10-06T10:30:31Z",
-      "source": {
-        "city": null,
-        "country": "CRO",
-        "station": "HPpostofficeH2",
-        "latitude": 45.831867,
-        "longitude": 15.690455,
-        "postal_code": null
-      },
-      "deadline": null,
-      "payweight": 4,
-      "destination": {
-        "city": null,
-        "country": "CRO",
-        "station": "HPpostofficeH4",
-        "latitude": 45.917165,
-        "longitude": 15.730056,
-        "postal_code": null
-      },
-      "organization": "HP",
-      "service_type": null,
-      "customs_checkpoint": null
-    },
-    {
-      "id": "HP123456790PS",
-      "state": "unserved",
-      "issued": "2020-10-06T10:08:12Z",
-      "source": {
-        "city": null,
-        "country": "CRO",
-        "station": "HPpostofficeH3",
-        "latitude": 45.803142,
-        "longitude": 15.710135,
-        "postal_code": null
-      },
-      "deadline": null,
-      "payweight": 8,
-      "destination": {
-        "city": null,
-        "country": "CRO",
-        "station": "HPpostofficeH4",
-        "latitude": 45.917165,
-        "longitude": 15.730056,
-        "postal_code": null
-      },
-      "organization": "HP",
-      "service_type": "normal",
       "customs_checkpoint": null
     }
   ],
