@@ -27,10 +27,10 @@
       },
       "state": {
         "location": {
-          "country": "SLO",
+          "country": "CRO",
           "latitude": 45.803142,
           "longitude": 15.710135,
-          "station": "PSpostofficeH3"
+          "station": "HPpostofficeH3"
         },
         "status": 0,
         "availability_prediction": {
@@ -40,6 +40,7 @@
           },
           "time": 0
         },
+        "parcels": [ "HP_01", "HP_02", "HP_03", "HP_04" ],
         "load_volume": 0,
         "available_space": 0,
         "plan": "HPplan21864865932144692",
@@ -57,7 +58,7 @@
                 "address": "Jesenice",
                 "latitude": 45.803142,
                 "longitude": 15.710135,
-                "station": "PSpostofficeH3"
+                "station": "HPpostofficeH3"
               },
               "load": [
                 "HP_01",
@@ -133,7 +134,7 @@
                 "address": "Ul. Drage Svajcara 5",
                 "latitude": 45.942039,
                 "longitude": 15.478103,
-                "station": "HPpostofficeS5"
+                "station": "PSpostofficeS5"
               },
               "load": [],
               "unload": [
@@ -166,13 +167,13 @@
           "plan": "HPplan21864865932133892",
           "driver": null,
           "status": null,
-          "parcels": [],
+          "parcels": [ "HP_06", "HP_07", "HP_08", "HP_09" ],
           "location": {
             "city": null,
             "country": "CRO",
             "latitude": 45.803142,
             "longitude": 15.710135,
-            "station": "PSpostofficeH3",
+            "station": "HPpostofficeH3",
             "postal_code": null
           },
           "load_volume": null,
@@ -196,7 +197,7 @@
                   "country": null,
                   "latitude": 45.803142,
                   "longitude": 15.710135,
-                  "station": "PSpostofficeH3",
+                  "station": "HPpostofficeH3",
                   "postal_code": null
                 },
                 "dependency": {
@@ -256,7 +257,7 @@
                 "location": {
                   "city": null,
                   "country": null,
-                  "station": "HPpostofficeS8",
+                  "station": "PSpostofficeS8",
                   "latitude": 45.89504865,
                   "longitude": 15.66006978,
                   "postal_code": null
@@ -277,7 +278,7 @@
                 "location": {
                   "city": null,
                   "country": null,
-                  "station": "HPpostofficeS1",
+                  "station": "PSpostofficeS1",
                   "latitude": 45.93107932,
                   "longitude": 15.67793203,
                   "postal_code": null
@@ -400,7 +401,7 @@
       "destination": {
         "city": null,
         "country": "CRO",
-        "station": "HPpostofficeS3",
+        "station": "PSpostofficeS3",
         "latitude": 45.89320611,
         "longitude": 15.6212996,
         "postal_code": null
@@ -478,7 +479,7 @@
       "destination": {
         "city": null,
         "country": "SLO",
-        "station": "HPpostofficeS8",
+        "station": "PSpostofficeS8",
         "latitude": 45.89504865,
         "longitude": 15.66006978,
         "postal_code": null

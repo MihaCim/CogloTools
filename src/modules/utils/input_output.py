@@ -6,6 +6,8 @@ import numpy as np
 
 from ..create_graph.config.config_parser import ConfigParser
 from ..utils.tsp import Tsp
+from ..utils.ConflictNodeOrdering import OrderRelations
+
 
 config_parser = ConfigParser()
 
@@ -196,7 +198,7 @@ class InputOutputTransformer:
                 else:
                     type = event["event_type"]
                     if type == "order":
-                        type = "pickupRequest"
+                        type = "AdHocRequest"
                     elif type == "vehicle":
                         type = "brokenVehicle"
                     elif type == "border":
@@ -427,6 +429,14 @@ class InputOutputTransformer:
                 InputOutputTransformer.updateOrdersList(broken_clo, payload, parcels_dict, transformation_map))
 
             payload["orders"] = orders  # Orders that need to be processed by the remaining CLOs
+        elif payload["eventType"] == "AdHocRequest":
+            parcels = []
+            for item in json["event"]["info"]["item"]:
+                parcels.append(item)
+            orders = InputOutputTransformer.buildOrdersFromParcels(parcels, payload["useCase"], transformation_map)
+            payload["orders"] = orders
+            payload["eventType"] == "pickupRequest"  # setting back the event_type to basic use case
+
         else:
             parcels = []
             if json["parcels"] is not None:
@@ -662,6 +672,7 @@ class InputOutputTransformer:
         # 4. cut the route before that and in the first part the broken vehicle node
         # 5. run TSP over first part of the rout
         # 6. append the second part of the route
+
         import copy
         recommendations_raw_tmp = copy.deepcopy(recommendations_raw)
         start_address = recommendations_raw_tmp[0]['start_address']
@@ -727,6 +738,21 @@ class InputOutputTransformer:
         recommendations_without_start_half[0]['route'] = recommendations_without_start_half[0][
                                                              'route'] + route_second_half
         recommendations_without_start_half[0]['start_address'] = start_address
+
+
+
+        #handling conflict/cycled nodes pairs with same pickup & delivery locations"""
+        # relations = [] list of node pairs that are "conflict dependencies"
+
+        """
+        relations = [("1","2"), ("1","3"), ("3","2"), ("3","1")]
+        reordered_nodes = OrderRelations.order_relations(relations)
+        """
+
+
+        
+
+
         return recommendations_without_start_half
 
     @staticmethod

@@ -802,6 +802,7 @@ def handle_recommendation_request():
         # Return generic message stating that request was received and is due to be processed
         return generic_message_received_response
 
+
     ##Use Case ELTA
     elif use_case == "ELTA":
         print("processing ELTA usecase")
@@ -853,10 +854,11 @@ def handle_recommendation_request():
         response = methods.order_parcels_on_route(response1)
 
         # This piece of code posts optimization response to MSB
-        RecReq.post_response_msb(request_id, response)
+        #RecReq.post_response_msb(request_id, response)
 
         # Response is always a generic one which just states that CA received request and will process it.
-        return generic_message_received_response
+        #return generic_message_received_response
+        return response
 
 @app.route("/api/clo/newCLOs", methods=['POST'])
 def new_clos():

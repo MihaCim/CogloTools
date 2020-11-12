@@ -134,7 +134,7 @@ class VrpProcessor:
 
             # compute routes based on dispatch vectors from VRP. Since VRP output is incomplete/not best,
             # we add A* routing on top
-            plan_routes = self.make_route(dispatch, partition, plan.vehicles, plan.deliveries_req, use_case)
+            plan_routes = self.make_route(dispatch, partition, plan.vehicles, plan.deliveries_req, event_type, use_case)
             routes += plan_routes
 
         return routes
@@ -200,7 +200,7 @@ class VrpProcessor:
         else:
             return route
 
-    def make_route(self, loads, graph, vehicles, deliveries_req, use_case):
+    def make_route(self, loads, graph, vehicles, deliveries_req, event_type, use_case):
         nodes = graph.nodes
         edges = graph.edges
         print("Building route from VRP output...")
@@ -211,28 +211,28 @@ class VrpProcessor:
         loads_new = []
         vehicle_node_sequence = []
 
-        # update list of vehicle parcels: add new parcels to vehicle.parcels list
+        # update list of vehicle parcels: add new parcels to vehicle.parcels list)
+        # exception: crossborder - as the mapping of parcels on hte nodes change. We keep the final list not updated
         for x, vehicle in enumerate(vehicles):
             load = loads[x]
             load = [int(x) for x in load]
             loads_origin = self.map_dropoff(graph, vehicle.parcels)
+            if event_type != "crossBorder":
+                for i in range(len(nodes)):     # add new parcels to the vehicle from the orders
+                    vehicle_load_diff = load[i] - loads_origin[i]
 
-            for i in range(len(nodes)):     # add new parcels to the vehicle from the orders
-                vehicle_load_diff = load[i] - loads_origin[i]
+                    while vehicle_load_diff > 0:
+                        for j in range(len(deliveries_req)):
+                            if deliveries_req[j].target == nodes[i].id:
 
-                while vehicle_load_diff > 0:
-                    for j in range(len(deliveries_req)):
-                        if deliveries_req[j].target == nodes[i].id:
+                                # Payweight needs to be decreased from vehicle_load_diff, because it
+                                # drops all packets for one location at once
+                                pay_weight = deliveries_req[j].volume
 
-                            # Payweight needs to be decreased from vehicle_load_diff, because it
-                            # drops all packets for one location at once
-                            pay_weight = deliveries_req[j].volume
-
-                            vehicle.parcels.append(deliveries_req[j])
-                            deliveries_req.remove(deliveries_req[j])
-                            vehicle_load_diff -= pay_weight
-                            break
-
+                                vehicle.parcels.append(deliveries_req[j])
+                                deliveries_req.remove(deliveries_req[j])
+                                vehicle_load_diff -= pay_weight
+                                break
 
             loads_new.append(self.map_dropoff(graph, vehicle.parcels))
 
@@ -470,7 +470,8 @@ class VrpProcessor:
         """
         delivery_parts = [[],[]] # First one is for SLO nodes, Second one is for CRO nodes
         for parcel in deliveries:
-            if SLOVENIA == parcel.country: # Source country
+            if "SLO" == parcel.country: # Source country
+                #if parcel.("CRO") or parcel.target.startswith("HP"):
                 if parcel.target.startswith("CRO") or parcel.target.startswith("HP"):
                     # assign closest cro border node
                     cro_border_nodes = config_parser.get_border_nodes_cro()

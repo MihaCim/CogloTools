@@ -5,7 +5,8 @@
     "event": "system",
     "initiator": "COGLOmoduleWebIF",
     "info": {
-      "item": {
+      "item": [
+        {
         "organization": "PS",
         "id": "parcelAdhoc1",
         "source": {
@@ -16,7 +17,7 @@
         },
         "destination": {
           "country": "SLO",
-          "station": "HPpostofficeS1",
+          "station": "PSpostofficeS1",
           "latitude": 45.93107932,
           "longitude": 15.67793203
         },
@@ -24,7 +25,8 @@
         "payweight": 1,
         "issued": "2020-10-27T05:54:57Z",
         "state": "unserved"
-      },
+      }
+      ],
       "location": {
         "country": "CRO",
         "station": "HPpostofficeH1",
@@ -35,7 +37,7 @@
   },
   "clos": [
     {
-      "id": "HPvehicle1",
+      "id": "vehicle1",
       "info": {
         "organization": "PS",
         "physical_id": "8",
@@ -93,7 +95,7 @@
                 "address": null,
                 "latitude": 45.88461153,
                 "longitude": 15.5231045,
-                "station": "HPpostofficeS4"
+                "station": "PSpostofficeS4"
               },
               "load": [],
               "unload": [
@@ -111,7 +113,7 @@
                 "address": null,
                 "latitude": 45.90488128,
                 "longitude": 15.59338439,
-                "station": "HPpostofficeS7"
+                "station": "PSpostofficeS7"
               },
               "load": [],
               "unload": [
@@ -132,9 +134,9 @@
       }
     },
     {
-      "id": "HPvehicle2",
+      "id": "vehicle2",
       "info": {
-        "organization": "HP",
+        "organization": "PS",
         "physical_id": "1",
         "type": "transportation means",
         "subtype": "vehicle",
@@ -190,7 +192,7 @@
                 "address": null,
                 "latitude": 45.95503619,
                 "longitude": 15.63656969,
-                "station": "HPpostofficeS2"
+                "station": "PSpostofficeS2"
               },
               "load": [],
               "unload": [
@@ -203,7 +205,8 @@
             }
           ],
           "delay_minutes": 0
-        }
+        },
+        "parcels": [ "P_03"]
       }
     }
   ],
@@ -214,7 +217,7 @@
       "issued": "2020-10-04T09:17:51Z",
       "source": {
         "country": "SLO",
-        "station": "HPpostofficeS3",
+        "station": "PSpostofficeS3",
         "latitude": 45.89320611,
         "longitude": 15.6212996
       },
@@ -222,7 +225,7 @@
       "payweight": 1,
       "destination": {
         "country": "SLO",
-        "station": "HPpostofficeS4",
+        "station": "PSpostofficeS4",
         "latitude": 45.88461153,
         "longitude": 15.5231045
       },
@@ -234,7 +237,7 @@
       "issued": "2020-10-04T12:41:46Z",
       "source": {
         "country": "SLO",
-        "station": "HPpostofficeS3",
+        "station": "PSpostofficeS3",
         "latitude": 45.89320611,
         "longitude": 15.6212996
       },
@@ -242,7 +245,7 @@
       "payweight": 1,
       "destination": {
         "country": "SLO",
-        "station": "HPpostofficeS7",
+        "station": "PSpostofficeS7",
         "latitude": 45.90488128,
         "longitude": 15.59338439
       },
@@ -254,21 +257,21 @@
       "issued": "2020-10-06T10:10:30Z",
       "source": {
         "country": "SLO",
-        "station": "HPpostofficeS1",
+        "station": "PSpostofficeS1",
         "latitude": 45.93107932,
         "longitude": 15.67793203
       },
       "payweight": 6,
       "destination": {
         "country": "SLO",
-        "station": "HPpostofficeS2",
+        "station": "PSpostofficeS2",
         "latitude": 45.887335,
         "longitude": 15.697116
       },
       "organization": "PS"
     },
     {
-      "id": "P_04",
+      "id": "parcelAdhoc1",
       "state": "unserved",
       "issued": "2020-10-06T10:10:30Z",
       "source": {
@@ -280,7 +283,7 @@
       "payweight": 6,
       "destination": {
         "country": "SLO",
-        "station": "HPpostofficeS1",
+        "station": "PSpostofficeS1",
         "latitude": 45.93107932,
         "longitude": 15.67793203
       },
