@@ -1,5 +1,7 @@
 """Class OrderRelathions handles conflist routing multiple different pickup locations nodes
 are in conflict, creating ordering loop cycles: different nodes have parcels with same pickup locaiton"""
+import collections
+import copy
 
 class DagNode:
 
@@ -28,6 +30,49 @@ class DagNode:
 
 
 class OrderRelations:
+
+    @staticmethod
+    def create_relations(PickupNodes, route):
+        #if no psarcels to deliver
+        #if (len(PickupNodes) == 1):
+        #    return (list(PickupNodes)[0])
+
+        relations = []
+        # start node has all dependencies, as needs to be pushed to beginning
+        nodesKeys = [key for key, value in PickupNodes.items()]
+        for station in route[1:]:
+            relations.append((nodesKeys[0], station["id"]))
+        # relations for pickup locations
+        for key in nodesKeys[1:]:
+            load_parcels = PickupNodes[key]["load"]
+            for station in route:
+                for parcel in load_parcels:
+                    if parcel in station["unload"]:
+                        relations.append((key, station["id"]))
+        relations_ordered = OrderRelations.order_relations(relations)
+
+        # creating new stations for double visits with two separate loading and unloading location
+        duplicates_load = [item for item, count in collections.Counter(relations_ordered).items() if count > 1]
+        duplicates_unload = [item for item, count in collections.Counter(relations_ordered).items() if count > 1]
+
+        stations = {}
+        for station in route:
+            stations[station["id"]] = station
+        stations_ordered = []
+        for item in relations_ordered:
+            if item not in duplicates_load and item not in duplicates_unload:
+                stations_ordered.append(stations[item])
+            elif item in duplicates_load and item in duplicates_unload:
+                station = copy.deepcopy(stations[item])
+                station["unload"] = []
+                stations_ordered.append(station)
+                duplicates_load.remove(item)
+            elif item not in duplicates_load and item in duplicates_unload:
+                station = copy.deepcopy(stations[item])
+                station["load"] = []
+                stations_ordered.append(station)
+
+        return stations_ordered
 
     @staticmethod
     def topological_sort(node_list):

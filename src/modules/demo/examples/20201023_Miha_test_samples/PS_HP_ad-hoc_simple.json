@@ -25,26 +25,6 @@
         "payweight": 1,
         "issued": "2020-10-27T05:54:57Z",
         "state": "unserved"
-      },
-        {
-        "organization": "PS",
-        "id": "parcelAdhoc2",
-        "source": {
-          "country": "SLO",
-          "station": "PSpostofficeS7",
-          "latitude": 45.90488128,
-          "longitude": 15.59338439
-        },
-        "destination": {
-          "country": "SLO",
-          "latitude": 45.88461153,
-          "longitude": 15.5231045,
-          "station": "PSpostofficeS4"
-        },
-        "service_type": "normal",
-        "payweight": 1,
-        "issued": "2020-10-27T05:54:57Z",
-        "state": "unserved"
       }
       ],
       "location": {
@@ -54,7 +34,6 @@
         "longitude": 15.686514
       }
     }
-
   },
   "clos": [
     {
@@ -137,7 +116,9 @@
                 "station": "PSpostofficeS7"
               },
               "load": [],
-              "unload": ["P_02"],
+              "unload": [
+                "P_02"
+              ],
               "complete": 0,
               "dependency": {
                 "plan_step": 0
@@ -146,7 +127,9 @@
           ]
         },
         "load_size": 0,
-        "parcels": ["P_01","P_02"],
+        "parcels": [
+          "P_01","P_02"
+        ],
         "delay_minutes": 0
       }
     },
@@ -278,7 +261,7 @@
         "latitude": 45.93107932,
         "longitude": 15.67793203
       },
-      "payweight": 1,
+      "payweight": 6,
       "destination": {
         "country": "SLO",
         "station": "PSpostofficeS2",
@@ -288,41 +271,25 @@
       "organization": "PS"
     },
     {
-      "organization": "PS",
       "id": "parcelAdhoc1",
+      "state": "unserved",
+      "issued": "2020-10-06T10:10:30Z",
       "source": {
-        "country": "SLO",
+        "country": "CRO",
         "station": "HPpostofficeH1",
         "latitude": 45.840296,
         "longitude": 15.686514
       },
+      "payweight": 6,
       "destination": {
         "country": "SLO",
         "station": "PSpostofficeS1",
         "latitude": 45.93107932,
         "longitude": 15.67793203
-      }
-    },
-    {
-      "id": "parcelAdhoc1",
-      "state": "unserved",
-      "issued": "2020-10-06T10:10:30Z",
-      "source": {
-        "country": "SLO",
-        "station": "PSpostofficeS7",
-        "latitude": 45.90488128,
-        "longitude": 15.59338439
-      },
-      "payweight": 1,
-      "destination": {
-        "country": "SLO",
-        "station": "PSpostofficeS4",
-        "latitude": 45.88461153,
-        "longitude": 15.5231045
       },
       "organization": "PS"
     }
   ],
   "request": "859eb9cd-65d1-4836-bd82-ddc3cad9a914",
-  "organization": "PS"
+  "organization": "HP"
 }
