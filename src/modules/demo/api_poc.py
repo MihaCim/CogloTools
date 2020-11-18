@@ -783,11 +783,7 @@ def handle_recommendation_request():
         #recommendations_raw = InputOutputTransformer.revert_coordinates(recommendations, transformation_map)
 
         print("starting final reordering & TSP")
-        # reorder the final route on TSP
-        if evt_type == "brokenVehicle":
-            recommendations = InputOutputTransformer.PickupNodeReorder(recommendations, data)
-        else:
-            recommendations = Tsp.order_recommendations(recommendations)
+        recommendations = InputOutputTransformer.PickupNodeReorder(recommendations)
 
         # Executes TSP algorithm upon calculated recommendations by our VRP
         #recommendations = Tsp.order_recommendations(recommendations_raw)
