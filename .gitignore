@@ -8,6 +8,8 @@ bin/
 venv
 # Vim files
 .vimrc
+# IntelliJ files
+*.iml
 .idea/*
 #*.osm
 *.pbf
