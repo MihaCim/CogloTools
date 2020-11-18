@@ -105,11 +105,28 @@ class OrderRelations:
 
     @staticmethod
     def order_relations(relations):
-        internal2external_id_map = {}
+        # convert IDs to internal IDs
+        external_node_id_set = set()
 
         for src_id, dst_id in relations:
-            internal2external_id_map[src_id] = src_id
-            internal2external_id_map[dst_id] = dst_id
+            external_node_id_set.add(src_id)
+            external_node_id_set.add(dst_id)
+
+        external2internal_id_map = {ext_node_id: int_node_id for int_node_id, ext_node_id in enumerate(external_node_id_set)}
+        internal2external_id_map = {int_node_id: ext_node_id for int_node_id, ext_node_id in enumerate(external_node_id_set)}
+
+        relations_internal = [] # convert relations to internal IDs to avoid problems later
+        for ext_src_id, ext_dst_id in relations:
+
+            int_src_id = external2internal_id_map[ext_src_id]
+            int_dst_id = external2internal_id_map[ext_dst_id]
+
+            relations_internal.append((
+                int_src_id,
+                int_dst_id
+            ))
+
+        # do the work
 
         # create a list of non-cyclic relations by duplicating
         # some nodes
@@ -117,14 +134,15 @@ class OrderRelations:
 
         used_relation_set = set()
         new_dst_id_map = {}
-        for src_id, dst_id in relations:
+        new_dst_to_dst_id_map = {}
+        for src_id, dst_id in relations_internal:
             if (dst_id, src_id) in used_relation_set:
                 # check if a new destination id already exists
                 if dst_id not in new_dst_id_map:
                     # instead of i -> j add the relation i -> j'
                     new_dst_id = len(internal2external_id_map)
                     new_dst_id_map[dst_id] = new_dst_id
-                    internal2external_id_map[new_dst_id] = dst_id
+                    new_dst_to_dst_id_map[new_dst_id] = dst_id
 
                 new_dst_id = new_dst_id_map[dst_id]
                 dag_relations.append((src_id, new_dst_id))
@@ -151,9 +169,19 @@ class OrderRelations:
             node_list.append(DagNode(node_id, node_src_id_set))
 
         ordered_node_list = OrderRelations.topological_sort(node_list)
-        node_id_vec = [internal2external_id_map[node.get_node_id()] for node in ordered_node_list]
 
-        return node_id_vec
+        # convert to external IDs
+        external_node_id_vec = []
+        for node in ordered_node_list:
+            node_id = node.get_node_id()
+
+            if node_id in new_dst_to_dst_id_map:
+                node_id = new_dst_to_dst_id_map[node_id]
+
+            ext_node_id = internal2external_id_map[node_id]
+            external_node_id_vec.append(ext_node_id)
+
+        return external_node_id_vec
 
 """
 if __name__ == '__main__':
