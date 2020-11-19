@@ -6,10 +6,10 @@ import requests
 from flask import Flask, request
 from flask_jsonpify import jsonify
 from flask_restful import Resource
-from jsonschema import ValidationError
+#from jsonschema import ValidationError
 from waitress import serve
 
-from .ErrorHandling import ErrorHandling
+#from .ErrorHandling import ErrorHandling
 from ..create_graph.config.config_parser import ConfigParser
 from ..create_graph.create_graph import JsonGraphCreator
 from ..create_graph.methods import methods
@@ -227,16 +227,13 @@ def handle_recommendation_request():
         print("starting final reordering & TSP")
         recommendations = InputOutputTransformer.PickupNodeReorder(recommendations)
 
-        # Executes TSP algorithm upon calculated recommendations by our VRP
-        #recommendations = Tsp.order_recommendations(recommendations_raw)
-
         # print route for all vehicles
         P=InputOutputTransformer.PrintRoutes(recommendations)
         # Prepare output message from calculated recommendations
         response = InputOutputTransformer.prepare_output_message(recommendations, use_case, request_id, organization)
 
         # Post response to MSB
-        #RecReq.post_response_msb(request_id, response)
+        RecReq.post_response_msb(request_id, response)
         # Return generic message stating that request was received and is due to be processed
         return generic_message_received_response
 
