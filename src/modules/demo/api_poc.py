@@ -293,7 +293,7 @@ def handle_recommendation_request():
         response = methods.order_parcels_on_route(response1)
 
         # This piece of code posts optimization response to MSB
-        #RecReq.post_response_msb(request_id, response)
+        RecReq.post_response_msb(request_id, response)
 
         # Response is always a generic one which just states that CA received request and will process it.
         #return generic_message_received_response
