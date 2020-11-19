@@ -118,6 +118,7 @@ def find_min_pickup(coords, posts_nparray):
     return label
 
 def elta_clustering(orig_data):
+    nClusters = 20
     data = copy.deepcopy(orig_data)
     l = []
     for i, el in enumerate(data['clos']):
@@ -126,6 +127,10 @@ def elta_clustering(orig_data):
         l.append([i, el['UUIDParcel'], "destination"] + el['destination'])
     df = pd.DataFrame(l)
     # run clustering
+
+    if (len(orig_data["orders"]) + 5) <= nClusters:
+        nClusters = len(orig_data["orders"])-8
+
     kmeans = KMeans(n_clusters=7)
     kmeans.fit(df[[3, 4]])  # Compute k-means clustering.
     centers = kmeans.cluster_centers_
