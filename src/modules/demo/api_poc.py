@@ -721,7 +721,7 @@ def handle_recommendation_request():
     """Main entry point for HTTP request"""
     received_request = request.get_json(force=True)
     try:
-        ErrorHandling.check_messsages_correctnes(received_request)
+        ErrorHandling.check_messages_correction(received_request)
     except ValidationError as error:
         return str(error)
 

@@ -1,19 +1,19 @@
 from jsonschema import validate
 import json
 
+
 class ErrorHandling:
 
     @staticmethod
-    def check_messsages_correctnes(input_data):
-
-
+    def check_messages_correction(input_data):
         if input_data['event']['event'] == 'breakdown':
             f = open('./modules/demo/schemas/PS_HP_brokenvehicle.json', )
             json_schema = json.load(f)
             validate(instance=input_data, schema=json_schema)
-
-
-
+        elif input_data['event']['event'] == 'order':
+            f = open('./modules/demo/schemas/PS_HP_ad-hoc.json', )
+            json_schema = json.load(f)
+            validate(instance=input_data, schema=json_schema)
     '''
     checkCLOs
 
