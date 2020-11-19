@@ -6,7 +6,7 @@ class ErrorHandling:
 
     @staticmethod
     def check_messages_correction(input_data):
-        event = input_data['event']['event']
+        event = input_data['event']['event_type']
         organization = input_data['organization']
         if event == 'breakdown' or organization == 'SLO-CRO':
             f = open('./modules/demo/schemas/PS_HP_brokenvehicle.json', )

@@ -16,3 +16,4 @@ waitress
 networkx
 sklearn
 pandas
+jsonschema
