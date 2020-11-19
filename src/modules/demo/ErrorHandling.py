@@ -12,7 +12,7 @@ class ErrorHandling:
             f = open('./modules/demo/schemas/PS_HP_brokenvehicle.json', )
             json_schema = json.load(f)
             validate(instance=input_data, schema=json_schema)
-        elif event == 'order' and  (organization == 'PS' or organization == 'HP'):
+        elif event == 'order' and (organization == 'PS' or organization == 'HP'):
             f = open('./modules/demo/schemas/PS_HP_ad-hoc.json', )
             json_schema = json.load(f)
             validate(instance=input_data, schema=json_schema)
@@ -20,3 +20,4 @@ class ErrorHandling:
             f = open('./modules/demo/schemas/Elta_ad-hoc.json', )
             json_schema = json.load(f)
             validate(instance=input_data, schema=json_schema)
+        #TODO missing daily_plan
