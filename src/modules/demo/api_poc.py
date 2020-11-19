@@ -827,7 +827,7 @@ def handle_recommendation_request():
         elif evt_type == "brokenVehicle":
             if "clos" not in data or "orders" not in data:
                 return {"msg": "Parameter 'clos' or 'orders' is missing", "status": 0}
-            broken_clo_orders = data["orders"]
+            broken_clo_orders = data_request["orders"]
             recommendations = RecReq.process_broken_clo(evt_type, clos, broken_clo_orders, vrp_processor_ref, use_case)
         elif evt_type == "pickupRequest":
             if "orders" not in data_request:
@@ -837,8 +837,12 @@ def handle_recommendation_request():
         else:
             return jsonify({"msg": "Invalid event type: {}".format(evt_type), "status": 0})
 
-        # Executes TSP on given recommendations to order route plan correctly
-        recommendations = Tsp.order_recommendations(recommendations)
+        print("starting final reordering & TSP")
+        recommendations = InputOutputTransformer.PickupNodeReorder(recommendations)
+
+        # print route for all vehicles
+        P = InputOutputTransformer.PrintRoutes(recommendations)
+
 
         # Maps recommendations based on transform_map_dict
         recommendations_mapped = methods.map_coordinates_to_response(recommendations, transform_map_dict)

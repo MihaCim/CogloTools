@@ -42,7 +42,6 @@ class VrpProcessor:
                 for node in graph.nodes:
                     if v.start_node == node.id:
                         map_v[i].append(v)
-
         return map_v
 
     def map_deliveries(self, deliveries):
@@ -417,8 +416,7 @@ class VrpProcessor:
             # list of additional parcels from request
             if evt_type == "brokenVehicle":
                 deliveries_diff = [Parcel(x["UUIDParcel"], x["destination"],
-                                          x["weight"], x["pickup"],
-                                          "order") for x in requests]
+                                          x["weight"], x["pickup"], "order") for x in requests]
             else:
                 deliveries_diff = [Parcel(x["UUIDParcel"], x["destination"],
                                           x["weight"], x["pickup"], "order") for x in requests]

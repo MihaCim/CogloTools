@@ -216,7 +216,7 @@ class InputOutputTransformer:
                 else:
                     type = event["event_type"]
                     if type == "order":
-                        type = "pickupRequest"
+                        type = "AdHocRequest"
                     elif type == "vehicle":
                         type = "brokenVehicle"
                     payload["eventType"] = type
@@ -395,7 +395,7 @@ class InputOutputTransformer:
                     station_id = InputOutputTransformer.getStationIdOrClosest(
                         vehicle_location, config_parser.get_csv_path(SLO_CRO_USE_CASE), transformation_map)
                     parcel['pickup'] = station_id
-                else:
+                else: #ELTA use case
                     InputOutputTransformer.validateMessageForValue(vehicle_location, ["latitude", "longitude"])
                     parcel['pickup'] = [vehicle_location["latitude"], vehicle_location["longitude"]]
 
@@ -409,7 +409,7 @@ class InputOutputTransformer:
                                                                                   SLO_CRO_USE_CASE), transformation_map,
                                                                               parcel_id)
                     parcel['destination'] = station_id
-                else:
+                else: #ELTA use_case
                     InputOutputTransformer.validateMessageForValue(destination, ["latitude", "longitude"])
                     parcel['destination'] = [destination["latitude"], destination["longitude"]]
 
@@ -418,15 +418,15 @@ class InputOutputTransformer:
             ########################################################################################
             # GO THROUGH AVAILABLE VEHICLES AND PUT REMAINING PLAN LOAD ORDERS IN ARRAY OF PARCELS
             ########################################################################################
-            for remaining_clo in new_clos:
-                orders.extend(
-                    InputOutputTransformer.updateOrdersList(remaining_clo, payload, parcels_dict, transformation_map))
-
+            #for remaining_clo in new_clos:
+            #   orders.extend(
+            #        InputOutputTransformer.updateOrdersList(remaining_clo, payload, parcels_dict, transformation_map))
+            #
             ########################################################################################
             # REMAINING PLAN FOR BROKEN CLO (PICKUP PARCELS THAT BROKEN CLO SHOULD, BUT CANNOT)
             ########################################################################################
-            orders.extend(
-                InputOutputTransformer.updateOrdersList(broken_clo, payload, parcels_dict, transformation_map))
+            #orders.extend(
+            #    InputOutputTransformer.updateOrdersList(broken_clo, payload, parcels_dict, transformation_map))
 
             payload["orders"] = orders  # Orders that need to be processed by the remaining CLOs
         elif payload["eventType"] == "AdHocRequest":
@@ -692,15 +692,17 @@ class InputOutputTransformer:
                 final_route = Tsp.order_recommendations(recommendations_new)[0]["route"]
             else:
                 #create ordered list of pickup locations
-                dependencies_stations = OrderRelations.create_relations(PickupNodes, route) #TODO: in puckup event last pickup node not appended in the list - on missing??
+                dependencies_stations = OrderRelations.create_relations(PickupNodes, route)
 
                 #Removes the dependencies nodes withought loading
+
                 PickupNodes_ids = [key for key, value in PickupNodes.items()]
                 dependencies_list = []
                 for idx, station in enumerate(dependencies_stations[:]):
                     if station["id"] in PickupNodes_ids:
                         dependencies_list.append(station)
                 dependencies_stations = copy.deepcopy(dependencies_list)
+
 
                 dependencies_stations_ids = [station["id"] for station in dependencies_stations]
                 dependencies_stations.pop(0)

@@ -126,7 +126,7 @@ def elta_clustering(orig_data):
         l.append([i, el['UUIDParcel'], "destination"] + el['destination'])
     df = pd.DataFrame(l)
     # run clustering
-    kmeans = KMeans(n_clusters=12)
+    kmeans = KMeans(n_clusters=7)
     kmeans.fit(df[[3, 4]])  # Compute k-means clustering.
     centers = kmeans.cluster_centers_
     df["labels"] = labels = kmeans.labels_
@@ -213,21 +213,12 @@ def elta_map_parcels(orig_data):
             mapped_location = find_min(parcel['destination'][0], parcel['destination'][1])
             parcel['destination_location'] = parcel['destination']
             parcel['destination'] = mapped_location
-            print(mapped_location)
-    if 'orders' in data:
-        for clo in data['orders']:
-            mapped_location = find_min(clo['destination'][0], clo['destination'][1])
-            clo['destination_location'] = clo['destination']
-            clo['destination'] = mapped_location
+    for order in data["orders"]:
+        mapped_location = find_min(order['destination'][0], order['destination'][1])
+        order['destination_location'] = order['destination']
+        order['destination'] = mapped_location
+        mapped_location = find_min(order['pickup'][0], order['pickup'][1])
+        order['pickup_location'] = order['pickup']
+        order['pickup'] = mapped_location
 
-            mapped_location = find_min(clo['pickup'][0], clo['pickup'][1])
-            clo['pickup_location'] = clo['pickup']
-            clo['pickup'] = mapped_location
-    if 'brokenVehicle' in data:
-        brokenVehicle_location = find_min(data["brokenVehicle"]["currentLocation"][0],data ["brokenVehicle"]["currentLocation"][1])
-        data["brokenVehicle"]["currentLocation"] = brokenVehicle_location
-        for clo in data['brokenVehicle']['parcels']:
-            mapped_location = find_min(clo['destination'][0], clo['destination'][1])
-            clo['destination_location'] = clo['destination']
-            clo['destination'] = mapped_location
     return data
