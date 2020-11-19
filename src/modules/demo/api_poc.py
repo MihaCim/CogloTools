@@ -6,8 +6,10 @@ import requests
 from flask import Flask, request
 from flask_jsonpify import jsonify
 from flask_restful import Resource
+from jsonschema import ValidationError
 from waitress import serve
 
+from .ErrorHandling import ErrorHandling
 from ..create_graph.config.config_parser import ConfigParser
 from ..create_graph.create_graph import JsonGraphCreator
 from ..create_graph.methods import methods
@@ -718,6 +720,11 @@ def handle_recommendation_request():
 
     """Main entry point for HTTP request"""
     received_request = request.get_json(force=True)
+    try:
+        ErrorHandling.check_messages_correction(received_request)
+    except ValidationError as error:
+        return str(error)
+
     with open('received_request.json', 'w') as outfile:
         json.dump(received_request, outfile)
 
