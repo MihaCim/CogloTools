@@ -6,6 +6,8 @@ import numpy as np
 
 from ..create_graph.config.config_parser import ConfigParser
 from ..utils.tsp import Tsp
+from ..utils.ConflictNodeOrdering import OrderRelations
+
 
 config_parser = ConfigParser()
 
@@ -196,9 +198,11 @@ class InputOutputTransformer:
                 else:
                     type = event["event_type"]
                     if type == "order":
-                        type = "pickupRequest"
+                        type = "AdHocRequest"
                     elif type == "vehicle":
                         type = "brokenVehicle"
+                    elif type == "border":
+                        type = "crossBorder"
                     payload["eventType"] = type
         elif json["organization"] == ELTA_USE_CASE:
             payload["useCase"] = ELTA_USE_CASE
@@ -212,7 +216,7 @@ class InputOutputTransformer:
                 else:
                     type = event["event_type"]
                     if type == "order":
-                        type = "pickupRequest"
+                        type = "AdHocRequest"
                     elif type == "vehicle":
                         type = "brokenVehicle"
                     payload["eventType"] = type
@@ -391,7 +395,7 @@ class InputOutputTransformer:
                     station_id = InputOutputTransformer.getStationIdOrClosest(
                         vehicle_location, config_parser.get_csv_path(SLO_CRO_USE_CASE), transformation_map)
                     parcel['pickup'] = station_id
-                else:
+                else: #ELTA use case
                     InputOutputTransformer.validateMessageForValue(vehicle_location, ["latitude", "longitude"])
                     parcel['pickup'] = [vehicle_location["latitude"], vehicle_location["longitude"]]
 
@@ -405,7 +409,7 @@ class InputOutputTransformer:
                                                                                   SLO_CRO_USE_CASE), transformation_map,
                                                                               parcel_id)
                     parcel['destination'] = station_id
-                else:
+                else: #ELTA use_case
                     InputOutputTransformer.validateMessageForValue(destination, ["latitude", "longitude"])
                     parcel['destination'] = [destination["latitude"], destination["longitude"]]
 
@@ -414,17 +418,24 @@ class InputOutputTransformer:
             ########################################################################################
             # GO THROUGH AVAILABLE VEHICLES AND PUT REMAINING PLAN LOAD ORDERS IN ARRAY OF PARCELS
             ########################################################################################
-            for remaining_clo in new_clos:
-                orders.extend(
-                    InputOutputTransformer.updateOrdersList(remaining_clo, payload, parcels_dict, transformation_map))
-
+            #for remaining_clo in new_clos:
+            #   orders.extend(
+            #        InputOutputTransformer.updateOrdersList(remaining_clo, payload, parcels_dict, transformation_map))
+            #
             ########################################################################################
             # REMAINING PLAN FOR BROKEN CLO (PICKUP PARCELS THAT BROKEN CLO SHOULD, BUT CANNOT)
             ########################################################################################
-            orders.extend(
-                InputOutputTransformer.updateOrdersList(broken_clo, payload, parcels_dict, transformation_map))
+            #orders.extend(
+            #    InputOutputTransformer.updateOrdersList(broken_clo, payload, parcels_dict, transformation_map))
 
             payload["orders"] = orders  # Orders that need to be processed by the remaining CLOs
+        elif payload["eventType"] == "AdHocRequest":
+            parcels = []
+            for item in json["event"]["info"]["item"]:
+                parcels.append(item)
+            orders = InputOutputTransformer.buildOrdersFromParcels(parcels, payload["useCase"], transformation_map)
+            payload["eventType"] = "pickupRequest"  # setting back the event_type to basic use case
+            payload["orders"] = orders
         else:
             parcels = []
             if json["parcels"] is not None:
@@ -653,15 +664,147 @@ class InputOutputTransformer:
         return recommendations
 
     @staticmethod
-    def PickupNodeReorder(recommendations_raw, data):
-        # 1. delete the node with broken vehicle from rout.
-        # 2. run TSP
-        # 3. check which node on route is the first one that has broken vehicle parcels
-        # 4. cut the route before that and in the first part the broken vehicle node
-        # 5. run TSP over first part of the rout
-        # 6. append the second part of the route
-        import copy
+    def PickupNodeReorder(recommendations_raw):
+        # 1. Itterate on vehicles.
+        # 2. for each route -> find pickup nodes
+        # 3. Reorder pickup nodes based on depencencies
+        # 4. Delete pickup nodes from original route and start adding them based on ordered list
+        # 5. For each pickup node: check where on route are nodes with parcels form pickup node = dependency locations
+        # 6. Put pickup node on route before dependency locations
+        # 7. Split the first part of the route and run TSP on it
+        # 8. Itterate till Aall pickup nodes added
+
+        """handling pickup locations nodes on route"""
+        for i in range(len(recommendations_raw)):
+
+            recommendations_new = []
+            recommendations_new.append(copy.deepcopy(recommendations_raw[i]))
+            route = copy.deepcopy(recommendations_new[0]["route"])
+            PickupNodes = {}
+            route_first_part = []
+            route_second_part = []
+            #create and ordered list of all pickup and dependency nodes
+            for station in route:
+                if len(station["load"]) != 0:
+                    PickupNodes[station["id"]] = station
+
+            if len(PickupNodes) == 1: #if daily plan, skip reordering
+                final_route = Tsp.order_recommendations(recommendations_new)[0]["route"]
+            else:
+                #create ordered list of pickup locations
+                dependencies_stations = OrderRelations.create_relations(PickupNodes, route)
+
+                #Removes the dependencies nodes withought loading
+
+                PickupNodes_ids = [key for key, value in PickupNodes.items()]
+                dependencies_list = []
+                for idx, station in enumerate(dependencies_stations[:]):
+                    if station["id"] in PickupNodes_ids:
+                        dependencies_list.append(station)
+                dependencies_stations = copy.deepcopy(dependencies_list)
+
+
+                dependencies_stations_ids = [station["id"] for station in dependencies_stations]
+                dependencies_stations.pop(0)
+                dependencies_stations.reverse() #reverse ordered for adding to the the route
+
+                #delete dependency stations from route + keep the start node + run TSP
+                for station in route[1:]:
+                    if station["id"] in dependencies_stations_ids:
+                        route.remove(station)
+                recommendations_new[0]["route"] = route
+                recommendations_ordered = Tsp.order_recommendations(recommendations_new)
+                route_first_part = recommendations_ordered[0]["route"]
+
+                ##insert each pickup node before the parcel delivery stations
+                for start_node in dependencies_stations:
+                    pickupnode_parcels = set(start_node["load"])
+                    station_idx = None
+                    # check from second station on - the starting location does not change
+                    for idx, station in enumerate(route_first_part[1:]):
+                        if station_idx == None:
+                            parcels = station["unload"]
+                            for parcel in parcels:
+                                if parcel in pickupnode_parcels:
+                                    station_idx = idx + 1
+                                    break
+
+                    if station_idx == None:
+                        print("adding nonconfict node to route_first_part")
+                        route_first_part.append(start_node)
+                        if len(route_first_part) >= 2:
+                            recommendations_new[0]["route"] = route_first_part
+                            route_tsp = Tsp.order_recommendations(recommendations_new)
+                            route_first_part = route_tsp[0]["route"]
+                        route_second_part2 = copy.deepcopy(route_first_part[1:])
+                        route_second_part = route_second_part2 + route_second_part
+                        route_first_part = copy.deepcopy(route_first_part[:1])
+                    else:
+                        print("adding  pickup node to route_first_part with conflict node")
+                        route_second_part2 = (copy.deepcopy(route_first_part[station_idx:]))
+                        route_first_part = copy.deepcopy(route_first_part[:station_idx])
+                        route_second_part = route_second_part2 + route_second_part
+                        route_first_part.append(start_node)
+                        if len(route_first_part) >= 2:
+                            recommendations_new[0]["route"] = route_first_part
+                            route_tsp = Tsp.order_recommendations(recommendations_new)
+                            route_first_part = route_tsp[0]["route"]
+                final_route = route_first_part + route_second_part
+
+            recommendations_raw[i]["route"] = final_route
+        return recommendations_raw
+
+
+
+
+        """
+            #udpdating new reordered route for vehicle
+            Recommendations_reordered[i]["route"] = recommendations_new[0]["route"]
+        """
+
+        """
+        route = copy.deepcopy(recommendations_raw[0]["route"])
+        PickupNodes = {}
+        for station in route[1:]:
+            if len(station["load"]) != 0:
+                PickupNodes[station["id"]] = station
+        for station in route[:]:
+            if station["id"] in PickupNodes:
+                route.remove(station)
+
+
+        recommendations_new = copy.deepcopy(recommendations_raw)
+        recommendations_new[0]["route"] = route
+        route_tsp = Tsp.order_recommendations(recommendations_new)
+
+        ##insert each pickup node before the parcel delivery stations
+        for key, value in PickupNodes.items():
+            node_id = key
+            start_node = PickupNodes[node_id]
+            pickupnode_parcels = set(start_node["load"])
+            route = route_tsp[0]["route"]
+            station_idx = None
+            # check from second station - the starting location does not change
+            for idx, station in enumerate(route[1:]):
+                if station_idx == None:
+                    parcels = station["unload"]
+                    for parcel in parcels:
+                        if parcel in pickupnode_parcels:
+                            station_idx = idx + 1
+                            break
+
+            # split route, add start node to first part
+            route_second_part = copy.deepcopy(route[station_idx:])
+            route_first_part = copy.deepcopy(route[:station_idx])
+            route_first_part.append(start_node)
+            # runt TSP on first part of the route
+            recommendations_new[0]["route"] = route_first_part
+            route_tsp = Tsp.order_recommendations(recommendations_new)
+
+        """
+        """
         recommendations_raw_tmp = copy.deepcopy(recommendations_raw)
+        start_address = recommendations_raw_tmp[0]['start_address']
         broken_vehicle_station = data['orders'][0]['pickup']
         broken_vehicle = {}
         route = []
@@ -693,17 +836,78 @@ class InputOutputTransformer:
                 break
             else:
                 route.append(el)
-        #create first part of the route with briken vehicle
+
+        size = len(route)
+        # kreiras novo lokacijo - kopija node[0]
+        # route_part1:  pobrises parcels from broken vehicle na  node[0]["unload"]
+        # route_part2 dodas lokacijo  z  parcels from broken vehicle: node[0]["unload"] + pobrisses node[0]["load"] = []
+
         route.append(broken_vehicle)
         recommendations_without_broken_vehicle[0]['route'] = route
-        recommendations_final = Tsp.order_recommendations(recommendations_without_broken_vehicle)
+        recommendations_without_broken_vehicle[0]['start_address'] = start_address
+        recommendations_without_start_half = Tsp.order_recommendations(recommendations_without_broken_vehicle)
 
-        #append second part of the route
-        recommendations_final[0]['route'] = recommendations_final[0][
+        if size == 1:
+            new_location = copy.deepcopy(broken_vehicle)
+            unload = []
+            for loc in broken_vehicle['unload'][:]:
+                if loc not in vehicle_parcels_list:
+                    unload.append(loc)
+            new_location['load'] = []
+            new_location['unload'] = unload
+
+            route_second_half = recommendations_without_broken_vehicle[0]['route'][1:]
+            route_second_half.append(new_location)
+            recommendations_without_broken_vehicle[0]['route'] = route_second_half
+            recommendations_second_reorder = Tsp.order_recommendations(recommendations_without_broken_vehicle)
+            route_second_half = recommendations_second_reorder[0]['route']
+
+
+
+        recommendations_without_start_half[0]['route'] = recommendations_without_start_half[0][
                                                              'route'] + route_second_half
+        recommendations_without_start_half[0]['start_address'] = start_address
 
-        return recommendations_final
+        """
 
+        #handling conflict/cycled nodes pairs with same pickup & delivery locations"""
+        # relations = [] list of node pairs that are "conflict dependencies"
+
+        """
+        relations = [("1","2"), ("1","3"), ("3","2"), ("3","1")]
+        reordered_nodes = OrderRelations.order_relations(relations)
+        """
+
+
+        
+
+
+        return recommendations_without_start_half
+
+    @staticmethod
+    def PrintRoutes(recommendations):
+        # Print route sequence for each CLO in recommendations plan.
+        print("*******Route plan for delivery********")
+        for plan in recommendations:
+            print("Plan for VEHICLE:", plan["UUID"])
+            string = ""
+            for step in plan["route"]:
+                location_name = (step["location"]["station"])
+                loadparcels = ""
+                for load in step["load"]:
+                    loadparcels = loadparcels + " " + load
+                unloadparcels = ""
+                for unload in step["unload"]:
+                    unloadparcels = unloadparcels + " " + unload
+
+                step_string = "nodeName:" + " " + location_name + "Load:" + loadparcels
+                print("STEP:", location_name)
+                if loadparcels:
+                    print("parcels loading:", loadparcels)
+                if unloadparcels:
+                    print("parcels unloading:", unloadparcels)
+        print("****end of plan****")
+        return(True)
 
 class ParcelLocation:
     """

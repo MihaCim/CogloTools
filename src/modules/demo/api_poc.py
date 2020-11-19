@@ -6,8 +6,10 @@ import requests
 from flask import Flask, request
 from flask_jsonpify import jsonify
 from flask_restful import Resource
+from jsonschema import ValidationError
 from waitress import serve
 
+from .ErrorHandling import ErrorHandling
 from ..create_graph.config.config_parser import ConfigParser
 from ..create_graph.create_graph import JsonGraphCreator
 from ..create_graph.methods import methods
@@ -144,572 +146,6 @@ class RecReq(Resource):
 @app.route("/api/adhoc/getRecommendation", methods=['POST'])
 def handle_recommendation_request():
     # TODO: Make generic_message_received_response synchronous and all other operations asynchronous
-    """
-
-    // =====================================================
-    // REQUEST
-    // =====================================================
-
-    Message received will always be in the following format. This info was given by company IntraSoft,
-    integration work-package leader on 5.6.2020. clos = Vehicles, parcels = orders.
-    {
-        organization: "ELTA"
-        clos: http://app.cog-lo.eu/getCLOs?org=ELTA, # Vehicles
-        parcels: http://app.cog-lo.eu/getParcels?org=ELTA, #Orders
-        event: null (for the daily plan),
-        request: "request UUID"
-    }
-
-    Example of "clos" field:
-    {
-      "status": 1,
-      "msg": "18 CLOs found",
-      "clos": [
-        {
-          "id": "ELTApostoffice12188",
-          "info": {
-            "id": "ELTApostoffice12188",
-            "name": "ELTA post office A7",
-            "type": "station",
-            "subtype": "post office",
-            "capacity": null,
-            "location": {
-              "city": null,
-              "country": null,
-              "station": null,
-              "latitude": 38.0018005371,
-              "longitude": 23.7500495911,
-              "postal_code": null
-            },
-            "description": null,
-            "physical_id": "12188",
-            "capacity_unit": null,
-            "working_hours": null
-          },
-          "state": null
-        },
-        {
-          "id": "ELTAvehicle001",
-          "info": {
-            "id": "ELTAvehicle001",
-            "name": "ELTA vehicle 001",
-            "type": "transportation means",
-            "subtype": "vehicle",
-            "capacity": null,
-            "location": {
-              "city": null,
-              "country": null,
-              "station": null,
-              "latitude": null,
-              "longitude": null,
-              "postal_code": null
-            },
-            "description": "truck",
-            "physical_id": "001",
-            "capacity_unit": null,
-            "working_hours": null
-          },
-          "state": {
-            "plan": "ELTAplan39",
-            "driver": null,
-            "status": null,
-            "parcels": null,
-            "location": {
-              "city": null,
-              "country": null,
-              "station": null,
-              "latitude": 37.9870396023,
-              "longitude": 23.7520077519,
-              "postal_code": null
-            },
-            "load_volume": null,
-            "capacity_unit": null,
-            "delay_minutes": null,
-            "completed_plan": {
-              "steps": [
-                {
-                  "id": 1,
-                  "rank": 1,
-                  "unload": [
-                    "e5ece9c1-c2bf-443a-881a-04c08bbd1256"
-                  ],
-                  "complete": 1,
-                  "due_time": null,
-                  "location": {
-                    "city": null,
-                    "country": null,
-                    "station": "PSpostoffice3701",
-                    "latitude": 45.755153656,
-                    "longitude": 15.9372501373,
-                    "postal_code": null
-                  },
-                  "dependency": {
-                    "plan": null,
-                    "plan_step": null
-                  }
-                }
-              ]
-            },
-            "remaining_plan": {
-              "steps": [
-                {
-                  "id": 2,
-                  "load": [
-                    "5ae413b4-530d-437f-bd1b-7ef1994c0fca",
-                    "694ef5bb-6a06-42e2-a589-6881dedc78ff"
-                  ],
-                  "rank": 2,
-                  "unload": [
-                    "d3ef0800-931c-46be-a458-c509465df1c3",
-                    "1d1b75d4-fa23-423a-af55-4c54c2db8136",
-                    "90df51cd-c06a-4918-90ae-8cdefdb57bd4"
-                  ],
-                  "complete": 0,
-                  "due_time": null,
-                  "location": {
-                    "city": null,
-                    "country": null,
-                    "station": "PSpostoffice5016",
-                    "latitude": 45.7793617249,
-                    "longitude": 15.9955749512,
-                    "postal_code": null
-                  },
-                  "dependency": {
-                    "plan": null,
-                    "plan_step": null
-                  }
-                },
-                {
-                  "id": 3,
-                  "load": [
-                    "8913e033-12d8-4011-a986-ed880fc94dd3",
-                    "a4ccbe6a-4bb4-4c94-85a5-80ff4bce45cb"
-                  ],
-                  "rank": 3,
-                  "unload": [
-                    "ccac88e7-a605-4d3b-b920-8e93be7abcad",
-                    "22f4b9d0-204e-46f2-8252-eb3698dc05e3"
-                  ],
-                  "complete": 0,
-                  "due_time": null,
-                  "location": {
-                    "city": null,
-                    "country": null,
-                    "station": "HPpostoffice7674",
-                    "latitude": 45.7909164429,
-                    "longitude": 15.9506902695,
-                    "postal_code": null
-                  },
-                  "dependency": {
-                    "plan": null,
-                    "plan_step": null
-                  }
-                },
-                {
-                  "id": 4,
-                  "load": [
-                    "ccbae818-b27d-451b-8861-765dd241c59c",
-                    "960ecda8-0290-42c4-b230-41f3268e8d56"
-                  ],
-                  "rank": 4,
-                  "complete": 0,
-                  "due_time": null,
-                  "location": {
-                    "city": null,
-                    "country": null,
-                    "station": "HPpostoffice639",
-                    "latitude": 45.8179473877,
-                    "longitude": 15.9740610123,
-                    "postal_code": null
-                  },
-                  "dependency": {
-                    "plan": null,
-                    "plan_step": null
-                  }
-                },
-                {
-                  "id": 5,
-                  "load": [
-                    "037f92e3-cef3-4360-ad42-3c808d398f2f",
-                    "02e43622-2919-4041-a522-ac355e5ce93e",
-                    "2334871c-c5c2-40c2-891e-fa2a48ea7167",
-                    "cfe75035-a55a-423a-a2a3-fcacdd07729a"
-                  ],
-                  "rank": 5,
-                  "complete": 0,
-                  "due_time": null,
-                  "location": {
-                    "city": null,
-                    "country": null,
-                    "station": "HPpostoffice3148",
-                    "latitude": 45.8144264221,
-                    "longitude": 16.019744873,
-                    "postal_code": null
-                  },
-                  "dependency": {
-                    "plan": null,
-                    "plan_step": null
-                  }
-                }
-              ]
-            },
-            "available_space": null,
-            "availability_prediction": {
-              "time": null,
-              "location": {
-                "city": null,
-                "country": null,
-                "station": null,
-                "latitude": null,
-                "longitude": null,
-                "postal_code": null
-              }
-            }
-          }
-        }
-      ]
-    }
-
-    Example of 'parcels' fields:
-    {
-      "status": 1,
-      "msg": "8 parcels found",
-      "parcels": [
-        {
-          "id": "EKOLorder346925744",
-          "state": "unserved",
-          "issued": null,
-          "source": {
-            "city": null,
-            "country": null,
-            "station": "EKOLstation1",
-            "latitude": null,
-            "longitude": null,
-            "postal_code": null
-          },
-          "deadline": null,
-          "payweight": 13700,
-          "destination": {
-            "city": null,
-            "country": null,
-            "station": null,
-            "latitude": null,
-            "longitude": null,
-            "postal_code": null
-          },
-          "organization": "EKOL",
-          "service_type": null,
-          "customs_checkpoint": null
-        },
-        {
-          "id": "EKOLorder366874833",
-          "state": "unserved",
-          "issued": null,
-          "source": {
-            "city": null,
-            "country": null,
-            "station": "EKOLstation1",
-            "latitude": null,
-            "longitude": null,
-            "postal_code": null
-          },
-          "deadline": null,
-          "payweight": 10400,
-          "destination": {
-            "city": null,
-            "country": null,
-            "station": null,
-            "latitude": null,
-            "longitude": null,
-            "postal_code": null
-          },
-          "organization": "EKOL",
-          "service_type": null,
-          "customs_checkpoint": null
-        },
-        {
-          "id": "EKOLorder366906596",
-          "state": "unserved",
-          "issued": null,
-          "source": {
-            "city": null,
-            "country": null,
-            "station": "EKOLstation1",
-            "latitude": null,
-            "longitude": null,
-            "postal_code": null
-          },
-          "deadline": null,
-          "payweight": 23800,
-          "destination": {
-            "city": null,
-            "country": null,
-            "station": null,
-            "latitude": null,
-            "longitude": null,
-            "postal_code": null
-          },
-          "organization": "EKOL",
-          "service_type": null,
-          "customs_checkpoint": null
-        },
-        {
-          "id": "EKOLorder366909632",
-          "state": "unserved",
-          "issued": null,
-          "source": {
-            "city": null,
-            "country": null,
-            "station": "EKOLstation1",
-            "latitude": null,
-            "longitude": null,
-            "postal_code": null
-          },
-          "deadline": null,
-          "payweight": 10400,
-          "destination": {
-            "city": null,
-            "country": null,
-            "station": null,
-            "latitude": null,
-            "longitude": null,
-            "postal_code": null
-          },
-          "organization": "EKOL",
-          "service_type": null,
-          "customs_checkpoint": null
-        },
-        {
-          "id": "EKOLorder366926724",
-          "state": "unserved",
-          "issued": null,
-          "source": {
-            "city": null,
-            "country": null,
-            "station": "EKOLstation1",
-            "latitude": null,
-            "longitude": null,
-            "postal_code": null
-          },
-          "deadline": null,
-          "payweight": 8000,
-          "destination": {
-            "city": null,
-            "country": null,
-            "station": null,
-            "latitude": null,
-            "longitude": null,
-            "postal_code": null
-          },
-          "organization": "EKOL",
-          "service_type": null,
-          "customs_checkpoint": null
-        },
-        {
-          "id": "EKOLorder366929776",
-          "state": "unserved",
-          "issued": null,
-          "source": {
-            "city": null,
-            "country": null,
-            "station": "EKOLstation1",
-            "latitude": null,
-            "longitude": null,
-            "postal_code": null
-          },
-          "deadline": null,
-          "payweight": 3200,
-          "destination": {
-            "city": null,
-            "country": null,
-            "station": null,
-            "latitude": null,
-            "longitude": null,
-            "postal_code": null
-          },
-          "organization": "EKOL",
-          "service_type": null,
-          "customs_checkpoint": null
-        },
-        {
-          "id": "EKOLorder366933058",
-          "state": "unserved",
-          "issued": null,
-          "source": {
-            "city": null,
-            "country": null,
-            "station": "EKOLstation1",
-            "latitude": null,
-            "longitude": null,
-            "postal_code": null
-          },
-          "deadline": null,
-          "payweight": 1000,
-          "destination": {
-            "city": null,
-            "country": null,
-            "station": null,
-            "latitude": null,
-            "longitude": null,
-            "postal_code": null
-          },
-          "organization": "EKOL",
-          "service_type": null,
-          "customs_checkpoint": null
-        },
-        {
-          "id": "EKOLorder366933280",
-          "state": "unserved",
-          "issued": null,
-          "source": {
-            "city": null,
-            "country": null,
-            "station": "EKOLstation1",
-            "latitude": null,
-            "longitude": null,
-            "postal_code": null
-          },
-          "deadline": null,
-          "payweight": 1400,
-          "destination": {
-            "city": null,
-            "country": null,
-            "station": null,
-            "latitude": null,
-            "longitude": null,
-            "postal_code": null
-          },
-          "organization": "EKOL",
-          "service_type": null,
-          "customs_checkpoint": null
-        }
-      ]
-    }
-
-    // =====================================================
-    // RESPONSE
-    // =====================================================
-
-    Response sent synchronously back after receiving the request is in the following format. Defined on 5.6.2020.
-    {
-        "status": 1,
-        "msg": "The CA has received a new request for optimization"
-    }
-
-    Response given after calculating recommendations should be send to MSB and is in the following format.
-    Defined on 5.6.2020.
-    {
-    topic: "Recommendation",
-    sender: "COGLOmoduleCA",
-    message:
-        {
-            request: "request UUID"
-            recommendation: http://app.cog-lo.eu/getRecommendation?id=EKOLrecommendation1
-        }
-    }
-
-    Example of recommendation message from 5.6.2020:
-    {
-        "status": 1,
-        "msg": "20 plans contained in the recommendation",
-        "recommendation": {
-            "organization": "EKOL",
-            "id": "EKOLrecommendation1",
-            "cloplans": [
-                {
-                    "clo": "EKOLvehicle34DL8536",
-                    "plan": {
-                        "organization": "EKOL",
-                        "execution_date": "2020-01-13 17:25:35.000000",
-                        "recommendation": "EKOLrecommendation1",
-                        "id": "EKOLplan6",
-                        "steps": [
-                            {
-                                "id": 1,
-                                "load": [
-                                    "EKOLcontainer34G80597"
-                                ],
-                                "rank": 1,
-                                "complete": 1,
-                                "due_time": null,
-                                "location": {
-                                "city": null,
-                                "country": null,
-                                "station": "EKOLcontainer34G80597",
-                                "latitude": 47.4481658936,
-                                "longitude": 19.0626106262,
-                                "postal_code": null
-                                },
-                                "dependency": {
-                                    "plan": null,
-                                    "plan_step": null
-                                }
-                            }
-                        ]
-                    }
-                },
-                {
-                    "clo": "EKOLvehicleTruck1",
-                    "plan": {
-                        "organization": "EKOL",
-                        "execution_date": "2020-01-13 17:25:33.000000",
-                        "recommendation": "EKOLrecommendation1",
-                        "id": "EKOLplan4",
-                        "steps": [
-                            {
-                                "id": 1,
-                                "load": [
-                                    "EKOLcontainerTrailer1"
-                                ],
-                                "rank": 1,
-                                "complete": 1,
-                                "due_time": null,
-                                "location": {
-                                "city": null,
-                                "country": null,
-                                "station": "EKOLwarehouse2",
-                                "latitude": 50.25258255,
-                                "longitude": 19.1939735413,
-                                "postal_code": null
-                                },
-                                "dependency": {
-                                    "plan": null,
-                                    "plan_step": null
-                                }
-                            },
-                            {
-                                "id": 2,
-                                "pack": [
-                                    {
-                                        "content": [
-                                            "EKOLorder366929776"
-                                        ],
-                                        "container": "EKOLcontainerTrailer1"
-                                    }
-                                ],
-                                "rank": 2,
-                                "complete": 0,
-                                "due_time": null,
-                                "location": {
-                                "city": null,
-                                "country": null,
-                                "station": "EKOLwarehouse2",
-                                "latitude": 50.25258255,
-                                "longitude": 19.1939735413,
-                                "postal_code": null
-                                },
-                                "dependency": {
-                                    "plan": null,
-                                    "plan_step": null
-                                }
-                            }
-                         ]
-                    }
-                }
-            ]
-        }
-    }
-    """
 
     global vrpProcessorReferenceSloCro
     global vrpProcessorReferenceElta
@@ -718,6 +154,12 @@ def handle_recommendation_request():
 
     """Main entry point for HTTP request"""
     received_request = request.get_json(force=True)
+    #Error Handling
+    """try:
+        ErrorHandling.check_messages_correction(received_request)
+    except ValidationError as error:
+        return str(error)
+    """
     with open('received_request.json', 'w') as outfile:
         json.dump(received_request, outfile)
 
@@ -765,7 +207,7 @@ def handle_recommendation_request():
                 return {"msg": "Parameter 'clos' or 'orders' is missing", "status": 0}
             requests = data["orders"]
             recommendations = RecReq.process_pickup_requests(evt_type, clos, requests, vrp_processor_ref, use_case)
-        elif evt_type == "crossBorder":
+        elif evt_type == "crossBorder" or "border":
             print("cross border event received")
             if "clos" not in data:
                 return {"msg": "Parameter 'clos' is missing", "status": 0}
@@ -779,28 +221,25 @@ def handle_recommendation_request():
         else:
             return jsonify({"message": "Invalid event type: {}".format(evt_type), "status": 0})
 
-        # Transform parcel locations back to the original ones
+        # Map parcel locations back to the original ones
+        #recommendations_raw = InputOutputTransformer.revert_coordinates(recommendations, transformation_map)
 
-        recommendations_raw = InputOutputTransformer.revert_coordinates(recommendations, transformation_map)
-
-        # reorder the final route on TSP
-        if evt_type == "brokenVehicle" or evt_type == "pickupRequest":
-            recommendations = InputOutputTransformer.PickupNodeReorder(recommendations_raw, data)
-
-        else:
-            recommendations = Tsp.order_recommendations(recommendations_raw)
-
+        print("starting final reordering & TSP")
+        recommendations = InputOutputTransformer.PickupNodeReorder(recommendations)
 
         # Executes TSP algorithm upon calculated recommendations by our VRP
-        #recommendations = Tsp.order_recommendations(recommendations)
+        #recommendations = Tsp.order_recommendations(recommendations_raw)
 
+        # print route for all vehicles
+        P=InputOutputTransformer.PrintRoutes(recommendations)
         # Prepare output message from calculated recommendations
         response = InputOutputTransformer.prepare_output_message(recommendations, use_case, request_id, organization)
-        # This piece of code posts optimization response to MSB
-        RecReq.post_response_msb(request_id, response)
 
-        # Always return generic message stating that request was received and is due to be processed
+        # Post response to MSB
+        #RecReq.post_response_msb(request_id, response)
+        # Return generic message stating that request was received and is due to be processed
         return generic_message_received_response
+
 
     ##Use Case ELTA
     elif use_case == "ELTA":
@@ -830,7 +269,7 @@ def handle_recommendation_request():
         elif evt_type == "brokenVehicle":
             if "clos" not in data or "orders" not in data:
                 return {"msg": "Parameter 'clos' or 'orders' is missing", "status": 0}
-            broken_clo_orders = data["orders"]
+            broken_clo_orders = data_request["orders"]
             recommendations = RecReq.process_broken_clo(evt_type, clos, broken_clo_orders, vrp_processor_ref, use_case)
         elif evt_type == "pickupRequest":
             if "orders" not in data_request:
@@ -840,8 +279,12 @@ def handle_recommendation_request():
         else:
             return jsonify({"msg": "Invalid event type: {}".format(evt_type), "status": 0})
 
-        # Executes TSP on given recommendations to order route plan correctly
-        recommendations = Tsp.order_recommendations(recommendations)
+        print("starting final reordering & TSP")
+        recommendations = InputOutputTransformer.PickupNodeReorder(recommendations)
+
+        # print route for all vehicles
+        P = InputOutputTransformer.PrintRoutes(recommendations)
+
 
         # Maps recommendations based on transform_map_dict
         recommendations_mapped = methods.map_coordinates_to_response(recommendations, transform_map_dict)
@@ -853,10 +296,11 @@ def handle_recommendation_request():
         response = methods.order_parcels_on_route(response1)
 
         # This piece of code posts optimization response to MSB
-        RecReq.post_response_msb(request_id, response)
+        #RecReq.post_response_msb(request_id, response)
 
         # Response is always a generic one which just states that CA received request and will process it.
-        return generic_message_received_response
+        #return generic_message_received_response
+        return response
 
 @app.route("/api/clo/newCLOs", methods=['POST'])
 def new_clos():
