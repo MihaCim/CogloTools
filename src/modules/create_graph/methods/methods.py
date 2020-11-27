@@ -91,11 +91,11 @@ def order_parcels_on_route(response):
         response["cloplans"][idx]["plan"]["steps"]=new_steps
     return response
 
-def proccess_elta_event(proc_event, data):
+def proccess_elta_event(proc_event, data, use_case_graph):
     if proc_event == None:
-        return elta_clustering(data)
+        return elta_clustering(data, use_case_graph)
     elif proc_event == 'pickupRequest' or proc_event == 'brokenVehicle':
-        return elta_map_parcels(data)
+        return elta_map_parcels(data, use_case_graph)
 
 def find_min_pickup(coords, posts_nparray):
     import sys
@@ -117,7 +117,7 @@ def find_min_pickup(coords, posts_nparray):
 
     return label
 
-def elta_clustering(orig_data):
+def elta_clustering(orig_data, use_case_graph):
     nClusters = 20
     data = copy.deepcopy(orig_data)
     l = []
@@ -167,7 +167,7 @@ def elta_clustering(orig_data):
         })
         i = i + 1
 
-    elta = config_parser.get_elta_path()
+    elta = config_parser.get_elta_path(use_case_graph)
     with open(elta) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         for row in csv_reader:
@@ -186,8 +186,8 @@ def elta_clustering(orig_data):
     clos["clos"] = clos_list
     return data, clos
 
-def find_min(lat_cord, lon_cord):
-    elta = config_parser.get_csv_path("ELTA")
+def find_min(use_case_graph, lat_cord, lon_cord):
+    elta = config_parser.get_csv_path(use_case_graph)
     posts = []
     with open(elta) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
@@ -208,21 +208,21 @@ def find_min(lat_cord, lon_cord):
 
     return label
 
-def elta_map_parcels(orig_data):
+def elta_map_parcels(orig_data, use_case_graph):
     data = copy.deepcopy(orig_data)
     for clo in data['clos']:
-        mapped_location = find_min(clo['currentLocation'][0], clo['currentLocation'][1])
+        mapped_location = find_min(use_case_graph, clo['currentLocation'][0], clo['currentLocation'][1])
         clo['currentLocation'] = mapped_location
         clo['currentLocationL'] = clo['currentLocation']
         for parcel in clo['parcels']:
-            mapped_location = find_min(parcel['destination'][0], parcel['destination'][1])
+            mapped_location = find_min(use_case_graph, parcel['destination'][0], parcel['destination'][1])
             parcel['destination_location'] = parcel['destination']
             parcel['destination'] = mapped_location
     for order in data["orders"]:
-        mapped_location = find_min(order['destination'][0], order['destination'][1])
+        mapped_location = find_min(use_case_graph,order['destination'][0], order['destination'][1])
         order['destination_location'] = order['destination']
         order['destination'] = mapped_location
-        mapped_location = find_min(order['pickup'][0], order['pickup'][1])
+        mapped_location = find_min(use_case_graph, order['pickup'][0], order['pickup'][1])
         order['pickup_location'] = order['pickup']
         order['pickup'] = mapped_location
 

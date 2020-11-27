@@ -177,7 +177,7 @@ class InputOutputTransformer:
         }
 
     @staticmethod
-    def parse_received_recommendation_message(json, transformation_map):
+    def parse_received_recommendation_message(json, transformation_map, use_case_graph):
         InputOutputTransformer.validateMessageForValue(json, ["organization"])
         InputOutputTransformer.validateMessageForValue(json, ["request"])
         payload = {
@@ -247,7 +247,7 @@ class InputOutputTransformer:
                 # Extract station ID from given 'latitude' and 'longitude'.
                 # location_station_dict = CloUpdateHandler.extract_location_station_dict(csv_file)
                 station_id = InputOutputTransformer.getStationIdOrClosest(
-                    location, config_parser.get_csv_path(SLO_CRO_USE_CASE), transformation_map)
+                    location, config_parser.get_csv_path(use_case_graph), transformation_map)
                 clo['currentLocation'] = station_id
             else:
                 clo['currentLocation'] = [location["latitude"], location["longitude"]]
@@ -295,7 +295,7 @@ class InputOutputTransformer:
                 parcel["country"] = clo["country"]
 
                 if payload["useCase"] == SLO_CRO_USE_CASE:
-                    csv_file = config_parser.get_csv_path(SLO_CRO_USE_CASE)
+                    csv_file = config_parser.get_csv_path(use_case_graph)
                     station_id = InputOutputTransformer.getStationIdOrClosest(destination, csv_file, transformation_map,
                                                                               parcel['id'])
                     parcel['destination'] = station_id
@@ -342,7 +342,7 @@ class InputOutputTransformer:
 
             if payload["useCase"] == SLO_CRO_USE_CASE:
                 station_id = InputOutputTransformer.getStationIdOrClosest(
-                    current_location, config_parser.get_csv_path(SLO_CRO_USE_CASE), transformation_map)
+                    current_location, config_parser.get_csv_path(use_case_graph), transformation_map)
                 broken_clo["currentLocation"] = station_id
             else:
                 InputOutputTransformer.validateMessageForValue(current_location, ["latitude", "longitude"])
@@ -393,7 +393,7 @@ class InputOutputTransformer:
                 # Pickup of these parcels is the vehicle's location!
                 if payload["useCase"] == SLO_CRO_USE_CASE:
                     station_id = InputOutputTransformer.getStationIdOrClosest(
-                        vehicle_location, config_parser.get_csv_path(SLO_CRO_USE_CASE), transformation_map)
+                        vehicle_location, config_parser.get_csv_path(use_case_graph), transformation_map)
                     parcel['pickup'] = station_id
                 else: #ELTA use case
                     InputOutputTransformer.validateMessageForValue(vehicle_location, ["latitude", "longitude"])
@@ -406,7 +406,7 @@ class InputOutputTransformer:
                 if payload["useCase"] == SLO_CRO_USE_CASE:
                     station_id = InputOutputTransformer.getStationIdOrClosest(destination,
                                                                               config_parser.get_csv_path(
-                                                                                  SLO_CRO_USE_CASE), transformation_map,
+                                                                                  use_case_graph), transformation_map,
                                                                               parcel_id)
                     parcel['destination'] = station_id
                 else: #ELTA use_case
@@ -433,14 +433,14 @@ class InputOutputTransformer:
             parcels = []
             for item in json["event"]["info"]["item"]:
                 parcels.append(item)
-            orders = InputOutputTransformer.buildOrdersFromParcels(parcels, payload["useCase"], transformation_map)
+            orders = InputOutputTransformer.buildOrdersFromParcels(parcels, payload["useCase"], use_case_graph, transformation_map)
             payload["eventType"] = "pickupRequest"  # setting back the event_type to basic use case
             payload["orders"] = orders
         else:
             parcels = []
             if json["parcels"] is not None:
                 parcels = json["parcels"]
-            orders = InputOutputTransformer.buildOrdersFromParcels(parcels, payload["useCase"], transformation_map)
+            orders = InputOutputTransformer.buildOrdersFromParcels(parcels, payload["useCase"], use_case_graph, transformation_map)
             payload["orders"] = orders
 
         return payload
@@ -513,7 +513,7 @@ class InputOutputTransformer:
         return station
 
     @staticmethod
-    def buildOrdersFromParcels(parcels, use_case, transformation_map):
+    def buildOrdersFromParcels(parcels, use_case, use_case_graph, transformation_map):
         # Goes through parcels and builds an array of orders to be delivered
         orders = []
 
@@ -527,7 +527,7 @@ class InputOutputTransformer:
 
             if use_case == SLO_CRO_USE_CASE:
                 station_id = InputOutputTransformer.getStationIdOrClosest(
-                    destination, config_parser.get_csv_path(SLO_CRO_USE_CASE), transformation_map)
+                    destination, config_parser.get_csv_path(use_case_graph), transformation_map)
                 parcel['destination'] = station_id
             else:
                 InputOutputTransformer.validateMessageForValue(destination, ["latitude", "longitude"])
@@ -545,7 +545,7 @@ class InputOutputTransformer:
 
             if use_case == SLO_CRO_USE_CASE:
                 station_id = InputOutputTransformer.getStationIdOrClosest(
-                    pickup, config_parser.get_csv_path(SLO_CRO_USE_CASE), transformation_map, parcel["UUIDParcel"])
+                    pickup, config_parser.get_csv_path(use_case_graph), transformation_map, parcel["UUIDParcel"])
                 parcel['pickup'] = station_id
             else:
                 InputOutputTransformer.validateMessageForValue(pickup, ["latitude", "longitude"])
@@ -755,135 +755,6 @@ class InputOutputTransformer:
         return recommendations_raw
 
 
-
-
-        """
-            #udpdating new reordered route for vehicle
-            Recommendations_reordered[i]["route"] = recommendations_new[0]["route"]
-        """
-
-        """
-        route = copy.deepcopy(recommendations_raw[0]["route"])
-        PickupNodes = {}
-        for station in route[1:]:
-            if len(station["load"]) != 0:
-                PickupNodes[station["id"]] = station
-        for station in route[:]:
-            if station["id"] in PickupNodes:
-                route.remove(station)
-
-
-        recommendations_new = copy.deepcopy(recommendations_raw)
-        recommendations_new[0]["route"] = route
-        route_tsp = Tsp.order_recommendations(recommendations_new)
-
-        ##insert each pickup node before the parcel delivery stations
-        for key, value in PickupNodes.items():
-            node_id = key
-            start_node = PickupNodes[node_id]
-            pickupnode_parcels = set(start_node["load"])
-            route = route_tsp[0]["route"]
-            station_idx = None
-            # check from second station - the starting location does not change
-            for idx, station in enumerate(route[1:]):
-                if station_idx == None:
-                    parcels = station["unload"]
-                    for parcel in parcels:
-                        if parcel in pickupnode_parcels:
-                            station_idx = idx + 1
-                            break
-
-            # split route, add start node to first part
-            route_second_part = copy.deepcopy(route[station_idx:])
-            route_first_part = copy.deepcopy(route[:station_idx])
-            route_first_part.append(start_node)
-            # runt TSP on first part of the route
-            recommendations_new[0]["route"] = route_first_part
-            route_tsp = Tsp.order_recommendations(recommendations_new)
-
-        """
-        """
-        recommendations_raw_tmp = copy.deepcopy(recommendations_raw)
-        start_address = recommendations_raw_tmp[0]['start_address']
-        broken_vehicle_station = data['orders'][0]['pickup']
-        broken_vehicle = {}
-        route = []
-
-        for st, el in enumerate(recommendations_raw_tmp[0]['route']):
-            if el['location']['station'] == broken_vehicle_station:
-                broken_vehicle = el
-                continue
-            else:
-                route.append(el)
-        recommendations_raw_tmp[0]['route'] = route
-        recommendations_without_broken_vehicle = Tsp.order_recommendations(recommendations_raw_tmp)
-
-        vehicle_parcels_list = set()
-        for parcel in data['orders']:
-            vehicle_parcels_list.add(parcel['UUIDParcel'])
-
-        route = [recommendations_without_broken_vehicle[0]['route'][0]]
-        route_second_half = []
-        for st, el in enumerate(recommendations_without_broken_vehicle[0]['route'][1:]):
-            find = False
-            for station in el['unload']:
-                if station in vehicle_parcels_list:
-                    find = True
-                    break
-
-            if find:
-                route_second_half = recommendations_without_broken_vehicle[0]['route'][st + 1:]
-                break
-            else:
-                route.append(el)
-
-        size = len(route)
-        # kreiras novo lokacijo - kopija node[0]
-        # route_part1:  pobrises parcels from broken vehicle na  node[0]["unload"]
-        # route_part2 dodas lokacijo  z  parcels from broken vehicle: node[0]["unload"] + pobrisses node[0]["load"] = []
-
-        route.append(broken_vehicle)
-        recommendations_without_broken_vehicle[0]['route'] = route
-        recommendations_without_broken_vehicle[0]['start_address'] = start_address
-        recommendations_without_start_half = Tsp.order_recommendations(recommendations_without_broken_vehicle)
-
-        if size == 1:
-            new_location = copy.deepcopy(broken_vehicle)
-            unload = []
-            for loc in broken_vehicle['unload'][:]:
-                if loc not in vehicle_parcels_list:
-                    unload.append(loc)
-            new_location['load'] = []
-            new_location['unload'] = unload
-
-            route_second_half = recommendations_without_broken_vehicle[0]['route'][1:]
-            route_second_half.append(new_location)
-            recommendations_without_broken_vehicle[0]['route'] = route_second_half
-            recommendations_second_reorder = Tsp.order_recommendations(recommendations_without_broken_vehicle)
-            route_second_half = recommendations_second_reorder[0]['route']
-
-
-
-        recommendations_without_start_half[0]['route'] = recommendations_without_start_half[0][
-                                                             'route'] + route_second_half
-        recommendations_without_start_half[0]['start_address'] = start_address
-
-        """
-
-        #handling conflict/cycled nodes pairs with same pickup & delivery locations"""
-        # relations = [] list of node pairs that are "conflict dependencies"
-
-        """
-        relations = [("1","2"), ("1","3"), ("3","2"), ("3","1")]
-        reordered_nodes = OrderRelations.order_relations(relations)
-        """
-
-
-        
-
-
-        return recommendations_without_start_half
-
     @staticmethod
     def PrintRoutes(recommendations):
         # Print route sequence for each CLO in recommendations plan.
@@ -908,6 +779,7 @@ class InputOutputTransformer:
                     print("parcels unloading:", unloadparcels)
         print("****end of plan****")
         return(True)
+
 
 class ParcelLocation:
     """
