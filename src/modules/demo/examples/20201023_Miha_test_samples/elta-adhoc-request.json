@@ -201,6 +201,7 @@
           "load_volume": null,
           "capacity_unit": null,
           "delay_minutes": null,
+          "completed_plan": {},
           "remaining_plan": {
             "steps": [
               {
