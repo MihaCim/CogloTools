@@ -50,11 +50,39 @@ class ErrorHandling:
     def check_locations(self, input_data):
 
         if input_data['organization'] == "PS" or \
-           input_data['organization'] == "HP" :
+                input_data['organization'] == "HP":
             use_case_graph = config_parser.ConfigParser()
-            use_case_graph.get_graph_path("SLO-CRO_urban")
-            f = open(config_parser.get_graph_path(use_case_graph), "r")
-            print(f)
+            fObj = open(use_case_graph.get_graph_path("SLO-CRO_crossborder"))
+            nodes = json.load(fObj)['nodes']
+            node_dict = {}
+            for node in nodes:
+                value = nodes[node]
+                node_dict[value['uuid']] = {'lat': value['lat'], 'lon': value['lon']}
+
+            for clo in input_data['clos']:
+                print(clo['state']['location'])
+                if clo['state']['location']['station'] not in node_dict or \
+                        clo['state']['location']['latitude'] != node_dict[clo['state']['location']['station']]['lat'] or \
+                        clo['state']['location']['longitude'] != node_dict[clo['state']['location']['station']]['lon']:
+                    raise ValueError("Check lat, lon and uuid. It doesnt exists in our database")
+
+            for clo in input_data['parcels']:
+                print(clo)
+                if clo['source']['station'] not in node_dict or \
+                        clo['source']['latitude'] != node_dict[clo['source']['station']]['lat'] or \
+                        clo['source']['longitude'] != node_dict[clo['source']['station']]['lon']:
+                    raise ValueError("Check lat, lon and uuid. It doesnt exists in our database {}".format(clo['source']))
+
+                if clo['destination']['station'] not in node_dict or \
+                        clo['destination']['latitude'] != node_dict[clo['destination']['station']]['lat'] or \
+                        clo['destination']['longitude'] != node_dict[clo['destination']['station']]['lon']:
+                    raise ValueError(
+                        "Check lat, lon and uuid. It doesnt exists in our database {}".format(clo['destination']))
+
+                '''
+                a = clo['state']['location']['latitude']
+                b = node_dict[clo['state']['location']['station']]['lat']
+                '''
 
         if input_data['organization'] == "SLO-CRO":
             pass
@@ -77,13 +105,12 @@ class ErrorHandling:
             validate(instance=input_data, schema=json_schema)
         #TODO missing daily_plan
         '''
-        #1.) Check the organization
+        # 1.) Check the organization
         self.check_organization(input_data)
 
         self.check_complited_plan(input_data)
 
         self.check_locations(input_data)
-
 
         # 3.) slo cro use case vsi locaisni (pri vsakem parslu in pri vsaki cloju)
         # v fajlu grapf/data poklice z configa

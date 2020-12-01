@@ -71,8 +71,8 @@
       "state": {
         "location": {
           "country": "SLO",
-          "latitude": 45.893208,
-          "longitude": 15.6213,
+          "latitude": 45.89337,
+          "longitude": 15.6214561,
           "station": "PSpostofficeS3"
         },
         "status": 0,
@@ -99,7 +99,7 @@
               "location": {
                 "address": null,
                 "latitude": 45.893208,
-                "longitude": 15.6213,
+                "longitude": 15.6214561,
                 "station": "PSpostofficeS3"
               },
               "load": ["P_01", "P_02"],
@@ -164,8 +164,8 @@
       "state": {
         "location": {
           "country": "SLO",
-          "latitude": 45.893208,
-          "longitude": 15.6213,
+          "latitude": 45.89337,
+          "longitude": 15.6214561,
           "station": "PSpostofficeS3"
         },
         "status": 0,
@@ -235,16 +235,16 @@
       "source": {
         "country": "SLO",
         "station": "PSpostofficeS3",
-        "latitude": 45.89320611,
-        "longitude": 15.6212996
+        "latitude": 45.89337,
+        "longitude": 15.6214561
       },
       "deadline": "2020-10-05T14:17:51Z",
       "payweight": 1,
       "destination": {
         "country": "SLO",
         "station": "PSpostofficeS4",
-        "latitude": 45.88461153,
-        "longitude": 15.5231045
+        "latitude": 45.8844935,
+        "longitude": 15.5231733
       },
       "organization": "PS"
     },
@@ -255,16 +255,16 @@
       "source": {
         "country": "SLO",
         "station": "PSpostofficeS3",
-        "latitude": 45.89320611,
-        "longitude": 15.6212996
+        "latitude": 45.89337,
+        "longitude": 15.6214561
       },
       "deadline": "2020-10-05T17:41:46Z",
       "payweight": 1,
       "destination": {
         "country": "SLO",
         "station": "PSpostofficeS7",
-        "latitude": 45.90488128,
-        "longitude": 15.59338439
+        "latitude": 45.9046721,
+        "longitude": 15.5934382
       },
       "organization": "PS"
     },
@@ -275,15 +275,15 @@
       "source": {
         "country": "SLO",
         "station": "PSpostofficeS1",
-        "latitude": 45.93107932,
-        "longitude": 15.67793203
+        "latitude": 45.9310499,
+        "longitude": 15.6780936
       },
       "payweight": 1,
       "destination": {
         "country": "SLO",
         "station": "PSpostofficeS2",
-        "latitude": 45.887335,
-        "longitude": 15.697116
+        "latitude": 45.9548852,
+        "longitude": 15.6365929
       },
       "organization": "PS"
     },
@@ -293,14 +293,14 @@
       "source": {
         "country": "SLO",
         "station": "HPpostofficeH1",
-        "latitude": 45.840296,
-        "longitude": 15.686514
+        "latitude": 45.8402267,
+        "longitude": 15.6863883
       },
       "destination": {
         "country": "SLO",
         "station": "PSpostofficeS1",
-        "latitude": 45.93107932,
-        "longitude": 15.67793203
+        "latitude": 45.9310499,
+        "longitude": 15.6780936
       }
     },
     {
@@ -310,15 +310,15 @@
       "source": {
         "country": "SLO",
         "station": "PSpostofficeS7",
-        "latitude": 45.90488128,
-        "longitude": 15.59338439
+        "latitude": 45.9046721,
+        "longitude": 15.5934382
       },
       "payweight": 1,
       "destination": {
         "country": "SLO",
         "station": "PSpostofficeS4",
-        "latitude": 45.88461153,
-        "longitude": 15.5231045
+        "latitude": 45.8844935,
+        "longitude": 15.5231733
       },
       "organization": "PS"
     }
