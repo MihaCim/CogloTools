@@ -5,7 +5,7 @@
     "event": "system",
     "initiator": "COGLOmoduleWebIF",
     "info": {
-      "item": [
+      "items": [
         {
           "id": "ELTAparcel_9",
           "state": "unserved",
