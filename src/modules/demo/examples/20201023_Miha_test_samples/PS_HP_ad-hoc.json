@@ -290,6 +290,7 @@
     {
       "organization": "PS",
       "id": "parcelAdhoc1",
+      "payweight": 1,
       "source": {
         "country": "SLO",
         "station": "HPpostofficeH1",

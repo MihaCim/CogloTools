@@ -71,7 +71,8 @@ class ErrorHandling:
                 if clo['source']['station'] not in node_dict or \
                         clo['source']['latitude'] != node_dict[clo['source']['station']]['lat'] or \
                         clo['source']['longitude'] != node_dict[clo['source']['station']]['lon']:
-                    raise ValueError("Check lat, lon and uuid. It doesnt exists in our database {}".format(clo['source']))
+                    raise ValueError(
+                        "Check lat, lon and uuid. It doesnt exists in our database {}".format(clo['source']))
 
                 if clo['destination']['station'] not in node_dict or \
                         clo['destination']['latitude'] != node_dict[clo['destination']['station']]['lat'] or \
@@ -87,8 +88,22 @@ class ErrorHandling:
         if input_data['organization'] == "SLO-CRO":
             pass
 
+    def check_event(self, input_data):
+        event_types = {'order', 'vehicle', 'border'}
+        if 'event_type' not in input_data['event']:
+            raise ValueError("Event type is missing")
+
+        if input_data['event']['event_type'] not in event_types:
+            raise ValueError("Wrong event type.")
+
+    def check_payweight(self, input_data):
+        for clo in input_data['parcels']:
+            print(clo)
+            if 'payweight' not in clo or clo['payweight'] != 1:
+                raise ValueError("Payweight is missing.")
+
     def check_messages_correction(self, input_data):
-        event = input_data['event']['event_type']
+
         '''
         organization = input_data['organization']
         if event == 'breakdown' or organization == 'SLO-CRO':
@@ -105,17 +120,15 @@ class ErrorHandling:
             validate(instance=input_data, schema=json_schema)
         #TODO missing daily_plan
         '''
-        # 1.) Check the organization
+
+        self.check_event(input_data)
         self.check_organization(input_data)
 
         self.check_complited_plan(input_data)
 
         self.check_locations(input_data)
 
-        # 3.) slo cro use case vsi locaisni (pri vsakem parslu in pri vsaki cloju)
-        # v fajlu grapf/data poklice z configa
-        # get_csv_path(self, use_case):
-        #         if use_case == "SLO-CRO_crossborder":
+        self.check_payweight(input_data)
 
         # 4.) event type precekiraj:
         '''
@@ -134,3 +147,5 @@ class ErrorHandling:
         # 6.) id od parclov/clo so unique znotrej celga message
         # clos: parcels: lahko prazen [] ali pa se kej dodati gor -vsi
         # ce ima parsel v planu jih mora imeti tudi tokaj zlisatne
+
+
