@@ -11,9 +11,11 @@ class ErrorHandling:
         '''
          Organization ce je slo-cro/ ps hp
         '''
+        if input_data['event'] is None:
+            return
 
         if input_data['organization'] == 'ELTA':
-            for item in input_data['event']['info']['item']:
+            for item in input_data['event']['info']['items']:
                 if item['organization'] != 'ELTA':
                     raise ValueError("Wrong organization. Organization should be the same at the same message")
 
