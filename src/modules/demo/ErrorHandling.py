@@ -26,7 +26,7 @@ class ErrorHandling:
                     raise ValueError("Wrong organization. Organization should be the same at the same message")
 
         if input_data['organization'] == 'PS':
-            for item in input_data['event']['info']['item']:
+            for item in input_data['event']['info']['items']:
                 if item['organization'] not in self.slo_case:
                     raise ValueError("Wrong organization. Organization should be the same at the same message")
 
@@ -102,24 +102,23 @@ class ErrorHandling:
             if 'payweight' not in clo or clo['payweight'] != 1:
                 raise ValueError("Payweight is missing.")
 
-    def check_messages_correction(self, input_data):
+    def check_parcel_clos(self, input_data):
+        if 'parcels' not in input_data or \
+                type(input_data['parcels']) is not list or \
+                'clos' not in input_data or \
+                type(input_data['clos']) is not list:
+            raise ValueError("Parcels and Clos wrong type.")
 
-        '''
-        organization = input_data['organization']
-        if event == 'breakdown' or organization == 'SLO-CRO':
-            f = open('./modules/demo/schemas/PS_HP_brokenvehicle.json', )
-            json_schema = json.load(f)
-            validate(instance=input_data, schema=json_schema)
-        elif event == 'order' and (organization == 'PS' or organization == 'HP'):
-            f = open('./modules/demo/schemas/PS_HP_ad-hoc.json', )
-            json_schema = json.load(f)
-            validate(instance=input_data, schema=json_schema)
-        elif event == 'order' and organization == 'ELTA':
-            f = open('./modules/demo/schemas/Elta_ad-hoc.json', )
-            json_schema = json.load(f)
-            validate(instance=input_data, schema=json_schema)
-        #TODO missing daily_plan
-        '''
+    def chech_parcel_id(self, input_data):
+        l = []
+        for clo in input_data['parcels']:
+            l.append(clo["id"])
+
+        if len(l) != len(set(l)):
+            raise ValueError("Parcelid are not unique.")
+
+
+    def check_messages_correction(self, input_data):
 
         self.check_event(input_data)
         self.check_organization(input_data)
@@ -129,23 +128,6 @@ class ErrorHandling:
         self.check_locations(input_data)
 
         self.check_payweight(input_data)
+        self.check_parcel_clos(input_data)
 
-        # 4.) event type precekiraj:
-        '''
-                            if type == "order":
-                        type = "AdHocRequest"
-                    elif type == "vehicle":
-                        type = "brokenVehicle"
-                    elif type == "border":
-                    
-                    none je pri daily planu 
-                                    if "event" not in json:
-        '''
-
-        # vsi:
-        # 5.)         parcels -> payweight == 1 :)
-        # 6.) id od parclov/clo so unique znotrej celga message
-        # clos: parcels: lahko prazen [] ali pa se kej dodati gor -vsi
-        # ce ima parsel v planu jih mora imeti tudi tokaj zlisatne
-
-
+        self.chech_parcel_id(input_data)
