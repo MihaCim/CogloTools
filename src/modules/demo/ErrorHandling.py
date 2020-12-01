@@ -15,9 +15,10 @@ class ErrorHandling:
             return
 
         if input_data['organization'] == 'ELTA':
-            for item in input_data['event']['info']['items']:
-                if item['organization'] != 'ELTA':
-                    raise ValueError("Wrong organization. Organization should be the same at the same message")
+            if input_data['event']['event_type'] != 'vehicle':
+                for item in input_data['event']['info']['items']:
+                    if item['organization'] != 'ELTA':
+                        raise ValueError("Wrong organization. Organization should be the same at the same message")
 
             for clo in input_data['clos']:
                 if clo['info']['organization'] != 'ELTA':
@@ -28,9 +29,10 @@ class ErrorHandling:
                     raise ValueError("Wrong organization. Organization should be the same at the same message")
 
         if input_data['organization'] == 'PS':
-            for item in input_data['event']['info']['items']:
-                if item['organization'] not in self.slo_case:
-                    raise ValueError("Wrong organization. Organization should be the same at the same message")
+            if input_data['event']['event_type'] != 'vehicle':
+                for item in input_data['event']['info']['items']:
+                    if item['organization'] not in self.slo_case:
+                        raise ValueError("Wrong organization. Organization should be the same at the same message")
 
             for clo in input_data['clos']:
                 if clo['info']['organization'] not in self.slo_case:
