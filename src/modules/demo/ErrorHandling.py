@@ -91,7 +91,10 @@ class ErrorHandling:
 
     def check_event(self, input_data):
         event_types = {'order', 'vehicle', 'border'}
-        if 'event_type' not in input_data['event']:
+        if input_data['event'] is None:
+            return
+
+        if 'event_type' not in input_data['event'] :
             raise ValueError("Event type is missing")
 
         if input_data['event']['event_type'] not in event_types:
