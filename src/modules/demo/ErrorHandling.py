@@ -64,7 +64,8 @@ class ErrorHandling:
                 if clo['state']['location']['station'] not in node_dict or \
                         clo['state']['location']['latitude'] != node_dict[clo['state']['location']['station']]['lat'] or \
                         clo['state']['location']['longitude'] != node_dict[clo['state']['location']['station']]['lon']:
-                    raise ValueError("Check lat, lon and uuid. It doesnt exists in our database")
+                    raise ValueError("Check lat, lon and uuid. It doesnt exists in our database {}"
+                                     .format(clo['state']['location']))
 
             for clo in input_data['parcels']:
                 print(clo)
