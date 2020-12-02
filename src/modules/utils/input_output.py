@@ -431,7 +431,7 @@ class InputOutputTransformer:
             payload["orders"] = orders  # Orders that need to be processed by the remaining CLOs
         elif payload["eventType"] == "AdHocRequest":
             parcels = []
-            for item in json["event"]["info"]["item"]:
+            for item in json["event"]["info"]["items"]:
                 parcels.append(item)
             orders = InputOutputTransformer.buildOrdersFromParcels(parcels, payload["useCase"], use_case_graph, transformation_map)
             payload["eventType"] = "pickupRequest"  # setting back the event_type to basic use case

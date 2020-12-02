@@ -7,9 +7,11 @@ from flask import Flask, request
 from flask_jsonpify import jsonify
 from flask_restful import Resource
 #from jsonschema import ValidationError
+from jsonschema import ValidationError
 from waitress import serve
 
 #from .ErrorHandling import ErrorHandling
+from .ErrorHandling import ErrorHandling
 from ..create_graph.config.config_parser import ConfigParser
 from ..create_graph.create_graph import JsonGraphCreator
 from ..create_graph.methods import methods
@@ -167,11 +169,15 @@ def handle_recommendation_request():
     print("received getRecommendation request", received_request)
 
     #Error Handling
-    """try:
-        ErrorHandling.check_messages_correction(received_request)
-    except ValidationError as error:
-        return str(error)
-    """
+    #try:
+    errorHandling = ErrorHandling()
+    errorHandling.check_messages_correction(received_request)
+    #except ValueError as value_error:
+    #    return str('Malformed json vas detected: {}'.format(value_error))
+    #except KeyError as key_error:
+    #    return str('Something is wrong with json input: {}'.format(key_error))
+    #except Exception as ex:
+    #    return str('Somthing whent wrong {}'.format(ex))
 
     ##mockup for pilot scenario
     if received_request["organization"] == "SLO-CRO" or received_request["organization"] == "PS" or \
