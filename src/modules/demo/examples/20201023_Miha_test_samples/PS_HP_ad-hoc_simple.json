@@ -264,9 +264,9 @@
       "payweight": 1,
       "destination": {
         "country": "SLO",
-        "station": "PSpostofficeS2",
-        "latitude": 45.887335,
-        "longitude": 15.697116
+        "latitude": 45.95503619,
+        "longitude": 15.63656969,
+        "station": "PSpostofficeS2"
       },
       "organization": "PS"
     },

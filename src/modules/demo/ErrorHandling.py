@@ -64,10 +64,9 @@ class ErrorHandling:
             with fObj as csvfile:
                 nodes = csv.reader(csvfile, delimiter=',')
                 for value in nodes:
-                    node_dict[value[1]] = {'lat': value[2], 'lon': value[3]}
+                    node_dict[value[1]] = {'lat': float(value[2]), 'lon': float(value[3])}
 
             for clo in input_data['clos']:
-                print(clo['state']['location'])
                 if clo['state']['location']['station'] not in node_dict or \
                         clo['state']['location']['latitude'] != node_dict[clo['state']['location']['station']]['lat'] or \
                         clo['state']['location']['longitude'] != node_dict[clo['state']['location']['station']]['lon']:
@@ -75,18 +74,17 @@ class ErrorHandling:
                                      .format(clo['state']['location']))
 
             for clo in input_data['parcels']:
-                print(clo)
                 if clo['source']['station'] not in node_dict or \
                         clo['source']['latitude'] != node_dict[clo['source']['station']]['lat'] or \
                         clo['source']['longitude'] != node_dict[clo['source']['station']]['lon']:
                     raise ValueError(
-                        "Check Parcels lat, lon and uuid. It doesnt exists in our database {}".format(clo['source']))
+                        "Check Parcels lat, lon and uuid. It doesnt exists in our database {}".format(clo['source']), clo["id"])
 
                 if clo['destination']['station'] not in node_dict or \
                         clo['destination']['latitude'] != node_dict[clo['destination']['station']]['lat'] or \
                         clo['destination']['longitude'] != node_dict[clo['destination']['station']]['lon']:
                     raise ValueError(
-                        "Check Parcels lat, lon and uuid. It doesnt exists in our database {}".format(clo['destination']))
+                        "Check Parcels lat, lon and uuid. It doesnt exists in our database {}".format(clo['destination'], clo["id"]))
 
                 '''
                 a = clo['state']['location']['latitude']
@@ -137,7 +135,7 @@ class ErrorHandling:
 
         self.check_remaining_plan(input_data)
 
-        #self.check_locations(input_data)
+        self.check_locations(input_data)
 
         self.check_payweight(input_data)
         self.check_parcel_clos(input_data)

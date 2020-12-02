@@ -169,15 +169,15 @@ def handle_recommendation_request():
     print("received getRecommendation request", received_request)
 
     #Error Handling
-    #try:
-    errorHandling = ErrorHandling()
-    errorHandling.check_messages_correction(received_request)
-    #except ValueError as value_error:
-    #    return str('Malformed json vas detected: {}'.format(value_error))
-    #except KeyError as key_error:
-    #    return str('Something is wrong with json input: {}'.format(key_error))
-    #except Exception as ex:
-    #    return str('Somthing whent wrong {}'.format(ex))
+    try:
+        errorHandling = ErrorHandling()
+        errorHandling.check_messages_correction(received_request)
+    except ValueError as value_error:
+        return str('Wrong values in JSON message - ValueError: {}'.format(value_error))
+    except KeyError as key_error:
+        return str('JSON schema incorrect, parameter/KeyValue missing: {}'.format(key_error))
+    except Exception as ex:
+        return str('Unexpected Error in message structure {}'.format(ex))
 
     ##mockup for pilot scenario
     if received_request["organization"] == "SLO-CRO" or received_request["organization"] == "PS" or \
@@ -256,7 +256,7 @@ def handle_recommendation_request():
         # Prepare output message from calculated recommendations
         response = InputOutputTransformer.prepare_output_message(recommendations, use_case, request_id, organization)
         # Post recommendations to MSB
-        #RecReq.post_response_msb(request_id, response)
+        RecReq.post_response_msb(request_id, response)
 
         # Return generic response message
         return generic_message_received_response
@@ -318,7 +318,7 @@ def handle_recommendation_request():
         # restructures steps plan and and lists all the parcels from clusters as a list of locations
         response = methods.order_parcels_on_route(response1)
         # Posting response to MSB endpoint
-        #RecReq.post_response_msb(request_id, response)
+        RecReq.post_response_msb(request_id, response)
 
         #return generic_message_received_response
         return generic_message_received_response
