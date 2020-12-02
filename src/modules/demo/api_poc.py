@@ -6,11 +6,7 @@ import requests
 from flask import Flask, request
 from flask_jsonpify import jsonify
 from flask_restful import Resource
-#from jsonschema import ValidationError
-from jsonschema import ValidationError
 from waitress import serve
-
-#from .ErrorHandling import ErrorHandling
 from .ErrorHandling import ErrorHandling
 from ..create_graph.config.config_parser import ConfigParser
 from ..create_graph.create_graph import JsonGraphCreator
@@ -19,7 +15,6 @@ from ..cvrp.processor.vrp_processor import VrpProcessor
 from ..partitioning.graph_partitioning_preprocess import GraphPreprocessing
 from ..utils.clo_update_handler import CloUpdateHandler
 from ..utils.input_output import InputOutputTransformer
-from ..utils.tsp import Tsp
 
 app = Flask(__name__)
 vrpProcessorReferenceSloCro = None
