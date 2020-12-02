@@ -5,7 +5,7 @@
     "event": "system",
     "initiator": "COGLOmoduleWebIF",
     "info": {
-      "item": [
+      "items": [
         {
         "organization": "PS",
         "id": "parcelAdhoc1",
@@ -71,8 +71,8 @@
       "state": {
         "location": {
           "country": "SLO",
-          "latitude": 45.893208,
-          "longitude": 15.6213,
+          "latitude": 45.89320611,
+          "longitude": 15.6212996,
           "station": "PSpostofficeS3"
         },
         "status": 0,
@@ -98,8 +98,8 @@
               "rank": 1,
               "location": {
                 "address": null,
-                "latitude": 45.893208,
-                "longitude": 15.6213,
+                "latitude": 45.89320611,
+                "longitude": 15.6212996,
                 "station": "PSpostofficeS3"
               },
               "load": ["P_01", "P_02"],
@@ -164,8 +164,8 @@
       "state": {
         "location": {
           "country": "SLO",
-          "latitude": 45.893208,
-          "longitude": 15.6213,
+          "latitude": 45.89320611,
+          "longitude": 15.6212996,
           "station": "PSpostofficeS3"
         },
         "status": 0,
@@ -234,9 +234,9 @@
       "issued": "2020-10-04T09:17:51Z",
       "source": {
         "country": "SLO",
-        "station": "PSpostofficeS3",
         "latitude": 45.89320611,
-        "longitude": 15.6212996
+        "longitude": 15.6212996,
+        "station": "PSpostofficeS3"
       },
       "deadline": "2020-10-05T14:17:51Z",
       "payweight": 1,
@@ -287,23 +287,7 @@
       },
       "organization": "PS"
     },
-    {
-      "organization": "PS",
-      "id": "parcelAdhoc1",
-      "source": {
-        "country": "SLO",
-        "station": "HPpostofficeH1",
-        "latitude": 45.840296,
-        "longitude": 15.686514
-      },
-      "destination": {
-        "country": "SLO",
-        "station": "PSpostofficeS1",
-        "latitude": 45.93107932,
-        "longitude": 15.67793203
-      }
-    },
-    {
+     {
       "id": "parcelAdhoc1",
       "state": "unserved",
       "issued": "2020-10-06T10:10:30Z",

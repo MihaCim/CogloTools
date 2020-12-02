@@ -371,7 +371,7 @@
         "postal_code": null
       },
       "deadline": null,
-      "payweight": 6,
+      "payweight": 1,
       "destination": {
         "city": null,
         "country": "CRO",

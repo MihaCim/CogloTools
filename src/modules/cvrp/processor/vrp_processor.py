@@ -86,7 +86,7 @@ class VrpProcessor:
             indexes.append(index)
         return indexes
 
-    def process(self, vehicles, deliveries_object, event_type, use_case):
+    def process(self, vehicles, deliveries_object, event_type, use_case_graph):
         """Process routing request with N vehicles and M deliveries, to produce a list of routing plans"""
         deliveries_all = deliveries_object.origin + deliveries_object.req
         deliveries_req = deliveries_object.req
@@ -133,7 +133,7 @@ class VrpProcessor:
 
             # compute routes based on dispatch vectors from VRP. Since VRP output is incomplete/not best,
             # we add A* routing on top
-            plan_routes = self.make_route(dispatch, partition, plan.vehicles, plan.deliveries_req, event_type, use_case)
+            plan_routes = self.make_route(dispatch, partition, plan.vehicles, plan.deliveries_req, event_type, use_case_graph)
             routes += plan_routes
 
         return routes
@@ -199,7 +199,7 @@ class VrpProcessor:
         else:
             return route
 
-    def make_route(self, loads, graph, vehicles, deliveries_req, event_type, use_case):
+    def make_route(self, loads, graph, vehicles, deliveries_req, event_type, use_case_graph):
         nodes = graph.nodes
         edges = graph.edges
         print("Building route from VRP output...")
@@ -211,7 +211,7 @@ class VrpProcessor:
         vehicle_node_sequence = []
 
         # update list of vehicle parcels: add new parcels to vehicle.parcels list)
-        # exception: crossborder - as the mapping of parcels on hte nodes change. We keep the final list not updated
+        # exception: crossborder - as the mapping of parcels on the nodes change. We keep the final list not updated
         for x, vehicle in enumerate(vehicles):
             load = loads[x]
             load = [int(x) for x in load]
@@ -262,7 +262,7 @@ class VrpProcessor:
             routes.append(route)
 
             # Extract 'latitude' and 'longitude' from station ID
-            csv_file = config_parser.get_csv_path(use_case)
+            csv_file = config_parser.get_csv_path(use_case_graph)
             location_station_dict = CloUpdateHandler.extract_location_station_dict(csv_file)
             station_id = vehicles[i].start_node
             lat, lon = list(location_station_dict.keys())[list(location_station_dict.values()).index(station_id)]

@@ -7,9 +7,11 @@ from flask import Flask, request
 from flask_jsonpify import jsonify
 from flask_restful import Resource
 #from jsonschema import ValidationError
+from jsonschema import ValidationError
 from waitress import serve
 
 #from .ErrorHandling import ErrorHandling
+from .ErrorHandling import ErrorHandling
 from ..create_graph.config.config_parser import ConfigParser
 from ..create_graph.create_graph import JsonGraphCreator
 from ..create_graph.methods import methods
@@ -21,7 +23,9 @@ from ..utils.tsp import Tsp
 
 app = Flask(__name__)
 vrpProcessorReferenceSloCro = None
-vrpProcessorReferenceElta = None
+vrpProcessorReferenceElta1 = None
+vrpProcessorReferenceElta2 = None
+
 
 config_parser = ConfigParser()
 msb_post_url = "https://msb.cog-lo.eu/api/publish"
@@ -36,34 +40,40 @@ generic_message_received_response = {
 }
 
 
-def process_new_CLOs_request(data):
-    global vrpProcessorReferenceElta
+def process_new_CLOs_request(data, use_case_graph):
+    global vrpProcessorReferenceElta1
+    global vrpProcessorReferenceElta2
     global vrpProcessorReferenceSloCro
 
     if "clos" not in data or "useCase" not in data:
         return {"message": "Parameter 'clos' or 'useCase' is missing"}
     clos = data["clos"]  # Extract array of CLOs
     use_case = data["useCase"]
-    csv_file = config_parser.get_csv_path(use_case)
 
+    csv_file = config_parser.get_csv_path(use_case_graph)
+
+    """
     if use_case != "SLO-CRO" and use_case != "ELTA":
         return {"message": "Parameter 'useCase' can have value 'SLO-CRO' or 'ELTA'."}
+    """
 
     needs_rebuild = CloUpdateHandler.handle_new_clo_request(clos, csv_file)
-    if needs_rebuild or not os.path.exists(config_parser.get_graph_path(use_case)):
+    if needs_rebuild or not os.path.exists(config_parser.get_graph_path(use_case_graph)):
         creator = JsonGraphCreator()
-        creator.create_json_graph(use_case)
+        creator.create_json_graph(use_case_graph)
 
         # Delete existing pickle file for graph
-        pickle_path = config_parser.get_pickle_path(use_case)
+        pickle_path = config_parser.get_pickle_path(use_case_graph)
         if os.path.exists(pickle_path):
             os.remove(pickle_path)
 
-        # Remove use case specific
-        if use_case == "SLO-CRO":
+        # Remove pickle file
+        if use_case_graph == "SLO-CRO_crossborder":
             vrpProcessorReferenceSloCro = None
-        else:
-            vrpProcessorReferenceElta = None
+        elif use_case_graph == "ELTA_urban1":
+            vrpProcessorReferenceElta1 = None
+        elif use_case_graph == "ELTA_urban2":
+            vrpProcessorReferenceElta2 = None
 
     return {"success": True}
 
@@ -81,28 +91,28 @@ class RecReq(Resource):
         # check api_ijs.py for this code
 
     @staticmethod
-    def process_pickup_requests(evt_type, clos, requests, vrp_processor_ref, use_case):
+    def process_pickup_requests(evt_type, clos, requests, vrp_processor_ref, use_case, use_case_graph):
         print("Processing Pickup Delivery Request for ", len(clos), 'vehicles')
         vehicles = vrp_processor_ref.parse_vehicles(clos)
         deliveries = vrp_processor_ref.parse_deliveries(evt_type, clos, requests, use_case)
 
-        return vrp_processor_ref.process(vehicles, deliveries, evt_type, use_case)
+        return vrp_processor_ref.process(vehicles, deliveries, evt_type, use_case_graph)
 
     @staticmethod
-    def process_broken_clo(evt_type, clos, broken_clo, vrp_processor_ref, use_case):
+    def process_broken_clo(evt_type, clos, broken_clo, vrp_processor_ref, use_case, use_case_graph):
         print("Processing Broken CLO for ", len(clos), 'vehicles')
         vehicles = vrp_processor_ref.parse_vehicles(clos)
         deliveries = vrp_processor_ref.parse_deliveries(evt_type, clos, broken_clo, use_case)
 
-        return vrp_processor_ref.process(vehicles, deliveries, evt_type, use_case)
+        return vrp_processor_ref.process(vehicles, deliveries, evt_type, use_case_graph)
 
     @staticmethod
-    def process_cross_border_request(evt_type, clos, requests, vrp_processor_ref, use_case):
+    def process_cross_border_request(evt_type, clos, requests, vrp_processor_ref, use_case, use_case_graph):
         print("Processing Cross Border Delivery Request for ", len(clos), 'vehicles')
         vehicles = vrp_processor_ref.parse_vehicles(clos)
         deliveries = vrp_processor_ref.parse_deliveries(evt_type, clos, requests, use_case)
 
-        return vrp_processor_ref.process(vehicles, deliveries, evt_type, use_case)
+        return vrp_processor_ref.process(vehicles, deliveries, evt_type, use_case_graph)
 
     @staticmethod
     def post_response_msb(UUID, recommendations):
@@ -145,38 +155,52 @@ class RecReq(Resource):
 
 @app.route("/api/adhoc/getRecommendation", methods=['POST'])
 def handle_recommendation_request():
-    # TODO: Make generic_message_received_response synchronous and all other operations asynchronous
 
     global vrpProcessorReferenceSloCro
-    global vrpProcessorReferenceElta
+    global vrpProcessorReferenceElta1
+    global vrpProcessorReferenceElta2
 
     transformation_map = LocationParcelMap()
 
     """Main entry point for HTTP request"""
     received_request = request.get_json(force=True)
-    #Error Handling
-    """try:
-        ErrorHandling.check_messages_correction(received_request)
-    except ValidationError as error:
-        return str(error)
-    """
     with open('received_request.json', 'w') as outfile:
         json.dump(received_request, outfile)
-
     print("received getRecommendation request", received_request)
 
-    # transforms received message for internal structures
+    #Error Handling
+    try:
+        errorHandling = ErrorHandling()
+        errorHandling.check_messages_correction(received_request)
+    except ValueError as value_error:
+        return str('Wrong values in JSON message - ValueError: {}'.format(value_error))
+    except KeyError as key_error:
+        return str('JSON schema incorrect, parameter/KeyValue missing: {}'.format(key_error))
+    except Exception as ex:
+        return str('Unexpected Error in message structure {}'.format(ex))
+
+    ##mockup for pilot scenario
+    if received_request["organization"] == "SLO-CRO" or received_request["organization"] == "PS" or \
+            received_request["organization"] == "HP":
+        received_request["pilot"] = "crossborder"
+        use_case_graph = "SLO-CRO" + "_" + received_request["pilot"]
+    else:
+        received_request["pilot"] = "urban1"
+        use_case_graph = "ELTA" + "_" + received_request["pilot"]
+
+    # transformation to internal structures
     try:
         data = InputOutputTransformer.parse_received_recommendation_message(
-            received_request, transformation_map)
+            received_request, transformation_map, use_case_graph)
     except ValueError as error:
         return str(error)
-
     # needed for response handling
     request_id = received_request["request"]
     use_case = data['useCase']
     organization = received_request["organization"]
+    evt_type = data["eventType"]
 
+    """
     ##Errors
     if use_case != "SLO-CRO" and use_case != "ELTA":
         return {"message": "Parameter 'useCase' can have value 'SLO-CRO' or 'ELTA'."}
@@ -184,12 +208,13 @@ def handle_recommendation_request():
         return {"message": "Parameter 'eventType' or 'useCase' is missing"}
     evt_type = data["eventType"]
     use_case = data["useCase"]
+    """
 
     ##Use Case SLO-CRO
     if use_case == "SLO-CRO":
         print("processing SLO-CRO use-case request")
         if vrpProcessorReferenceSloCro is None:     #initialize VRP
-            vrpProcessorReferenceSloCro = RecReq.init_vrp(use_case)
+            vrpProcessorReferenceSloCro = RecReq.init_vrp(use_case_graph)
         vrp_processor_ref = vrpProcessorReferenceSloCro
 
         # Extract 'clos' which should be a field in each request
@@ -201,12 +226,12 @@ def handle_recommendation_request():
             if "clos" not in data or "orders" not in data:
                 return {"msg": "Parameter 'clos' or 'orders' is missing", "status": 0}
             broken_clo_orders = data["orders"]
-            recommendations = RecReq.process_broken_clo(evt_type, clos, broken_clo_orders, vrp_processor_ref, use_case)
+            recommendations = RecReq.process_broken_clo(evt_type, clos, broken_clo_orders, vrp_processor_ref, use_case, use_case_graph)
         elif evt_type == "pickupRequest":
             if "clos" not in data or "orders" not in data:
                 return {"msg": "Parameter 'clos' or 'orders' is missing", "status": 0}
             requests = data["orders"]
-            recommendations = RecReq.process_pickup_requests(evt_type, clos, requests, vrp_processor_ref, use_case)
+            recommendations = RecReq.process_pickup_requests(evt_type, clos, requests, vrp_processor_ref, use_case, use_case_graph)
         elif evt_type == "crossBorder" or "border":
             print("cross border event received")
             if "clos" not in data:
@@ -217,26 +242,24 @@ def handle_recommendation_request():
                 for parcel in parcels:
                     parcel["currentLocation"] = clo["currentLocation"]
                     requests.append(parcel)
-            recommendations = RecReq.process_cross_border_request(evt_type, clos, requests, vrp_processor_ref, use_case)
+            recommendations = RecReq.process_cross_border_request(evt_type, clos, requests, vrp_processor_ref, use_case, use_case_graph)
         else:
             return jsonify({"message": "Invalid event type: {}".format(evt_type), "status": 0})
 
         # Map parcel locations back to the original ones
         #recommendations_raw = InputOutputTransformer.revert_coordinates(recommendations, transformation_map)
-
-        print("starting final reordering & TSP")
+        #print("starting final reordering & TSP")
         recommendations = InputOutputTransformer.PickupNodeReorder(recommendations)
-
         # print route for all vehicles
         P=InputOutputTransformer.PrintRoutes(recommendations)
+
         # Prepare output message from calculated recommendations
         response = InputOutputTransformer.prepare_output_message(recommendations, use_case, request_id, organization)
-
-        # Post response to MSB
+        # Post recommendations to MSB
         RecReq.post_response_msb(request_id, response)
-        # Return generic message stating that request was received and is due to be processed
-        return generic_message_received_response
 
+        # Return generic response message
+        return generic_message_received_response
 
     ##Use Case ELTA
     elif use_case == "ELTA":
@@ -244,14 +267,20 @@ def handle_recommendation_request():
         ### VRP INICIALIZATION AND MESSAGE PREPROCESSING
         transform_map_dict = methods.get_orders_coordinates(data)
         if evt_type is None:
-            data_request, data_CLOs = methods.proccess_elta_event(evt_type, data)
-            res = process_new_CLOs_request(data_CLOs)  # make graph build
+            data_request, data_CLOs = methods.proccess_elta_event(evt_type, data, use_case_graph)
+            res = process_new_CLOs_request(data_CLOs, use_case_graph)  # make graph build
         else:
-            data_request = methods.proccess_elta_event(evt_type, data)
+            data_request = methods.proccess_elta_event(evt_type, data, use_case_graph)
 
-        if vrpProcessorReferenceElta is None:     #initialize VRP
-            vrpProcessorReferenceElta = RecReq.init_vrp(use_case)
-        vrp_processor_ref = vrpProcessorReferenceElta
+        #seting graph instance reference
+        if use_case_graph == "ELTA_urban1":
+            if vrpProcessorReferenceElta1 is None:
+                vrpProcessorReferenceElta1 = RecReq.init_vrp(use_case_graph)
+            vrp_processor_ref = vrpProcessorReferenceElta1
+        elif use_case_graph == "ELTA_urban2":
+            if vrpProcessorReferenceElta2 is None:
+               vrpProcessorReferenceElta2 = RecReq.init_vrp(use_case_graph)
+            vrp_processor_ref = vrpProcessorReferenceElta2
 
         if "clos" not in data_request:
             return {"msg": "Parameter 'clos' is missing", "status": 0}
@@ -262,344 +291,44 @@ def handle_recommendation_request():
             if "orders" not in data_request:
                 return {"msg": "Parameter 'orders' is missing", "status": 0}
             data_requests = data_request["orders"]
-            recommendations = RecReq.process_pickup_requests(evt_type, clos, data_requests, vrp_processor_ref, use_case)
+            recommendations = RecReq.process_pickup_requests(evt_type, clos, data_requests, vrp_processor_ref, use_case, use_case_graph)
         elif evt_type == "brokenVehicle":
             if "clos" not in data or "orders" not in data:
                 return {"msg": "Parameter 'clos' or 'orders' is missing", "status": 0}
             broken_clo_orders = data_request["orders"]
-            recommendations = RecReq.process_broken_clo(evt_type, clos, broken_clo_orders, vrp_processor_ref, use_case)
+            recommendations = RecReq.process_broken_clo(evt_type, clos, broken_clo_orders, vrp_processor_ref, use_case, use_case_graph)
         elif evt_type == "pickupRequest":
             if "orders" not in data_request:
                 return {"msg": "Parameter 'orders' is missing", "status": 0}
             data_requests = data_request["orders"]
-            recommendations = RecReq.process_pickup_requests(evt_type, clos, data_requests, vrp_processor_ref, use_case)
+            recommendations = RecReq.process_pickup_requests(evt_type, clos, data_requests, vrp_processor_ref, use_case, use_case_graph)
         else:
             return jsonify({"msg": "Invalid event type: {}".format(evt_type), "status": 0})
 
         print("starting final reordering & TSP")
         recommendations = InputOutputTransformer.PickupNodeReorder(recommendations)
-
         # print route for all vehicles
         P = InputOutputTransformer.PrintRoutes(recommendations)
 
 
         # Maps recommendations based on transform_map_dict
         recommendations_mapped = methods.map_coordinates_to_response(recommendations, transform_map_dict)
-
         # Transforms response in 'JSI' format to the one used for MSB
         response1 = InputOutputTransformer.prepare_output_message(recommendations_mapped, use_case, request_id, organization)
-
         # restructures steps plan and and lists all the parcels from clusters as a list of locations
         response = methods.order_parcels_on_route(response1)
-
-        # This piece of code posts optimization response to MSB
+        # Posting response to MSB endpoint
         RecReq.post_response_msb(request_id, response)
 
-        # Response is always a generic one which just states that CA received request and will process it.
         #return generic_message_received_response
-        return response
+        return generic_message_received_response
 
 @app.route("/api/clo/newCLOs", methods=['POST'])
 def new_clos():
+    ##TODO: needs to be updated for different pilots
     """
     API route used for handling request for newCLOs.
     This method checks if graph needs to be rebuilt or updated.
-
-    Example request:
-    {
-      "clos": [
-        {
-          "id": "PSpostofficeS1",
-          "info": {
-            "name": "Kapele",
-            "type": "station",
-            "subtype": "post office",
-            "organization": "PS",
-            "physical_id": "S1",
-            "location": {
-              "latitude": 45.93107932,
-              "longitude": 15.67793203,
-              "country": "SLO"
-            }
-          },
-          "state": {
-            "status": 1.0
-          }
-        },
-        {
-          "id": "PSpostofficeS2",
-          "info": {
-            "name": "Globoko",
-            "type": "station",
-            "subtype": "post office",
-            "organization": "PS",
-            "physical_id": "S2",
-            "location": {
-              "latitude": 45.95503619,
-              "longitude": 15.63656969,
-              "country": "SLO"
-            }
-          },
-          "state": {
-            "status": 1.0
-          }
-        },
-        {
-          "id": "PSpostofficeS3",
-          "info": {
-            "name": "Jesenice",
-            "type": "station",
-            "subtype": "post office",
-            "organization": "PS",
-            "physical_id": "S3",
-            "location": {
-              "latitude": 45.85945758,
-              "longitude": 15.68964069,
-              "country": "SLO"
-            }
-          },
-          "state": {
-            "status": 1.0
-          }
-        },
-        {
-          "id": "PSpostofficeS4",
-          "info": {
-            "name": "Topliska cesta",
-            "type": "station",
-            "subtype": "post office",
-            "organization": "PS",
-            "physical_id": "S4",
-            "location": {
-              "latitude": 45.89320611,
-              "longitude": 15.6212996,
-              "country": "SLO"
-            }
-          },
-          "state": {
-            "status": 1.0
-          }
-        },
-        {
-          "id": "PSpostofficeS5",
-          "info": {
-            "name": "Cerklje ob Krki",
-            "type": "station",
-            "subtype": "post office",
-            "organization": "PS",
-            "physical_id": "S5",
-            "location": {
-              "latitude": 45.88461153,
-              "longitude": 15.5231045,
-              "country": "SLO"
-            }
-          },
-          "state": {
-            "status": 1.0
-          }
-        },
-        {
-          "id": "PSpostofficeS6",
-          "info": {
-            "name": "Ulica 11. novembra",
-            "type": "station",
-            "subtype": "post office",
-            "organization": "PS",
-            "physical_id": "S6",
-            "location": {
-              "latitude": 45.942039,
-              "longitude": 15.478103,
-              "country": "SLO"
-            }
-          },
-          "state": {
-            "status": 1.0
-          }
-        },
-        {
-          "id": "PSpostofficeS7",
-          "info": {
-            "name": "Kriska vas",
-            "type": "station",
-            "subtype": "post office",
-            "organization": "PS",
-            "physical_id": "S7",
-            "location": {
-              "latitude": 45.89123853,
-              "longitude": 15.57086927,
-              "country": "SLO"
-            }
-          },
-          "state": {
-            "status": 1.0
-          }
-        },
-        {
-          "id": "PSpostofficeS8",
-          "info": {
-            "name": "Ulica stare pravde",
-            "type": "station",
-            "subtype": "post office",
-            "organization": "PS",
-            "physical_id": "S8",
-            "location": {
-              "latitude": 45.90488128,
-              "longitude": 15.59338439,
-              "country": "SLO"
-            }
-          },
-          "state": {
-            "status": 1.0
-          }
-        },
-        {
-          "id": "PSpostofficeS9",
-          "info": {
-            "name": "Ulica bratov Gerjovicev",
-            "type": "station",
-            "subtype": "post office",
-            "organization": "PS",
-            "physical_id": "S9",
-            "location": {
-              "latitude": 45.89504865,
-              "longitude": 15.66006978,
-              "country": "SLO"
-            }
-          },
-          "state": {
-            "status": 1.0
-          }
-        },
-        {
-          "id": "HPpostofficeH1",
-          "info": {
-            "name": "Ul. ?ure Basari?eka 9",
-            "type": "station",
-            "subtype": "post office",
-            "organization": "HP",
-            "physical_id": "H1",
-            "location": {
-              "latitude": 45.839828,
-              "longitude": 15.68643,
-              "country": "CRO"
-            }
-          },
-          "state": {
-            "status": 1.0
-          }
-        },
-        {
-          "id": "HPpostofficeH2",
-          "info": {
-            "name": "Ul. Ljudevita Gaja 4",
-            "type": "station",
-            "subtype": "post office",
-            "organization": "HP",
-            "physical_id": "H2",
-            "location": {
-              "latitude": 45.803142,
-              "longitude": 15.710135,
-              "country": "CRO"
-            }
-          },
-          "state": {
-            "status": 1.0
-          }
-        },
-        {
-          "id": "HPpostofficeH3",
-          "info": {
-            "name": "Gori?ka 1",
-            "type": "station",
-            "subtype": "post office",
-            "organization": "HP",
-            "physical_id": "H3",
-            "location": {
-              "latitude": 45.917165,
-              "longitude": 15.730056,
-              "country": "CRO"
-            }
-          },
-          "state": {
-            "status": 1.0
-          }
-        },
-        {
-          "id": "HPpostofficeH4",
-          "info": {
-            "name": "Ul. Dr. Franje Tu?mana 38a",
-            "type": "station",
-            "subtype": "post office",
-            "organization": "HP",
-            "physical_id": "H4",
-            "location": {
-              "latitude": 45.808406,
-              "longitude": 15.816847,
-              "country": "CRO"
-            }
-          },
-          "state": {
-            "status": 1.0
-          }
-        },
-        {
-          "id": "HPpostofficeH5",
-          "info": {
-            "name": "Zagreba?ka ul. 45",
-            "type": "station",
-            "subtype": "post office",
-            "organization": "HP",
-            "physical_id": "H5",
-            "location": {
-              "latitude": 45.887335,
-              "longitude": 15.697116,
-              "country": "CRO"
-            }
-          },
-          "state": {
-            "status": 1.0
-          }
-        },
-        {
-          "id": "HPpostofficeH6",
-          "info": {
-            "name": "Ul. Drage ?vajcara 5",
-            "type": "station",
-            "subtype": "post office",
-            "organization": "HP",
-            "physical_id": "H6",
-            "location": {
-              "latitude": 45.859075,
-              "longitude": 15.80341,
-              "country": "CRO"
-            }
-          },
-          "state": {
-            "status": 1.0
-          }
-        },
-        {
-          "id": "HPpostofficeH7",
-          "info": {
-            "name": "Zagreba?ka ul. 29",
-            "type": "station",
-            "subtype": "post office",
-            "organization": "HP",
-            "physical_id": "H9",
-            "location": {
-              "latitude": 45.878072,
-              "longitude": 15.739208,
-              "country": "CRO"
-            }
-          },
-          "state": {
-            "status": 1.0
-          }
-        }
-      ],
-      "useCase": "SLO-CRO"
-    }
-
     """
     """Main entry point for HTTP request"""
     data = request.get_json(force=True)
