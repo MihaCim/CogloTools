@@ -3,7 +3,7 @@ import csv
 from jsonschema import validate
 import json
 
-from src.modules.create_graph.config import config_parser
+from ..create_graph.config.config_parser import ConfigParser
 
 
 class ErrorHandling:
@@ -57,7 +57,7 @@ class ErrorHandling:
 
         if input_data['organization'] == "PS" or \
                 input_data['organization'] == "HP":
-            use_case_graph = config_parser.ConfigParser()
+            use_case_graph = ConfigParser()
             fObj = open(use_case_graph.get_csv_path("SLO-CRO_crossborder"))
 
             node_dict = {}
