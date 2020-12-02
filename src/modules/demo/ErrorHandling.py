@@ -1,3 +1,5 @@
+import csv
+
 from jsonschema import validate
 import json
 
@@ -58,11 +60,11 @@ class ErrorHandling:
             use_case_graph = config_parser.ConfigParser()
             fObj = open(use_case_graph.get_csv_path("SLO-CRO_crossborder"))
 
-            nodes = json.load(fObj)['nodes']
             node_dict = {}
-            for node in nodes:
-                value = nodes[node]
-                node_dict[value['uuid']] = {'lat': value['lat'], 'lon': value['lon']}
+            with fObj as csvfile:
+                nodes = csv.reader(csvfile, delimiter=',')
+                for value in nodes:
+                    node_dict[value[1]] = {'lat': value[1], 'lon': value[2]}
 
             for clo in input_data['clos']:
                 print(clo['state']['location'])

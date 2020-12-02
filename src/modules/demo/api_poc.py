@@ -169,15 +169,15 @@ def handle_recommendation_request():
     print("received getRecommendation request", received_request)
 
     #Error Handling
-    try:
-        errorHandling = ErrorHandling()
-        errorHandling.check_messages_correction(received_request)
-    except ValueError as value_error:
-        return str('Malformed json vas detected: {}'.format(value_error))
-    except KeyError as key_error:
-        return str('Something is wrong with json input: {}'.format(key_error))
-    except Exception as ex:
-        return str('Somthing whent wrong {}'.format(ex))
+    #try:
+    errorHandling = ErrorHandling()
+    errorHandling.check_messages_correction(received_request)
+    #except ValueError as value_error:
+    #    return str('Malformed json vas detected: {}'.format(value_error))
+    #except KeyError as key_error:
+    #    return str('Something is wrong with json input: {}'.format(key_error))
+    #except Exception as ex:
+    #    return str('Somthing whent wrong {}'.format(ex))
 
     ##mockup for pilot scenario
     if received_request["organization"] == "SLO-CRO" or received_request["organization"] == "PS" or \
