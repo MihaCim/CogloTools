@@ -64,7 +64,7 @@ class ErrorHandling:
             with fObj as csvfile:
                 nodes = csv.reader(csvfile, delimiter=',')
                 for value in nodes:
-                    node_dict[value[1]] = {'lat': value[2], 'lon': value[3]}
+                    node_dict[value[1]] = {'lat': float(value[2]), 'lon': float(value[3])}
 
             for clo in input_data['clos']:
                 print(clo['state']['location'])
