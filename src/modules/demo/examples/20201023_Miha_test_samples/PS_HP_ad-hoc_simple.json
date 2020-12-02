@@ -261,7 +261,7 @@
         "latitude": 45.93107932,
         "longitude": 15.67793203
       },
-      "payweight": 6,
+      "payweight": 1,
       "destination": {
         "country": "SLO",
         "station": "PSpostofficeS2",
@@ -280,7 +280,7 @@
         "latitude": 45.840296,
         "longitude": 15.686514
       },
-      "payweight": 6,
+      "payweight": 1,
       "destination": {
         "country": "SLO",
         "station": "PSpostofficeS1",

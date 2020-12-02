@@ -287,23 +287,7 @@
       },
       "organization": "PS"
     },
-    {
-      "organization": "PS",
-      "id": "parcelAdhoc1",
-      "source": {
-        "country": "SLO",
-        "station": "HPpostofficeH1",
-        "latitude": 45.840296,
-        "longitude": 15.686514
-      },
-      "destination": {
-        "country": "SLO",
-        "station": "PSpostofficeS1",
-        "latitude": 45.93107932,
-        "longitude": 15.67793203
-      }
-    },
-    {
+     {
       "id": "parcelAdhoc1",
       "state": "unserved",
       "issued": "2020-10-06T10:10:30Z",

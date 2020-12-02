@@ -127,7 +127,7 @@ class ErrorHandling:
             l.append(clo["id"])
 
         if len(l) != len(set(l)):
-            raise ValueError("Parcelid are not unique.")
+            raise ValueError("Parcelid are not unique - duplicate id.", clo["id"])
 
 
     def check_messages_correction(self, input_data):
@@ -137,7 +137,7 @@ class ErrorHandling:
 
         self.check_remaining_plan(input_data)
 
-        self.check_locations(input_data)
+        #self.check_locations(input_data)
 
         self.check_payweight(input_data)
         self.check_parcel_clos(input_data)

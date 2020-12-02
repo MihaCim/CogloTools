@@ -339,6 +339,7 @@
             "latitude":45.840296,
             "longitude":15.686514
          },
+         "payweight":1,
          "destination":{
             "country":"SLO",
             "station":"PSpostofficeS1",
