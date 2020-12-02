@@ -44,14 +44,14 @@ class ErrorHandling:
                 if parcel['organization'] not in self.slo_case:
                     raise ValueError("Wrong organization. Organization should be the same at the same message")
 
-    def check_complited_plan(self, input_data):
+    def check_remaining_plan(self, input_data):
         '''
          daily plan -> complited plan prazn oz missing
         '''
 
         for clo in input_data['clos']:
-            if 'completed_plan' not in clo['state']:
-                raise ValueError("Completed plan is missing")
+            if 'remaining_plan' not in clo['state']:
+                raise ValueError("Remaining_plan is missing in CLO")
 
     def check_locations(self, input_data):
 
@@ -64,14 +64,14 @@ class ErrorHandling:
             with fObj as csvfile:
                 nodes = csv.reader(csvfile, delimiter=',')
                 for value in nodes:
-                    node_dict[value[1]] = {'lat': value[1], 'lon': value[2]}
+                    node_dict[value[1]] = {'lat': value[2], 'lon': value[3]}
 
             for clo in input_data['clos']:
                 print(clo['state']['location'])
                 if clo['state']['location']['station'] not in node_dict or \
                         clo['state']['location']['latitude'] != node_dict[clo['state']['location']['station']]['lat'] or \
                         clo['state']['location']['longitude'] != node_dict[clo['state']['location']['station']]['lon']:
-                    raise ValueError("Check lat, lon and uuid. It doesnt exists in our database {}"
+                    raise ValueError("Check vehicle lat, lon and uuid. It doesnt exists in our database {}"
                                      .format(clo['state']['location']))
 
             for clo in input_data['parcels']:
@@ -80,13 +80,13 @@ class ErrorHandling:
                         clo['source']['latitude'] != node_dict[clo['source']['station']]['lat'] or \
                         clo['source']['longitude'] != node_dict[clo['source']['station']]['lon']:
                     raise ValueError(
-                        "Check lat, lon and uuid. It doesnt exists in our database {}".format(clo['source']))
+                        "Check Parcels lat, lon and uuid. It doesnt exists in our database {}".format(clo['source']))
 
                 if clo['destination']['station'] not in node_dict or \
                         clo['destination']['latitude'] != node_dict[clo['destination']['station']]['lat'] or \
                         clo['destination']['longitude'] != node_dict[clo['destination']['station']]['lon']:
                     raise ValueError(
-                        "Check lat, lon and uuid. It doesnt exists in our database {}".format(clo['destination']))
+                        "Check Parcels lat, lon and uuid. It doesnt exists in our database {}".format(clo['destination']))
 
                 '''
                 a = clo['state']['location']['latitude']
@@ -111,14 +111,15 @@ class ErrorHandling:
         for clo in input_data['parcels']:
             print(clo)
             if 'payweight' not in clo or clo['payweight'] != 1:
-                raise ValueError("Payweight is missing.")
+                self.error = ValueError("Payweight is missing or not == 1.", clo["id"])
+                raise self.error
 
     def check_parcel_clos(self, input_data):
         if 'parcels' not in input_data or \
                 type(input_data['parcels']) is not list or \
                 'clos' not in input_data or \
                 type(input_data['clos']) is not list:
-            raise ValueError("Parcels and Clos wrong type.")
+            raise ValueError("Parcels and ClOs wrong type.")
 
     def chech_parcel_id(self, input_data):
         l = []
@@ -134,7 +135,7 @@ class ErrorHandling:
         self.check_event(input_data)
         self.check_organization(input_data)
 
-        self.check_complited_plan(input_data)
+        self.check_remaining_plan(input_data)
 
         self.check_locations(input_data)
 

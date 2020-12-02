@@ -17,8 +17,10 @@
         "location": {
           "country": "SLO",
           "latitude": 45.90488128,
-          "longitude": 15.59338439
-        }
+          "longitude": 15.59338439,
+          "station":"PSpostofficeS7"
+        },
+        "remaining_plan":[]
       }
     },
     {
@@ -38,8 +40,10 @@
         "location": {
           "country": "SLO",
           "latitude": 45.90488128,
-          "longitude": 15.59338439
-        }
+          "longitude": 15.59338439,
+          "station":"PSpostofficeS7"
+        },
+        "remaining_plan":[]
       }
     }
   ],
@@ -331,7 +335,7 @@
         "latitude": 45.90488128,
         "longitude": 15.59338439,
         "station": "PSpostofficeS7",
-        "country": "SLO"
+        "country": "HP"
       },
       "destination": {
         "latitude": 45.89504865,
@@ -346,6 +350,6 @@
     }
   ],
   "request": "DAILY-90d12325-6980-4483-982d-ea22310fb9cd",
-  "organization": "SLO-CRO",
+  "organization": "PS",
   "event": null
 }
