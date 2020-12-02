@@ -5,7 +5,7 @@ from src.modules.create_graph.config import config_parser
 
 
 class ErrorHandling:
-    slo_case = {'SLO', 'PS'}
+    slo_case = {'SLO', 'PS', 'HP'}
 
     def check_organization(self, input_data):
         '''
@@ -56,7 +56,8 @@ class ErrorHandling:
         if input_data['organization'] == "PS" or \
                 input_data['organization'] == "HP":
             use_case_graph = config_parser.ConfigParser()
-            fObj = open(use_case_graph.get_graph_path("SLO-CRO_crossborder"))
+            fObj = open(use_case_graph.get_csv_path("SLO-CRO_crossborder"))
+
             nodes = json.load(fObj)['nodes']
             node_dict = {}
             for node in nodes:

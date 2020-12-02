@@ -13,7 +13,6 @@
         "capacity_unit": "kg"
       },
       "state": {
-        "completed_plan": {},
         "status": 1,
         "location": {
           "country": "SLO",
@@ -35,7 +34,6 @@
         "capacity_unit": "kg"
       },
       "state": {
-        "completed_plan": {},
         "status": 1,
         "location": {
           "country": "SLO",

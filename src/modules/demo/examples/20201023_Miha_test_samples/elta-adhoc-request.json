@@ -5,7 +5,7 @@
     "event": "system",
     "initiator": "COGLOmoduleWebIF",
     "info": {
-      "items": [
+      "item": [
         {
           "id": "ELTAparcel_9",
           "state": "unserved",
@@ -201,7 +201,6 @@
           "load_volume": null,
           "capacity_unit": null,
           "delay_minutes": null,
-          "completed_plan": {},
           "remaining_plan": {
             "steps": [
               {

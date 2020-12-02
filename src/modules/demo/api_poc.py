@@ -23,7 +23,9 @@ from ..utils.tsp import Tsp
 
 app = Flask(__name__)
 vrpProcessorReferenceSloCro = None
-vrpProcessorReferenceElta = None
+vrpProcessorReferenceElta1 = None
+vrpProcessorReferenceElta2 = None
+
 
 config_parser = ConfigParser()
 msb_post_url = "https://msb.cog-lo.eu/api/publish"
@@ -266,7 +268,7 @@ def handle_recommendation_request():
         transform_map_dict = methods.get_orders_coordinates(data)
         if evt_type is None:
             data_request, data_CLOs = methods.proccess_elta_event(evt_type, data, use_case_graph)
-            #res = process_new_CLOs_request(data_CLOs, use_case_graph)  # make graph build
+            res = process_new_CLOs_request(data_CLOs, use_case_graph)  # make graph build
         else:
             data_request = methods.proccess_elta_event(evt_type, data, use_case_graph)
 
