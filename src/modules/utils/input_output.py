@@ -690,7 +690,7 @@ class InputOutputTransformer:
 
             if len(PickupNodes) == 1: #if daily plan, skip reordering
                 final_route = Tsp.order_recommendations(recommendations_new)[0]["route"]
-            else:
+            elif len(PickupNodes) >= 1:
                 #create ordered list of pickup locations
                 dependencies_stations = OrderRelations.create_relations(PickupNodes, route)
 
