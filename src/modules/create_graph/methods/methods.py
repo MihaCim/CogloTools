@@ -13,10 +13,10 @@ url = "https://graphhopper.com/api/1/vrp?key=e8a55308-9419-4814-81f1-6250efe25b5
 
 def map_coordinates_to_response(recommendations, transform_map_dict):
     for recommendation in recommendations:
-        for route in recommendation['route']:
+        for route in recommendation['route'][:]:
             pickup_parcels = []
             if route['load'] != '' and len(route['load']):
-                for pickup_parcel in route['load']:
+                for pickup_parcel in route['load'][:]:
                     pickup_parcels.append({
                         'id': pickup_parcel,
                         'latitude': transform_map_dict[(pickup_parcel, 'pickup')][0],
