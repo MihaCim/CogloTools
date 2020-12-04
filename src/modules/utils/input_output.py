@@ -684,13 +684,14 @@ class InputOutputTransformer:
             route_first_part = []
             route_second_part = []
             #create and ordered list of all pickup and dependency nodes
+            final_route = []
             for station in route:
                 if len(station["load"]) != 0:
                     PickupNodes[station["id"]] = station
 
             if len(PickupNodes) == 1: #if daily plan, skip reordering
                 final_route = Tsp.order_recommendations(recommendations_new)[0]["route"]
-            else:
+            elif len(PickupNodes) >= 1:
                 #create ordered list of pickup locations
                 dependencies_stations = OrderRelations.create_relations(PickupNodes, route)
 
@@ -751,7 +752,7 @@ class InputOutputTransformer:
                             route_first_part = route_tsp[0]["route"]
                 final_route = route_first_part + route_second_part
 
-            recommendations_raw[i]["route"] = final_route
+            recommendations_raw[i]["route"] = copy.deepcopy(final_route)
         return recommendations_raw
 
 

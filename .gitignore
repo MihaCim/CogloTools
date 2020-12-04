@@ -16,8 +16,8 @@ venv
 #*.csv
 .ipynb_checkpoints/
 .vscode/
-#./src/modules/demo/data/
-#./src/response.json
-#./src/received_request.json
+./src/modules/demo/data/
+./src/response.json
+./src/received_request.json
 
 
