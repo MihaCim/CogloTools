@@ -104,3 +104,6 @@ class ConfigParser():
         # Get the number of partitions used for graph split by partitioner
         return self.json_config["graph_partitions"]
 
+    def get_logger_file(self):
+        # Get the number of partitions used for graph split by partitioner
+        return self.json_config["logger_file_location"]
