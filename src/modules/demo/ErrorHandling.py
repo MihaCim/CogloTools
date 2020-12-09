@@ -1,13 +1,14 @@
 import csv
 
-from jsonschema import validate
-import json
-
 from ..create_graph.config.config_parser import ConfigParser
-
+import json
+import datetime
 
 class ErrorHandling:
     slo_case = {'SLO', 'PS', 'HP'}
+
+    def __init__(self):
+        self.config_parser = ConfigParser()
 
     def check_organization(self, input_data):
         '''
@@ -127,8 +128,18 @@ class ErrorHandling:
         if len(l) != len(set(l)):
             raise ValueError("Parcelid are not unique - duplicate id.", clo["id"])
 
+    def write_file(self, input_data):
+        date_time_obj = datetime.datetime.now()
+        timestamp_str = date_time_obj.strftime("%d-%b-%Y_(%H:%M:%S)")
+        logger_file = self.config_parser.get_logger_file()
+
+        path = logger_file + 'requests_' + timestamp_str + '.json'
+        with open(path, 'w') as outfile:
+            json.dump(input_data, outfile)
 
     def check_messages_correction(self, input_data):
+
+        self.write_file(input_data)
 
         self.check_event(input_data)
         self.check_organization(input_data)
