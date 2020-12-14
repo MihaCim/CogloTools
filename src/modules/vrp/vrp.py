@@ -10,19 +10,15 @@ import json
 
 if __name__ == '__main__':
 
-    print 'initializing Flask'
     app = Flask(__name__)
 
     # initialize MATLAB
-    print 'initializing the MATLAB engine'
     engine = matlab.engine.start_matlab()
     engine.cd('./matlab')
     engine.addpath('./utils')
 
     @app.route('/api/vrptw', methods=['POST'])
     def callVrptw():
-        print 'processing VRPTW request'
-
         req_json = request.json
 
         if req_json is None or req_json == 'null':
@@ -69,8 +65,6 @@ if __name__ == '__main__':
         n_cols = R.size[1]
 
         R_py = [[R[rowN][colN] for colN in range(n_cols)] for rowN in range(n_rows)]
-
-        print 'request processed in ' + str(round(end_tm - start_tm, 2)) + ' seconds'
 
         return json.dumps({
             'routes': R_py,
