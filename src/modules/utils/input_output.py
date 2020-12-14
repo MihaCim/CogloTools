@@ -177,6 +177,18 @@ class InputOutputTransformer:
         }
 
     @staticmethod
+    def get_clo_parcels(clo):
+        parcels = []
+        if len(clo["state"]["remaining_plan"]["steps"]) == 0:
+            clo_parcels = []
+        else:
+            for step in clo["state"]["remaining_plan"]["steps"]:
+                parcels.extend(step["unload"])
+                clo_parcels = copy.deepcopy(parcels)
+        return clo_parcels
+
+
+    @staticmethod
     def parse_received_recommendation_message(json, transformation_map, use_case_graph):
         InputOutputTransformer.validateMessageForValue(json, ["organization"])
         InputOutputTransformer.validateMessageForValue(json, ["request"])
@@ -264,16 +276,12 @@ class InputOutputTransformer:
             clo['capacity'] = clo["info"].pop('capacity')
 
             # Check for state -> remaining_plan -> steps
-            if "state" not in clo:
+            if "state" not in clo or clo["state"] is None:
                 clo["parcels"] = []
-                continue
-            if clo["state"] is None:
-                clo["parcels"] = []
-                continue
 
-            parcels = []
+            parcels=[]
             if "parcels" in clo["state"]:
-                parcels = clo["state"]["parcels"][:]
+                parcels = InputOutputTransformer.get_clo_parcels(clo)
 
             ########################################################################
             # PARCELS ON THE VEHICLE (CLO)
@@ -312,7 +320,6 @@ class InputOutputTransformer:
         # NEW ORDERS PLAN TO DELIVER REMAINING PARCELS FROM THE BROKEN VEHICLE
         ########################################################################
 
-        # TODO: This needs to be tested furthermore on examples provided by testers!!!
         if payload["eventType"] == "brokenVehicle":
             InputOutputTransformer.validateMessageForValue(json["event"], ["info"])
             InputOutputTransformer.validateMessageForValue(json["event"]["info"], ["clo"])
@@ -368,7 +375,7 @@ class InputOutputTransformer:
             # Current vehicle state at breakdown
             vehicle_state = broken_clo["state"]
             InputOutputTransformer.validateMessageForValue(vehicle_state, ["parcels"])
-            parcel_ids = vehicle_state["parcels"]
+            parcel_ids = InputOutputTransformer.get_clo_parcels(broken_clo)     #= vehicle_state["parcels"]
 
             # Currently loaded parcels on the vehicle need to be delivered as well!
             for parcel_id in parcel_ids:
