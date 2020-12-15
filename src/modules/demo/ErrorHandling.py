@@ -140,7 +140,7 @@ class ErrorHandling:
 
     def check_messages_correction(self, input_data):
 
-        #self.write_file(input_data)
+        self.write_file(input_data)
 
         self.check_event(input_data)
         self.check_organization(input_data)
