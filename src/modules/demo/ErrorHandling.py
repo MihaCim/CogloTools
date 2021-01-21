@@ -124,8 +124,8 @@ class ErrorHandling:
         l = []
         for clo in input_data['parcels']:
             l.append(clo["id"])
-
         if len(l) != len(set(l)):
+            print("true")
             raise ValueError("Parcelid are not unique - duplicate id.", clo["id"])
 
     def write_file(self, input_data):
