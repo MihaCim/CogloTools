@@ -124,8 +124,8 @@ class ErrorHandling:
         l = []
         for clo in input_data['parcels']:
             l.append(clo["id"])
-
         if len(l) != len(set(l)):
+            print("true")
             raise ValueError("Parcelid are not unique - duplicate id.", clo["id"])
 
     def write_file(self, input_data):
@@ -147,7 +147,7 @@ class ErrorHandling:
 
         self.check_remaining_plan(input_data)
 
-        self.check_locations(input_data)
+        #self.check_locations(input_data)
 
         self.check_payweight(input_data)
         self.check_parcel_clos(input_data)
