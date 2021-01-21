@@ -181,7 +181,7 @@ class InputOutputTransformer:
         parcels = []
         if clo["state"]["remaining_plan"] == None:
             return parcels
-        if len(clo["state"]["remaining_plan"]["steps"]) == 0:
+        if len(clo["state"]["remaining_plan"]) == 0:
             clo_parcels = []
         else:
             for step in clo["state"]["remaining_plan"]["steps"]:
