@@ -130,11 +130,12 @@ class ErrorHandling:
 
     def write_file(self, input_data):
         date_time_obj = datetime.datetime.now()
-        timestamp_str = date_time_obj.strftime("%d-%b-%Y_(%H:%M:%S)")
+        timestamp_str = date_time_obj.strftime("%d_%b_%Y_(%H_%M_%S)")
         logger_file = self.config_parser.get_logger_file()
 
-        path = logger_file + 'requests_' + timestamp_str + '.json'
-        with open(path, 'w') as outfile:
+
+        filename = logger_file + 'requests_' + timestamp_str + '.json'
+        with open(filename, 'w') as outfile:
             json.dump(input_data, outfile)
 
     def check_messages_correction(self, input_data):
