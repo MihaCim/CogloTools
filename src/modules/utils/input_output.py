@@ -179,6 +179,8 @@ class InputOutputTransformer:
     @staticmethod
     def get_clo_parcels(clo):
         parcels = []
+        if clo["state"]["remaining_plan"] == None:
+            return parcels
         if len(clo["state"]["remaining_plan"]["steps"]) == 0:
             clo_parcels = []
         else:
