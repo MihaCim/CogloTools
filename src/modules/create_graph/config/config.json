@@ -24,7 +24,7 @@
   "elta_pickle_path_urban2": "./modules/demo/data/elta_graphs_urban2.pickle",
   "slo_cro_pickle_path_crossborder": "./modules/demo/data/slo_cro_graph_crossborder.pickle",
   "slo_cro_pickle_path_urban": "./modules/demo/data/slo_cro_graph_urban.pickle",
-  "logger_file_location": "./modules/demo/data/send_requests/",
+  "logger_file_location": "./modules/demo/data/requests/",
   "slo_border_nodes": [
     "PSpostofficeS1",
     "PSpostofficeS3",
