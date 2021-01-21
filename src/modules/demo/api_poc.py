@@ -23,6 +23,7 @@ vrpProcessorReferenceElta2 = None
 
 
 config_parser = ConfigParser()
+msb_post_url_tms = "https://msb.cog-lo.eu/api/send"
 msb_post_url = "https://msb.cog-lo.eu/api/publish"
 response_validation_url = "http://db.cog-lo.eu/postRecommendation"
 recommendation_post_verification_url = "http://116.203.13.198/api/postRecommendation"
@@ -123,9 +124,9 @@ class RecReq(Resource):
             "message": json_for_serialization
         }
 
-        print("Storing message for validation service...")
-        with open('validation_service_message_posted.json', 'w') as outfile:
-            json.dump(recommendations, outfile)
+        #print("Storing message for validation service...")
+        #with open('validation_service_message_posted.json', 'w') as outfile:
+        #    json.dump(recommendations, outfile)
 
         print("Storing message content posted...")
         with open('content_message_posted.json', 'w') as outfile:
@@ -145,6 +146,30 @@ class RecReq(Resource):
         try:
             response = requests.post(msb_post_url, json = content, headers=headers, verify=False)
             print("response from MSB:", response)
+        except Exception as ex:
+            print("Error occurred while posting response to MSB", ex)
+
+    @staticmethod
+    def post_request_graph_tms(use_case_graph):
+        # post to TMS system for ELTA graph real-time data
+        graph_path = config_parser.get_graph_path(use_case_graph)
+        with open(graph_path) as json_file:
+            requestdata = json.load(json_file)
+
+        headers = {'Content-type': 'application/json'}
+        content = {
+            "sender": "COGLOmoduleCA",
+            "recipient": "ELTA::SWARCO::UPDATE_TRAFFIC_WEIGHTS",
+            "message": requestdata
+        }
+        print("posting request to TMS API for graph data")
+        try:
+            response = requests.post(msb_post_url_tms, json=content, headers=headers, verify=False)
+            data = response.json()
+            graph = json.loads(data["msg"])
+            with open("response.json", 'w') as outfile:
+                json.dump(graph, outfile)
+            print("received data from TMS")
         except Exception as ex:
             print("Error occurred while posting response to MSB", ex)
 
@@ -264,6 +289,9 @@ def handle_recommendation_request():
         if evt_type is None:
             data_request, data_CLOs = methods.proccess_elta_event(evt_type, data, use_case_graph)
             res = process_new_CLOs_request(data_CLOs, use_case_graph)  # make graph build
+            if use_case_graph == "ELTA_urban1": # update graph with real-time TMS data
+                RecReq.post_request_graph_tms(use_case_graph)
+
         else:
             data_request = methods.proccess_elta_event(evt_type, data, use_case_graph)
 
