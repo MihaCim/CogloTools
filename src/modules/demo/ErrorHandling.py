@@ -130,11 +130,11 @@ class ErrorHandling:
 
     def write_file(self, input_data):
         date_time_obj = datetime.datetime.now()
-        timestamp_str = date_time_obj.strftime("%d-%b-%Y_(%H:%M:%S)")
+        timestamp_str = date_time_obj.strftime("%d%b%Y_(%H_%M_%S)")
         logger_file = self.config_parser.get_logger_file()
 
 
-        filename = logger_file + '/requests_' + timestamp_str + '.json'
+        filename = logger_file + 'requests_' + timestamp_str + '.json'
         with open(filename, 'w') as outfile:
             json.dump(input_data, outfile)
 
